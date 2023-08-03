@@ -9,3 +9,4 @@ gcsfs
 git+https://github.com/streamlit/files-connection
 smtplib
 google-cloud-storage
+st_files_connection==1.0.0

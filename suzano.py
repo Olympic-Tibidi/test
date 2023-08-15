@@ -306,6 +306,7 @@ if gty==1:
                 st.dataframe(pd.DataFrame.from_dict(admin_bill_of_ladings).T)
             
             with admin_tab3:
+                st.write("LALALA")
                 st.markdown("SHIPMENT FILES")
                 shipment_tab1,shipment_tab2=st.tabs(["UPLOAD/PROCESS SHIPMENT FILE","SHIPMENT FILE DATABASE"])
                 with shipment_tab1:

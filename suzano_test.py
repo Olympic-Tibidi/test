@@ -2421,17 +2421,17 @@ if authentication_status:
  
     elif username == 'olysuzanodash':
         
-        Inventory=gcp_csv_to_df("olym_suzano", "Inventory.csv")
+        Inventory=gcp_csv_to_df(target_bucket, "Inventory.csv")
            
-        mill_info=json.loads(gcp_download("olym_suzano",rf"mill_info.json"))
-        inv1,inv2,inv3,inv4,inv5=st.tabs(["DAILY ACTION","REPORTS","EDI BANK","MAIN INVENTORY","SUZANO MILL SHIPMENT SCHEDULE/PROGRESS"])
+        mill_info=json.loads(gcp_download(target_bucket,rf"mill_info.json"))
+        inv1,inv2,inv3,inv4,inv5=st.tabs(["DAILY ACTION","SUZANO DAILY REPORTS","EDI BANK","MAIN INVENTORY","SUZANO MILL SHIPMENT SCHEDULE/PROGRESS"])
         with inv1:
-            data=gcp_download("olym_suzano",rf"terminal_bill_of_ladings.json")
+            data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
             bill_of_ladings=json.loads(data)
             daily1,daily2,daily3=st.tabs(["TODAY'SHIPMENTS","TRUCKS ENROUTE","TRUCKS AT DESTINATION"])
             with daily1:
                 now=datetime.datetime.now()-datetime.timedelta(hours=7)
-                st.markdown(f"**SHIPPED TODAY ON {datetime.datetime.strftime(now.date(),'%b %d, %Y')}**")     
+                st.markdown(f"**SHIPPED TODAY ON {datetime.datetime.strftime(now.date(),'%b %d, %Y')} - Indexed By Terminal Bill Of Lading**")     
                 df_bill=pd.DataFrame(bill_of_ladings).T
                 df_bill=df_bill[["vessel","release_order","destination","sales_order","ocean_bill_of_lading","grade","carrier_id","vehicle","quantity","issued"]]
                 df_bill.columns=["VESSEL","RELEASE ORDER","DESTINATION","SALES ORDER","OCEAN BILL OF LADING","GRADE","CARRIER ID","VEHICLE NO","QUANTITY (UNITS)","ISSUED"]
@@ -2487,20 +2487,33 @@ if authentication_status:
                 st.table(arrived_vehicles.T)
         
         with inv2:
+            @st.cache
+            def convert_df(df):
+                # IMPORTANT: Cache the conversion to prevent computation on every rerun
+                return df.to_csv().encode('utf-8')
             try:
-                suzano_report_=gcp_download("olym_suzano",rf"suzano_report.json")
+                now=datetime.datetime.now()-datetime.timedelta(hours=7)
+                suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
                 suzano_report=json.loads(suzano_report_)
                 suzano_report=pd.DataFrame(suzano_report).T
                 suzano_report=suzano_report[["Date Shipped","Vehicle", "Shipment ID #", "Consignee","Consignee City","Consignee State","Release #","Carrier","ETA","Ocean BOL#","Warehouse","Vessel","Voyage #","Grade","Quantity","Metric Ton", "ADMT","Mode of Transportation"]]
                 suzano_report["Shipment ID #"]=[str(i) for i in suzano_report["Shipment ID #"]]
-                st.dataframe(suzano_report)
+                daily_suzano=suzano_report.copy()
+                daily_suzano["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suzano_report["Date Shipped"]]
+                daily_suzano=daily_suzano[daily_suzano["Date"]==now.date()]
+                choose = st.radio(
+                                "Select Daily or Accumulative Report",
+                                ["DAILY", "ACCUMULATIVE"])
+                if choose=="DAILY":
+                    st.dataframe(daily_suzano)
+                    csv=convert_df(daily_suzano)
+                else:
+                    st.dataframe(suzano_report)
+                    csv=convert_df(suzano_report)
                 
-                @st.cache
-                def convert_df(df):
-                    # IMPORTANT: Cache the conversion to prevent computation on every rerun
-                    return df.to_csv().encode('utf-8')
                 
-                csv = convert_df(suzano_report)
+                
+               
                 
             
                 st.download_button(
@@ -2510,43 +2523,48 @@ if authentication_status:
                     mime='text/csv')
             except:
                 st.write("NO REPORTS RECORDED")
-           
+            
 
         with inv3:
-            edi_files=list_files_in_subfolder("olym_suzano", rf"EDIS/KIRKENES-2304/")
+            edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/KIRKENES-2304/")
             requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
             try:
-                requested_edi=gcp_download("olym_suzano", rf"EDIS/KIRKENES-2304/{requested_edi_file}")
+                requested_edi=gcp_download(target_bucket, rf"EDIS/KIRKENES-2304/{requested_edi_file}")
                 st.text_area("EDI",requested_edi,height=400)
+                st.download_button(
+                    label="DOWNLOAD EDI",
+                    data=requested_edi,
+                    file_name=f'{requested_edi_file}',
+                    mime='text/csv')
+
             except:
                 st.write("NO EDI FILES IN DIRECTORY")
             
 
-
             
         with inv4:
                  
-            dab1,dab2=st.tabs(["IN WAREHOUSE","SHIPPED"])
-            df=Inventory[(Inventory["Location"]=="OLYM")|(Inventory["Location"]=="PARTIAL")][["Lot","Bales","Batch","Ocean B/L","Grade","DryWeight","ADMT","Location","Warehouse_In"]]
-            zf=Inventory[(Inventory["Location"]=="ON TRUCK")|(Inventory["Location"]=="PARTIAL")][["Lot","Bales","Batch","Ocean B/L","Grade","DryWeight","ADMT","Release_Order_Number","Carrier_Code","Terminal B/L",
+            dab1,dab2=st.tabs(["IN WAREHOUSE","SHIPPED BY DATE"])
+            df=Inventory[(Inventory["Location"]=="OLYM")|(Inventory["Location"]=="PARTIAL")][["Lot","Bales","Shipped","Remaining","Batch","Ocean B/L","Grade","DryWeight","ADMT","Location","Warehouse_In"]]
+            zf=Inventory[(Inventory["Location"]=="ON TRUCK")|(Inventory["Location"]=="PARTIAL")][["Lot","Bales","Shipped","Remaining","Batch","Ocean B/L","Grade","DryWeight","ADMT","Release_Order_Number","Carrier_Code","Terminal B/L",
                                                           "Vehicle_Id","Warehouse_In","Warehouse_Out"]]
-            zf["Bales"]=[8-i if i<8 else i for i in zf["Bales"] ]
+       
             items=df["Ocean B/L"].unique().tolist()
             
             with dab1:
                 
                 inv_col1,inv_col2,inv_col3=st.columns([2,6,2])
                 with inv_col1:
-                    wrh=df["Bales"].sum()*250/1000
-                    shp=zf["Bales"].sum()*250/1000
+                    wrh=df["Remaining"].sum()*250/1000
+                    shp=zf["Shipped"].sum()*250/1000
                     
                     st.markdown(f"**IN WAREHOUSE = {wrh} tons**")
                     st.markdown(f"**TOTAL SHIPPED = {shp} tons**")
                     st.markdown(f"**TOTAL OVERALL = {wrh+shp} tons**")
                 with inv_col2:
                     #st.write(items)
-                    inhouse=[df[df["Ocean B/L"]==i]["Bales"].sum()*250/1000 for i in items]
-                    shipped=[zf[zf["Ocean B/L"]==i]["Bales"].sum()*250/1000 for i in items]
+                    inhouse=[df[df["Ocean B/L"]==i]["Remaining"].sum()*250/1000 for i in items]
+                    shipped=[df[df["Ocean B/L"]==i]["Shipped"].sum()*250/1000 for i in items]
                     
                     wrap_=[df[df["Ocean B/L"]==i]["Grade"].unique()[0] for i in items]
                    # st.write(wrap_)
@@ -2560,60 +2578,36 @@ if authentication_status:
                     st.dataframe(df)
             with dab2:
                 
-                date_filter=st.checkbox("CLICK FOR DATE FILTER")
-                if "disabled" not in st.session_state:
-                    st.session_state.visibility = "visible"
-                    st.session_state.disabled = True
-                if date_filter:
-                    st.session_state.disabled=False
-                    
-                else:
-                    st.session_state.disabled=True
-                    #min_value=min([i.date() for i in zf["Warehouse_Out"]])
-                filter_date=st.date_input("Choose Warehouse OUT Date",datetime.datetime.today(),min_value=None, max_value=None,disabled=st.session_state.disabled,key="filter_date")
+                
+                filter_date=st.date_input("Choose Warehouse OUT Date",datetime.datetime.today(),min_value=None, max_value=None,disabled=False,key="filter_date")
                 
                 
                
-                zf[["Release_Order_Number","Carrier_Code","Terminal Bill Of Lading","Vehicle_Id"]]=zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]].astype("str")
+                zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]]=zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]].astype("str")
                 
                 zf["Warehouse_Out"]=[datetime.datetime.strptime(j,"%Y-%m-%d %H:%M:%S") for j in zf["Warehouse_Out"]]
                 filtered_zf=zf.copy()
-                if date_filter:
-                    filtered_zf["Warehouse_Out"]=[i.date() for i in filtered_zf["Warehouse_Out"]]
-                    
-                    filtered_zf=filtered_zf[filtered_zf["Warehouse_Out"]==filter_date]
-                    
-                filter_by=st.selectbox("SELECT FILTER",["Grade","Ocean B/L","Release_Order_Number","Terminal B/L","Carrier_Code","Vehicle_Id"])
-                #st.write(filter_by)
-                choice=st.selectbox(f"Filter By {filter_by}",[f"ALL {filter_by.upper()}"]+[str(j) for j in [str(i) for i in filtered_zf[filter_by].unique().tolist()]])
                 
+                filtered_zf["Warehouse_Out"]=[i.date() for i in filtered_zf["Warehouse_Out"]]
+                    
+                filtered_zf=filtered_zf[filtered_zf["Warehouse_Out"]==filter_date]
+                    
                 
                 col1,col2=st.columns([2,8])
-                with col1:
-                    st.markdown(f"**TOTAL SHIPPED = {len(zf)}**")
-                    st.markdown(f"**IN WAREHOUSE = {len(df)}**")
-                    st.markdown(f"**TOTAL OVERALL = {len(zf)+len(df)}**")
-                try:
-                    filtered_zf=filtered_zf[filtered_zf[filter_by]==choice]
-                    filtered_df=filtered_zf[filtered_zf[filter_by]==choice]
-                    
-                except:
-                    filtered_zf=filtered_zf
-                    filtered_df=df.copy()
-                    
-                    pass
                 with col2:
-                    if date_filter:
-                        st.markdown(f"**SHIPPED ON THIS DAY = {len(filtered_zf)}**")
-                    else:
-                        st.markdown(f"**TOTAL SHIPPED = {len(filtered_zf)}**")
-                        st.markdown(f"**IN WAREHOUSE = {len(filtered_df)}**")
-                        st.markdown(f"**TOTAL OVERALL = {len(filtered_zf)+len(filtered_df)}**")
+                    st.dataframe(zf)
+                    
+                           
+                    
+                with col1:
+                    st.markdown(f"**SHIPPED ON THIS DAY = {zf['Shipped'].sum()*0.250} TONS**")
+                    
+                       
                     
                     
-                st.table(filtered_zf)
+               
         with inv5:
-            mill_progress=json.loads(gcp_download("olym_suzano",rf"mill_progress.json"))
+            mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
             reformed_dict = {}
             for outerKey, innerDict in mill_progress.items():
                 for innerKey, values in innerDict.items():

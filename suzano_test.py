@@ -355,7 +355,7 @@ if authentication_status:
                 mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
                 mill_df["New Product"]=mill_df["New Product"].astype(str)
                 #st.table(mill_df)
-                mill_tab1,mill_tab2=st.tabs(["CURRENT SCHEDULE","UPLOAD SCHEDULE"])
+                mill_tab1,mill_tab2,mill_tab3=st.tabs(["CURRENT SCHEDULE","UPLOAD SCHEDULE","MILL PROGRESS"])
                 with mill_tab1:
                     choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])
                     current_schedule.rename(columns={"Unnamed: 0":"Date"},inplace=True)  
@@ -1736,7 +1736,7 @@ if authentication_status:
                 mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
                 mill_df["New Product"]=mill_df["New Product"].astype(str)
                 #st.table(mill_df)
-                mill_tab1,mill_tab2=st.tabs(["CURRENT SCHEDULE","UPLOAD SCHEDULE"])
+                mill_tab1,mill_tab2=st.tabs(["TRUCK SCHEDULE","MILL PROGRESS"])
                 with mill_tab1:
                     choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])
                     current_schedule.rename(columns={"Unnamed: 0":"Date"},inplace=True)  
@@ -1758,95 +1758,97 @@ if authentication_status:
                                 totals=[sum(x) for x in zip(totals, current_schedule_str[i])]
                         current_schedule_str["Total"]=totals
                         st.dataframe(pd.DataFrame(current_schedule_str))
-                mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
-                reformed_dict = {}
-                for outerKey, innerDict in mill_progress.items():
-                    for innerKey, values in innerDict.items():
-                        reformed_dict[(outerKey,innerKey)] = values
-                mill_prog_col1,mill_prog_col2=st.columns([2,4])
-                with mill_prog_col1:
-                    st.dataframe(pd.DataFrame(reformed_dict).T)
-                with mill_prog_col2:
-                    chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
-                    mills = mill_progress.keys()
-                    targets = [mill_progress[i][chosen_month]["Planned"] for i in mills]
-                    shipped = [mill_progress[i][chosen_month]["Shipped"] for i in mills]
+                with mill_tab2:
                     
-                    # Create a figure with a horizontal bar chart
-                    fig = go.Figure()
+                    mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
+                    reformed_dict = {}
+                    for outerKey, innerDict in mill_progress.items():
+                        for innerKey, values in innerDict.items():
+                            reformed_dict[(outerKey,innerKey)] = values
+                    mill_prog_col1,mill_prog_col2=st.columns([2,4])
+                    with mill_prog_col1:
+                        st.dataframe(pd.DataFrame(reformed_dict).T)
+                    with mill_prog_col2:
+                        chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
+                        mills = mill_progress.keys()
+                        targets = [mill_progress[i][chosen_month]["Planned"] for i in mills]
+                        shipped = [mill_progress[i][chosen_month]["Shipped"] for i in mills]
+                        
+                        # Create a figure with a horizontal bar chart
+                        fig = go.Figure()
+                        
+                        for mill, target, shipped_qty in zip(mills, targets, shipped):
+                            fig.add_trace(
+                                go.Bar(
+                                    y=[mill],
+                                    x=[shipped_qty],  # Darker shade indicating shipped
+                                    orientation="h",
+                                    name="Shipped",
+                                    marker=dict(color='rgba(0, 128, 0, 0.7)')
+                                )
+                            )
+                            fig.add_trace(
+                                go.Bar(
+                                    y=[mill],
+                                    x=[target],  # Lighter shade indicating target
+                                    orientation="h",
+                                    name="Target",
+                                    marker=dict(color='rgba(0, 128, 0, 0.3)')
+                                )
+                            )
+                        
+                        # Customize the layout
+                        fig.update_layout(
+                                    barmode='stack',  # Stack the bars on top of each other
+                                    xaxis_title="Quantity",
+                                    yaxis_title="Mills",
+                                    title=f"Monthly Targets and Shipped Quantities - {chosen_month}",
+                                    legend=dict(
+                                        x=1.02,  # Move the legend to the right
+                                        y=1.0,
+                                        xanchor="left",  # Adjust legend position
+                                        yanchor="top",
+                                        font=dict(size=12)  # Increase legend font size
+                                    ),
+                                    xaxis=dict(tickfont=dict(size=10)),  # Increase x-axis tick label font size
+                                    yaxis=dict(tickfont=dict(size=12)),  # Increase y-axis tick label font size
+                                    title_font=dict(size=16),  # Increase title font size and weight
+                                     height=600,  # Adjust the height of the chart (in pixels)
+                                    width=800 
+                                )
+        
+                        st.plotly_chart(fig)
+    
+                    requested_mill=st.selectbox("**SELECT MILL TO SEE PROGRESS**",mill_progress.keys())
+                    def cust_business_days(start, end):
+                        business_days = pd.date_range(start=start, end=end, freq='B')
+                        return business_days
+                    target=mill_progress[requested_mill]["SEP 2023"]["Planned"]
+                    shipped=mill_progress[requested_mill]["SEP 2023"]["Shipped"]
+                    daily_needed_rate=int(target/len(cust_business_days(datetime.date(2023,9,1),datetime.date(2023,10,1))))
+                    days_passed=len(cust_business_days(datetime.date(2023,8,1),datetime.datetime.today()))
+                    days_left=len(cust_business_days(datetime.datetime.today(),datetime.date(2023,9,1)))
+                    #shipped=800
+                    reference=daily_needed_rate*days_passed
                     
-                    for mill, target, shipped_qty in zip(mills, targets, shipped):
-                        fig.add_trace(
-                            go.Bar(
-                                y=[mill],
-                                x=[shipped_qty],  # Darker shade indicating shipped
-                                orientation="h",
-                                name="Shipped",
-                                marker=dict(color='rgba(0, 128, 0, 0.7)')
-                            )
-                        )
-                        fig.add_trace(
-                            go.Bar(
-                                y=[mill],
-                                x=[target],  # Lighter shade indicating target
-                                orientation="h",
-                                name="Target",
-                                marker=dict(color='rgba(0, 128, 0, 0.3)')
-                            )
-                        )
-                    
-                    # Customize the layout
-                    fig.update_layout(
-                                barmode='stack',  # Stack the bars on top of each other
-                                xaxis_title="Quantity",
-                                yaxis_title="Mills",
-                                title=f"Monthly Targets and Shipped Quantities - {chosen_month}",
-                                legend=dict(
-                                    x=1.02,  # Move the legend to the right
-                                    y=1.0,
-                                    xanchor="left",  # Adjust legend position
-                                    yanchor="top",
-                                    font=dict(size=12)  # Increase legend font size
-                                ),
-                                xaxis=dict(tickfont=dict(size=10)),  # Increase x-axis tick label font size
-                                yaxis=dict(tickfont=dict(size=12)),  # Increase y-axis tick label font size
-                                title_font=dict(size=16),  # Increase title font size and weight
-                                 height=600,  # Adjust the height of the chart (in pixels)
-                                width=800 
-                            )
+                   
+                    fig = go.Figure(go.Indicator(
+                            domain = {'x': [0, 1], 'y': [0, 1]},
+                            value = shipped,
+                            mode = "gauge+number+delta",
+                            title={'text': f"<span style='font-weight:bold; color:blue;'>TONS SHIPPED TO {requested_mill} - SEPT TARGET {target} MT</span>", 'font': {'size': 20}},
+                            delta = {'reference': reference},
+                            gauge = {'axis': {'range': [None, target]},
+                                     'steps' : [
+                                         {'range': [0, reference], 'color': "lightgray"},
+                                      ],
+                                     'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': target}}))
     
                     st.plotly_chart(fig)
-
-                requested_mill=st.selectbox("**SELECT MILL TO SEE PROGRESS**",mill_progress.keys())
-                def cust_business_days(start, end):
-                    business_days = pd.date_range(start=start, end=end, freq='B')
-                    return business_days
-                target=mill_progress[requested_mill]["SEP 2023"]["Planned"]
-                shipped=mill_progress[requested_mill]["SEP 2023"]["Shipped"]
-                daily_needed_rate=int(target/len(cust_business_days(datetime.date(2023,9,1),datetime.date(2023,10,1))))
-                days_passed=len(cust_business_days(datetime.date(2023,8,1),datetime.datetime.today()))
-                days_left=len(cust_business_days(datetime.datetime.today(),datetime.date(2023,9,1)))
-                #shipped=800
-                reference=daily_needed_rate*days_passed
-                
-               
-                fig = go.Figure(go.Indicator(
-                        domain = {'x': [0, 1], 'y': [0, 1]},
-                        value = shipped,
-                        mode = "gauge+number+delta",
-                        title={'text': f"<span style='font-weight:bold; color:blue;'>TONS SHIPPED TO {requested_mill} - SEPT TARGET {target} MT</span>", 'font': {'size': 20}},
-                        delta = {'reference': reference},
-                        gauge = {'axis': {'range': [None, target]},
-                                 'steps' : [
-                                     {'range': [0, reference], 'color': "lightgray"},
-                                  ],
-                                 'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': target}}))
-
-                st.plotly_chart(fig)
-
-                st.markdown(f"**SHOULD HAVE SHIPPED SO FAR : {reference} TONS (GRAY SHADE ON CHART)**")
-                st.markdown(f"**SHIPPED SO FAR : {shipped} TONS (GREEN LINE ON CHART) - DAYS PASSED : {days_passed}**")
-                st.markdown(f"**LEFT TO GO : {target-shipped} TONS (WHITE SHADE)- DAYS TO GO : {days_left}**")
+    
+                    st.markdown(f"**SHOULD HAVE SHIPPED SO FAR : {reference} TONS (GRAY SHADE ON CHART)**")
+                    st.markdown(f"**SHIPPED SO FAR : {shipped} TONS (GREEN LINE ON CHART) - DAYS PASSED : {days_passed}**")
+                    st.markdown(f"**LEFT TO GO : {target-shipped} TONS (WHITE SHADE)- DAYS TO GO : {days_left}**")
                 
                 
 

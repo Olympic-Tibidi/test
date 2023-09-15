@@ -403,7 +403,7 @@ if authentication_status:
                                         date_indexs.append(i)
                                 except:
                                     pass
-                        for j in range(1,6):
+                       for j in range(1,6):
     
     
                             for i in date_indexs[:-1]:
@@ -421,11 +421,17 @@ if authentication_status:
                                             plan[key]={}
                                             plan[key][location]=schedule.loc[k,j]
                         
-                            for k in range(date_indexs[-1],len(schedule)):        
-                                    if schedule.loc[k,0] in locations:
-                                        location=schedule.loc[k,0]
-                                        plan[schedule.loc[date_indexs[-1],j]]={}
-                                        plan[schedule.loc[date_indexs[-1],j]]={location:schedule.loc[k,j]}
+                            for k in range(date_indexs[-1],len(schedule)):  
+                                
+                                if schedule.loc[k,0] in locations:
+                                    location=schedule.loc[k,0]
+                                    key=schedule.loc[date_indexs[-1],j]
+                                    try:
+                                        plan[key][location]=schedule.loc[k,j]
+                                    except:
+                                        plan[key]={}
+                                        plan[key][location]=schedule.loc[k,j]
+            
                         df=pd.DataFrame(plan).T.sort_index().fillna("0")
                         dates=[datetime.datetime.strftime(i,"%b %d,%A") for i in df.index]
                         df.index=dates

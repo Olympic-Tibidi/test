@@ -1729,6 +1729,35 @@ if authentication_status:
                         
                    
             with inv5:
+                current_schedule=gcp_csv_to_df(target_bucket, "truck_schedule.csv")
+                mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
+                mill_shipments=json.loads(mill_shipments)
+                mill_df=pd.DataFrame.from_dict(mill_shipments).T
+                mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
+                mill_df["New Product"]=mill_df["New Product"].astype(str)
+                #st.table(mill_df)
+                mill_tab1,mill_tab2=st.tabs(["CURRENT SCHEDULE","UPLOAD SCHEDULE"])
+                with mill_tab1:
+                    choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])
+                    current_schedule.rename(columns={"Unnamed: 0":"Date"},inplace=True)  
+                    current_schedule.set_index("Date",drop=True,inplace=True)
+                    current_schedule_str=current_schedule.copy()
+                    if choice=="TRUCKS":
+                        st.markdown("**TRUCKS**")                        
+                        st.dataframe(pd.DataFrame(current_schedule_str))
+                    else:
+                        st.markdown("**TONS**")
+                        totals=[0]*len(current_schedule)
+                        for i in current_schedule_str.columns[:-1]:
+                            
+                            if i in ["Wauna, Oregon","Halsey, Oregon"]:
+                                current_schedule_str[i]=current_schedule_str[i]*28
+                                totals=[sum(x) for x in zip(totals, current_schedule_str[i])]
+                            else:
+                                current_schedule_str[i]=current_schedule_str[i]*20
+                                totals=[sum(x) for x in zip(totals, current_schedule_str[i])]
+                        current_schedule_str["Total"]=totals
+                        st.dataframe(pd.DataFrame(current_schedule_str))
                 mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
                 reformed_dict = {}
                 for outerKey, innerDict in mill_progress.items():

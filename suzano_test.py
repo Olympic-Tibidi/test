@@ -522,7 +522,7 @@ if authentication_status:
                                 st.write(f"Uploaded {gemi}-{voyage}-shipping_file.csv to database")
                         st.dataframe(new_df)
                     with shipment_tab2:
-                        folder_name = "olym_suzano/shipping_files"  # Replace this with the folder path you want to read
+                        folder_name = "olym_suzano_test/shipping_files"  # Replace this with the folder path you want to read
                         files_in_folder = list_files_in_folder(target_bucket, "shipping_files")
                         requested_file=st.selectbox("SHIPPING FILES IN DATABASE",files_in_folder[1:])
                         if st.button("LOAD SHIPPING FILE"):
@@ -535,7 +535,7 @@ if authentication_status:
             with admin_tab1:
                 carrier_list_=gcp_download(target_bucket,rf"carrier.json")
                 carrier_list=json.loads(carrier_list_)
-                junk=gcp_download("olym_suzano",rf"junk_release.json")
+                junk=gcp_download(target_bucket,rf"junk_release.json")
                 junk=json.loads(junk)
                 try:
                     release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
@@ -1645,10 +1645,10 @@ if authentication_status:
                 
 
             with inv3:
-                edi_files=list_files_in_subfolder("olym_suzano", rf"EDIS/KIRKENES-2304/")
+                edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/KIRKENES-2304/")
                 requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
                 try:
-                    requested_edi=gcp_download("olym_suzano", rf"EDIS/KIRKENES-2304/{requested_edi_file}")
+                    requested_edi=gcp_download(target_bucket, rf"EDIS/KIRKENES-2304/{requested_edi_file}")
                     st.text_area("EDI",requested_edi,height=400)
                     st.download_button(
                         label="DOWNLOAD EDI",
@@ -1726,7 +1726,7 @@ if authentication_status:
                         
                    
             with inv5:
-                mill_progress=json.loads(gcp_download("olym_suzano",rf"mill_progress.json"))
+                mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
                 reformed_dict = {}
                 for outerKey, innerDict in mill_progress.items():
                     for innerKey, values in innerDict.items():

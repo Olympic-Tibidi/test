@@ -312,7 +312,7 @@ name, authentication_status, username = authenticator.login('PORT OF OLYMPIA TOS
 
 if authentication_status:
     authenticator.logout('Logout', 'main')
-    if username == 'ayilmaz' or username=='gatehouse':
+    if username == 'ayilmaz' or username=='gatehouse' or username=='visitor':
         st.subheader("PORT OF OLYMPIA TOS")
         st.write(f'Welcome *{name}*')
         select=st.sidebar.radio("SELECT FUNCTION",

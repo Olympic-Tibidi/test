@@ -480,7 +480,7 @@ if authentication_status:
                                                                                          df.loc[i,column],truck_size)
                         df=df.replace(0,"")
                         for i in df.columns:
-                            df[i]=[(0,j) for j in df[i].values if j >0]
+                            df[i]=[(0,j) for j in df[i].values if j is not None]
 
 
                         for i in report:

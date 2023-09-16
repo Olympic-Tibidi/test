@@ -514,7 +514,7 @@ if authentication_status:
                     #current_schedule_str=current_schedule.copy()
                     if choice=="TRUCKS":
                         st.markdown("**TRUCKS**")                        
-                        st.dataframe(pd.DataFrame(current_schedule))
+                        st.dataframe(current_schedule)
                     else:
                         st.markdown("**TONS**")
                         totals=[0]*len(current_schedule)

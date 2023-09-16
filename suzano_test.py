@@ -509,7 +509,9 @@ if authentication_status:
                 with mill_tab1:
                     current_schedule,zf=process_schedule()
                     choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])
-                    #current_schedule.rename(columns={"Unnamed: 0":"Date"},inplace=True)  
+                    #dates=[i.date() for i on current_schedule.index]
+                    #current_schedule["Date"]=dates
+                    current_schedule.index=[i.date() for i in current_schedule.index]
                     #current_schedule.set_index("Date",drop=True,inplace=True)
                     #current_schedule_str=current_schedule.copy()
                     if choice=="TRUCKS":

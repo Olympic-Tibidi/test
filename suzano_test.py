@@ -357,11 +357,11 @@ if authentication_status:
             with admin_tab5:
                 #schedule=gcp_download_x(target_bucket,rf"truck_schedule.xlsx","schedule.xlsx")
                 #schedule=pd.read_excel(schedule,header=None,index_col=None)
-                schedule=gcp_csv_to_df(target_bucket, rf"truck_schedule.xlsx")
+                #schedule=gcp_csv_to_df(target_bucket, rf"truck_schedule.xlsx")
                 
-                schedule=schedule.dropna(0, how="all")
-                schedule.reset_index(drop=True,inplace=True)
-                report=json.loads(gcp_download(target_bucket,rf"suzano_report.json"))
+                #schedule=schedule.dropna(0, how="all")
+                #schedule.reset_index(drop=True,inplace=True)
+               # report=json.loads(gcp_download(target_bucket,rf"suzano_report.json"))
                 
                 def process_schedule():
                     class Mill:
@@ -497,12 +497,12 @@ if authentication_status:
                 mill_tab1,mill_tab2,mill_tab3=st.tabs(["CURRENT SCHEDULE","UPLOAD SCHEDULE","MILL PROGRESS"])
                 with mill_tab1:
                     choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])
-                    current_schedule.rename(columns={"Unnamed: 0":"Date"},inplace=True)  
-                    current_schedule.set_index("Date",drop=True,inplace=True)
-                    current_schedule_str=current_schedule.copy()
+                    #current_schedule.rename(columns={"Unnamed: 0":"Date"},inplace=True)  
+                    #current_schedule.set_index("Date",drop=True,inplace=True)
+                    #current_schedule_str=current_schedule.copy()
                     if choice=="TRUCKS":
                         st.markdown("**TRUCKS**")                        
-                        st.dataframe(pd.DataFrame(current_schedule_str))
+                        #st.dataframe(pd.DataFrame(current_schedule_str))
                     else:
                         st.markdown("**TONS**")
                         totals=[0]*len(current_schedule)

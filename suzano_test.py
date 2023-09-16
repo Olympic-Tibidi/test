@@ -140,6 +140,7 @@ def upload_xl_file(bucket_name, uploaded_file, destination_blob_name):
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
+    uploaded_file.seek(0)
 
     # Upload the file from the file object provided by st.file_uploader
     blob.upload_from_file(uploaded_file)

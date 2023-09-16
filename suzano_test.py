@@ -365,12 +365,12 @@ if authentication_status:
             with admin_tab5:
                 schedule=gcp_download_x(target_bucket,rf"truck_schedule.xlsx","schedule.xlsx")
                 schedule=pd.read_excel(schedule,sheet_name="SEPTEMBER",header=None,index_col=None)
-                #schedule=pd.read_excel(schedule,header=None,index_col=None)
-                #schedule=gcp_csv_to_df(target_bucket, rf"truck_schedule.xlsx")
-                
-                #schedule=schedule.dropna(0, how="all")
-                #schedule.reset_index(drop=True,inplace=True)
                 report=json.loads(gcp_download(target_bucket,rf"suzano_report.json"))
+                locations=[ 'GP WAUNA - OR',
+                                 'GP HALSEY - OR',
+                                 'CLEARWATER - LEWISTON ID',
+                                 'KROGER - BC',
+                                 'WILLAMETTE FALLS - OR']  
                 
                 def process_schedule():
                     class Mill:
@@ -495,36 +495,38 @@ if authentication_status:
                     #st.dataframe(df.style.apply(color_coding, axis=1))
                     df=df.style.applymap(lambda x: f"color: {'red' if isinstance(x,str) else 'black'}")
                     return df,zf
-                df,zf=process_schedule()
-                st.dataframe(df)
+                
 
-                mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
-                mill_shipments=json.loads(mill_shipments)
-                mill_df=pd.DataFrame.from_dict(mill_shipments).T
-                mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
-                mill_df["New Product"]=mill_df["New Product"].astype(str)
-                #st.table(mill_df)
+                
                 mill_tab1,mill_tab2,mill_tab3=st.tabs(["CURRENT SCHEDULE","UPLOAD SCHEDULE","MILL PROGRESS"])
+                with mill_tab3:
+                    mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
+                    mill_shipments=json.loads(mill_shipments)
+                    mill_df=pd.DataFrame.from_dict(mill_shipments).T
+                    mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
+                    mill_df["New Product"]=mill_df["New Product"].astype(str)
+                    #st.table(mill_df)
                 with mill_tab1:
+                    current_schedule,zf=process_schedule()
                     choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])
                     #current_schedule.rename(columns={"Unnamed: 0":"Date"},inplace=True)  
                     #current_schedule.set_index("Date",drop=True,inplace=True)
                     #current_schedule_str=current_schedule.copy()
                     if choice=="TRUCKS":
                         st.markdown("**TRUCKS**")                        
-                        #st.dataframe(pd.DataFrame(current_schedule_str))
+                        st.dataframe(pd.DataFrame(current_schedule))
                     else:
                         st.markdown("**TONS**")
                         totals=[0]*len(current_schedule)
-                        for i in current_schedule_str.columns[:-1]:
+                        for i in current_schedule.columns[:-1]:
                             
                             if i in ["Wauna, Oregon","Halsey, Oregon"]:
-                                current_schedule_str[i]=current_schedule_str[i]*28
-                                totals=[sum(x) for x in zip(totals, current_schedule_str[i])]
+                                current_schedule[i]=current_schedule_str[i]*28
+                                totals=[sum(x) for x in zip(totals, current_schedule[i])]
                             else:
-                                current_schedule_str[i]=current_schedule_str[i]*20
-                                totals=[sum(x) for x in zip(totals, current_schedule_str[i])]
-                        current_schedule_str["Total"]=totals
+                                current_schedule[i]=current_schedule[i]*20
+                                totals=[sum(x) for x in zip(totals, current_schedule[i])]
+                        current_schedule["Total"]=totals
                         st.dataframe(pd.DataFrame(current_schedule_str))
                                 
                     

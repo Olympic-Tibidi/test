@@ -389,56 +389,11 @@ if authentication_status:
                 with mill_tab2:                    
                     uploaded_file = st.file_uploader("Choose a file",key="pdods")
                     if uploaded_file is not None:
-                        
+                        schedule=pd.ExcelFile(uploaded_file)
+                        st.write(schedule.sheet_names)                        
                         schedule=pd.read_excel(uploaded_file,sheet_name="SEPTEMBER",header=None,index_col=None)
                         schedule=schedule.dropna(0, how="all")
-                        schedule.reset_index(drop=True,inplace=True)
-                        locations=[ 'GP WAUNA - OR', 'GP HALSEY - OR', 'CLEARWATER - LEWISTON ID', 'KROGER - BC', 'WILLAMETTE FALLS - OR']
-                        date_indexs=[]
-                        plan={}
-                        for i in schedule.index:
-                                try:
-                                    if schedule.loc[i,1].date():
-                                        #print(i)
-                                        date_indexs.append(i)
-                                except:
-                                    pass
-                        for j in range(1,6):
-                            
-    
-    
-                            for i in date_indexs[:-1]:
-                                #print(i)
-                                for k in range(i+1,date_indexs[date_indexs.index(i)+1]):
-                                    #print(k)
-                                    if schedule.loc[k,0] in locations:
-                                        location=schedule.loc[k,0]
-                                        #print(location)
-                                        key=schedule.loc[i,j]
-                                        #print(key)            
-                                        try:
-                                            plan[key][location]=schedule.loc[k,j]
-                                        except:
-                                            plan[key]={}
-                                            plan[key][location]=schedule.loc[k,j]
                         
-                            for k in range(date_indexs[-1],len(schedule)):  
-                                
-                                if schedule.loc[k,0] in locations:
-                                    location=schedule.loc[k,0]
-                                    key=schedule.loc[date_indexs[-1],j]
-                                    try:
-                                        plan[key][location]=schedule.loc[k,j]
-                                    except:
-                                        plan[key]={}
-                                        plan[key][location]=schedule.loc[k,j]
-            
-                        df=pd.DataFrame(plan).T.sort_index().fillna("0")
-                        dates=[datetime.datetime.strftime(i,"%b %d,%A") for i in df.index]
-                        df.index=dates
-                        df=df.astype(int)
-                        df["Total"]=df.sum(axis=1)
-                        st.table(df)
                         if st.button("UPDATE DATABASE WITH NEW SCHEDULE",key="lolos"):
                             
                             temp=df.to_csv("temp.csv")

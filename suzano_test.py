@@ -478,7 +478,7 @@ if authentication_status:
                                     truck_size=28 if column in ['GP WAUNA - OR','GP HALSEY - OR'] else 20
                                     location_dict[column][i.to_pydatetime().date()]=Mill(column,i.to_pydatetime().date(),
                                                                                          df.loc[i,column],truck_size)
-                        df=df.replace(0,"")
+                        #df=df.replace(0,"")
                         for i in df.columns:
                             df[i]=[(0,j) if j is not None else "" for j in df[i].values ]
 

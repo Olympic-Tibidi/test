@@ -511,9 +511,10 @@ if authentication_status:
                 with mill_tab1:
                     current_schedule,zf=process_schedule()
                     current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
-                    def elementwise_sum(t1, t2):
-                        return (t1[0] + t2[0]+ t3[0]+ t4[0]+ 52[0], t1[1] + t2[1])
-                    current_schedule["Total"]=current_schedule['CLEARWATER - LEWISTON ID']+current_schedule['GP HALSEY - OR']
+                    def elementwise_sum(t1, t2,t3,t4,t5):
+                        return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])
+                    current_schedule["Total"]= current_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'],
+                                                                                                  row['WILLAMETTE FALLS - OR']),axis=1)
                     choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])                   
                    
                     if choice=="TRUCKS":

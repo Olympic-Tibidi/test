@@ -112,6 +112,13 @@ def gcp_download(bucket_name, source_file_name):
     blob = bucket.blob(source_file_name)
     data = blob.download_as_text()
     return data
+    
+def gcp_download_x(bucket_name, source_file_name):
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(source_file_name)
+    data = blob.download_as_bytes()
+    return data
 
 def gcp_csv_to_df(bucket_name, source_file_name):
     storage_client = storage.Client()

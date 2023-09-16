@@ -1846,35 +1846,198 @@ if authentication_status:
                         
                    
             with inv5:
-                current_schedule=gcp_csv_to_df(target_bucket, "truck_schedule.csv")
-                mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
-                mill_shipments=json.loads(mill_shipments)
-                mill_df=pd.DataFrame.from_dict(mill_shipments).T
-                mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
-                mill_df["New Product"]=mill_df["New Product"].astype(str)
-                #st.table(mill_df)
-                mill_tab1,mill_tab2=st.tabs(["TRUCK SCHEDULE","MILL PROGRESS"])
-                with mill_tab1:
-                    choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])
-                    current_schedule.rename(columns={"Unnamed: 0":"Date"},inplace=True)  
-                    current_schedule.set_index("Date",drop=True,inplace=True)
-                    current_schedule_str=current_schedule.copy()
-                    if choice=="TRUCKS":
-                        st.markdown("**TRUCKS**")                        
-                        st.dataframe(pd.DataFrame(current_schedule_str))
-                    else:
-                        st.markdown("**TONS**")
-                        totals=[0]*len(current_schedule)
-                        for i in current_schedule_str.columns[:-1]:
+                schedule=gcp_download_x(target_bucket,rf"truck_schedule.xlsx","schedule.xlsx")
+                schedule=pd.read_excel(schedule,sheet_name="SEPTEMBER",header=None,index_col=None)
+                report=json.loads(gcp_download(target_bucket,rf"suzano_report.json"))
+                locations=[ 'GP WAUNA - OR',
+                                 'GP HALSEY - OR',
+                                 'CLEARWATER - LEWISTON ID',
+                                 'KROGER - BC',
+                                 'WILLAMETTE FALLS - OR']  
+                
+                def process_schedule():
+                    class Mill:
+                        def __init__(self, location, date, number_of_trucks, truck_size):
                             
-                            if i in ["Wauna, Oregon","Halsey, Oregon"]:
-                                current_schedule_str[i]=current_schedule_str[i]*28
-                                totals=[sum(x) for x in zip(totals, current_schedule_str[i])]
+                            self.location = location
+                            self.date = date
+                            self.number_of_trucks = number_of_trucks
+                            self.truck_size = truck_size
+                            self.total=number_of_trucks*truck_size
+                            self.shipped_quantity = 0
+                            self.remaining=self.total
+                        def ship(self, quantity_shipped):
+                            if quantity_shipped <= self.remaining_quantity():
+                                self.shipped_quantity += quantity_shipped
                             else:
-                                current_schedule_str[i]=current_schedule_str[i]*20
-                                totals=[sum(x) for x in zip(totals, current_schedule_str[i])]
-                        current_schedule_str["Total"]=totals
-                        st.dataframe(pd.DataFrame(current_schedule_str))
+                                print("Error: Quantity exceeds remaining quantity.")
+                    
+                        def remaining_quantity(self):
+                            # Calculate the remaining quantity based on the number of trucks and shipped quantity
+                            return self.number_of_trucks * self.truck_size - self.shipped_quantity
+                    
+                        def __str__(self):
+                            return f" Location: {self.location}, Date: {self.date}, " \
+                                   f"Trucks: {self.number_of_trucks}, Size: {self.truck_size}, " \
+                                   f"Shipped Quantity: {self.shipped_quantity}"
+                    consignee_dict={"Lewiston":'CLEARWATER - LEWISTON ID',"West  Linn":'WILLAMETTE FALLS - OR',
+                                    "Clatskanie":'GP WAUNA - OR',"Halsey":'GP HALSEY - OR',"New Westminster":'KROGER - BC'}
+                    locations=[ 'GP WAUNA - OR',
+                                 'GP HALSEY - OR',
+                                 'CLEARWATER - LEWISTON ID',
+                                 'KROGER - BC',
+                                 'WILLAMETTE FALLS - OR']       
+                    date_indexs=[]
+                    plan={}
+                    for i in schedule.index:
+                            try:
+                                if schedule.loc[i,1].date():
+                                    #print(i)
+                                    date_indexs.append(i)
+                            except:
+                                pass
+                    for j in range(1,6):
+                        
+                        
+                        for i in date_indexs[:-1]:
+                            #print(i)
+                            for k in range(i+1,date_indexs[date_indexs.index(i)+1]):
+                                #print(k)
+                                if schedule.loc[k,0] in locations:
+                                    location=schedule.loc[k,0]
+                                    #print(location)
+                                    key=schedule.loc[i,j]
+                                    #print(key)            
+                                    try:
+                                        plan[key][location]=schedule.loc[k,j]
+                                    except:
+                                        plan[key]={}
+                                        plan[key][location]=schedule.loc[k,j]
+                    
+                        for k in range(date_indexs[-1],len(schedule)):  
+                            
+                            if schedule.loc[k,0] in locations:
+                                location=schedule.loc[k,0]
+                                key=schedule.loc[date_indexs[-1],j]
+                                try:
+                                    plan[key][location]=schedule.loc[k,j]
+                                except:
+                                    plan[key]={}
+                                    plan[key][location]=schedule.loc[k,j]
+                                    
+                    df=pd.DataFrame(plan).T.sort_index()
+                    zf=df.copy()
+                    location_dict={'GP WAUNA - OR':{},'GP HALSEY - OR':{},'CLEARWATER - LEWISTON ID':{},
+                                   'KROGER - BC':{},'WILLAMETTE FALLS - OR':{}}
+                    
+                    for column in df.columns:
+                        for i in df.index:
+                            #print(i.to_pydatetime().date())
+                            if df.loc[i,column]>0:
+                                #print(df.loc[i,column])
+                                truck_size=28 if column in ['GP WAUNA - OR','GP HALSEY - OR'] else 20
+                                location_dict[column][i.to_pydatetime().date()]=Mill(column,i.to_pydatetime().date(),
+                                                                                     df.loc[i,column],truck_size)
+                    #df=df.replace(0,"")
+                    for i in df.columns:
+                        df[i]=[(0,j) if j is not None else "" for j in df[i].values ]
+    
+    
+                    for i in report:
+                        #print(datetime.datetime.strptime(report[i]["Date Shipped"],"%Y-%m-%d %H:%M:%S").date())
+                        #print(report[i]["Metric Ton"])
+                        where=consignee_dict[report[i]["Consignee City"]]
+                        when=datetime.datetime.strptime(report[i]["Date Shipped"],"%Y-%m-%d %H:%M:%S").date()
+                        qt=report[i]["Metric Ton"]
+                        #print(when)
+                        if location_dict[where][when]:
+                            
+                            location_dict[where][when].shipped_quantity+=qt
+                            location_dict[where][when].remaining-=qt
+                    for i in df.columns:
+                        for k in df.index:
+                            #print(k.date())
+                            try:
+                                shipped=location_dict[i][k.date()].shipped_quantity
+                                remaining=location_dict[i][k.date()].remaining
+                                truck_size=location_dict[i][k.date()].truck_size
+                                #print(truck_size)
+                                if shipped>0:
+                                    
+                                    if df.loc[k,i][1] >0:                                       
+                                        
+                                        a=(int(df.loc[k,i][0]+shipped/truck_size),df.loc[k,i][1])
+                                        df.at[k,i]=a
+                                        
+                                
+                            except:
+                                pass
+                        #print(location_dict[i])
+                    def color_coding(row):
+                        return ['color:red'] * len(row) if row['CLEARWATER - LEWISTON ID'] == (5,5) else ['color:green'] * len(row)
+                    #st.dataframe(df.style.apply(color_coding, axis=1))
+                    #df=df.style.applymap(lambda x: f"color: {'red' if isinstance(x,str) else 'black'}")
+                    return df,zf
+                
+
+                
+                mill_tab1,mill_tab2,mill_tab3=st.tabs(["CURRENT SCHEDULE","UPLOAD SCHEDULE","MILL PROGRESS"])
+                
+                with mill_tab3:
+                    mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
+                    mill_shipments=json.loads(mill_shipments)
+                    mill_df=pd.DataFrame.from_dict(mill_shipments).T
+                    mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
+                    mill_df["New Product"]=mill_df["New Product"].astype(str)
+                    #st.table(mill_df)
+                
+                with mill_tab1:
+                    current_schedule,zf=process_schedule()
+                    current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
+                    def elementwise_sum(t1, t2,t3,t4,t5):
+                        return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])
+                    truck_schedule=current_schedule.copy()
+                    ton_schedule=current_schedule.copy()
+                    truck_schedule["Total"]= truck_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
+                    choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])                   
+                   
+                    if choice=="TRUCKS":
+                        st.markdown("**TRUCKS - (Actual # of Loaded Trucks,Planned # of Trucks)**")                    
+                        st.table(truck_schedule)
+                    else:
+                        st.markdown("**TONS - (Actual Shipped Tonnage,Planned Tonnage)**")
+                        totals=[0]*len(ton_schedule)
+                        for ix in ton_schedule.index:
+                            for i in ton_schedule.columns:
+                                if i in [ 'GP WAUNA - OR','GP HALSEY - OR']:
+                                    ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*28,ton_schedule.loc[ix,i][1]*28)
+                             
+                                else:
+                                    ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*20,ton_schedule.loc[ix,i][1]*20)
+                        ton_schedule["Total"]= ton_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
+                    
+                        st.table(pd.DataFrame(ton_schedule))
+                                
+                    
+                    
+                    #current_schedule_str.index = pd.to_datetime(current_schedule_str.index)
+                    #dates=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S") for i in current_schedule_str.index]#datetime.datetime.strftime(i,"%b %d,%A")
+                    #current_schedule_str.index=dates
+                    
+                    
+                
+                with mill_tab2:                    
+                    
+                    
+                    uploaded_file = st.file_uploader("Choose a file",key="pdods")
+                    if uploaded_file is not None:
+                        schedule=pd.ExcelFile(uploaded_file)
+                        st.write(schedule.sheet_names)                        
+                        schedule=pd.read_excel(uploaded_file,sheet_name="SEPTEMBER",header=None,index_col=None)
+                        schedule=schedule.dropna(0, how="all")
+                        schedule.reset_index(drop=True,inplace=True)
+                        df,zf=process_schedule()
+                        st.write(df)
                 with mill_tab2:
                     
                     mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))

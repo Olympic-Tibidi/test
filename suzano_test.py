@@ -513,6 +513,7 @@ if authentication_status:
                                 except:
                                     pass
                             #print(location_dict[i])
+                        df=df.replace((0,0),"")
                         st.write(df)
 
                         if st.button("UPDATE DATABASE WITH NEW SCHEDULE",key="lolos"):

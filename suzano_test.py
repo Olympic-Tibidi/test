@@ -513,7 +513,9 @@ if authentication_status:
                                 except:
                                     pass
                             #print(location_dict[i])
-                  
+                        def color_coding(row):
+                                return ['background-color:red'] * len(row) if row.col1 == 2 else ['background-color:green'] * len(row)
+                        st.dataframe(df.style.apply(color_coding, axis=1))
                         st.write(df)
 
                         if st.button("UPDATE DATABASE WITH NEW SCHEDULE",key="lolos"):

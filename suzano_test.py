@@ -518,14 +518,14 @@ if authentication_status:
                     else:
                         st.markdown("**TONS**")
                         totals=[0]*len(current_schedule)
-                        for i in current_schedule.columns[:-1]:
-                            
-                            if i in [ 'GP WAUNA - OR','GP HALSEY - OR']:
-                                current_schedule[i]=(current_schedule[i][0]*28,current_schedule[i][1]*28)
+                        for ix in current_schedule.index:
+                            for i in current_schedule.columns:
+                                if i in [ 'GP WAUNA - OR','GP HALSEY - OR']:
+                                    current_schedule.at[ix,i]=(current_schedule.loc[ix,i][0]*28,current_schedule.loc[ix,i][1]*28)
                                 #totals=[sum(x) for x in zip(totals, current_schedule[i])]
-                            else:
-                                current_schedule[i]=(current_schedule[i][0]*20,current_schedule[i][1]*20)
-                                #totals=[sum(x) for x in zip(totals, current_schedule[i])]
+                                else:
+                                    current_schedule.at[ix,i]=(current_schedule.loc[ix,i][0]*20,current_schedule.loc[ix,i][1]*20)
+                                    #totals=[sum(x) for x in zip(totals, current_schedule[i])]
                         #current_schedule["Total"]=totals
                         st.dataframe(pd.DataFrame(current_schedule_str))
                                 

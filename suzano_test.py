@@ -493,7 +493,7 @@ if authentication_status:
                     def color_coding(row):
                         return ['color:red'] * len(row) if row['CLEARWATER - LEWISTON ID'] == (5,5) else ['color:green'] * len(row)
                     #st.dataframe(df.style.apply(color_coding, axis=1))
-                    df=df.style.applymap(lambda x: f"color: {'red' if isinstance(x,str) else 'black'}")
+                    #df=df.style.applymap(lambda x: f"color: {'red' if isinstance(x,str) else 'black'}")
                     return df,zf
                 
 

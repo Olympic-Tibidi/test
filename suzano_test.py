@@ -527,7 +527,7 @@ if authentication_status:
                                     current_schedule.at[ix,i]=(current_schedule.loc[ix,i][0]*20,current_schedule.loc[ix,i][1]*20)
                                     #totals=[sum(x) for x in zip(totals, current_schedule[i])]
                         #current_schedule["Total"]=totals
-                        st.dataframe(pd.DataFrame(current_schedule_str))
+                        st.dataframe(pd.DataFrame(current_schedule))
                                 
                     
                     

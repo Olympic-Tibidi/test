@@ -364,6 +364,7 @@ if authentication_status:
                                                                                  
             with admin_tab5:
                 schedule=gcp_download_x(target_bucket,rf"truck_schedule.xlsx","schedule.xlsx")
+                schedule=pd.read_excel(schedule,sheet_name="SEPTEMBER",header=None,index_col=None)
                 #schedule=pd.read_excel(schedule,header=None,index_col=None)
                 #schedule=gcp_csv_to_df(target_bucket, rf"truck_schedule.xlsx")
                 
@@ -494,7 +495,8 @@ if authentication_status:
                     #st.dataframe(df.style.apply(color_coding, axis=1))
                     df=df.style.applymap(lambda x: f"color: {'red' if isinstance(x,str) else 'black'}")
                     return df,zf
-                #st.write(process_schedule)
+                df,zf=process_schedule()
+                st.dataframe(df)
 
                 mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
                 mill_shipments=json.loads(mill_shipments)

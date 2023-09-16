@@ -355,7 +355,7 @@ if authentication_status:
                     st.write("NO EDI FILES IN DIRECTORY")
                                                                                  
             with admin_tab5:
-                current_schedule=gcp_download(target_bucket,rf"truck_schedule.xlsx")
+                current_schedule=gcp_download_x(target_bucket,rf"truck_schedule.xlsx")
                 schedule=pd.read_excel(current_schedule,sheet_name="SEPTEMBER",header=None,index_col=None)
                 schedule=schedule.dropna(0, how="all")
                 schedule.reset_index(drop=True,inplace=True)

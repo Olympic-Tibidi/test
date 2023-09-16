@@ -513,25 +513,26 @@ if authentication_status:
                     current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
                     def elementwise_sum(t1, t2,t3,t4,t5):
                         return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])
-                    current_schedule["Total"]= current_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
+                    truck_schedule=current_schedule.copy()
+                    ton_schedule=current_schedule.copy()
+                    truck_schedule["Total"]= truck_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
                     choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])                   
                    
                     if choice=="TRUCKS":
                         st.markdown("**TRUCKS - (Actual # of Loaded Trucks,Planned # of Trucks)**")                    
-                        st.table(current_schedule)
+                        st.table(truck_schedule)
                     else:
                         st.markdown("**TONS - (Actual Shipped Tonnage,Planned Tonnage)**")
-                        totals=[0]*len(current_schedule)
-                        for ix in current_schedule.index:
-                            for i in current_schedule.columns:
+                        totals=[0]*len(ton_schedule)
+                        for ix in ton_schedule.index:
+                            for i in ton_schedule.columns:
                                 if i in [ 'GP WAUNA - OR','GP HALSEY - OR']:
-                                    current_schedule.at[ix,i]=(current_schedule.loc[ix,i][0]*28,current_schedule.loc[ix,i][1]*28)
-                                #totals=[sum(x) for x in zip(totals, current_schedule[i])]
+                                    ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*28,ton_schedule.loc[ix,i][1]*28)
+                             
                                 else:
-                                    current_schedule.at[ix,i]=(current_schedule.loc[ix,i][0]*20,current_schedule.loc[ix,i][1]*20)
-                                    #totals=[sum(x) for x in zip(totals, current_schedule[i])]
-                        #current_schedule["Total"]=totals
-                        st.table(pd.DataFrame(current_schedule))
+                                    ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*20,ton_schedule.loc[ix,i][1]*20)
+                    
+                        st.table(pd.DataFrame(ton_schedule))
                                 
                     
                     

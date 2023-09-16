@@ -499,6 +499,7 @@ if authentication_status:
 
                 
                 mill_tab1,mill_tab2,mill_tab3=st.tabs(["CURRENT SCHEDULE","UPLOAD SCHEDULE","MILL PROGRESS"])
+                
                 with mill_tab3:
                     mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
                     mill_shipments=json.loads(mill_shipments)
@@ -506,14 +507,13 @@ if authentication_status:
                     mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
                     mill_df["New Product"]=mill_df["New Product"].astype(str)
                     #st.table(mill_df)
+                
                 with mill_tab1:
                     current_schedule,zf=process_schedule()
-                    choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])
-                    #dates=[i.date() for i on current_schedule.index]
-                    #current_schedule["Date"]=dates
                     current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
-                    #current_schedule.set_index("Date",drop=True,inplace=True)
-                    #current_schedule_str=current_schedule.copy()
+                    current_schedule["Total"]=current_schedule.sum(axis=1)
+                    choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])                   
+                   
                     if choice=="TRUCKS":
                         st.markdown("**TRUCKS - (Actual # of Loaded Trucks,Planned # of Trucks)**")                    
                         st.table(current_schedule)

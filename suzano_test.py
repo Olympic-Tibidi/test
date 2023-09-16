@@ -511,7 +511,7 @@ if authentication_status:
                     choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])
                     #dates=[i.date() for i on current_schedule.index]
                     #current_schedule["Date"]=dates
-                    current_schedule.index=[i.date() for i in current_schedule.index]
+                    current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
                     #current_schedule.set_index("Date",drop=True,inplace=True)
                     #current_schedule_str=current_schedule.copy()
                     if choice=="TRUCKS":

@@ -514,7 +514,7 @@ if authentication_status:
                     #current_schedule_str=current_schedule.copy()
                     if choice=="TRUCKS":
                         st.markdown("**TRUCKS - (Actual # of Loaded Trucks,Planned # of Trucks)**")                    
-                        st.dataframe(current_schedule)
+                        st.table(current_schedule)
                     else:
                         st.markdown("**TONS - (Actual Shipped Tonnage,Planned Tonnage)**")
                         totals=[0]*len(current_schedule)
@@ -527,7 +527,7 @@ if authentication_status:
                                     current_schedule.at[ix,i]=(current_schedule.loc[ix,i][0]*20,current_schedule.loc[ix,i][1]*20)
                                     #totals=[sum(x) for x in zip(totals, current_schedule[i])]
                         #current_schedule["Total"]=totals
-                        st.dataframe(pd.DataFrame(current_schedule))
+                        st.table(pd.DataFrame(current_schedule))
                                 
                     
                     

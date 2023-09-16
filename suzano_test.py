@@ -113,11 +113,11 @@ def gcp_download(bucket_name, source_file_name):
     data = blob.download_as_text()
     return data
     
-def gcp_download_x(bucket_name, source_file_name):
+def gcp_download_x(bucket_name, source_file_name,dest):
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(source_file_name)
-    data = blob.download_as_bytes()
+    data = blob.download_to_filename(dest)
     return data
 
 def gcp_csv_to_df(bucket_name, source_file_name):
@@ -355,9 +355,10 @@ if authentication_status:
                     st.write("NO EDI FILES IN DIRECTORY")
                                                                                  
             with admin_tab5:
-                #current_schedule=gcp_download_x(target_bucket,rf"truck_schedule.csv")
+                schedule=gcp_download_x(target_bucket,rf"truck_schedule.xlsx","schedule.xlsx)
                 #schedule=pd.read_excel(current_schedule,header=None,index_col=None)
-                schedule=gcp_csv_to_df(target_bucket, rf"truck_schedule.csv")
+                #schedule=gcp_csv_to_df(target_bucket, rf"truck_schedule.csv")
+                
                 schedule=schedule.dropna(0, how="all")
                 schedule.reset_index(drop=True,inplace=True)
                 report=json.loads(gcp_download(target_bucket,rf"suzano_report.json"))

@@ -361,7 +361,7 @@ if authentication_status:
                 
                 #schedule=schedule.dropna(0, how="all")
                 #schedule.reset_index(drop=True,inplace=True)
-               # report=json.loads(gcp_download(target_bucket,rf"suzano_report.json"))
+                report=json.loads(gcp_download(target_bucket,rf"suzano_report.json"))
                 
                 def process_schedule():
                     class Mill:

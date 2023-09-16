@@ -136,6 +136,13 @@ def upload_cs_file(bucket_name, source_file_name, destination_file_name):
     blob = bucket.blob(destination_file_name)
     blob.upload_from_filename(source_file_name)
     return True
+def upload_xl_file(bucket_name, uploaded_file, destination_blob_name):
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+
+    # Upload the file from the file object provided by st.file_uploader
+    blob.upload_from_file(uploaded_file)
 # define function that list files in the bucket
 def list_cs_files(bucket_name): 
     storage_client = storage.Client()
@@ -541,7 +548,7 @@ if authentication_status:
                         if st.button("UPDATE DATABASE WITH NEW SCHEDULE",key="lolos"):
                             
                             #temp=zf.to_excel("temp.csv")
-                            upload_cs_file(target_bucket, uploaded_file,"truck_schedule.xlsx") 
+                            upload_xl_file(target_bucket, uploaded_file,"truck_schedule.xlsx") 
                             st.success('File Uploaded', icon="✅")
                             
 

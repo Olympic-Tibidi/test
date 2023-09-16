@@ -513,10 +513,10 @@ if authentication_status:
                     #current_schedule.set_index("Date",drop=True,inplace=True)
                     #current_schedule_str=current_schedule.copy()
                     if choice=="TRUCKS":
-                        st.markdown("**TRUCKS**")                        
+                        st.markdown("**TRUCKS - (Actual # of Loaded Trucks,Planned # of Trucks)**")                    
                         st.dataframe(current_schedule)
                     else:
-                        st.markdown("**TONS**")
+                        st.markdown("**TONS - (Actual Shipped Tonnage,Planned Tonnage)**")
                         totals=[0]*len(current_schedule)
                         for ix in current_schedule.index:
                             for i in current_schedule.columns:

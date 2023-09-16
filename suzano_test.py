@@ -514,7 +514,7 @@ if authentication_status:
                                     pass
                             #print(location_dict[i])
                         def color_coding(row):
-                            return ['background-color:red'] * len(row) if row['CLEARWATER - LEWISTON ID'] == (5,5) else ['background-color:green'] * len(row)
+                            return ['font-color:red'] * len(row) if row['CLEARWATER - LEWISTON ID'] == (5,5) else ['font-color:green'] * len(row)
                         st.dataframe(df.style.apply(color_coding, axis=1))
                         st.write(df)
 

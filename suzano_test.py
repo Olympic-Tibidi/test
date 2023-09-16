@@ -387,7 +387,8 @@ if authentication_status:
                     
                 
                 with mill_tab2:                    
-                    report=gcp_download(target_bucket,rf"suzano_report.json")
+                    report=json.loads(gcp_download(target_bucket,rf"suzano_report.json"))
+                    
                     uploaded_file = st.file_uploader("Choose a file",key="pdods")
                     if uploaded_file is not None:
                         schedule=pd.ExcelFile(uploaded_file)

@@ -655,8 +655,8 @@ if authentication_status:
 
                         if st.button("UPDATE DATABASE WITH NEW SCHEDULE",key="lolos"):
                             
-                            temp=zf.to_excel("temp.xlsx")
-                            upload_cs_file(target_bucket, 'temp.xlsx',"truck_schedule.xlsx") 
+                            temp=zf.to_csv("temp.csv")
+                            upload_cs_file(target_bucket, 'temp.csv',"truck_schedule.csv") 
                             st.success('File Uploaded', icon="✅")
                             
 

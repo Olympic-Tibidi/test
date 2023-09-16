@@ -1981,9 +1981,9 @@ if authentication_status:
                 
 
                 
-                mill_tab1,mill_tab2,mill_tab3=st.tabs(["CURRENT SCHEDULE","UPLOAD SCHEDULE","MILL PROGRESS"])
+                mill_tab1,mill_tab2=st.tabs(["CURRENT SCHEDULE","MILL PROGRESS"])
                 
-                with mill_tab3:
+                with mill_tab2:
                     mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
                     mill_shipments=json.loads(mill_shipments)
                     mill_df=pd.DataFrame.from_dict(mill_shipments).T
@@ -2025,19 +2025,9 @@ if authentication_status:
                     #current_schedule_str.index=dates
                     
                     
+                           
+                    
                 
-                with mill_tab2:                    
-                    
-                    
-                    uploaded_file = st.file_uploader("Choose a file",key="pdods")
-                    if uploaded_file is not None:
-                        schedule=pd.ExcelFile(uploaded_file)
-                        st.write(schedule.sheet_names)                        
-                        schedule=pd.read_excel(uploaded_file,sheet_name="SEPTEMBER",header=None,index_col=None)
-                        schedule=schedule.dropna(0, how="all")
-                        schedule.reset_index(drop=True,inplace=True)
-                        df,zf=process_schedule()
-                        st.write(df)
                 with mill_tab2:
                     
                     mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))

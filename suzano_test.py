@@ -520,13 +520,13 @@ if authentication_status:
                         totals=[0]*len(current_schedule)
                         for i in current_schedule.columns[:-1]:
                             
-                            if i in ["Wauna, Oregon","Halsey, Oregon"]:
-                                current_schedule[i]=current_schedule_str[i]*28
-                                totals=[sum(x) for x in zip(totals, current_schedule[i])]
+                            if i in [ 'GP WAUNA - OR','GP HALSEY - OR']:
+                                current_schedule[i]=(current_schedule[i][0]*28,current_schedule[i][1]*28)
+                                #totals=[sum(x) for x in zip(totals, current_schedule[i])]
                             else:
-                                current_schedule[i]=current_schedule[i]*20
-                                totals=[sum(x) for x in zip(totals, current_schedule[i])]
-                        current_schedule["Total"]=totals
+                                current_schedule[i]=(current_schedule[i][0]*20,current_schedule[i][1]*20)
+                                #totals=[sum(x) for x in zip(totals, current_schedule[i])]
+                        #current_schedule["Total"]=totals
                         st.dataframe(pd.DataFrame(current_schedule_str))
                                 
                     

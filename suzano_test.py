@@ -478,9 +478,9 @@ if authentication_status:
                                     truck_size=28 if column in ['GP WAUNA - OR','GP HALSEY - OR'] else 20
                                     location_dict[column][i.to_pydatetime().date()]=Mill(column,i.to_pydatetime().date(),
                                                                                          df.loc[i,column],truck_size)
-                        
+                        df=df.replace(0,"")
                         for i in df.columns:
-                            df[i]=[(0,j) for j in df[i].values]
+                            df[i]=[(0,j) for j in df[i].values if j >0]
 
 
                         for i in report:
@@ -513,7 +513,7 @@ if authentication_status:
                                 except:
                                     pass
                             #print(location_dict[i])
-                        df=df.replace((0,0),"")
+                  
                         st.write(df)
 
                         if st.button("UPDATE DATABASE WITH NEW SCHEDULE",key="lolos"):

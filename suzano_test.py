@@ -2091,7 +2091,7 @@ if authentication_status:
                 
                     
                     ton_schedule.loc["TOTAL"]=totals
-                    st.table(ton_schedule)
+                   
 
                     mill_update={}
                     for i in ton_schedule.columns:
@@ -2154,36 +2154,35 @@ if authentication_status:
         
                         st.plotly_chart(fig)
     
-                    requested_mill=st.selectbox("**SELECT MILL TO SEE PROGRESS**",mill_progress.keys())
-                    def cust_business_days(start, end):
-                        business_days = pd.date_range(start=start, end=end, freq='B')
-                        return business_days
-                    target=mill_progress[requested_mill]["SEP 2023"]["Planned"]
-                    shipped=mill_progress[requested_mill]["SEP 2023"]["Shipped"]
-                    daily_needed_rate=int(target/len(cust_business_days(datetime.date(2023,9,1),datetime.date(2023,10,1))))
-                    days_passed=len(cust_business_days(datetime.date(2023,8,1),datetime.datetime.today()))
-                    days_left=len(cust_business_days(datetime.datetime.today(),datetime.date(2023,9,1)))
-                    #shipped=800
-                    reference=daily_needed_rate*days_passed
+                    #requested_mill=st.selectbox("**SELECT MILL TO SEE PROGRESS**",mill_progress.keys())
+                    #def cust_business_days(start, end):
+                   #     business_days = pd.date_range(start=start, end=end, freq='B')
+                   #     return business_days
+                  #  target=mill_progress[requested_mill]["SEP 2023"]["Planned"]
+                  #  shipped=mill_progress[requested_mill]["SEP 2023"]["Shipped"]
+                   # daily_needed_rate=int(target/len(cust_business_days(datetime.date(2023,9,1),datetime.date(2023,10,1))))
+                   # days_passed=len(cust_business_days(datetime.date(2023,8,1),datetime.datetime.today()))
+                   # days_left=len(cust_business_days(datetime.datetime.today(),datetime.date(2023,9,1)))
+                   # #shipped=800
+                   # reference=daily_needed_rate*days_passed
                     
                    
-                    fig = go.Figure(go.Indicator(
-                            domain = {'x': [0, 1], 'y': [0, 1]},
-                            value = shipped,
-                            mode = "gauge+number+delta",
-                            title={'text': f"<span style='font-weight:bold; color:blue;'>TONS SHIPPED TO {requested_mill} - SEPT TARGET {target} MT</span>", 'font': {'size': 20}},
-                            delta = {'reference': reference},
-                            gauge = {'axis': {'range': [None, target]},
-                                     'steps' : [
-                                         {'range': [0, reference], 'color': "lightgray"},
-                                      ],
-                                     'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': target}}))
+                 #   fig = go.Figure(go.Indicator(
+                    #        domain = {'x': [0, 1], 'y': [0, 1]},
+                    #        value = shipped,
+                    #        mode = "gauge+number+delta",
+                    #       title={'text': f"<span style='font-weight:bold; color:blue;'>TONS SHIPPED TO {requested_mill} - SEPT TARGET {target} MT</span>", 'font': {'size': 20}},
+                    #       delta = {'reference': reference},
+                    #       gauge = {'axis': {'range': [None, target]},
+                    #                'steps' : [
+                     ####                ],
+                        #             'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': target}}))
     
-                    st.plotly_chart(fig)
+                    #st.plotly_chart(fig)
     
-                    st.markdown(f"**SHOULD HAVE SHIPPED SO FAR : {reference} TONS (GRAY SHADE ON CHART)**")
-                    st.markdown(f"**SHIPPED SO FAR : {shipped} TONS (GREEN LINE ON CHART) - DAYS PASSED : {days_passed}**")
-                    st.markdown(f"**LEFT TO GO : {target-shipped} TONS (WHITE SHADE)- DAYS TO GO : {days_left}**")
+                   # st.markdown(f"**SHOULD HAVE SHIPPED SO FAR : {reference} TONS (GRAY SHADE ON CHART)**")
+                   # st.markdown(f"**SHIPPED SO FAR : {shipped} TONS (GREEN LINE ON CHART) - DAYS PASSED : {days_passed}**")
+                   # st.markdown(f"**LEFT TO GO : {target-shipped} TONS (WHITE SHADE)- DAYS TO GO : {days_left}**")
                 
                 
 

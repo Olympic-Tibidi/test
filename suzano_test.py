@@ -1847,7 +1847,11 @@ if authentication_status:
                     
                     col1,col2=st.columns([2,8])
                     with col2:
-                        st.write(bill_of_ladings)
+                        
+                        dated_bill_of_ladings={}
+                        for i in bill_of_ladings:
+                            dated_bill_of_ladings[bill_of_ladings[i]["issued"]]=[bill_of_ladings[i]["destination"],bill_of_ladings[i]["quantity"]]
+                        st.write(dated_bill_of_ladings)
                         #st.dataframe(filtered_zf)
                         
                                

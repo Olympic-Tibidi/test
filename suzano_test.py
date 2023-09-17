@@ -1861,7 +1861,8 @@ if authentication_status:
                                     except:
                                         locations[dated_bill_of_ladings[i][0]]=dated_bill_of_ladings[i][1]*2
                                     #st.markdown(f"**{} Tons to {dated_bill_of_ladings[i][0]}**")
-                        st.write(locations)
+                        for i in locations:
+                            st.markdown(f"**{locations[i]} Tons to {i}**")
                         #st.dataframe(filtered_zf)
                         
                                

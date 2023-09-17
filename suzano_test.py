@@ -2037,7 +2037,7 @@ if authentication_status:
                         st.markdown("**TRUCKS - (Actual # of Loaded Trucks,Planned # of Trucks)**")              
                         def color_coding(row):
                             return ['background-color:red'] * len(row) if row["CLEARWATER - LEWISTON ID"] == (5,5) else ['background-color:green'] * len(row)
-                        st.dataframe(truck_schedule.style.apply(color_coding, axis=1))
+                        st.table(truck_schedule.style.apply(color_coding, axis=1))
                     else:
                         st.markdown("**TONS - (Actual Shipped Tonnage,Planned Tonnage)**")
                         totals=[0]*len(ton_schedule)

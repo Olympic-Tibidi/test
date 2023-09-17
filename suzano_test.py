@@ -524,7 +524,7 @@ if authentication_status:
                         totals.append(total)
                     st.write(totals)       
                         
-                    truck_schedule.iloc[len(truck_schedule)+1,:]=totals
+                    truck_schedule.loc["TOTAL",:]=totals
                     choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])                   
                    
                     if choice=="TRUCKS":

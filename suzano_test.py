@@ -1821,7 +1821,7 @@ if authentication_status:
                     filter_date=st.date_input("Choose Warehouse OUT Date",datetime.datetime.today(),min_value=None, max_value=None,disabled=False,key="filter_date")
                     
                     
-                   
+                    st.write(filter_date)
                     zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]]=zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]].astype("str")
                     
                     zf["Warehouse_Out"]=[datetime.datetime.strptime(j,"%Y-%m-%d %H:%M:%S") for j in zf["Warehouse_Out"]]
@@ -1834,12 +1834,12 @@ if authentication_status:
                     
                     col1,col2=st.columns([2,8])
                     with col2:
-                        st.dataframe(zf)
+                        st.dataframe(filtered_zf)
                         
                                
                         
                     with col1:
-                        st.markdown(f"**SHIPPED ON THIS DAY = {zf['Shipped'].sum()*0.250} TONS**")
+                        st.markdown(f"**SHIPPED ON THIS DAY = {filtered_zf['Shipped'].sum()*0.250} TONS**")
                         
                            
                         

@@ -2105,8 +2105,8 @@ if authentication_status:
                     with mill_prog_col2:
                         
                         mills = [i for i in ton_schedule.columns if i!="Total"]
-                        targets = [mill_update[i]["SCHEDULED"] for i in mills]
-                        shipped = [mill_update[i]["SHIPPED"] for i in mills]
+                        targets = [mill_update[i]["SCHEDULED (TONS)"] for i in mills]
+                        shipped = [mill_update[i]["SHIPPED (TONS)"] for i in mills]
                         
                         # Create a figure with a horizontal bar chart
                         fig = go.Figure()

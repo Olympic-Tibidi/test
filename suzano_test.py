@@ -1849,13 +1849,19 @@ if authentication_status:
                     with col2:
                         
                         dated_bill_of_ladings={}
+                        locations={}
                         for i in bill_of_ladings:
                             dated_bill_of_ladings[bill_of_ladings[i]["issued"]]=[bill_of_ladings[i]["destination"],bill_of_ladings[i]["quantity"]]
                        # st.write(dated_bill_of_ladings)
                         for i in dated_bill_of_ladings:                            
                             if i is not None:
                                 if datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date()==filter_date:
-                                    st.markdown(f"**{dated_bill_of_ladings[i][1]*2} Tons to {dated_bill_of_ladings[i][0]}**")
+                                    try:
+                                        locations[dated_bill_of_ladings[i][0]]+=dated_bill_of_ladings[i][1]*2
+                                    except:
+                                        locations[dated_bill_of_ladings[i][0]]=dated_bill_of_ladings[i][1]*2
+                                    #st.markdown(f"**{} Tons to {dated_bill_of_ladings[i][0]}**")
+                        st.write(locations)
                         #st.dataframe(filtered_zf)
                         
                                

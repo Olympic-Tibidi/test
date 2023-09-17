@@ -516,6 +516,15 @@ if authentication_status:
                     truck_schedule=current_schedule.copy()
                     ton_schedule=current_schedule.copy()
                     truck_schedule["Total"]= truck_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
+                    totals=[]
+                    for col in truck_schedule.columns:  
+                        total=(0,0)
+                        for ix in truck_schedule.index:
+                            total=(total[0]+truck_schedule.loc[ix,col][0],total[1]+truck_schedule.loc[ix,col][1])
+                        totals.append(total)
+                            
+                        
+                    truck_schedule.loc["Total",:]=totals
                     choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])                   
                    
                     if choice=="TRUCKS":

@@ -1854,8 +1854,9 @@ if authentication_status:
                        # st.write(dated_bill_of_ladings)
                         for i in dated_bill_of_ladings:
                             st.write(i)
-                           #if datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date()==filter_date:
-                            #    st.write("yes")
+                            if i is not None:
+                                if datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date()==filter_date:
+                                    st.write("yes")
                         #st.dataframe(filtered_zf)
                         
                                

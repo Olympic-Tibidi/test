@@ -2095,7 +2095,7 @@ if authentication_status:
 
                     mill_update={}
                     for i in ton_schedule.columns:
-                        mill_update[i]={"SHIPPED":ton_schedule.loc["TOTAL",i][0],"SCHEDULED":ton_schedule.loc["TOTAL",i][1]}
+                        mill_update[i]={"SHIPPED (TONS)":ton_schedule.loc["TOTAL",i][0],"SCHEDULED (TONS)":ton_schedule.loc["TOTAL",i][1]}
                     
                     chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
                     mill_prog_col1,mill_prog_col2=st.columns([2,4])
@@ -2128,6 +2128,7 @@ if authentication_status:
                                     x=[target],  # Lighter shade indicating target
                                     orientation="h",
                                     name="Target",
+                                    text=[shipped_qty],
                                     marker=dict(color='rgba(0, 128, 0, 0.3)')
                                 )
                             )

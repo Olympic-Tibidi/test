@@ -2012,14 +2012,7 @@ if authentication_status:
                 
                 mill_tab1,mill_tab2=st.tabs(["CURRENT SCHEDULE","MILL PROGRESS"])
                 
-                with mill_tab2:
-                    mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
-                    mill_shipments=json.loads(mill_shipments)
-                    mill_df=pd.DataFrame.from_dict(mill_shipments).T
-                    mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
-                    mill_df["New Product"]=mill_df["New Product"].astype(str)
-                    #st.table(mill_df)
-                
+                              
                 with mill_tab1:
                     
                     current_schedule,zf=process_schedule()
@@ -2071,7 +2064,9 @@ if authentication_status:
                     
                 
                 with mill_tab2:
-                    
+                    current_schedule,zf=process_schedule()
+                    st.write(current_schedule)
+                    {"CLEARWATER-Lewiston,ID": {"SEP 2023": {"Planned": 1500, "Shipped": 100}, "OCT 2023": {"Planned": 2000, "Shipped": 0}, "NOV 2023": {"Planned": 2000, "Shipped": 0}, "DEC 2023": {"Planned": 2000, "Shipped": 0}}, "GP-Halsey,OR": {"SEP 2023": {"Planned": 2500, "Shipped": 26}, "OCT 2023": {"Planned": 2500, "Shipped": 0}, "NOV 2023": {"Planned": 2500, "Shipped": 0}, "DEC 2023": {"Planned": 2500, "Shipped": 0}}, "GP-Clatskanie,OR": {"SEP 2023": {"Planned": 1000, "Shipped": 26}, "OCT 2023": {"Planned": 2000, "Shipped": 0}, "NOV 2023": {"Planned": 2000, "Shipped": 0}, "DEC 2023": {"Planned": 2000, "Shipped": 0}}, "KRUGER-New Westminster,BC": {"SEP 2023": {"Planned": 400, "Shipped": 0}, "OCT 2023": {"Planned": 400, "Shipped": 0}, "NOV 2023": {"Planned": 400, "Shipped": 0}, "DEC 2023": {"Planned": 400, "Shipped": 0}}, "WILLAMETTE FALLS-West Linn,OR": {"SEP 2023": {"Planned": 409, "Shipped": 0}, "OCT 2023": {"Planned": 409, "Shipped": 0}, "NOV 2023": {"Planned": 409, "Shipped": 0}, "DEC 2023": {"Planned": 409, "Shipped": 0}}}
                     mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
                     reformed_dict = {}
                     for outerKey, innerDict in mill_progress.items():

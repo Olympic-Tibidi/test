@@ -1675,12 +1675,12 @@ if authentication_status:
                         
         if select=="INVENTORY" :
             Inventory=gcp_csv_to_df(target_bucket, "Inventory.csv")
-           
+            data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+            bill_of_ladings=json.loads(data)
             mill_info=json.loads(gcp_download(target_bucket,rf"mill_info.json"))
             inv1,inv2,inv3,inv4,inv5=st.tabs(["DAILY ACTION","SUZANO DAILY REPORTS","EDI BANK","MAIN INVENTORY","SUZANO MILL SHIPMENT SCHEDULE/PROGRESS"])
             with inv1:
-                data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                bill_of_ladings=json.loads(data)
+                
                 daily1,daily2,daily3=st.tabs(["TODAY'SHIPMENTS","TRUCKS ENROUTE","TRUCKS AT DESTINATION"])
                 with daily1:
                     now=datetime.datetime.now()-datetime.timedelta(hours=7)
@@ -1814,8 +1814,7 @@ if authentication_status:
                         st.markdown(f"**IN WAREHOUSE = {wrh} tons**")
                         st.markdown(f"**TOTAL SHIPPED = {shp} tons**")
                         st.markdown(f"**TOTAL OVERALL = {wrh+shp} tons**")
-                        if st.checkbox("CLICK TO SEE INVENTORY LIST"):
-                            st.dataframe(df)
+                        
                     with inv_col2:
                         #st.write(items)
                         inhouse=[df[df["Ocean B/L"]==i]["Remaining"].sum()*250/1000 for i in items]
@@ -1829,8 +1828,8 @@ if authentication_status:
                         tablo["TOTAL"] = tablo.loc[:, ["In Warehouse", "Shipped"]].sum(axis=1)
                         st.markdown(f"**IN METRIC TONS -- AS OF {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),'%b %d -  %H:%M')}**")
                         st.dataframe(tablo)
-                        if st.checkbox("CLICK TO SEE INVENTORY LIST",key="23223"):
-                            st.dataframe(df)
+                    if st.checkbox("CLICK TO SEE INVENTORY LIST",key="23223"):
+                        st.dataframe(df)
                 with dab2:
                     
                     
@@ -1848,7 +1847,8 @@ if authentication_status:
                     
                     col1,col2=st.columns([2,8])
                     with col2:
-                        st.dataframe(filtered_zf)
+                        st.write(bill_of_ladings)
+                        #st.dataframe(filtered_zf)
                         
                                
                         

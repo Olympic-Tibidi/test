@@ -2095,17 +2095,18 @@ if authentication_status:
 
                     mill_update={}
                     for i in ton_schedule.columns:
-                        mill_update[i]={"shipped":ton_schedule.loc["TOTAL",i][0],"scheduled":ton_schedule.loc["TOTAL",i][1]}
+                        mill_update[i]={"SHIPPED":ton_schedule.loc["TOTAL",i][0],"SCHEDULED":ton_schedule.loc["TOTAL",i][1]}
                     
                     
                     mill_prog_col1,mill_prog_col2=st.columns([2,4])
+                    chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
                     with mill_prog_col1:
                         st.dataframe(pd.DataFrame(mill_update).T)
                     with mill_prog_col2:
-                        chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
-                        mills = mill_progress.keys()
-                        targets = [mill_progress[i][chosen_month]["Planned"] for i in mills]
-                        shipped = [mill_progress[i][chosen_month]["Shipped"] for i in mills]
+                        
+                        mills = ton_schedule.columns
+                        targets = [mill_update[i]["SCHEDULED"] for i in mills]
+                        shipped = [mill_update[i]["SHIPPED"] for i in mills]
                         
                         # Create a figure with a horizontal bar chart
                         fig = go.Figure()

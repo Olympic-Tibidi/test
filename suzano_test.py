@@ -2067,7 +2067,7 @@ if authentication_status:
                     current_schedule,zf=process_schedule()
                     st.table(zf)
                     #mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
-                    for k in current_schedule.columns:
+                    #for k in current_schedule.columns:
                         
                     reformed_dict = {}
                     for outerKey, innerDict in mill_progress.items():

@@ -2095,7 +2095,8 @@ if authentication_status:
 
                     mill_update={}
                     for i in ton_schedule.columns:
-                        mill_update[i]={"SHIPPED":ton_schedule.loc["TOTAL",i][0],"SCHEDULED":ton_schedule.loc["TOTAL",i][1]}
+                        if i!="Total":
+                            mill_update[i]={"SHIPPED":ton_schedule.loc["TOTAL",i][0],"SCHEDULED":ton_schedule.loc["TOTAL",i][1]}
                     
                     chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
                     mill_prog_col1,mill_prog_col2=st.columns([2,4])

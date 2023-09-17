@@ -2095,8 +2095,7 @@ if authentication_status:
 
                     mill_update={}
                     for i in ton_schedule.columns:
-                        if i!="Total":
-                            mill_update[i]={"SHIPPED":ton_schedule.loc["TOTAL",i][0],"SCHEDULED":ton_schedule.loc["TOTAL",i][1]}
+                        mill_update[i]={"SHIPPED":ton_schedule.loc["TOTAL",i][0],"SCHEDULED":ton_schedule.loc["TOTAL",i][1]}
                     
                     chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
                     mill_prog_col1,mill_prog_col2=st.columns([2,4])
@@ -2105,7 +2104,7 @@ if authentication_status:
                         st.dataframe(pd.DataFrame(mill_update).T)
                     with mill_prog_col2:
                         
-                        mills = ton_schedule.columns
+                        mills = [i for i in ton_schedule.columns if i!="Total"]
                         targets = [mill_update[i]["SCHEDULED"] for i in mills]
                         shipped = [mill_update[i]["SHIPPED"] for i in mills]
                         

@@ -522,7 +522,7 @@ if authentication_status:
                         for ix in truck_schedule.index:
                             total=(total[0]+truck_schedule.loc[ix,col][0],total[1]+truck_schedule.loc[ix,col][1])
                         totals.append(total)
-                    st.write(totals)       
+                    st.write(truck_schedule.columns)       
                         
                     truck_schedule.loc["TOTAL",:]=totals
                     choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])                   

@@ -2065,10 +2065,10 @@ if authentication_status:
                 
                 with mill_tab2:
                     current_schedule,zf=process_schedule()
-                    st.table(current_schedule)
-                    {"CLEARWATER-Lewiston,ID": {"SEP 2023": {"Planned": 1500, "Shipped": 100}, "OCT 2023": {"Planned": 2000, "Shipped": 0}, "NOV 2023": {"Planned": 2000, "Shipped": 0}, "DEC 2023": {"Planned": 2000, "Shipped": 0}}, "GP-Halsey,OR": {"SEP 2023": {"Planned": 2500, "Shipped": 26}, "OCT 2023": {"Planned": 2500, "Shipped": 0}, "NOV 2023": {"Planned": 2500, "Shipped": 0}, "DEC 2023": {"Planned": 2500, "Shipped": 0}}, "GP-Clatskanie,OR": {"SEP 2023": {"Planned": 1000, "Shipped": 26}, "OCT 2023": {"Planned": 2000, "Shipped": 0}, "NOV 2023": {"Planned": 2000, "Shipped": 0}, "DEC 2023": {"Planned": 2000, "Shipped": 0}}, "KRUGER-New Westminster,BC": {"SEP 2023": {"Planned": 400, "Shipped": 0}, "OCT 2023": {"Planned": 400, "Shipped": 0}, "NOV 2023": {"Planned": 400, "Shipped": 0}, "DEC 2023": {"Planned": 400, "Shipped": 0}}, "WILLAMETTE FALLS-West Linn,OR": {"SEP 2023": {"Planned": 409, "Shipped": 0}, "OCT 2023": {"Planned": 409, "Shipped": 0}, "NOV 2023": {"Planned": 409, "Shipped": 0}, "DEC 2023": {"Planned": 409, "Shipped": 0}}}
-                    {"CLEARWATER-Lewiston,ID": {"SEP 2023": {"Planned": 1500, "Shipped": 100}, "OCT 2023": {"Planned": 2000, "Shipped": 0}, "NOV 2023": {"Planned": 2000, "Shipped": 0}, "DEC 2023": {"Planned": 2000, "Shipped": 0}}, "GP-Halsey,OR": {"SEP 2023": {"Planned": 2500, "Shipped": 26}, "OCT 2023": {"Planned": 2500, "Shipped": 0}, "NOV 2023": {"Planned": 2500, "Shipped": 0}, "DEC 2023": {"Planned": 2500, "Shipped": 0}}, "GP-Clatskanie,OR": {"SEP 2023": {"Planned": 1000, "Shipped": 26}, "OCT 2023": {"Planned": 2000, "Shipped": 0}, "NOV 2023": {"Planned": 2000, "Shipped": 0}, "DEC 2023": {"Planned": 2000, "Shipped": 0}}, "KRUGER-New Westminster,BC": {"SEP 2023": {"Planned": 400, "Shipped": 0}, "OCT 2023": {"Planned": 400, "Shipped": 0}, "NOV 2023": {"Planned": 400, "Shipped": 0}, "DEC 2023": {"Planned": 400, "Shipped": 0}}, "WILLAMETTE FALLS-West Linn,OR": {"SEP 2023": {"Planned": 409, "Shipped": 0}, "OCT 2023": {"Planned": 409, "Shipped": 0}, "NOV 2023": {"Planned": 409, "Shipped": 0}, "DEC 2023": {"Planned": 409, "Shipped": 0}}}
-                    mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
+                    st.table(zf)
+                    #mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
+                    for k in current_schedule.columns:
+                        
                     reformed_dict = {}
                     for outerKey, innerDict in mill_progress.items():
                         for innerKey, values in innerDict.items():

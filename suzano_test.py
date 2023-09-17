@@ -2097,9 +2097,9 @@ if authentication_status:
                     for i in ton_schedule.columns:
                         mill_update[i]={"SHIPPED":ton_schedule.loc["TOTAL",i][0],"SCHEDULED":ton_schedule.loc["TOTAL",i][1]}
                     
-                    
-                    mill_prog_col1,mill_prog_col2=st.columns([2,4])
                     chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
+                    mill_prog_col1,mill_prog_col2=st.columns([2,4])
+                    
                     with mill_prog_col1:
                         st.dataframe(pd.DataFrame(mill_update).T)
                     with mill_prog_col2:
@@ -2118,6 +2118,7 @@ if authentication_status:
                                     x=[shipped_qty],  # Darker shade indicating shipped
                                     orientation="h",
                                     name="Shipped",
+                                    text=[shipped_qty],
                                     marker=dict(color='rgba(0, 128, 0, 0.7)')
                                 )
                             )

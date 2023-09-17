@@ -3138,6 +3138,7 @@ if authentication_status:
             
             with mill_tab1:
                 
+                    
                 current_schedule,zf=process_schedule()
                 current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
                 def elementwise_sum(t1, t2,t3,t4,t5):
@@ -3187,20 +3188,49 @@ if authentication_status:
                 
             
             with mill_tab2:
+                current_schedule,zf=process_schedule()
                 
                 mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
-                reformed_dict = {}
-                for outerKey, innerDict in mill_progress.items():
-                    for innerKey, values in innerDict.items():
-                        reformed_dict[(outerKey,innerKey)] = values
+                
+                current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
+                
+                def elementwise_sum(t1, t2,t3,t4,t5):
+                    return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])
+                ton_schedule=current_schedule.copy()
+                totals=[0]*len(ton_schedule)
+                for ix in ton_schedule.index:
+                    for i in ton_schedule.columns:
+                        if i in [ 'GP WAUNA - OR','GP HALSEY - OR']:
+                            ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*28,ton_schedule.loc[ix,i][1]*28)
+                     
+                        else:
+                            ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*20,ton_schedule.loc[ix,i][1]*20)
+                ton_schedule["Total"]= ton_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
+                totals=[]
+                for col in ton_schedule.columns:  
+                    total=(0,0)
+                    for ix in ton_schedule.index:
+                        total=(total[0]+ton_schedule.loc[ix,col][0],total[1]+ton_schedule.loc[ix,col][1])
+                    totals.append(total)
+            
+                
+                ton_schedule.loc["TOTAL"]=totals
+               
+
+                mill_update={}
+                for i in ton_schedule.columns:
+                    mill_update[i]={"SHIPPED (TONS)":ton_schedule.loc["TOTAL",i][0],"SCHEDULED (TONS)":ton_schedule.loc["TOTAL",i][1]}
+                
+                chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
                 mill_prog_col1,mill_prog_col2=st.columns([2,4])
+                
                 with mill_prog_col1:
-                    st.dataframe(pd.DataFrame(reformed_dict).T)
+                    st.dataframe(pd.DataFrame(mill_update).T)
                 with mill_prog_col2:
-                    chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
-                    mills = mill_progress.keys()
-                    targets = [mill_progress[i][chosen_month]["Planned"] for i in mills]
-                    shipped = [mill_progress[i][chosen_month]["Shipped"] for i in mills]
+                    
+                    mills = [i for i in ton_schedule.columns if i!="Total"]
+                    targets = [mill_update[i]["SCHEDULED (TONS)"] for i in mills]
+                    shipped = [mill_update[i]["SHIPPED (TONS)"] for i in mills]
                     
                     # Create a figure with a horizontal bar chart
                     fig = go.Figure()
@@ -3212,6 +3242,7 @@ if authentication_status:
                                 x=[shipped_qty],  # Darker shade indicating shipped
                                 orientation="h",
                                 name="Shipped",
+                                text=[shipped_qty],
                                 marker=dict(color='rgba(0, 128, 0, 0.7)')
                             )
                         )
@@ -3221,6 +3252,7 @@ if authentication_status:
                                 x=[target],  # Lighter shade indicating target
                                 orientation="h",
                                 name="Target",
+                                text=[target],
                                 marker=dict(color='rgba(0, 128, 0, 0.3)')
                             )
                         )
@@ -3246,37 +3278,6 @@ if authentication_status:
                             )
     
                     st.plotly_chart(fig)
-
-                requested_mill=st.selectbox("**SELECT MILL TO SEE PROGRESS**",mill_progress.keys())
-                def cust_business_days(start, end):
-                    business_days = pd.date_range(start=start, end=end, freq='B')
-                    return business_days
-                target=mill_progress[requested_mill]["SEP 2023"]["Planned"]
-                shipped=mill_progress[requested_mill]["SEP 2023"]["Shipped"]
-                daily_needed_rate=int(target/len(cust_business_days(datetime.date(2023,9,1),datetime.date(2023,10,1))))
-                days_passed=len(cust_business_days(datetime.date(2023,8,1),datetime.datetime.today()))
-                days_left=len(cust_business_days(datetime.datetime.today(),datetime.date(2023,9,1)))
-                #shipped=800
-                reference=daily_needed_rate*days_passed
-                
-               
-                fig = go.Figure(go.Indicator(
-                        domain = {'x': [0, 1], 'y': [0, 1]},
-                        value = shipped,
-                        mode = "gauge+number+delta",
-                        title={'text': f"<span style='font-weight:bold; color:blue;'>TONS SHIPPED TO {requested_mill} - SEPT TARGET {target} MT</span>", 'font': {'size': 20}},
-                        delta = {'reference': reference},
-                        gauge = {'axis': {'range': [None, target]},
-                                 'steps' : [
-                                     {'range': [0, reference], 'color': "lightgray"},
-                                  ],
-                                 'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': target}}))
-
-                st.plotly_chart(fig)
-
-                st.markdown(f"**SHOULD HAVE SHIPPED SO FAR : {reference} TONS (GRAY SHADE ON CHART)**")
-                st.markdown(f"**SHIPPED SO FAR : {shipped} TONS (GREEN LINE ON CHART) - DAYS PASSED : {days_passed}**")
-                st.markdown(f"**LEFT TO GO : {target-shipped} TONS (WHITE SHADE)- DAYS TO GO : {days_left}**")
 elif authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:

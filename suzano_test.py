@@ -1855,7 +1855,7 @@ if authentication_status:
                         for i in dated_bill_of_ladings:                            
                             if i is not None:
                                 if datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date()==filter_date:
-                                    st.write(f"{dated_bill_of_ladings[i][1]*2} Tons to {dated_bill_of_ladings[i][0]})
+                                    st.write(f"{dated_bill_of_ladings[i][1]*2} Tons to {dated_bill_of_ladings[i][0]}")
                         #st.dataframe(filtered_zf)
                         
                                

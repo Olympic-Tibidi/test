@@ -1829,7 +1829,7 @@ if authentication_status:
                         tablo["TOTAL"] = tablo.loc[:, ["In Warehouse", "Shipped"]].sum(axis=1)
                         st.markdown(f"**IN METRIC TONS -- AS OF {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),'%b %d -  %H:%M')}**")
                         st.dataframe(tablo)
-                        if st.checkbox("CLICK TO SEE INVENTORY LIST"):
+                        if st.checkbox("CLICK TO SEE INVENTORY LIST",key="23223"):
                             st.dataframe(df)
                 with dab2:
                     

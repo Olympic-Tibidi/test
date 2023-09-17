@@ -1814,6 +1814,8 @@ if authentication_status:
                         st.markdown(f"**IN WAREHOUSE = {wrh} tons**")
                         st.markdown(f"**TOTAL SHIPPED = {shp} tons**")
                         st.markdown(f"**TOTAL OVERALL = {wrh+shp} tons**")
+                        if st.checkbox("CLICK TO SEE INVENTORY LIST"):
+                            st.dataframe(df)
                     with inv_col2:
                         #st.write(items)
                         inhouse=[df[df["Ocean B/L"]==i]["Remaining"].sum()*250/1000 for i in items]
@@ -1827,8 +1829,8 @@ if authentication_status:
                         tablo["TOTAL"] = tablo.loc[:, ["In Warehouse", "Shipped"]].sum(axis=1)
                         st.markdown(f"**IN METRIC TONS -- AS OF {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),'%b %d -  %H:%M')}**")
                         st.dataframe(tablo)
-                    if st.checkbox("CLICK TO SEE INVENTORY LIST"):
-                        st.dataframe(df)
+                        if st.checkbox("CLICK TO SEE INVENTORY LIST"):
+                            st.dataframe(df)
                 with dab2:
                     
                     

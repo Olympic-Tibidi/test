@@ -2128,7 +2128,7 @@ if authentication_status:
                                     x=[target],  # Lighter shade indicating target
                                     orientation="h",
                                     name="Target",
-                                    text=[shipped_qty],
+                                    text=[target],
                                     marker=dict(color='rgba(0, 128, 0, 0.3)')
                                 )
                             )

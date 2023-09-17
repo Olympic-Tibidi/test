@@ -1851,10 +1851,11 @@ if authentication_status:
                         dated_bill_of_ladings={}
                         for i in bill_of_ladings:
                             dated_bill_of_ladings[bill_of_ladings[i]["issued"]]=[bill_of_ladings[i]["destination"],bill_of_ladings[i]["quantity"]]
-                        st.write(dated_bill_of_ladings)
+                       # st.write(dated_bill_of_ladings)
                         for i in dated_bill_of_ladings:
-                            if datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date()==filter_date:
-                                st.write("yes")
+                            st.write(i)
+                           #if datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date()==filter_date:
+                            #    st.write("yes")
                         #st.dataframe(filtered_zf)
                         
                                

@@ -2065,10 +2065,32 @@ if authentication_status:
                 
                 with mill_tab2:
                     current_schedule,zf=process_schedule()
-                    st.table(zf)
-                    #mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
-                    #for k in current_schedule.columns:
-                        
+                    
+                    mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
+                    current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
+                    def elementwise_sum(t1, t2,t3,t4,t5):
+                        return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])
+                    ton_schedule=current_schedule.copy()
+                    totals=[0]*len(ton_schedule)
+                    for ix in ton_schedule.index:
+                        for i in ton_schedule.columns:
+                            if i in [ 'GP WAUNA - OR','GP HALSEY - OR']:
+                                ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*28,ton_schedule.loc[ix,i][1]*28)
+                         
+                            else:
+                                ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*20,ton_schedule.loc[ix,i][1]*20)
+                    ton_schedule["Total"]= ton_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
+                    totals=[]
+                    for col in ton_schedule.columns:  
+                        total=(0,0)
+                        for ix in ton_schedule.index:
+                            total=(total[0]+ton_schedule.loc[ix,col][0],total[1]+ton_schedule.loc[ix,col][1])
+                        totals.append(total)
+                
+                    
+                    ton_schedule.loc["TOTAL"]=totals
+                    st.table(ton_schedule)
+                    
                     reformed_dict = {}
                     for outerKey, innerDict in mill_progress.items():
                         for innerKey, values in innerDict.items():

@@ -2067,7 +2067,9 @@ if authentication_status:
                     current_schedule,zf=process_schedule()
                     
                     mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
+                    
                     current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
+                    
                     def elementwise_sum(t1, t2,t3,t4,t5):
                         return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])
                     ton_schedule=current_schedule.copy()
@@ -2090,14 +2092,15 @@ if authentication_status:
                     
                     ton_schedule.loc["TOTAL"]=totals
                     st.table(ton_schedule)
+
+                    mill_update={}
+                    for i in ton_schedule.columns:
+                        mill_update[i]={"shipped":ton_schedule.loc["TOTAL",i][0],"scheduled":ton_schedule.loc["TOTAL",i][1]}
                     
-                    reformed_dict = {}
-                    for outerKey, innerDict in mill_progress.items():
-                        for innerKey, values in innerDict.items():
-                            reformed_dict[(outerKey,innerKey)] = values
+                    
                     mill_prog_col1,mill_prog_col2=st.columns([2,4])
                     with mill_prog_col1:
-                        st.dataframe(pd.DataFrame(reformed_dict).T)
+                        st.dataframe(pd.DataFrame(mill_update).T)
                     with mill_prog_col2:
                         chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
                         mills = mill_progress.keys()

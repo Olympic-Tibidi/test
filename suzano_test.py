@@ -555,11 +555,7 @@ if authentication_status:
                                 
                     
                     
-                    #current_schedule_str.index = pd.to_datetime(current_schedule_str.index)
-                    #dates=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S") for i in current_schedule_str.index]#datetime.datetime.strftime(i,"%b %d,%A")
-                    #current_schedule_str.index=dates
-                    
-                    
+                                        
                 
                 with mill_tab2:                    
                     
@@ -2008,6 +2004,7 @@ if authentication_status:
                     #st.table(mill_df)
                 
                 with mill_tab1:
+                    
                     current_schedule,zf=process_schedule()
                     current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
                     def elementwise_sum(t1, t2,t3,t4,t5):
@@ -2015,6 +2012,15 @@ if authentication_status:
                     truck_schedule=current_schedule.copy()
                     ton_schedule=current_schedule.copy()
                     truck_schedule["Total"]= truck_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
+                    totals=[]
+                    for col in truck_schedule.columns:  
+                        total=(0,0)
+                        for ix in truck_schedule.index:
+                            total=(total[0]+truck_schedule.loc[ix,col][0],total[1]+truck_schedule.loc[ix,col][1])
+                        totals.append(total)
+                    
+                        
+                    truck_schedule.loc["TOTAL"]=totals
                     choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])                   
                    
                     if choice=="TRUCKS":
@@ -2031,14 +2037,17 @@ if authentication_status:
                                 else:
                                     ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*20,ton_schedule.loc[ix,i][1]*20)
                         ton_schedule["Total"]= ton_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
+                        totals=[]
+                        for col in ton_schedule.columns:  
+                            total=(0,0)
+                            for ix in ton_schedule.index:
+                                total=(total[0]+ton_schedule.loc[ix,col][0],total[1]+ton_schedule.loc[ix,col][1])
+                            totals.append(total)
+                    
+                        
+                        ton_schedule.loc["TOTAL"]=totals
                     
                         st.table(pd.DataFrame(ton_schedule))
-                                
-                    
-                    
-                    #current_schedule_str.index = pd.to_datetime(current_schedule_str.index)
-                    #dates=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S") for i in current_schedule_str.index]#datetime.datetime.strftime(i,"%b %d,%A")
-                    #current_schedule_str.index=dates
                     
                     
                            

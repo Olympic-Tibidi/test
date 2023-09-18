@@ -468,7 +468,7 @@ if authentication_status:
                         qt=report[i]["Metric Ton"]
                        
                         try:
-                            location_dict[where][when]:
+                            location_dict[where][when]
                             
                             location_dict[where][when].shipped_quantity+=qt
                             location_dict[where][when].remaining-=qt

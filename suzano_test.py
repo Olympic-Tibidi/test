@@ -466,11 +466,13 @@ if authentication_status:
                         where=consignee_dict[report[i]["Consignee City"]]
                         when=datetime.datetime.strptime(report[i]["Date Shipped"],"%Y-%m-%d %H:%M:%S").date()
                         qt=report[i]["Metric Ton"]
-                        #print(when)
+                       
                         if location_dict[where][when]:
                             
                             location_dict[where][when].shipped_quantity+=qt
                             location_dict[where][when].remaining-=qt
+                        else:
+                            location_dict[consignee_dict[where]][when]=Mill(consignee_dict[where],when,qt,qt)
                     for i in df.columns:
                         for k in df.index:
                             #print(k.date())

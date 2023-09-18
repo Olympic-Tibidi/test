@@ -471,6 +471,7 @@ if authentication_status:
                             location_dict[where][when].shipped_quantity+=qt
                             location_dict[where][when].remaining-=qt
                         except:
+                            st.write(location_dict[where])
                             location_dict[where]={when:None}
                             location_dict[where][when]=Mill(consignee_dict[where],when,qt,truck_size)
                     for i in df.columns:

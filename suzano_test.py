@@ -459,7 +459,7 @@ if authentication_status:
                     for i in df.columns:
                         df[i]=[(0,j) if j is not None else "" for j in df[i].values ]
     
-    
+                    st.write(df)
                     for i in report:
                         where=consignee_dict[report[i]["Consignee City"]]
                         when=datetime.datetime.strptime(report[i]["Date Shipped"],"%Y-%m-%d %H:%M:%S").date()
@@ -475,7 +475,7 @@ if authentication_status:
                             location_dict[where]={when:None}
                             location_dict[where][when]=Mill(where,when,qt,truck_size)
                             df.loc[when,where]=(int(qt),0)
-                    st.write(df)
+                    
                     for i in df.columns:
                         for k in df.index:
                             #print(k.date())

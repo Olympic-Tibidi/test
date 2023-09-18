@@ -461,19 +461,18 @@ if authentication_status:
     
     
                     for i in report:
-                        #print(datetime.datetime.strptime(report[i]["Date Shipped"],"%Y-%m-%d %H:%M:%S").date())
-                        #print(report[i]["Metric Ton"])
                         where=consignee_dict[report[i]["Consignee City"]]
                         when=datetime.datetime.strptime(report[i]["Date Shipped"],"%Y-%m-%d %H:%M:%S").date()
+                        
                         qt=report[i]["Metric Ton"]
                        
                         try:
-                            location_dict[where][when]
-                            
+                            truck_size=28 if where in ['GP WAUNA - OR','GP HALSEY - OR'] else 20                    
                             location_dict[where][when].shipped_quantity+=qt
                             location_dict[where][when].remaining-=qt
                         except:
-                            location_dict[consignee_dict[where]][when]=Mill(consignee_dict[where],when,qt,qt)
+                            location_dict[where]={}
+                            location_dict[where][when]=Mill(consignee_dict[where],when,qt,truck_size)
                     for i in df.columns:
                         for k in df.index:
                             #print(k.date())

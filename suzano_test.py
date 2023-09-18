@@ -474,7 +474,7 @@ if authentication_status:
                             st.write(location_dict[where])
                             location_dict[where]={when:None}
                             location_dict[where][when]=Mill(where,when,qt,truck_size)
-                            df.loc[when][where]=(qt,0)
+                            df.loc[when,where]=(qt,0)
                     for i in df.columns:
                         for k in df.index:
                             #print(k.date())

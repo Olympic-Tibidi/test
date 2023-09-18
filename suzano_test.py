@@ -515,6 +515,7 @@ if authentication_status:
                 
                 with mill_tab1:
                     current_schedule,zf=process_schedule()
+                    st,write(current_schedule)
                     current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
                     def elementwise_sum(t1, t2,t3,t4,t5):
                         return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])

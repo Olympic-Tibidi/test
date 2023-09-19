@@ -1879,7 +1879,7 @@ if authentication_status:
                                     #st.markdown(f"**{} Tons to {dated_bill_of_ladings[i][0]}**")
                         for i in locations:
                             st.markdown(f"**{locations[i]} Tons to {i}**")
-                        #st.dataframe(filtered_zf)
+                        st.dataframe(filtered_zf)
                         
                                
                         

@@ -1843,7 +1843,7 @@ if authentication_status:
             
                     zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]]=zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]].astype("str")
                     
-                    zf["Warehouse_Out"]=[datetime.datetime.strptime(j,"%Y-%m-%d %H:%M") for j in zf["Warehouse_Out"]]
+                    zf["Warehouse_Out"]=[datetime.datetime.strptime(j,"%m-%d-%Y %H:%M") for j in zf["Warehouse_Out"]]
                     filtered_zf=zf.copy()
                     
                     filtered_zf["Warehouse_Out"]=[i.date() for i in filtered_zf["Warehouse_Out"]]

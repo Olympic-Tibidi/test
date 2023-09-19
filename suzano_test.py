@@ -1842,7 +1842,7 @@ if authentication_status:
                     filter_date=st.date_input("Choose Warehouse OUT Date",datetime.datetime.today(),min_value=None, max_value=None,disabled=False,key="filter_date")
             
                     zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]]=zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]].astype("str")
-                    
+                   
                     new_dates=[]
                     for i in zf["Warehouse_Out"]:
                         
@@ -1869,6 +1869,7 @@ if authentication_status:
                         for i in bill_of_ladings:
                             dated_bill_of_ladings[bill_of_ladings[i]["issued"]]=[bill_of_ladings[i]["destination"],bill_of_ladings[i]["quantity"]]
                        # st.write(dated_bill_of_ladings)
+                        toplam=0
                         for i in dated_bill_of_ladings:                            
                             if i is not None:
                                 if datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date()==filter_date:
@@ -1877,14 +1878,19 @@ if authentication_status:
                                     except:
                                         locations[dated_bill_of_ladings[i][0]]=dated_bill_of_ladings[i][1]*2
                                     #st.markdown(f"**{} Tons to {dated_bill_of_ladings[i][0]}**")
+                        
                         for i in locations:
                             st.markdown(f"**{locations[i]} Tons to {i}**")
-                        st.dataframe(filtered_zf)
+                            toplam+=locations[i]
+                        
                         
                                
                         
                     with col1:
-                        st.markdown(f"**SHIPPED ON THIS DAY = {filtered_zf['Shipped'].sum()*0.250} TONS**")
+                        st.markdown(f"**SHIPPED ON THIS DAY = {toplam} TONS**")
+                        
+                               
+                 
                         
                            
                         
@@ -2969,9 +2975,9 @@ if authentication_status:
                 
                 
                 filter_date=st.date_input("Choose Warehouse OUT Date",datetime.datetime.today(),min_value=None, max_value=None,disabled=False,key="filter_date")
-        
+            
                 zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]]=zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]].astype("str")
-                
+               
                 new_dates=[]
                 for i in zf["Warehouse_Out"]:
                     
@@ -2998,6 +3004,7 @@ if authentication_status:
                     for i in bill_of_ladings:
                         dated_bill_of_ladings[bill_of_ladings[i]["issued"]]=[bill_of_ladings[i]["destination"],bill_of_ladings[i]["quantity"]]
                    # st.write(dated_bill_of_ladings)
+                    toplam=0
                     for i in dated_bill_of_ladings:                            
                         if i is not None:
                             if datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date()==filter_date:
@@ -3006,14 +3013,16 @@ if authentication_status:
                                 except:
                                     locations[dated_bill_of_ladings[i][0]]=dated_bill_of_ladings[i][1]*2
                                 #st.markdown(f"**{} Tons to {dated_bill_of_ladings[i][0]}**")
+                    
                     for i in locations:
                         st.markdown(f"**{locations[i]} Tons to {i}**")
-                    #st.dataframe(filtered_zf)
+                        toplam+=locations[i]
+                    
                     
                            
                     
                 with col1:
-                    st.markdown(f"**SHIPPED ON THIS DAY = {filtered_zf['Shipped'].sum()*0.250} TONS**")
+                    st.markdown(f"**SHIPPED ON THIS DAY = {toplam} TONS**")
                     
                        
                     

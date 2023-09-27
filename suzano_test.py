@@ -1274,7 +1274,8 @@ if authentication_status:
                         st.session_state.updated_quantity=updated_quantity
                     def audit_unit(x):
                             if len(x)==10:
-                              
+                                if x not in bill_mapping:
+                                    st.write("**:red[THIS UNIT NOT IN INVENTORY / PUT ASIDE]**")
                                 if bill_mapping[x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[x[:-2]]["Batch"]!=batch:
                                     
                                     return False

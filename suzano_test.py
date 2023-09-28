@@ -274,7 +274,28 @@ def process():
             Inventory.loc[Inventory["Lot"]==i,"Carrier_Code"]=str(carrier_code)
             Inventory.loc[Inventory["Lot"]==i,"Terminal B/L"]=str(terminal_bill_of_lading)
         except:
-            st.write("Check Unit Number,Unit Not In Inventory")         
+            Inventory.loc[len(Inventory),"LOT"]=i  
+            Inventory.loc[len(Inventory),"LOT Qty"]=i
+            Inventory.loc[len(Inventory),"Bales"]=loads[i]*8
+            Inventory.loc[len(Inventory),"Shipped"]=loads[i]*8
+            Inventory.loc[len(Inventory),"Remaining"]=0
+            Inventory.loc[len(Inventory),"Batch"]="45305548"
+            Inventory.loc[len(Inventory),"Grade"]="ISU"
+            Inventory.loc[len(Inventory),"Ocean B/L"]="GSSWKIR6013D"
+            Inventory.loc[len(Inventory),"DryWeight"]=89.764
+            Inventory.loc[len(Inventory),"ADMT"]=0.997778
+            Inventory.loc[len(Inventory),"Location"]="Unaccounted"
+            Inventory.loc[len(Inventory),"Warehouse_In"]="8/27/2023"
+            Inventory.loc[len(Inventory),"Warehouse_Out"]=datetime.datetime.combine(file_date,file_time)
+            Inventory.loc[len(Inventory),"Vehicle_Id"]=str(vehicle_id)
+            Inventory.loc[len(Inventory),"Release_Order_Number"]=str(release_order_number)
+            Inventory.loc[len(Inventory),"Carrier Code"]=str(carrier_code)
+            Inventory.loc[len(Inventory),"Terminal B/L"]=str(terminal_bill_of_lading)
+            
+            
+            
+            
+            
         
         temp=Inventory.to_csv("temp.csv")
         upload_cs_file(target_bucket, 'temp.csv',"Inventory.csv") 
@@ -1396,7 +1417,8 @@ if authentication_status:
                     ####   IF NOT double load
                     else:
                         
-                    
+                        ghost_units=[]
+                        ghost_bales=[]
                         faults=[]
                         bale_faults=[]
                         fault_messaging={}
@@ -1410,9 +1432,11 @@ if authentication_status:
                             textsplit=[i for i in textsplit if len(i)>8]
                        
                             seen=set()
+                            
                             for i,x in enumerate(textsplit):
                                 if x not in bill_mapping:
-                                    st.write(f"**:red[THIS UNIT {x} NOT IN INVENTORY / PUT ASIDE]**")
+                                    st.write(f"**:red[Unit No: {i+1}-{x} NOT IN INVENTORY, but Added to Inventory, Proceed.]**")
+                                    ghost_units.append(x)
                                 else:
                                     
                                     if audit_unit(x):
@@ -1438,7 +1462,8 @@ if authentication_status:
                             seen=set()
                             for i,x in enumerate(bale_textsplit):
                                 if x not in bill_mapping:
-                                    st.write(f"**:red[THIS UNIT {x} NOT IN INVENTORY / PUT ASIDE]**")
+                                    st.write(f"**:red[Bale No: {i+1}-{x} NOT IN INVENTORY, but Added to Inventory, Proceed.]**")
+                                    ghost_bales.append(x)
                                 else:
                                     if audit_unit(x):
                                         if x in textsplit:

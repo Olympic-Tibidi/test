@@ -274,23 +274,11 @@ def process():
             Inventory.loc[Inventory["Lot"]==i,"Carrier_Code"]=str(carrier_code)
             Inventory.loc[Inventory["Lot"]==i,"Terminal B/L"]=str(terminal_bill_of_lading)
         except:
-            Inventory.loc[i,"LOT"]=i  
-            Inventory.loc[i,"LOT Qty"]=i
-            Inventory.loc[i,"Bales"]=loads[i]*8
-            Inventory.loc[i,"Shipped"]=loads[i]*8
-            Inventory.loc[i,"Remaining"]=0
-            Inventory.loc[i,"Batch"]="45305548"
-            Inventory.loc[i,"Grade"]="ISU"
-            Inventory.loc[i,"Ocean B/L"]="GSSWKIR6013D"
-            Inventory.loc[i,"DryWeight"]=89.764
-            Inventory.loc[i,"ADMT"]=0.997778
-            Inventory.loc[i,"Location"]="Unaccounted"
-            Inventory.loc[i,"Warehouse_In"]="8/27/2023"
-            Inventory.loc[i,"Warehouse_Out"]=datetime.datetime.combine(file_date,file_time)
-            Inventory.loc[i,"Vehicle_Id"]=str(vehicle_id)
-            Inventory.loc[i,"Release_Order_Number"]=str(release_order_number)
-            Inventory.loc[i,"Carrier Code"]=str(carrier_code)
-            Inventory.loc[i,"Terminal B/L"]=str(terminal_bill_of_lading)
+            a={"LOT":i,"LOT Qty":i,"Bales":loads[i]*8,"Shipped":loads[i]*8,"Remaining":0,"Batch":"45305548",
+                "Grade":"ISU","Grade":"ISU","Ocean B/L":"GSSWKIR6013D","DryWeight":89.764,"ADMT":0.997778,"Location":"Unaccounted",
+                "Warehouse_In":"8/27/2023","Warehouse_Out":datetime.datetime.combine(file_date,file_time),"Vehicle_Id":str(vehicle_id),
+                "Release_Order_Number":str(release_order_number),"Carrier Code":str(carrier_code),"Terminal B/L":str(terminal_bill_of_lading)}
+            
             
             
             

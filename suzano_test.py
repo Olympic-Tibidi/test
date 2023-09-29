@@ -277,7 +277,7 @@ def process():
             new_unit={"Lot":i,"Lot Qty":i,"Bales":loads[i]*8,"Shipped":loads[i]*8,"Remaining":0,"Batch":"45305548",
                 "Grade":"ISU","Grade":"ISU","Ocean B/L":"GSSWKIR6013D","DryWeight":89.764,"ADMT":0.997778,"Location":"Unaccounted",
                 "Warehouse_In":"8/27/2023","Warehouse_Out":datetime.datetime.combine(file_date,file_time),"Vehicle_Id":str(vehicle_id),
-                "Release_Order_Number":str(release_order_number),"Carrier Code":str(carrier_code),"Terminal B/L":str(terminal_bill_of_lading)}
+                "Release_Order_Number":str(release_order_number),"Carrier_Code":str(carrier_code),"Terminal B/L":str(terminal_bill_of_lading)}
             st.write(new_unit)
             Inventory.append(new_unit,ignore_index=True)
             

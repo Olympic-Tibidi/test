@@ -363,8 +363,8 @@ if authentication_status:
                                                                                  
             with admin_tab5:
                 schedule=gcp_download_x(target_bucket,rf"truck_schedule.xlsx","schedule.xlsx")
-                month=st.selectbox("SELECT MONTH",["SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"])
-                schedule=pd.read_excel(schedule,sheet_name="SEPTEMBER",header=None,index_col=None)
+                
+                
                 report=json.loads(gcp_download(target_bucket,rf"suzano_report.json"))
                 locations=[ 'GP WAUNA - OR',
                                  'GP HALSEY - OR',
@@ -509,6 +509,8 @@ if authentication_status:
                     #st.table(mill_df)
                 
                 with mill_tab1:
+                    month=st.selectbox("SELECT MONTH",["SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"])
+                    schedule=pd.read_excel(schedule,sheet_name=month,header=None,index_col=None)
                     current_schedule,zf=process_schedule()
                     current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
                     def elementwise_sum(t1, t2,t3,t4,t5):

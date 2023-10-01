@@ -363,6 +363,7 @@ if authentication_status:
                                                                                  
             with admin_tab5:
                 schedule=gcp_download_x(target_bucket,rf"truck_schedule.xlsx","schedule.xlsx")
+                month=st.selectbox("SELECT MONTH",["SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"])
                 schedule=pd.read_excel(schedule,sheet_name="SEPTEMBER",header=None,index_col=None)
                 report=json.loads(gcp_download(target_bucket,rf"suzano_report.json"))
                 locations=[ 'GP WAUNA - OR',

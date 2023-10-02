@@ -467,10 +467,12 @@ if authentication_status:
                         when=datetime.datetime.strptime(report[i]["Date Shipped"],"%Y-%m-%d %H:%M:%S").date()
                         qt=report[i]["Metric Ton"]
                         #print(when)
-                        if location_dict[where][when]:
+                        try:
                             
                             location_dict[where][when].shipped_quantity+=qt
                             location_dict[where][when].remaining-=qt
+                        except:
+                            pass
                     for i in df.columns:
                         for k in df.index:
                             #print(k.date())

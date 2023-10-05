@@ -346,18 +346,27 @@ if authentication_status:
                 st.write("OK")
                 client = storage.Client()
                 bucket = client.bucket(target_bucket)
-                
-                
+            
                 list_files_to_download = ['suzano_report.json', 'Inventory.csv']
-                for file_to_download in list_files_to_download:
-                    blob = bucket.blob(file_to_download)
-                    dd=blob.download_to_filename(f'./{blob.name}')
-                    st.download_button(
-                        label="DOWNLOAD EDI",
-                        data=dd,
-                        file_name=f'dsd',
-                        mime='text/csv')
-              
+                
+                # Create a temporary directory to store the downloaded files
+                with st.spinner("Downloading files..."):
+                    for file_to_download in list_files_to_download:
+                        blob = bucket.blob(file_to_download)
+                        blob.download_to_filename(f'./{blob.name}')
+                
+                # Create a zip archive of the downloaded files
+                with zipfile.ZipFile('downloaded_files.zip', 'w') as zipf:
+                    for file_to_download in list_files_to_download:
+                        zipf.write(file_to_download)
+            
+                # Provide a download button for the zip file
+                st.download_button(
+                    label="Download All Files",
+                    data='downloaded_files.zip',
+                    key='download_button'
+                )
+                          
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","MILL SHIPMENTS"])
             with admin_tab2:

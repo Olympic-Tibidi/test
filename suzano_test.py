@@ -351,7 +351,12 @@ if authentication_status:
                 list_files_to_download = ['suzano_report.json', 'Inventory.csv']
                 for file_to_download in list_files_to_download:
                     blob = bucket.blob(file_to_download)
-                    blob.download_to_filename(f'./{blob.name}')
+                    dd=blob.download_to_filename(f'./{blob.name}')
+                    st.download_button(
+                        label="DOWNLOAD EDI",
+                        data=dd,
+                        file_name=f'{fg}',
+                        mime='text/csv')
               
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","MILL SHIPMENTS"])

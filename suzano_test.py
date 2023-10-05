@@ -347,7 +347,8 @@ if authentication_status:
                 client = storage.Client()
                 bucket = client.bucket(target_bucket)
             
-                list_files_to_download = ['suzano_report.json', 'Inventory.csv']
+                list_files_to_download = ['dispatched.json','terminal_bill_of_ladings.json','truck_schedule.xlsx','suzano_report.json',
+                                          'mill_progress.json', 'Inventory.csv']
                 
                 # Create a temporary directory to store the downloaded files
                 with st.spinner("Downloading files..."):

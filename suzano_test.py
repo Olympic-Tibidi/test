@@ -370,7 +370,32 @@ if authentication_status:
                 file_name='downloaded_files.zip',
                 key='download_button'
             )
-          
+            list_folders_to_download = ['EDIS/', 'release_orders/']
+    
+    # Create a temporary directory to store the downloaded files
+            output_directory = './downloaded_files'
+            os.makedirs(output_directory, exist_ok=True)
+            
+            with st.spinner("Downloading files..."):
+                for folder_name in list_folders_to_download:
+                    download_files_in_folder(bucket, folder_name, output_directory)
+            
+            # Create a zip archive of the downloaded files
+            with zipfile.ZipFile('downloaded_files.zip', 'w') as zipf:
+                for root, _, files in os.walk(output_directory):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        zipf.write(file_path, os.path.relpath(file_path, output_directory))
+            
+            # Provide a download button for the zip file
+            with open('downloaded_files.zip', 'rb') as zip_file:
+                zip_file_binary = zip_file.read()
+            st.download_button(
+                label="Download All Files",
+                data=zip_file_binary,
+                file_name='downloaded_olders.zip',
+                key='download_button'
+            )
                           
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","MILL SHIPMENTS"])

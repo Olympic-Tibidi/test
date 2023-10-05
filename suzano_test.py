@@ -355,7 +355,7 @@ if authentication_status:
                     st.download_button(
                         label="DOWNLOAD EDI",
                         data=dd,
-                        file_name=f'{fg}',
+                        file_name=f'dsd',
                         mime='text/csv')
               
         if select=="ADMIN" :

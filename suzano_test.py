@@ -345,7 +345,7 @@ if authentication_status:
             if st.button("BACKUP DATA"):
                 st.write("OK")
                 client = storage.Client()
-                bucket = storage_client.bucket(target_bucket)
+                bucket = client.bucket(target_bucket)
                 
                 
                 list_files_to_download = ['suzano_report.json', 'Inventory.csv']

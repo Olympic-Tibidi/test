@@ -383,7 +383,7 @@ if authentication_status:
             # Create the directory locally
             Path(str_folder_name_on_gcs).mkdir(parents=True, exist_ok=True)
             
-            blobs = target_bucket.list_blobs(prefix=str_folder_name_on_gcs)
+            blobs = bucket.list_blobs(prefix=str_folder_name_on_gcs)
             for blob in blobs:
                 if not blob.name.endswith('/'):
                     # This blob is not a directory!

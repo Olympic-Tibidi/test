@@ -335,13 +335,17 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
-            def gcp_download_x(bucket_name, source_file_name,dest):
-                storage_client = storage.Client()
-                bucket = storage_client.bucket(bucket_name)
-                blob = bucket.blob(source_file_name)
-                data = blob.download_as_bytes()
-                return data
+            def download_files_in_folder(bucket, folder_name, output_directory):
+                blob_iterator = bucket.list_blobs(prefix=folder_name)
+            
+                for blob in blob_iterator:
+                    # Skip folders (objects ending with '/')
+                    if blob.name.endswith('/'):
+                        continue
 
+                     # Download the file to the specified output directory
+                    output_path = os.path.join(output_directory, blob.name)
+                    blob.download_to_filename(output_path)
             if st.button("BACKUP DATA"):
                 st.write("OK")
                 client = storage.Client()

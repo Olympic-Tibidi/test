@@ -33,6 +33,7 @@ import yaml
 from yaml.loader import SafeLoader
 #from streamlit_extras.dataframe_explorer import dataframe_explorer
 import math
+from pathlib import Path
 
 import zipfile
 
@@ -375,8 +376,22 @@ if authentication_status:
                 file_name='downloaded_files.zip',
                 key='download_button'
             )
+            
             list_folders_to_download = ['EDIS/', 'release_orders/']
-    
+            str_folder_name_on_gcs = 'EDIS/'
+
+            # Create the directory locally
+            Path(str_folder_name_on_gcs).mkdir(parents=True, exist_ok=True)
+            
+            blobs = target_bucket.list_blobs(prefix=str_folder_name_on_gcs)
+            for blob in blobs:
+                if not blob.name.endswith('/'):
+                    # This blob is not a directory!
+                    print(f'Downloading file [{blob.name}]')
+                    blob.download_to_filename(f'./{blob.name}')
+            with zipfile.ZipFile('downloaded_folders.zip', 'w') as zipf:
+                    for file_to_download in list_files_to_download:
+                        zipf.write(file_to_download)
            
                           
         if select=="ADMIN" :

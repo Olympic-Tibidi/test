@@ -335,9 +335,23 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
-            pass
+            def gcp_download_x(bucket_name, source_file_name,dest):
+                storage_client = storage.Client()
+                bucket = storage_client.bucket(bucket_name)
+                blob = bucket.blob(source_file_name)
+                data = blob.download_as_bytes()
+                return data
+
             if st.button("BACKUP DATA"):
-                pass
+                
+                client = storage.Client()
+                bucket = storage_client.bucket(target_bucket)
+                
+                
+                list_files_to_download = ['suzano_report.json', 'Inventory.csv']
+                for file_to_download in list_files_to_download:
+                    blob = bucket.blob(file_to_download)
+                    blob.download_to_filename(f'./{blob.name}')
               
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","MILL SHIPMENTS"])

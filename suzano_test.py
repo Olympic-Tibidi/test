@@ -376,7 +376,8 @@ if authentication_status:
                 file_name='downloaded_files.zip',
                 key='download_button'
             )
-            
+            client = storage.Client()
+            bucket = client.bucket(target_bucket)
             list_folders_to_download = ['EDIS/', 'release_orders/']
             str_folder_name_on_gcs = 'EDIS/'
 

@@ -382,7 +382,7 @@ if authentication_status:
             
             with st.spinner("Downloading files..."):
                 for folder_name in list_folders_to_download:
-                    download_files_in_folder(bucket, folder_name, output_directory)
+                    download_files_in_folder(target_bucket, folder_name, output_directory)
             
             # Create a zip archive of the downloaded files
             with zipfile.ZipFile('downloaded_files.zip', 'w') as zipf:

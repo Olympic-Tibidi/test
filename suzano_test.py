@@ -361,11 +361,15 @@ if authentication_status:
                         zipf.write(file_to_download)
             
                 # Provide a download button for the zip file
+            with open('downloaded_files.zip', 'rb') as zip_file:
+                zip_file_binary = zip_file.read()
             st.download_button(
                 label="Download All Files",
-                data='downloaded_files.zip',
+                data=zip_file_binary,
+                file_name='downloaded_files.zip',
                 key='download_button'
             )
+          
                           
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","MILL SHIPMENTS"])

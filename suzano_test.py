@@ -1126,7 +1126,20 @@ if authentication_status:
         
         if select=="LOADOUT" :
         
-            
+            check_bills=gcp_download(target_bucket,"terminal_bill_of_ladings.json")
+            check_bills=pd.read_json(check_bills).T
+            load_dict={}
+            for row in check_bills.index[1:]:
+                #print(df.loc[row,'loads'])
+                for unit in check_bills.loc[row,'loads'].keys():
+                    load_dict[unit]={"BOL":row,"RO":check_bills.loc[row,'release_order'],"destination":check_bills.loc[row,'destination'],
+                                     "OBOL":check_bills.loc[row,'ocean_bill_of_lading'],
+                                     "grade":check_bills.loc[row,'grade'],"carrier_Id":check_bills.loc[row,'carrier_id'],
+                                     "vehicle":check_bills.loc[row,'vehicle'],"date":check_bills.loc[row,'issued']                        
+                                    }
+    
+   
+            Load_df=pd.DataFrame(load_dict).T      
             bill_mapping=gcp_download(target_bucket,"bill_mapping.json")
             bill_mapping=json.loads(bill_mapping)
             mill_info_=gcp_download(target_bucket,rf"mill_info.json")
@@ -1331,7 +1344,8 @@ if authentication_status:
                                 if bill_mapping[x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[x[:-2]]["Batch"]!=batch:
                                     
                                     return False
-                                                                                
+                                if x in Load_df.index:
+                                    return False
                                 else:
                                     return True
                     def audit_split(release,sales):

@@ -1344,8 +1344,7 @@ if authentication_status:
                                 if bill_mapping[x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[x[:-2]]["Batch"]!=batch:
                                     
                                     return False
-                                if x in Load_df.index:
-                                    return False
+                                
                                 else:
                                     return True
                     def audit_split(release,sales):
@@ -1484,7 +1483,10 @@ if authentication_status:
                                         st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                         faults.append(1)
                                         st.markdown("**:red[This unit has been scanned TWICE!]**")
-                                        
+                                    if x in Load_df.index:
+                                        st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                        faults.append(1)
+                                        st.markdown("**:red[This unit has been SHIPPED!]**")
                                     else:
                                         st.write(f"**Unit No : {i+1}-{x}**")
                                         faults.append(0)

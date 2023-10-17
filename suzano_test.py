@@ -41,7 +41,7 @@ import plotly.graph_objects as go
 st.set_page_config(layout="wide")
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"
-target_bucket="olym_suzano"
+target_bucket="olym_suzano_test"
 def check_password():
     """Returns `True` if the user had a correct password."""
 

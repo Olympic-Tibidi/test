@@ -33,7 +33,6 @@ import yaml
 from yaml.loader import SafeLoader
 #from streamlit_extras.dataframe_explorer import dataframe_explorer
 import math
-from pathlib import Path
 
 import zipfile
 
@@ -42,7 +41,7 @@ import plotly.graph_objects as go
 st.set_page_config(layout="wide")
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"
-target_bucket="olym_suzano_test"
+target_bucket="olym_suzano"
 def check_password():
     """Returns `True` if the user had a correct password."""
 
@@ -393,19 +392,21 @@ if authentication_status:
             with zipfile.ZipFile('downloaded_folders.zip', 'w') as zipf:
                     for file_to_download in list_files_to_download:
                         zipf.write(file_to_download)
-           
-                          
+            pass
+            if st.button("BACKUP DATA"):
+                pass
+              
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","MILL SHIPMENTS"])
             with admin_tab2:
-                bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                bill_data=gcp_download("olym_suzano",rf"terminal_bill_of_ladings.json")
                 admin_bill_of_ladings=json.loads(bill_data)
                 st.dataframe(pd.DataFrame.from_dict(admin_bill_of_ladings).T[1:])
             with admin_tab3:
-                edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/KIRKENES-2304/")
+                edi_files=list_files_in_subfolder("olym_suzano", rf"EDIS/KIRKENES-2304/")
                 requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
                 try:
-                    requested_edi=gcp_download(target_bucket, rf"EDIS/KIRKENES-2304/{requested_edi_file}")
+                    requested_edi=gcp_download("olym_suzano", rf"EDIS/KIRKENES-2304/{requested_edi_file}")
                     st.text_area("EDI",requested_edi,height=400)                                
                    
                     st.download_button(
@@ -570,49 +571,52 @@ if authentication_status:
                 with mill_tab1:
                     month=st.selectbox("SELECT MONTH",["SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"])
                     schedule=pd.read_excel(schedule,sheet_name=month,header=None,index_col=None)
-                    current_schedule,zf=process_schedule()
-                    current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
-                    def elementwise_sum(t1, t2,t3,t4,t5):
-                        return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])
-                    truck_schedule=current_schedule.copy()
-                    ton_schedule=current_schedule.copy()
-                    truck_schedule["Total"]= truck_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
-                    totals=[]
-                    for col in truck_schedule.columns:  
-                        total=(0,0)
-                        for ix in truck_schedule.index:
-                            total=(total[0]+truck_schedule.loc[ix,col][0],total[1]+truck_schedule.loc[ix,col][1])
-                        totals.append(total)
-                    
-                        
-                    truck_schedule.loc["TOTAL"]=totals
-                    choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])                   
-                   
-                    if choice=="TRUCKS":
-                        st.markdown("**TRUCKS - (Actual # of Loaded Trucks,Planned # of Trucks)**")                    
-                        st.table(truck_schedule)
-                    else:
-                        st.markdown("**TONS - (Actual Shipped Tonnage,Planned Tonnage)**")
-                        totals=[0]*len(ton_schedule)
-                        for ix in ton_schedule.index:
-                            for i in ton_schedule.columns:
-                                if i in [ 'GP WAUNA - OR','GP HALSEY - OR']:
-                                    ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*28,ton_schedule.loc[ix,i][1]*28)
-                             
-                                else:
-                                    ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*20,ton_schedule.loc[ix,i][1]*20)
-                        ton_schedule["Total"]= ton_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
+                    try:
+                        current_schedule,zf=process_schedule()
+                        current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
+                        def elementwise_sum(t1, t2,t3,t4,t5):
+                            return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])
+                        truck_schedule=current_schedule.copy()
+                        ton_schedule=current_schedule.copy()
+                        truck_schedule["Total"]= truck_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
                         totals=[]
-                        for col in ton_schedule.columns:  
+                        for col in truck_schedule.columns:  
                             total=(0,0)
-                            for ix in ton_schedule.index:
-                                total=(total[0]+ton_schedule.loc[ix,col][0],total[1]+ton_schedule.loc[ix,col][1])
+                            for ix in truck_schedule.index:
+                                total=(total[0]+truck_schedule.loc[ix,col][0],total[1]+truck_schedule.loc[ix,col][1])
                             totals.append(total)
-                    
                         
-                        ton_schedule.loc["TOTAL"]=totals
-                    
-                        st.table(pd.DataFrame(ton_schedule))
+                            
+                        truck_schedule.loc["TOTAL"]=totals
+                        choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])                   
+                       
+                        if choice=="TRUCKS":
+                            st.markdown("**TRUCKS - (Actual # of Loaded Trucks,Planned # of Trucks)**")                    
+                            st.table(truck_schedule)
+                        else:
+                            st.markdown("**TONS - (Actual Shipped Tonnage,Planned Tonnage)**")
+                            totals=[0]*len(ton_schedule)
+                            for ix in ton_schedule.index:
+                                for i in ton_schedule.columns:
+                                    if i in [ 'GP WAUNA - OR','GP HALSEY - OR']:
+                                        ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*28,ton_schedule.loc[ix,i][1]*28)
+                                 
+                                    else:
+                                        ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*20,ton_schedule.loc[ix,i][1]*20)
+                            ton_schedule["Total"]= ton_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
+                            totals=[]
+                            for col in ton_schedule.columns:  
+                                total=(0,0)
+                                for ix in ton_schedule.index:
+                                    total=(total[0]+ton_schedule.loc[ix,col][0],total[1]+ton_schedule.loc[ix,col][1])
+                                totals.append(total)
+                        
+                            
+                            ton_schedule.loc["TOTAL"]=totals
+                        
+                            st.table(pd.DataFrame(ton_schedule))
+                    except:
+                        pass
                     
                     
                 
@@ -709,29 +713,29 @@ if authentication_status:
                                 st.markdown(f"**{bls[i]} units of Bill of Lading {bls.keys()[i]} - -{wrap_dict[wraps[i]]}-{wraps[i]}**")
                         with col2:
                             if st.button("RECORD PARSED SHIPMENT TO DATABASE"):
-                                #st.write(list_cs_files(target_bucket))
+                                #st.write(list_cs_files("olym_suzano"))
                                 temp=new_df.to_csv("temp.csv")
-                                upload_cs_file(target_bucket, 'temp.csv',rf"shipping_files/{gemi}-{voyage}-shipping_file.csv") 
+                                upload_cs_file("olym_suzano", 'temp.csv',rf"shipping_files/{gemi}-{voyage}-shipping_file.csv") 
                                 st.write(f"Uploaded {gemi}-{voyage}-shipping_file.csv to database")
                         st.dataframe(new_df)
                     with shipment_tab2:
-                        folder_name = "olym_suzano_test/shipping_files"  # Replace this with the folder path you want to read
-                        files_in_folder = list_files_in_folder(target_bucket, "shipping_files")
+                        folder_name = "olym_suzano/shipping_files"  # Replace this with the folder path you want to read
+                        files_in_folder = list_files_in_folder("olym_suzano", "shipping_files")
                         requested_file=st.selectbox("SHIPPING FILES IN DATABASE",files_in_folder[1:])
                         if st.button("LOAD SHIPPING FILE"):
-                            requested_shipping_file=gcp_csv_to_df(target_bucket, requested_file)
+                            requested_shipping_file=gcp_csv_to_df("olym_suzano", requested_file)
                             filtered_df=requested_shipping_file[["Lot","Lot Qty","Batch","Grade","Ocean B/L","DryWeight","ADMT","Location",
                                                                                       "Warehouse_In","Warehouse_Out","Vehicle_Id","Release_Order_Number","Carrier_Code"]]
                             #st.data_editor(filtered_df, use_container_width=True)
                             st.data_editor(filtered_df)
                           
             with admin_tab1:
-                carrier_list_=gcp_download(target_bucket,rf"carrier.json")
+                carrier_list_=gcp_download("olym_suzano",rf"carrier.json")
                 carrier_list=json.loads(carrier_list_)
-                junk=gcp_download(target_bucket,rf"junk_release.json")
+                junk=gcp_download("olym_suzano",rf"junk_release.json")
                 junk=json.loads(junk)
                 try:
-                    release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                    release_order_database=gcp_download("olym_suzano",rf"release_orders/RELEASE_ORDERS.json")
                     release_order_database=json.loads(release_order_database)
                 except:
                     release_order_database={}
@@ -741,7 +745,7 @@ if authentication_status:
                 with release_order_tab1:
                     vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304"])
                     edit=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER")
-                    batch_mapping=gcp_download(target_bucket,rf"batch_mapping.json")
+                    batch_mapping=gcp_download("olym_suzano",rf"batch_mapping.json")
                     batch_mapping=json.loads(batch_mapping)
                     if edit:
                         #release_order_number=st.selectbox("SELECT RELEASE ORDER",(list_files_in_folder("olym_suzano", "release_orders/{vessel}")))
@@ -762,7 +766,7 @@ if authentication_status:
                     dryness=st.text_input("Dryness",batch_mapping[ocean_bill_of_lading]["dryness"],disabled=True)
                     admt=st.text_input("ADMT PER UNIT",round(int(batch_mapping[ocean_bill_of_lading]["dryness"])/90,6),disabled=True)
                     unitized=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
-                    quantity=st.number_input("Quantity of Units", min_value=1, max_value=800, value=1, step=1,  key=None, help=None, on_change=None, disabled=False, label_visibility="visible")
+                    quantity=st.number_input("Quantity of Units", min_value=1, max_value=5000, value=1, step=1,  key=None, help=None, on_change=None, disabled=False, label_visibility="visible")
                     tonnage=2*quantity
                     #queue=st.number_input("Place in Queue", min_value=1, max_value=20, value=1, step=1,  key=None, help=None, on_change=None, disabled=False, label_visibility="visible")
                     transport_type=st.radio("Select Transport Type",("TRUCK","RAIL"))
@@ -773,7 +777,7 @@ if authentication_status:
                     if create_release_order:
                         
                         if edit: 
-                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
+                            data=gcp_download("olym_suzano",rf"release_orders/{vessel}/{release_order_number}.json")
                             to_edit=json.loads(data)
                             temp=edit_release_order_data(to_edit,vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
                             st.write(f"ADDED sales order item {sales_order_item} to release order {release_order_number}!")
@@ -782,15 +786,15 @@ if authentication_status:
                             temp=store_release_order_data(vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
                      
                         try:
-                            junk=gcp_download(target_bucket,rf"release_orders/{vessel}/junk_release.json")
+                            junk=gcp_download("olym_suzano",rf"release_orders/{vessel}/junk_release.json")
                         except:
-                            junk=gcp_download(target_bucket,rf"junk_release.json")
+                            junk=gcp_download("olym_suzano",rf"junk_release.json")
                         junk=json.loads(junk)
                         try:
                             del junk[release_order_number]
                             jason_data=json.dumps(junk)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
+                            bucket = storage_client.bucket("olym_suzano")
                             blob = bucket.blob(rf"release_orders/{vessel}/junk_release.json")
                             blob.upload_from_string(jason_data)
                         except:
@@ -798,7 +802,7 @@ if authentication_status:
                         
 
                         storage_client = storage.Client()
-                        bucket = storage_client.bucket(target_bucket)
+                        bucket = storage_client.bucket("olym_suzano")
                         blob = bucket.blob(rf"release_orders/{vessel}/{release_order_number}.json")
                         blob.upload_from_string(temp)
 
@@ -812,7 +816,7 @@ if authentication_status:
                             release_order_database[release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}
                         release_orders_json=json.dumps(release_order_database)
                         storage_client = storage.Client()
-                        bucket = storage_client.bucket(target_bucket)
+                        bucket = storage_client.bucket("olym_suzano")
                         blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                         blob.upload_from_string(release_orders_json)
                         st.write(f"Recorded Release Order - {release_order_number} for Item No: {sales_order_item}")
@@ -822,7 +826,7 @@ if authentication_status:
                     vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304"],key="other")
                     rls_tab1,rls_tab2=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS"])
 
-                    data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                    data=gcp_download("olym_suzano",rf"release_orders/RELEASE_ORDERS.json")
                     try:
                         release_order_dictionary=json.loads(data)
                     except: 
@@ -844,9 +848,9 @@ if authentication_status:
                             if not_yet==0:
                                 completed_release_orders.append(key)
                         
-                        files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")]   ### REMOVE json extension from name
+                        files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder("olym_suzano", rf"release_orders/KIRKENES-2304/")]   ### REMOVE json extension from name
                         
-                        junk=gcp_download(target_bucket,rf"junk_release.json")
+                        junk=gcp_download("olym_suzano",rf"junk_release.json")
                         junk=json.loads(junk)
                         files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
                         files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
@@ -866,7 +870,7 @@ if authentication_status:
                         except:
                             st.write("NO RELEASE ORDERS YET")
                         try:
-                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
+                            data=gcp_download("olym_suzano",rf"release_orders/{vessel}/{requested_file}.json")
                             release_order_json = json.loads(data)
                             
                             
@@ -886,7 +890,7 @@ if authentication_status:
                         #### DISPATCHED CLEANUP  #######
                         
                         try:
-                            dispatched=gcp_download(target_bucket,rf"dispatched.json")
+                            dispatched=gcp_download("olym_suzano",rf"dispatched.json")
                             dispatched=json.loads(dispatched)
                             #st.write(dispatched)
                         except:
@@ -903,7 +907,7 @@ if authentication_status:
                            
                             json_data = json.dumps(dispatched)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
+                            bucket = storage_client.bucket("olym_suzano")
                             blob = bucket.blob(rf"dispatched.json")
                             blob.upload_from_string(json_data)
                         except:
@@ -1042,7 +1046,7 @@ if authentication_status:
                                     
                                     json_data = json.dumps(dispatch)
                                     storage_client = storage.Client()
-                                    bucket = storage_client.bucket(target_bucket)
+                                    bucket = storage_client.bucket("olym_suzano")
                                     blob = bucket.blob(rf"dispatched.json")
                                     blob.upload_from_string(json_data)
                                     st.markdown(f"**DISPATCHED Release Order Number {requested_file} Item No : {hangisi} to Warehouse**")
@@ -1050,24 +1054,24 @@ if authentication_status:
                                 
                                 if st.button("DELETE SALES ORDER ITEM",key="lalag"):
                                     
-                                    data_d=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
+                                    data_d=gcp_download("olym_suzano",rf"release_orders/{vessel}/{requested_file}.json")
                                     to_edit_d=json.loads(data_d)
                                     to_edit_d[vessel][requested_file].pop(hangisi)
                                     #st.write(to_edit_d)
                                     
                                     json_data = json.dumps(to_edit_d)
                                     storage_client = storage.Client()
-                                    bucket = storage_client.bucket(target_bucket)
+                                    bucket = storage_client.bucket("olym_suzano")
                                     blob = bucket.blob(rf"release_orders/{vessel}/{requested_file}.json")
                                     blob.upload_from_string(json_data)
                                 if st.button("DELETE RELEASE ORDER ITEM!",key="laladg"):
-                                    junk=gcp_download(target_bucket,rf"junk_release.json")
+                                    junk=gcp_download("olym_suzano",rf"junk_release.json")
                                     junk=json.loads(junk)
                                    
                                     junk[requested_file]=1
                                     json_data = json.dumps(junk)
                                     storage_client = storage.Client()
-                                    bucket = storage_client.bucket(target_bucket)
+                                    bucket = storage_client.bucket("olym_suzano")
                                     blob = bucket.blob(rf"junk_release.json")
                                     blob.upload_from_string(json_data)
                                            
@@ -1076,12 +1080,12 @@ if authentication_status:
                                     dispatch={}
                                     json_data = json.dumps(dispatch)
                                     storage_client = storage.Client()
-                                    bucket = storage_client.bucket(target_bucket)
+                                    bucket = storage_client.bucket("olym_suzano")
                                     blob = bucket.blob(rf"dispatched.json")
                                     blob.upload_from_string(json_data)
                                     st.markdown(f"**CLEARED ALL DISPATCHES**")   
                             with dol3:
-                                dispatch=gcp_download(target_bucket,rf"dispatched.json")
+                                dispatch=gcp_download("olym_suzano",rf"dispatched.json")
                                 dispatch=json.loads(dispatch)
                                 try:
                                     item=st.selectbox("CHOOSE ITEM",dispatch.keys())
@@ -1089,7 +1093,7 @@ if authentication_status:
                                         del dispatch[item]
                                         json_data = json.dumps(dispatch)
                                         storage_client = storage.Client()
-                                        bucket = storage_client.bucket(target_bucket)
+                                        bucket = storage_client.bucket("olym_suzano")
                                         blob = bucket.blob(rf"dispatched.json")
                                         blob.upload_from_string(json_data)
                                         st.markdown(f"**CLEARED DISPATCH ITEM {item}**")   
@@ -1097,7 +1101,7 @@ if authentication_status:
                                     pass
                             st.markdown("**CURRENT DISPATCH QUEUE**")
                             try:
-                                dispatch=gcp_download(target_bucket,rf"dispatched.json")
+                                dispatch=gcp_download("olym_suzano",rf"dispatched.json")
                                 dispatch=json.loads(dispatch)
                                 try:
                                     for dispatched_release in dispatch.keys():
@@ -1113,8 +1117,38 @@ if authentication_status:
                         else:
                             st.write("NO RELEASE ORDERS IN DATABASE")
                     with rls_tab2:
-                        pass
-                        #sales_orders_completed=[k for k in targets if target[k]['remaining']<=0]
+                        data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                        completed_release_orders=[]
+                        
+                        for key in release_order_database:
+                            not_yet=0
+                            #st.write(key)
+                            for sales in release_order_database[key]:
+                                #st.write(sales)
+                                if release_order_database[key][sales]["remaining"]>0:
+                                    not_yet=1
+                                else:
+                                    pass#st.write(f"{key}{sales} seems to be finished")
+                            if not_yet==0:
+                                completed_release_orders.append(key)
+                        
+                        for completed in completed_release_orders:
+                            st.write(completed)
+                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{completed}.json")
+                            comp_rel_order=json.loads(data)
+                        
+                        completed_release_order_dest_map={}
+                  
+                        for i in release_order_dictionary:
+                            if i in completed_release_orders:
+                                completed_release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
+                        st.write(completed_release_order_dest_map)
+                        destinations_of_completed_release_orders=[f"{i} to {completed_release_order_dest_map[i]}" for i in completed_release_orders]
+                    
+                                                                    
+                        requested_file_=st.selectbox("COMPLETED RELEASE ORDERS",destinations_of_completed_release_orders,key=16)
+                        requested_file=requested_file_.split(" ")[0]
+                        nofile=0
                         
                                 
         
@@ -1126,30 +1160,17 @@ if authentication_status:
         
         if select=="LOADOUT" :
         
-            check_bills=gcp_download(target_bucket,"terminal_bill_of_ladings.json")
-            check_bills=pd.read_json(check_bills).T
-            load_dict={}
-            for row in check_bills.index[1:]:
-                #print(df.loc[row,'loads'])
-                for unit in check_bills.loc[row,'loads'].keys():
-                    load_dict[unit]={"BOL":row,"RO":check_bills.loc[row,'release_order'],"destination":check_bills.loc[row,'destination'],
-                                     "OBOL":check_bills.loc[row,'ocean_bill_of_lading'],
-                                     "grade":check_bills.loc[row,'grade'],"carrier_Id":check_bills.loc[row,'carrier_id'],
-                                     "vehicle":check_bills.loc[row,'vehicle'],"date":check_bills.loc[row,'issued']                        
-                                    }
-    
-   
-            Load_df=pd.DataFrame(load_dict).T      
-            bill_mapping=gcp_download(target_bucket,"bill_mapping.json")
+            
+            bill_mapping=gcp_download("olym_suzano","bill_mapping.json")
             bill_mapping=json.loads(bill_mapping)
-            mill_info_=gcp_download(target_bucket,rf"mill_info.json")
+            mill_info_=gcp_download("olym_suzano",rf"mill_info.json")
             mill_info=json.loads(mill_info_)
             no_dispatch=0
             number=None
             if number not in st.session_state:
                 st.session_state.number=number
             try:
-                dispatched=gcp_download(target_bucket,"dispatched.json")
+                dispatched=gcp_download("olym_suzano","dispatched.json")
                 dispatched=json.loads(dispatched)
             except:
                 no_dispatch=1
@@ -1190,13 +1211,13 @@ if authentication_status:
                 except:
                     
                     pass
-                info=gcp_download(target_bucket,rf"release_orders/{vessel}/{work_order}.json")
+                info=gcp_download("olym_suzano",rf"release_orders/{vessel}/{work_order}.json")
                 info=json.loads(info)
                 
                 
                 #if st.checkbox("CLICK TO LOAD MIXED SKU"):
                 #    try:
-                  #      next_item=gcp_download(target_bucket,rf"release_orders/{dispatched['2']['vessel']}/{dispatched['2']['release_order']}.json")
+                  #      next_item=gcp_download("olym_suzano",rf"release_orders/{dispatched['2']['vessel']}/{dispatched['2']['release_order']}.json")
                   #      double_load=True
                  #   except:
                    #     st.markdown("**:red[ONLY ONE ITEM IN QUEUE ! ASK NEXT ITEM TO BE DISPATCHED!]**")
@@ -1286,6 +1307,7 @@ if authentication_status:
                     eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
                     
                 with col2:
+                    ocean_bol_to_batch = {"GSSWKIR6013D": 45302855,"GSSWKIR6013E": 45305548}
                     if double_load:
                         release_order_number=st.text_input("Release Order Number",current_release_order,disabled=True,help="Release Order Number without the Item no")
                         sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
@@ -1344,7 +1366,7 @@ if authentication_status:
                                 if bill_mapping[x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[x[:-2]]["Batch"]!=batch:
                                     
                                     return False
-                                
+                                                                                
                                 else:
                                     return True
                     def audit_split(release,sales):
@@ -1365,7 +1387,7 @@ if authentication_status:
                     if double_load:
                         
                         try:
-                            next_item=gcp_download(target_bucket,rf"release_orders/{dispatched['2']['vessel']}/{dispatched['2']['release_order']}.json")
+                            next_item=gcp_download("olym_suzano",rf"release_orders/{dispatched['2']['vessel']}/{dispatched['2']['release_order']}.json")
                             
                             first_load_input=st.text_area("**FIRST SKU LOADS**",height=300)
                             first_quantity=0
@@ -1483,10 +1505,7 @@ if authentication_status:
                                         st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                         faults.append(1)
                                         st.markdown("**:red[This unit has been scanned TWICE!]**")
-                                    if x in Load_df.index:
-                                        st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                        faults.append(1)
-                                        st.markdown("**:red[This unit has been SHIPPED!]**")
+                                        
                                     else:
                                         st.write(f"**Unit No : {i+1}-{x}**")
                                         faults.append(0)
@@ -1583,7 +1602,7 @@ if authentication_status:
                         if proceed:
                             carrier_code=carrier_code.split("-")[0]
                             try:
-                                suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
+                                suzano_report_=gcp_download("olym_suzano",rf"suzano_report.json")
                                 suzano_report=json.loads(suzano_report_)
                             except:
                                 suzano_report={}
@@ -1615,7 +1634,7 @@ if authentication_status:
                                                 
                             bill_of_ladings=json.dumps(bill_of_ladings)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
+                            bucket = storage_client.bucket("olym_suzano")
                             blob = bucket.blob(rf"terminal_bill_of_ladings.json")
                             blob.upload_from_string(bill_of_ladings)
                             
@@ -1639,21 +1658,22 @@ if authentication_status:
                                
                                 suzano_report.update({next_report_no:{"Date Shipped":f"{a_} {b_}","Vehicle":vehicle_id, "Shipment ID #": bill_of_lading_number, "Consignee":consignee,"Consignee City":consignee_city,
                                                      "Consignee State":consignee_state,"Release #":release_order_number,"Carrier":carrier_code,
-                                                     "ETA":eta,"Ocean BOL#":ocean_bill_of_lading,"Warehouse":"OLYM","Vessel":vessel_suzano,"Voyage #":voyage_suzano,"Grade":wrap,"Quantity":quantity,
+                                                     "ETA":eta,"Ocean BOL#":ocean_bill_of_lading,"Batch#":ocean_bol_to_batch[ocean_bill_of_lading],
+                                                     "Warehouse":"OLYM","Vessel":vessel_suzano,"Voyage #":voyage_suzano,"Grade":wrap,"Quantity":quantity,
                                                      "Metric Ton": quantity*2, "ADMT":admt,"Mode of Transportation":transport_type}})
                                 suzano_report=json.dumps(suzano_report)
                                 storage_client = storage.Client()
-                                bucket = storage_client.bucket(target_bucket)
+                                bucket = storage_client.bucket("olym_suzano")
                                 blob = bucket.blob(rf"suzano_report.json")
                                 blob.upload_from_string(suzano_report)
     
                               
-                                mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
+                                mill_progress=json.loads(gcp_download("olym_suzano",rf"mill_progress.json"))
                                 map={8:"SEP 2023",9:"SEP 2023",10:"OCT 2023",11:"NOV 2023",12:"DEC 2023"}
                                 mill_progress[destination][map[file_date.month]]["Shipped"]=mill_progress[destination][map[file_date.month]]["Shipped"]+len(textsplit)*2
                                 json_data = json.dumps(mill_progress)
                                 storage_client = storage.Client()
-                                bucket = storage_client.bucket(target_bucket)
+                                bucket = storage_client.bucket("olym_suzano")
                                 blob = bucket.blob(rf"mill_progress.json")
                                 blob.upload_from_string(json_data)       
                             if double_load:
@@ -1678,18 +1698,18 @@ if authentication_status:
                                 
                                 json_data = json.dumps(dispatched)
                                 storage_client = storage.Client()
-                                bucket = storage_client.bucket(target_bucket)
+                                bucket = storage_client.bucket("olym_suzano")
                                 blob = bucket.blob(rf"dispatched.json")
                                 blob.upload_from_string(json_data)       
                             
                             json_data = json.dumps(info)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
+                            bucket = storage_client.bucket("olym_suzano")
                             blob = bucket.blob(rf"release_orders/{vessel}/{current_release_order}.json")
                             blob.upload_from_string(json_data)
     
                             try:
-                                release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                                release_order_database=gcp_download("olym_suzano",rf"release_orders/RELEASE_ORDERS.json")
                                 release_order_database=json.loads(release_order_database)
                             except:
                                 release_order_database={}
@@ -1697,7 +1717,7 @@ if authentication_status:
                             release_order_database[current_release_order][current_sales_order]["remaining"]=release_order_database[current_release_order][current_sales_order]["remaining"]-quantity
                             release_order_database=json.dumps(release_order_database)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
+                            bucket = storage_client.bucket("olym_suzano")
                             blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                             blob.upload_from_string(release_order_database)
                             with open('placeholder.txt', 'r') as f:
@@ -1716,8 +1736,8 @@ if authentication_status:
                             body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                             st.write(body)           
                             sender = "warehouseoly@gmail.com"
-                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                            recipients = ["afsiny@portolympia.com"]
+                            recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                            #recipients = ["afsiny@portolympia.com"]
                             password = "xjvxkmzbpotzeuuv"
                     
                   
@@ -1729,7 +1749,7 @@ if authentication_status:
                             file_path = 'temp_file.txt'  # Use the path of the temporary file
                     
                             send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
-                            upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}") 
+                            upload_cs_file("olym_suzano", 'temp_file.txt',rf"EDIS/{vessel}/{file_name}") 
                             
                         else:   ###cancel bill of lading
                             pass
@@ -1824,8 +1844,9 @@ if authentication_status:
                     suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
                     suzano_report=json.loads(suzano_report_)
                     suzano_report=pd.DataFrame(suzano_report).T
-                    suzano_report=suzano_report[["Date Shipped","Vehicle", "Shipment ID #", "Consignee","Consignee City","Consignee State","Release #","Carrier","ETA","Ocean BOL#","Warehouse","Vessel","Voyage #","Grade","Quantity","Metric Ton", "ADMT","Mode of Transportation"]]
+                    suzano_report=suzano_report[["Date Shipped","Vehicle", "Shipment ID #", "Consignee","Consignee City","Consignee State","Release #","Carrier","ETA","Ocean BOL#","Batch#","Warehouse","Vessel","Voyage #","Grade","Quantity","Metric Ton", "ADMT","Mode of Transportation"]]
                     suzano_report["Shipment ID #"]=[str(i) for i in suzano_report["Shipment ID #"]]
+                    suzano_report["Batch#"]=[str(i) for i in suzano_report["Batch#"]]
                     daily_suzano=suzano_report.copy()
                     daily_suzano["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suzano_report["Date Shipped"]]
                     daily_suzano=daily_suzano[daily_suzano["Date"]==now.date()]
@@ -1963,8 +1984,10 @@ if authentication_status:
                         
                    
             with inv5:
+                
                 schedule=gcp_download_x(target_bucket,rf"truck_schedule.xlsx","schedule.xlsx")
-                schedule=pd.read_excel(schedule,sheet_name="SEPTEMBER",header=None,index_col=None)
+                
+                
                 report=json.loads(gcp_download(target_bucket,rf"suzano_report.json"))
                 locations=[ 'GP WAUNA - OR',
                                  'GP HALSEY - OR',
@@ -2067,10 +2090,12 @@ if authentication_status:
                         when=datetime.datetime.strptime(report[i]["Date Shipped"],"%Y-%m-%d %H:%M:%S").date()
                         qt=report[i]["Metric Ton"]
                         #print(when)
-                        if location_dict[where][when]:
+                        try:
                             
                             location_dict[where][when].shipped_quantity+=qt
                             location_dict[where][when].remaining-=qt
+                        except:
+                            pass
                     for i in df.columns:
                         for k in df.index:
                             #print(k.date())
@@ -2092,41 +2117,85 @@ if authentication_status:
                         #print(location_dict[i])
                     def color_coding(row):
                         return ['color:red'] * len(row) if row['CLEARWATER - LEWISTON ID'] == (5,5) else ['color:green'] * len(row)
-                    #st.dataframe(df.style.apply(color_coding, axis=1))
-                    #df=df.style.applymap(lambda x: f"color: {'red' if isinstance(x,str) else 'black'}")
+                    
+                    df=df.loc[pd.notnull(df.index)]
+                    zf=zf.loc[pd.notnull(zf.index)]
                     return df,zf
                 
 
                 
                 mill_tab1,mill_tab2=st.tabs(["CURRENT SCHEDULE","MILL PROGRESS"])
                 
-                
-                
+                              
                 with mill_tab1:
-                    
-                    current_schedule,zf=process_schedule()
-                    current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
-                    def elementwise_sum(t1, t2,t3,t4,t5):
-                        return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])
-                    truck_schedule=current_schedule.copy()
-                    ton_schedule=current_schedule.copy()
-                    truck_schedule["Total"]= truck_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
-                    totals=[]
-                    for col in truck_schedule.columns:  
-                        total=(0,0)
-                        for ix in truck_schedule.index:
-                            total=(total[0]+truck_schedule.loc[ix,col][0],total[1]+truck_schedule.loc[ix,col][1])
-                        totals.append(total)
-                    
+                    month=st.selectbox("SELECT MONTH",["SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"])
+                    schedule=pd.read_excel(schedule,sheet_name=month,header=None,index_col=None)
+                    try:
                         
-                    truck_schedule.loc["TOTAL"]=totals
-                    choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])                   
-                   
-                    if choice=="TRUCKS":
-                        st.markdown("**TRUCKS - (Actual # of Loaded Trucks,Planned # of Trucks)**")                    
-                        st.table(truck_schedule)
-                    else:
-                        st.markdown("**TONS - (Actual Shipped Tonnage,Planned Tonnage)**")
+                        current_schedule,zf=process_schedule()
+                        current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
+                        def elementwise_sum(t1, t2,t3,t4,t5):
+                            return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])
+                        truck_schedule=current_schedule.copy()
+                        ton_schedule=current_schedule.copy()
+                        truck_schedule["Total"]= truck_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
+                        totals=[]
+                        for col in truck_schedule.columns:  
+                            total=(0,0)
+                            for ix in truck_schedule.index:
+                                total=(total[0]+truck_schedule.loc[ix,col][0],total[1]+truck_schedule.loc[ix,col][1])
+                            totals.append(total)
+                        
+                            
+                        truck_schedule.loc["TOTAL"]=totals
+                        choice=st.radio("TRUCK LOADS OR TONS",["TRUCKS","TONS"])                   
+                       
+                        if choice=="TRUCKS":
+                            st.markdown("**TRUCKS - (Actual # of Loaded Trucks,Planned # of Trucks)**")                    
+                            st.table(truck_schedule)
+                        else:
+                            st.markdown("**TONS - (Actual Shipped Tonnage,Planned Tonnage)**")
+                            totals=[0]*len(ton_schedule)
+                            for ix in ton_schedule.index:
+                                for i in ton_schedule.columns:
+                                    if i in [ 'GP WAUNA - OR','GP HALSEY - OR']:
+                                        ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*28,ton_schedule.loc[ix,i][1]*28)
+                                 
+                                    else:
+                                        ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*20,ton_schedule.loc[ix,i][1]*20)
+                            ton_schedule["Total"]= ton_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
+                            totals=[]
+                            for col in ton_schedule.columns:  
+                                total=(0,0)
+                                for ix in ton_schedule.index:
+                                    total=(total[0]+ton_schedule.loc[ix,col][0],total[1]+ton_schedule.loc[ix,col][1])
+                                totals.append(total)
+                        
+                            
+                            ton_schedule.loc["TOTAL"]=totals
+                        
+                            st.table(pd.DataFrame(ton_schedule))
+                    except:
+                        pass
+                
+                
+               
+                    
+                    
+                           
+                    
+                
+                with mill_tab2:
+                    try:
+                        current_schedule,zf=process_schedule()
+                    
+                        mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
+                        
+                        current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
+                        
+                        def elementwise_sum(t1, t2,t3,t4,t5):
+                            return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])
+                        ton_schedule=current_schedule.copy()
                         totals=[0]*len(ton_schedule)
                         for ix in ton_schedule.index:
                             for i in ton_schedule.columns:
@@ -2145,104 +2214,71 @@ if authentication_status:
                     
                         
                         ton_schedule.loc["TOTAL"]=totals
-                    
-                        st.table(pd.DataFrame(ton_schedule))
-                    
-                    
-                           
-                    
-                
-                with mill_tab2:
-                    current_schedule,zf=process_schedule()
-                    
-                    mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
-                    
-                    current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
-                    
-                    def elementwise_sum(t1, t2,t3,t4,t5):
-                        return (t1[0] + t2[0]+ t3[0]+ t4[0]+ t5[0], t1[1] + t2[1]+ t3[1]+ t4[1]+ t5[1])
-                    ton_schedule=current_schedule.copy()
-                    totals=[0]*len(ton_schedule)
-                    for ix in ton_schedule.index:
+                       
+    
+                        mill_update={}
                         for i in ton_schedule.columns:
-                            if i in [ 'GP WAUNA - OR','GP HALSEY - OR']:
-                                ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*28,ton_schedule.loc[ix,i][1]*28)
-                         
-                            else:
-                                ton_schedule.at[ix,i]=(ton_schedule.loc[ix,i][0]*20,ton_schedule.loc[ix,i][1]*20)
-                    ton_schedule["Total"]= ton_schedule.apply(lambda row: elementwise_sum(row['GP WAUNA - OR'], row['CLEARWATER - LEWISTON ID'],row['GP HALSEY - OR'],row['KROGER - BC'], row['WILLAMETTE FALLS - OR']),axis=1)
-                    totals=[]
-                    for col in ton_schedule.columns:  
-                        total=(0,0)
-                        for ix in ton_schedule.index:
-                            total=(total[0]+ton_schedule.loc[ix,col][0],total[1]+ton_schedule.loc[ix,col][1])
-                        totals.append(total)
-                
-                    
-                    ton_schedule.loc["TOTAL"]=totals
-                   
-
-                    mill_update={}
-                    for i in ton_schedule.columns:
-                        mill_update[i]={"SHIPPED (TONS)":ton_schedule.loc["TOTAL",i][0],"SCHEDULED (TONS)":ton_schedule.loc["TOTAL",i][1]}
-                    
-                    chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
-                    mill_prog_col1,mill_prog_col2=st.columns([2,4])
-                    
-                    with mill_prog_col1:
-                        st.dataframe(pd.DataFrame(mill_update).T)
-                    with mill_prog_col2:
+                            mill_update[i]={"SHIPPED (TONS)":ton_schedule.loc["TOTAL",i][0],"SCHEDULED (TONS)":ton_schedule.loc["TOTAL",i][1]}
                         
-                        mills = [i for i in ton_schedule.columns if i!="Total"]
-                        targets = [mill_update[i]["SCHEDULED (TONS)"] for i in mills]
-                        shipped = [mill_update[i]["SHIPPED (TONS)"] for i in mills]
+                        chosen_month=st.selectbox("SELECT MONTH",["SEP 2023","OCT 2023","NOV 2023","DEC 2023"])
+                        mill_prog_col1,mill_prog_col2=st.columns([2,4])
                         
-                        # Create a figure with a horizontal bar chart
-                        fig = go.Figure()
-                        
-                        for mill, target, shipped_qty in zip(mills, targets, shipped):
-                            fig.add_trace(
-                                go.Bar(
-                                    y=[mill],
-                                    x=[shipped_qty],  # Darker shade indicating shipped
-                                    orientation="h",
-                                    name="Shipped",
-                                    text=[shipped_qty],
-                                    marker=dict(color='rgba(0, 128, 0, 0.7)')
+                        with mill_prog_col1:
+                            st.dataframe(pd.DataFrame(mill_update).T)
+                        with mill_prog_col2:
+                            
+                            mills = [i for i in ton_schedule.columns if i!="Total"]
+                            targets = [mill_update[i]["SCHEDULED (TONS)"] for i in mills]
+                            shipped = [mill_update[i]["SHIPPED (TONS)"] for i in mills]
+                            
+                            # Create a figure with a horizontal bar chart
+                            fig = go.Figure()
+                            
+                            for mill, target, shipped_qty in zip(mills, targets, shipped):
+                                fig.add_trace(
+                                    go.Bar(
+                                        y=[mill],
+                                        x=[shipped_qty],  # Darker shade indicating shipped
+                                        orientation="h",
+                                        name="Shipped",
+                                        text=[shipped_qty],
+                                        marker=dict(color='rgba(0, 128, 0, 0.7)')
+                                    )
                                 )
-                            )
-                            fig.add_trace(
-                                go.Bar(
-                                    y=[mill],
-                                    x=[target],  # Lighter shade indicating target
-                                    orientation="h",
-                                    name="Target",
-                                    text=[target],
-                                    marker=dict(color='rgba(0, 128, 0, 0.3)')
+                                fig.add_trace(
+                                    go.Bar(
+                                        y=[mill],
+                                        x=[target],  # Lighter shade indicating target
+                                        orientation="h",
+                                        name="Target",
+                                        text=[target],
+                                        marker=dict(color='rgba(0, 128, 0, 0.3)')
+                                    )
                                 )
-                            )
-                        
-                        # Customize the layout
-                        fig.update_layout(
-                                    barmode='stack',  # Stack the bars on top of each other
-                                    xaxis_title="Quantity",
-                                    yaxis_title="Mills",
-                                    title=f"Monthly Targets and Shipped Quantities - {chosen_month}",
-                                    legend=dict(
-                                        x=1.02,  # Move the legend to the right
-                                        y=1.0,
-                                        xanchor="left",  # Adjust legend position
-                                        yanchor="top",
-                                        font=dict(size=12)  # Increase legend font size
-                                    ),
-                                    xaxis=dict(tickfont=dict(size=10)),  # Increase x-axis tick label font size
-                                    yaxis=dict(tickfont=dict(size=12)),  # Increase y-axis tick label font size
-                                    title_font=dict(size=16),  # Increase title font size and weight
-                                     height=600,  # Adjust the height of the chart (in pixels)
-                                    width=800 
-                                )
-        
-                        st.plotly_chart(fig)
+                            
+                            # Customize the layout
+                            fig.update_layout(
+                                        barmode='stack',  # Stack the bars on top of each other
+                                        xaxis_title="Quantity",
+                                        yaxis_title="Mills",
+                                        title=f"Monthly Targets and Shipped Quantities - {chosen_month}",
+                                        legend=dict(
+                                            x=1.02,  # Move the legend to the right
+                                            y=1.0,
+                                            xanchor="left",  # Adjust legend position
+                                            yanchor="top",
+                                            font=dict(size=12)  # Increase legend font size
+                                        ),
+                                        xaxis=dict(tickfont=dict(size=10)),  # Increase x-axis tick label font size
+                                        yaxis=dict(tickfont=dict(size=12)),  # Increase y-axis tick label font size
+                                        title_font=dict(size=16),  # Increase title font size and weight
+                                         height=600,  # Adjust the height of the chart (in pixels)
+                                        width=800 
+                                    )
+            
+                            st.plotly_chart(fig)
+                    except:
+                        pass
                 
                 
 
@@ -2397,6 +2433,7 @@ if authentication_status:
                 eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
                 
             with col2:
+                ocean_bol_to_batch = {"GSSWKIR6013D": 45302855,"GSSWKIR6013E": 45305548}
                 if double_load:
                     release_order_number=st.text_input("Release Order Number",current_release_order,disabled=True,help="Release Order Number without the Item no")
                     sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
@@ -2732,7 +2769,8 @@ if authentication_status:
                             
                             suzano_report.update({next_report_no:{"Date Shipped":f"{a_} {b_}","Vehicle":vehicle_id, "Shipment ID #": bill_of_lading_number, "Consignee":consignee,"Consignee City":consignee_city,
                                                  "Consignee State":consignee_state,"Release #":release_order_number,"Carrier":carrier_code,
-                                                 "ETA":eta,"Ocean BOL#":ocean_bill_of_lading,"Warehouse":"OLYM","Vessel":vessel_suzano,"Voyage #":voyage_suzano,"Grade":wrap,"Quantity":quantity,
+                                                 "ETA":eta,"Ocean BOL#":ocean_bill_of_lading,"Batch#":ocean_bol_to_batch[ocean_bill_of_lading],
+                                                 "Warehouse":"OLYM","Vessel":vessel_suzano,"Voyage #":voyage_suzano,"Grade":wrap,"Quantity":quantity,
                                                  "Metric Ton": quantity*2, "ADMT":admt,"Mode of Transportation":transport_type}})
                         else:
                            
@@ -2921,8 +2959,9 @@ if authentication_status:
                 suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
                 suzano_report=json.loads(suzano_report_)
                 suzano_report=pd.DataFrame(suzano_report).T
-                suzano_report=suzano_report[["Date Shipped","Vehicle", "Shipment ID #", "Consignee","Consignee City","Consignee State","Release #","Carrier","ETA","Ocean BOL#","Warehouse","Vessel","Voyage #","Grade","Quantity","Metric Ton", "ADMT","Mode of Transportation"]]
+                suzano_report=suzano_report[["Date Shipped","Vehicle", "Shipment ID #", "Consignee","Consignee City","Consignee State","Release #","Carrier","ETA","Ocean BOL#","Batch#","Warehouse","Vessel","Voyage #","Grade","Quantity","Metric Ton", "ADMT","Mode of Transportation"]]
                 suzano_report["Shipment ID #"]=[str(i) for i in suzano_report["Shipment ID #"]]
+                suzano_report["Batch#"]=[str(i) for i in suzano_report["Batch#"]]
                 daily_suzano=suzano_report.copy()
                 daily_suzano["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suzano_report["Date Shipped"]]
                 daily_suzano=daily_suzano[daily_suzano["Date"]==now.date()]
@@ -3006,7 +3045,7 @@ if authentication_status:
                 
                 
                 filter_date=st.date_input("Choose Warehouse OUT Date",datetime.datetime.today(),min_value=None, max_value=None,disabled=False,key="filter_date")
-            
+        
                 zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]]=zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]].astype("str")
                
                 new_dates=[]
@@ -3060,8 +3099,10 @@ if authentication_status:
                     
                
         with inv5:
+            
             schedule=gcp_download_x(target_bucket,rf"truck_schedule.xlsx","schedule.xlsx")
-            schedule=pd.read_excel(schedule,sheet_name="SEPTEMBER",header=None,index_col=None)
+            
+            
             report=json.loads(gcp_download(target_bucket,rf"suzano_report.json"))
             locations=[ 'GP WAUNA - OR',
                              'GP HALSEY - OR',
@@ -3164,10 +3205,12 @@ if authentication_status:
                     when=datetime.datetime.strptime(report[i]["Date Shipped"],"%Y-%m-%d %H:%M:%S").date()
                     qt=report[i]["Metric Ton"]
                     #print(when)
-                    if location_dict[where][when]:
+                    try:
                         
                         location_dict[where][when].shipped_quantity+=qt
                         location_dict[where][when].remaining-=qt
+                    except:
+                        pass
                 for i in df.columns:
                     for k in df.index:
                         #print(k.date())
@@ -3189,16 +3232,19 @@ if authentication_status:
                     #print(location_dict[i])
                 def color_coding(row):
                     return ['color:red'] * len(row) if row['CLEARWATER - LEWISTON ID'] == (5,5) else ['color:green'] * len(row)
-                #st.dataframe(df.style.apply(color_coding, axis=1))
-                #df=df.style.applymap(lambda x: f"color: {'red' if isinstance(x,str) else 'black'}")
+                
+                df=df.loc[pd.notnull(df.index)]
+                zf=zf.loc[pd.notnull(zf.index)]
                 return df,zf
             
 
             
             mill_tab1,mill_tab2=st.tabs(["CURRENT SCHEDULE","MILL PROGRESS"])
             
+                          
             with mill_tab1:
-                    
+                month=st.selectbox("SELECT MONTH",["SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"])
+                schedule=pd.read_excel(schedule,sheet_name=month,header=None,index_col=None)
                 current_schedule,zf=process_schedule()
                 current_schedule.index=[datetime.datetime.strftime(i,"%B %d,%A") for i in current_schedule.index]
                 def elementwise_sum(t1, t2,t3,t4,t5):
@@ -3242,6 +3288,10 @@ if authentication_status:
                     ton_schedule.loc["TOTAL"]=totals
                 
                     st.table(pd.DataFrame(ton_schedule))
+            
+            
+            
+           
                 
                 
                        

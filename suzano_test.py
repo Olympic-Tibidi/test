@@ -720,22 +720,22 @@ if authentication_status:
                         st.dataframe(new_df)
                     with shipment_tab2:
                         folder_name = "olym_suzano/shipping_files"  # Replace this with the folder path you want to read
-                        files_in_folder = list_files_in_folder("olym_suzano", "shipping_files")
+                        files_in_folder = list_files_in_folder(target_bucket, "shipping_files")
                         requested_file=st.selectbox("SHIPPING FILES IN DATABASE",files_in_folder[1:])
                         if st.button("LOAD SHIPPING FILE"):
-                            requested_shipping_file=gcp_csv_to_df("olym_suzano", requested_file)
+                            requested_shipping_file=gcp_csv_to_df(target_bucket, requested_file)
                             filtered_df=requested_shipping_file[["Lot","Lot Qty","Batch","Grade","Ocean B/L","DryWeight","ADMT","Location",
                                                                                       "Warehouse_In","Warehouse_Out","Vehicle_Id","Release_Order_Number","Carrier_Code"]]
                             #st.data_editor(filtered_df, use_container_width=True)
                             st.data_editor(filtered_df)
                           
             with admin_tab1:
-                carrier_list_=gcp_download("olym_suzano",rf"carrier.json")
+                carrier_list_=gcp_download(target_bucket,rf"carrier.json")
                 carrier_list=json.loads(carrier_list_)
-                junk=gcp_download("olym_suzano",rf"junk_release.json")
+                junk=gcp_download(target_bucket,rf"junk_release.json")
                 junk=json.loads(junk)
                 try:
-                    release_order_database=gcp_download("olym_suzano",rf"release_orders/RELEASE_ORDERS.json")
+                    release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                     release_order_database=json.loads(release_order_database)
                 except:
                     release_order_database={}

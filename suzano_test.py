@@ -1883,8 +1883,8 @@ if authentication_status:
                     for line in bills_df.loads[1:]:
                         for unit in line.keys():
 
-                            Inventory.loc[kirkenes["Lot"]==unit[:-2],"Shipped"]=Inventory.loc[Inventory["Lot"]==unit[:-2],"Shipped"]+line[unit]*8
-                            Inventory.loc[kirkenes["Lot"]==unit[:-2],"Remaining"]=Inventory.loc[Inventory["Lot"]==unit[:-2],"Remaining"]-line[unit]*8
+                            Inventory.loc[Inventory["Lot"]==unit[:-2],"Shipped"]=Inventory.loc[Inventory["Lot"]==unit[:-2],"Shipped"]+line[unit]*8
+                            Inventory.loc[Inventory["Lot"]==unit[:-2],"Remaining"]=Inventory.loc[Inventory["Lot"]==unit[:-2],"Remaining"]-line[unit]*8
     
    
     

@@ -336,6 +336,8 @@ if authentication_status:
             
         if select=="DATA BACKUP" :
             
+            
+            
             # Define your target bucket and folder
             bucket_name = "olym_suzano_test"
             folder_name = "EDIS/KIRKENES-2304"
@@ -352,6 +354,9 @@ if authentication_status:
                     # Create the local file path by joining the destination directory and the filename
                     local_file_path = os.path.join(destination_directory, os.path.basename(blob_name))
                     
+                    # Ensure the destination directory exists
+                    os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
+                    
                     # Download the file from GCS to the local file path
                     blob = bucket.blob(blob_name)
                     blob.download_to_filename(local_file_path)
@@ -360,6 +365,7 @@ if authentication_status:
             
             if st.button("Download EDIS"):
                 download_files_from_gcs(bucket_name, folder_name, destination_directory)
+
 
                           
         if select=="ADMIN" :

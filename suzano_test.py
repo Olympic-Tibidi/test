@@ -338,6 +338,8 @@ if authentication_status:
             
             
             
+            import shutil
+            
             # Define your target bucket and folder
             bucket_name = "olym_suzano_test"
             folder_name = "EDIS/KIRKENES-2304"
@@ -357,14 +359,19 @@ if authentication_status:
                     # Ensure the destination directory exists
                     os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
                     
-                    # Download the file from GCS to the local file path
+                    # Download the file from GCS to a temporary location
+                    temp_file_path = local_file_path + '.tmp'
                     blob = bucket.blob(blob_name)
-                    blob.download_to_filename(local_file_path)
+                    blob.download_to_filename(temp_file_path)
+                    
+                    # Rename the temporary file to the final local file path
+                    os.rename(temp_file_path, local_file_path)
                     
                     st.write(f"Downloaded {blob_name} to {local_file_path}")
-            
-            if st.button("Download EDIS"):
-                download_files_from_gcs(bucket_name, folder_name, destination_directory)
+
+if st.button("Download EDIS"):
+    download_files_from_gcs(bucket_name, folder_name, destination_directory)
+
 
 
                           

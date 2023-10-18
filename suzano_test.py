@@ -355,7 +355,7 @@ if authentication_status:
                         st.write("Downloaded {} to {}.".format(name, file_path))
             
             if st.button("DD"):
-                target_bucket = "your_bucket_name"  # Define the target bucket
+                target_bucket = target_bucket  # Define the target bucket
                 destination_directory = r"C:\Users\afsin\Downloads"
                 download_bucket_with_transfer_manager(target_bucket, destination_directory, workers=8, max_results=1000)
               

@@ -337,7 +337,7 @@ if authentication_status:
         if select=="DATA BACKUP" :
             if st.button("DD"):
                 
-                def download_bucket_with_transfer_manager(bucket_name, destination_directory="", workers=8, max_results=1000):
+                def download_bucket_with_transfer_manager(bucket_name, destination_directory=destination_directory, workers=8, max_results=1000):
                     """Download all of the blobs in a bucket, concurrently in a process pool.
                 
                     The filename of each blob once downloaded is derived from the blob name and

@@ -1211,7 +1211,7 @@ if authentication_status:
                 except:
                     
                     pass
-                info=gcp_download("olym_suzano",rf"release_orders/{vessel}/{work_order}.json")
+                info=gcp_download(target_bucket,rf"release_orders/{vessel}/{work_order}.json")
                 info=json.loads(info)
                 
                 
@@ -1387,7 +1387,7 @@ if authentication_status:
                     if double_load:
                         
                         try:
-                            next_item=gcp_download("olym_suzano",rf"release_orders/{dispatched['2']['vessel']}/{dispatched['2']['release_order']}.json")
+                            next_item=gcp_download(target_bucket,rf"release_orders/{dispatched['2']['vessel']}/{dispatched['2']['release_order']}.json")
                             
                             first_load_input=st.text_area("**FIRST SKU LOADS**",height=300)
                             first_quantity=0
@@ -1483,8 +1483,19 @@ if authentication_status:
                             
                     ####   IF NOT double load
                     else:
+                        units_shipped=gcp_download(target_bucket,rf"suzano_report.json")
+                        units_shipped=pd.read_json(units_shipped).T
+                        load_dict={}
+                        for row in units_shipped.index[1:]:
+                           
+                            for unit in units_shipped.loc[row,'loads'].keys():
+                                load_dict[unit]={"BOL":row,"RO":units_shipped.loc[row,'release_order'],"destination":units_shipped.loc[row,'destination'],
+                                                 "OBOL":units_shipped.loc[row,'ocean_bill_of_lading'],
+                                                 "grade":units_shipped.loc[row,'grade'],"carrier_Id":units_shipped.loc[row,'carrier_id'],
+                                                 "vehicle":units_shipped.loc[row,'vehicle'],"date":units_shipped.loc[row,'issued']                        
+                                                }
+                                             
                         
-                    
                         faults=[]
                         bale_faults=[]
                         fault_messaging={}
@@ -1505,7 +1516,9 @@ if authentication_status:
                                         st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                         faults.append(1)
                                         st.markdown("**:red[This unit has been scanned TWICE!]**")
-                                        
+                                    if x in load_dict.keys():
+                                        faults.append(1)
+                                        st.markdown("**:red[This unit has been SHIPPED!]**")
                                     else:
                                         st.write(f"**Unit No : {i+1}-{x}**")
                                         faults.append(0)
@@ -1602,7 +1615,7 @@ if authentication_status:
                         if proceed:
                             carrier_code=carrier_code.split("-")[0]
                             try:
-                                suzano_report_=gcp_download("olym_suzano",rf"suzano_report.json")
+                                suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
                                 suzano_report=json.loads(suzano_report_)
                             except:
                                 suzano_report={}
@@ -1663,17 +1676,17 @@ if authentication_status:
                                                      "Metric Ton": quantity*2, "ADMT":admt,"Mode of Transportation":transport_type}})
                                 suzano_report=json.dumps(suzano_report)
                                 storage_client = storage.Client()
-                                bucket = storage_client.bucket("olym_suzano")
+                                bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"suzano_report.json")
                                 blob.upload_from_string(suzano_report)
     
                               
-                                mill_progress=json.loads(gcp_download("olym_suzano",rf"mill_progress.json"))
+                                mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
                                 map={8:"SEP 2023",9:"SEP 2023",10:"OCT 2023",11:"NOV 2023",12:"DEC 2023"}
                                 mill_progress[destination][map[file_date.month]]["Shipped"]=mill_progress[destination][map[file_date.month]]["Shipped"]+len(textsplit)*2
                                 json_data = json.dumps(mill_progress)
                                 storage_client = storage.Client()
-                                bucket = storage_client.bucket("olym_suzano")
+                                bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"mill_progress.json")
                                 blob.upload_from_string(json_data)       
                             if double_load:
@@ -1704,12 +1717,12 @@ if authentication_status:
                             
                             json_data = json.dumps(info)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket("olym_suzano")
+                            bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/{vessel}/{current_release_order}.json")
                             blob.upload_from_string(json_data)
     
                             try:
-                                release_order_database=gcp_download("olym_suzano",rf"release_orders/RELEASE_ORDERS.json")
+                                release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                                 release_order_database=json.loads(release_order_database)
                             except:
                                 release_order_database={}
@@ -1717,7 +1730,7 @@ if authentication_status:
                             release_order_database[current_release_order][current_sales_order]["remaining"]=release_order_database[current_release_order][current_sales_order]["remaining"]-quantity
                             release_order_database=json.dumps(release_order_database)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket("olym_suzano")
+                            bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                             blob.upload_from_string(release_order_database)
                             with open('placeholder.txt', 'r') as f:

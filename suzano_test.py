@@ -1866,92 +1866,100 @@ if authentication_status:
 
                 
             with inv4:
-                     
-                dab1,dab2=st.tabs(["IN WAREHOUSE","SHIPPED BY DATE"])
-                df=Inventory[(Inventory["Location"]=="OLYM")|(Inventory["Location"]=="PARTIAL")][["Lot","Bales","Shipped","Remaining","Batch","Ocean B/L","Grade","DryWeight","ADMT","Location","Warehouse_In"]]
-                zf=Inventory[(Inventory["Location"]=="ON TRUCK")|(Inventory["Location"]=="PARTIAL")][["Lot","Bales","Shipped","Remaining","Batch","Ocean B/L","Grade","DryWeight","ADMT","Release_Order_Number","Carrier_Code","Terminal B/L",
-                                                              "Vehicle_Id","Warehouse_In","Warehouse_Out"]]
-           
-                items=df["Ocean B/L"].unique().tolist()
+                trial=1
+                if trial==1:
+                    wrh=Inventory["Remaining"].sum()*250/1000
+                    shp=Inventory["Shipped"].sum()*250/1000
+                    
+                    st.markdown(f"**IN WAREHOUSE = {wrh} tons**")
+                    st.markdown(f"**TOTAL SHIPPED = {shp} tons**")
+                    st.markdown(f"**TOTAL OVERALL = {wrh+shp} tons**")
+                else:
+                    dab1,dab2=st.tabs(["IN WAREHOUSE","SHIPPED BY DATE"])
+                    df=Inventory[(Inventory["Location"]=="OLYM")|(Inventory["Location"]=="PARTIAL")][["Lot","Bales","Shipped","Remaining","Batch","Ocean B/L","Grade","DryWeight","ADMT","Location","Warehouse_In"]]
+                    zf=Inventory[(Inventory["Location"]=="ON TRUCK")|(Inventory["Location"]=="PARTIAL")][["Lot","Bales","Shipped","Remaining","Batch","Ocean B/L","Grade","DryWeight","ADMT","Release_Order_Number","Carrier_Code","Terminal B/L",
+                                                                  "Vehicle_Id","Warehouse_In","Warehouse_Out"]]
+               
+                    items=df["Ocean B/L"].unique().tolist()
+                    
+                    with dab1:
+                        
+                        inv_col1,inv_col2,inv_col3=st.columns([2,6,2])
+                        with inv_col1:
+                            wrh=df["Remaining"].sum()*250/1000
+                            shp=zf["Shipped"].sum()*250/1000
+                            
+                            st.markdown(f"**IN WAREHOUSE = {wrh} tons**")
+                            st.markdown(f"**TOTAL SHIPPED = {shp} tons**")
+                            st.markdown(f"**TOTAL OVERALL = {wrh+shp} tons**")
+                            
+                        with inv_col2:
+                            #st.write(items)
+                            inhouse=[df[df["Ocean B/L"]==i]["Remaining"].sum()*250/1000 for i in items]
+                            shipped=[df[df["Ocean B/L"]==i]["Shipped"].sum()*250/1000 for i in items]
+                            
+                            wrap_=[df[df["Ocean B/L"]==i]["Grade"].unique()[0] for i in items]
+                           # st.write(wrap_)
+                            tablo=pd.DataFrame({"Ocean B/L":items,"Grade":wrap_,"In Warehouse":inhouse,"Shipped":shipped},index=[i for i in range(1,len(items)+1)])
+                            total_row={"Ocean B/L":"TOTAL","In Warehouse":sum(inhouse),"Shipped":sum(shipped)}
+                            tablo = tablo.append(total_row, ignore_index=True)
+                            tablo["TOTAL"] = tablo.loc[:, ["In Warehouse", "Shipped"]].sum(axis=1)
+                            st.markdown(f"**IN METRIC TONS -- AS OF {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),'%b %d -  %H:%M')}**")
+                            st.dataframe(tablo)
+                        if st.checkbox("CLICK TO SEE INVENTORY LIST",key="23223"):
+                            st.dataframe(df)
+                    with dab2:
+                        
+                        
+                        filter_date=st.date_input("Choose Warehouse OUT Date",datetime.datetime.today(),min_value=None, max_value=None,disabled=False,key="filter_date")
                 
-                with dab1:
-                    
-                    inv_col1,inv_col2,inv_col3=st.columns([2,6,2])
-                    with inv_col1:
-                        wrh=df["Remaining"].sum()*250/1000
-                        shp=zf["Shipped"].sum()*250/1000
-                        
-                        st.markdown(f"**IN WAREHOUSE = {wrh} tons**")
-                        st.markdown(f"**TOTAL SHIPPED = {shp} tons**")
-                        st.markdown(f"**TOTAL OVERALL = {wrh+shp} tons**")
-                        
-                    with inv_col2:
-                        #st.write(items)
-                        inhouse=[df[df["Ocean B/L"]==i]["Remaining"].sum()*250/1000 for i in items]
-                        shipped=[df[df["Ocean B/L"]==i]["Shipped"].sum()*250/1000 for i in items]
-                        
-                        wrap_=[df[df["Ocean B/L"]==i]["Grade"].unique()[0] for i in items]
-                       # st.write(wrap_)
-                        tablo=pd.DataFrame({"Ocean B/L":items,"Grade":wrap_,"In Warehouse":inhouse,"Shipped":shipped},index=[i for i in range(1,len(items)+1)])
-                        total_row={"Ocean B/L":"TOTAL","In Warehouse":sum(inhouse),"Shipped":sum(shipped)}
-                        tablo = tablo.append(total_row, ignore_index=True)
-                        tablo["TOTAL"] = tablo.loc[:, ["In Warehouse", "Shipped"]].sum(axis=1)
-                        st.markdown(f"**IN METRIC TONS -- AS OF {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),'%b %d -  %H:%M')}**")
-                        st.dataframe(tablo)
-                    if st.checkbox("CLICK TO SEE INVENTORY LIST",key="23223"):
-                        st.dataframe(df)
-                with dab2:
-                    
-                    
-                    filter_date=st.date_input("Choose Warehouse OUT Date",datetime.datetime.today(),min_value=None, max_value=None,disabled=False,key="filter_date")
-            
-                    zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]]=zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]].astype("str")
-                   
-                    new_dates=[]
-                    for i in zf["Warehouse_Out"]:
-                        
-                        try:
-                            new_dates.append(datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S"))
-                        except:                        
+                        zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]]=zf[["Release_Order_Number","Carrier_Code","Terminal B/L","Vehicle_Id"]].astype("str")
+                       
+                        new_dates=[]
+                        for i in zf["Warehouse_Out"]:
+                            
                             try:
-                                new_dates.append(datetime.datetime.strptime(i,"%Y-%m-%d %H:%M"))
-                            except:
-                                new_dates.append(datetime.datetime.strptime(i,"%m/%d/%Y %H:%M"))
-                    zf["Warehouse_Out"]=new_dates
-                    filtered_zf=zf.copy()
-                    
-                    filtered_zf["Warehouse_Out"]=[i.date() for i in filtered_zf["Warehouse_Out"]]
+                                new_dates.append(datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S"))
+                            except:                        
+                                try:
+                                    new_dates.append(datetime.datetime.strptime(i,"%Y-%m-%d %H:%M"))
+                                except:
+                                    new_dates.append(datetime.datetime.strptime(i,"%m/%d/%Y %H:%M"))
+                        zf["Warehouse_Out"]=new_dates
+                        filtered_zf=zf.copy()
                         
-                    filtered_zf=filtered_zf[filtered_zf["Warehouse_Out"]==filter_date]
+                        filtered_zf["Warehouse_Out"]=[i.date() for i in filtered_zf["Warehouse_Out"]]
+                            
+                        filtered_zf=filtered_zf[filtered_zf["Warehouse_Out"]==filter_date]
+                            
                         
-                    
-                    col1,col2=st.columns([2,8])
-                    with col2:
-                        
-                        dated_bill_of_ladings={}
-                        locations={}
-                        for i in bill_of_ladings:
-                            dated_bill_of_ladings[bill_of_ladings[i]["issued"]]=[bill_of_ladings[i]["destination"],bill_of_ladings[i]["quantity"]]
-                       # st.write(dated_bill_of_ladings)
-                        toplam=0
-                        for i in dated_bill_of_ladings:                            
-                            if i is not None:
-                                if datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date()==filter_date:
-                                    try:
-                                        locations[dated_bill_of_ladings[i][0]]+=dated_bill_of_ladings[i][1]*2
-                                    except:
-                                        locations[dated_bill_of_ladings[i][0]]=dated_bill_of_ladings[i][1]*2
-                                    #st.markdown(f"**{} Tons to {dated_bill_of_ladings[i][0]}**")
-                        
-                        for i in locations:
-                            st.markdown(f"**{locations[i]} Tons to {i}**")
-                            toplam+=locations[i]
-                        
-                        
-                               
-                        
-                    with col1:
-                        st.markdown(f"**SHIPPED ON THIS DAY = {toplam} TONS**")
+                        col1,col2=st.columns([2,8])
+                        with col2:
+                            
+                            dated_bill_of_ladings={}
+                            locations={}
+                            for i in bill_of_ladings:
+                                dated_bill_of_ladings[bill_of_ladings[i]["issued"]]=[bill_of_ladings[i]["destination"],bill_of_ladings[i]["quantity"]]
+                           # st.write(dated_bill_of_ladings)
+                            toplam=0
+                            for i in dated_bill_of_ladings:                            
+                                if i is not None:
+                                    if datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date()==filter_date:
+                                        try:
+                                            locations[dated_bill_of_ladings[i][0]]+=dated_bill_of_ladings[i][1]*2
+                                        except:
+                                            locations[dated_bill_of_ladings[i][0]]=dated_bill_of_ladings[i][1]*2
+                                        #st.markdown(f"**{} Tons to {dated_bill_of_ladings[i][0]}**")
+                            
+                            for i in locations:
+                                st.markdown(f"**{locations[i]} Tons to {i}**")
+                                toplam+=locations[i]
+                            
+                            
+                                   
+                            
+                        with col1:
+                            st.markdown(f"**SHIPPED ON THIS DAY = {toplam} TONS**")
                         
                            
                         

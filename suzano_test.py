@@ -335,6 +335,8 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
+            
+            # Define your target bucket and folder
             bucket_name = "olym_suzano_test"
             folder_name = "EDIS/KIRKENES-2304"
             destination_directory = r"C:\Users\afsin\Downloads"
@@ -347,7 +349,7 @@ if authentication_status:
                 blob_names = [blob.name for blob in bucket.list_blobs(prefix=folder_name)]
                 
                 for blob_name in blob_names:
-                    # Create the local file path by joining the destination directory and blob name
+                    # Create the local file path by joining the destination directory and the filename
                     local_file_path = os.path.join(destination_directory, os.path.basename(blob_name))
                     
                     # Download the file from GCS to the local file path
@@ -358,6 +360,7 @@ if authentication_status:
             
             if st.button("Download EDIS"):
                 download_files_from_gcs(bucket_name, folder_name, destination_directory)
+
                           
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","MILL SHIPMENTS"])

@@ -356,7 +356,7 @@ if authentication_status:
             
             if st.button("DD"):
                 target_bucket = target_bucket  # Define the target bucket
-                destination_directory = r"C:\Users\afsin\Downloads"
+                destination_directory = r"C:/Users/afsin/Downloads"
                 download_bucket_with_transfer_manager(target_bucket, destination_directory, workers=8, max_results=1000)
               
         if select=="ADMIN" :

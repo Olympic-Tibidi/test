@@ -377,7 +377,7 @@ if authentication_status:
                 
                    
                 
-                    storage_client = Client()
+                    storage_client = storage.Client()
                     bucket = storage_client.bucket(bucket_name)
                 
                     blob_names = [blob.name for blob in bucket.list_blobs(max_results=max_results)]
@@ -392,6 +392,7 @@ if authentication_status:
                             print("Failed to download {} due to exception: {}".format(name, result))
                         else:
                             print("Downloaded {} to {}.".format(name, destination_directory + name))
+                
                 bucket_name = target_bucket
                 destination_directory = r"C:\Users\afsin\Downloads"
                 download_bucket_with_transfer_manager(bucket_name, destination_directory="", workers=8, max_results=1000)

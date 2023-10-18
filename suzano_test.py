@@ -369,8 +369,8 @@ if authentication_status:
                     
                     st.write(f"Downloaded {blob_name} to {local_file_path}")
 
-if st.button("Download EDIS"):
-    download_files_from_gcs(bucket_name, folder_name, destination_directory)
+            if st.button("Download EDIS"):
+                download_files_from_gcs(bucket_name, folder_name, destination_directory)
 
 
 

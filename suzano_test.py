@@ -1867,7 +1867,6 @@ if authentication_status:
                 
             with inv4:
                 bills_df=pd.read_json(data).T
-                st.write(bills_df)
                 trial=1
                 if trial==1:
                     load_dict={}
@@ -1881,6 +1880,11 @@ if authentication_status:
                                             }
                     Load_df=pd.DataFrame(load_dict).T  
                     st.dataframe(Load_df)
+                    for line in df.loads[1:]:
+                        for unit in line.keys():
+
+                            Inventory.loc[kirkenes["Lot"]==unit[:-2],"Shipped"]=Inventory.loc[Inventory["Lot"]==unit[:-2],"Shipped"]+line[unit]*8
+                            Inventory.loc[kirkenes["Lot"]==unit[:-2],"Remaining"]=Inventory.loc[Inventory["Lot"]==unit[:-2],"Remaining"]-line[unit]*8
     
    
     

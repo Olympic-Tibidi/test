@@ -339,18 +339,23 @@ if authentication_status:
                 storage_client = storage.Client()
                 bucket = storage_client.bucket(bucket_name)
                 blob_names = [blob.name for blob in bucket.list_blobs(max_results=max_results)]
+                
+                for name in blob_names:
+                    # Use os.path.join to create the correct path with backslashes
+                    file_path = os.path.join(destination_directory, name.replace('/', '\\'))
+                    if not os.path.exists(os.path.dirname(file_path)):
+                        os.makedirs(os.path.dirname(file_path))
+                
                 results = transfer_manager.download_many_to_path(bucket, blob_names, destination_directory, max_workers=workers)
             
                 for name, result in zip(blob_names, results):
                     if isinstance(result, Exception):
                         st.write("Failed to download {} due to exception: {}".format(name, result))
                     else:
-                        # Use os.path.join to create the correct path with backslashes
-                        file_path = os.path.join(destination_directory, name.replace('/', '\\'))
                         st.write("Downloaded {} to {}.".format(name, file_path))
             
             if st.button("DD"):
-                target_bucket = target_bucket  # Define the target bucket
+                target_bucket = "your_bucket_name"  # Define the target bucket
                 destination_directory = r"C:\Users\afsin\Downloads"
                 download_bucket_with_transfer_manager(target_bucket, destination_directory, workers=8, max_results=1000)
               

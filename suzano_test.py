@@ -1867,6 +1867,7 @@ if authentication_status:
                 
             with inv4:
                 bills_df=pd.read_json(data)
+                st.write(bills_df)
                 trial=1
                 if trial==1:
                     load_dict={}

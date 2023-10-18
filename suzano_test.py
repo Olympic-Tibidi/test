@@ -346,6 +346,14 @@ if authentication_status:
                     # Download the file to the specified output directory
                     output_path = os.path.join(output_directory, os.path.basename(blob.name))
                     blob.download_to_filename(output_path)
+            if st.button("DOWNLOAD EDI",key="112334"):
+                
+                client = storage.Client()
+                bucket = client.bucket(target_bucket)
+                # Create a blob object from the filepath
+                blob = bucket.blob("EDIS/KIRKENES-2304/11502402.txt")
+                # Download the file to a destination
+                blob.download_to_filename(a.txt)
 
             if st.button("BACKUP DATA"):
                 st.write("OK")

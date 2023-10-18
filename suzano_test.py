@@ -1766,7 +1766,7 @@ if authentication_status:
                             file_path = 'temp_file.txt'  # Use the path of the temporary file
                     
                             send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
-                            upload_cs_file("olym_suzano", 'temp_file.txt',rf"EDIS/{vessel}/{file_name}") 
+                            upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}") 
                             
                         else:   ###cancel bill of lading
                             pass

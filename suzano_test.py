@@ -1484,8 +1484,9 @@ if authentication_status:
                     ####   IF NOT double load
                     else:
                         units_shipped=gcp_download(target_bucket,rf"suzano_report.json")
-                        st.write(units_shipped)
+                        
                         units_shipped=pd.read_json(units_shipped).T
+                        
                         st.write(units_shipped)
                         load_dict={}
                         for row in units_shipped.index[1:]:

@@ -338,7 +338,7 @@ if authentication_status:
             if st.button("DOWN"):
                 
             
-                folder='/google-cloud/download/{}'.format(table_id)
+                folder='EDIS/KIRKENES-2304'
                 delimiter='/'
                 bucket=storage_client.get_bucket(target_bucket)
                 blobs=bucket.list_blobs(prefix=table_id, delimiter=delimiter) #List all objects that satisfy the filter.

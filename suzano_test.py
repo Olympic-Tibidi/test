@@ -335,29 +335,44 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
-            if st.button("DOWN"):
-                
+            bucket_name = target_bucket
+            # Define the folder path within the bucket
+            folder_path = "EDIS/KIRKENES-2304"
             
-                folder='EDIS/KIRKENES-2304'
-                delimiter='/'
-                bucket=storage_client.get_bucket(target_bucket)
-                blobs=bucket.list_blobs(prefix=table_id, delimiter=delimiter) #List all objects that satisfy the filter.
-                
-                # Download the file to a destination 
-                def download_to_local():
-                   logging.info('File download Started…. Wait for the job to complete.')
-                 
-                #  Create this folder locally if not exists
-                   if not os.path.exists(folder):
-                     os.makedirs(folder)
-                 
-                # Iterating through for loop one by one using API call
-                   for blob in blobs:
-                     logging.info('Blobs: {}'.format(blob.name))
-                     destination_uri = '{}/{}'.format(folder, blob.name) 
-                     blob.download_to_filename(destination_uri)
-                     logging.info('Exported {} to {}'.format(
-                     blob.name, destination_uri))
+            # Create a Streamlit app
+            st.title("Download Files from GCS")
+            
+            # Function to download files from the GCS bucket to local disk
+            def download_files_from_bucket():
+                storage_client = storage.Client()
+                bucket = storage_client.bucket(bucket_name)
+            
+                # List all blobs (files) in the bucket
+                all_blobs = bucket.list_blobs()
+            
+                # Filter blobs to include only those in the specified folder
+                folder_files = [blob for blob in all_blobs if blob.name.startswith(folder_path)]
+            
+                # Download each file to the local directory
+                for blob in folder_files:
+                    destination_file = os.path.join(local_directory, os.path.basename(blob.name))
+                    blob.download_to_filename(destination_file)
+            
+            # Local directory where you want to save the downloaded files
+            local_directory = "downloaded_files"
+            os.makedirs(local_directory, exist_ok=True)
+            
+            # Button to initiate the download
+            if st.button("Download Files"):
+                download_files_from_bucket()
+                st.success("Download completed!")
+            
+            # List of downloaded files
+            downloaded_files = os.listdir(local_directory)
+            st.write("List of downloaded files:")
+            for file in downloaded_files:
+                file_path = os.path.join(local_directory, file)
+                st.markdown(f"[Download {file}](data:application/txt;charset=utf-8;base64,{base64.b64encode(open(file_path, 'rb').read()).decode()})", unsafe_allow_html=True)
                                             
                 
               

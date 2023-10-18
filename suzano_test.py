@@ -358,8 +358,8 @@ if authentication_status:
                             print("Downloaded {} to {}.".format(name, destination_directory + name))
                 
                 bucket_name = target_bucket
-                destination_directory = r"C:\Users\afsin\Downloads\
-                download_bucket_with_transfer_manager(bucket_name, destination_directory=destination_directory, workers=8, max_results=1000)
+                destination_directory = r"C:\Users\afsin\Downloads\"
+                download_bucket_with_transfer_manager(bucket_name, destination_directory="", workers=8, max_results=1000)
               
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","MILL SHIPMENTS"])

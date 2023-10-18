@@ -335,31 +335,22 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
+            def download_bucket_with_transfer_manager(bucket_name, destination_directory, workers=8, max_results=1000):
+                storage_client = storage.Client()
+                bucket = storage_client.bucket(bucket_name)
+                blob_names = [blob.name for blob in bucket.list_blobs(max_results=max_results)]
+                results = transfer_manager.download_many_to_path(bucket, blob_names, destination_directory, max_workers=workers)
+            
+                for name, result in zip(blob_names, results):
+                    if isinstance(result, Exception):
+                        st.write("Failed to download {} due to exception: {}".format(name, result))
+                    else:
+                        st.write("Downloaded {} to {}.".format(name, destination_directory + name))
+            
             if st.button("DD"):
-                
-                def download_bucket_with_transfer_manager(bucket_name, destination_directory=destination_directory, workers=8, max_results=1000):
-                    
-                   
-                
-                    storage_client = storage.Client()
-                    bucket = storage_client.bucket(bucket_name)
-                
-                    blob_names = [blob.name for blob in bucket.list_blobs(max_results=max_results)]
-                
-                    results = transfer_manager.download_many_to_path(bucket, blob_names, destination_directory, max_workers=workers)
-                
-                    for name, result in zip(blob_names, results):
-                        # The results list is either `None` or an exception for each blob in
-                        # the input list, in order.
-                
-                        if isinstance(result, Exception):
-                            print("Failed to download {} due to exception: {}".format(name, result))
-                        else:
-                            print("Downloaded {} to {}.".format(name, destination_directory + name))
-                
-                bucket_name = target_bucket
-                
-                download_bucket_with_transfer_manager(bucket_name, destination_directory=destination_directory, workers=8, max_results=1000)
+                target_bucket = "your_bucket_name"  # Define the target bucket
+                destination_directory = r"C:\Users\afsin\Downloads"
+                download_bucket_with_transfer_manager(target_bucket, destination_directory, workers=8, max_results=1000)
               
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","MILL SHIPMENTS"])

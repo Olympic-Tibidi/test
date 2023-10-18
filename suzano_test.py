@@ -345,7 +345,9 @@ if authentication_status:
                     if isinstance(result, Exception):
                         st.write("Failed to download {} due to exception: {}".format(name, result))
                     else:
-                        st.write("Downloaded {} to {}.".format(name, destination_directory + name))
+                        # Use os.path.join to create the correct path with backslashes
+                        file_path = os.path.join(destination_directory, name.replace('/', '\\'))
+                        st.write("Downloaded {} to {}.".format(name, file_path))
             
             if st.button("DD"):
                 target_bucket = target_bucket  # Define the target bucket

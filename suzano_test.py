@@ -33,7 +33,7 @@ import yaml
 from yaml.loader import SafeLoader
 #from streamlit_extras.dataframe_explorer import dataframe_explorer
 import math
-
+from google.cloud.storage import transfer_manager
 import zipfile
 
 
@@ -337,45 +337,61 @@ if authentication_status:
         if select=="DATA BACKUP" :
             if st.button("DD"):
                 
-                bucket_name = target_bucket
-                # Define the folder path within the bucket
-                folder_path = "EDIS/KIRKENES-2304"
+                def download_bucket_with_transfer_manager(bucket_name, destination_directory="", workers=8, max_results=1000):
+                    """Download all of the blobs in a bucket, concurrently in a process pool.
                 
-                # Create a Streamlit app
-                st.title("Download Files from GCS")
+                    The filename of each blob once downloaded is derived from the blob name and
+                    the `destination_directory `parameter. For complete control of the filename
+                    of each blob, use transfer_manager.download_many() instead.
                 
-                # Function to download files from the GCS bucket to local disk
-                def download_files_from_bucket():
-                    storage_client = storage.Client()
+                    Directories will be created automatically as needed, for instance to
+                    accommodate blob names that include slashes.
+                    """
+                
+                    # The ID of your GCS bucket
+                    bucket_name = target_bucket
+                
+                    # The directory on your computer to which to download all of the files. This
+                    # string is prepended (with os.path.join()) to the name of each blob to form
+                    # the full path. Relative paths and absolute paths are both accepted. An
+                    # empty string means "the current working directory". Note that this
+                    # parameter allows accepts directory traversal ("../" etc.) and is not
+                    # intended for unsanitized end user input.
+                    destination_directory = r"C:\Users\afsin\Downloads"
+                
+                    # The maximum number of processes to use for the operation. The performance
+                    # impact of this value depends on the use case, but smaller files usually
+                    # benefit from a higher number of processes. Each additional process occupies
+                    # some CPU and memory resources until finished. Threads can be used instead
+                    # of processes by passing `worker_type=transfer_manager.THREAD`.
+                    workers=8
+                
+                    # The maximum number of results to fetch from bucket.list_blobs(). This
+                    # sample code fetches all of the blobs up to max_results and queues them all
+                    # for download at once. Though they will still be executed in batches up to
+                    # the processes limit, queueing them all at once can be taxing on system
+                    # memory if buckets are very large. Adjust max_results as needed for your
+                    # system environment, or set it to None if you are sure the bucket is not
+                    # too large to hold in memory easily.
+                    max_results=1000
+                
+                   
+                
+                    storage_client = Client()
                     bucket = storage_client.bucket(bucket_name)
                 
-                    # List all blobs (files) in the bucket
-                    all_blobs = bucket.list_blobs()
+                    blob_names = [blob.name for blob in bucket.list_blobs(max_results=max_results)]
                 
-                    # Filter blobs to include only those in the specified folder
-                    folder_files = [blob for blob in all_blobs if blob.name.startswith(folder_path)]
+                    results = transfer_manager.download_many_to_path(bucket, blob_names, destination_directory=destination_directory, max_workers=workers)
                 
-                    # Download each file to the local directory
-                    for blob in folder_files:
-                        destination_file = os.path.join(local_directory, os.path.basename(blob.name))
-                        blob.download_to_filename(destination_file)
-            
-                # Local directory where you want to save the downloaded files
-                local_directory =r"C:\Users\afsin\Downloads"
-                os.makedirs(local_directory, exist_ok=True)
+                    for name, result in zip(blob_names, results):
+                        # The results list is either `None` or an exception for each blob in
+                        # the input list, in order.
                 
-                # Button to initiate the download
-                if st.button("Download Files"):
-                    download_files_from_bucket()
-                    st.success("Download completed!")
-                
-                # List of downloaded files
-                downloaded_files = os.listdir(local_directory)
-                st.write("List of downloaded files:")
-                for file in downloaded_files:
-                    file_path = os.path.join(local_directory, file)
-                    st.markdown(f"[Download {file}](data:application/txt;charset=utf-8;base64,{base64.b64encode(open(file_path, 'rb').read()).decode()})", unsafe_allow_html=True)
-                                                            
+                        if isinstance(result, Exception):
+                            print("Failed to download {} due to exception: {}".format(name, result))
+                        else:
+                            print("Downloaded {} to {}.".format(name, destination_directory + name))
                 
               
         if select=="ADMIN" :

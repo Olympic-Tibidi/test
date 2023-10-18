@@ -1866,16 +1866,17 @@ if authentication_status:
 
                 
             with inv4:
+                bills_df=pd.read_json(data)
                 trial=1
                 if trial==1:
                     load_dict={}
-                    for row in Inventory.index[1:]:
+                    for row in bills_df.index[1:]:
                         #print(df.loc[row,'loads'])
-                        for unit in Inventory.loc[row,'loads'].keys():
-                            load_dict[unit]={"BOL":row,"RO":Inventory.loc[row,'release_order'],"destination":Inventory.loc[row,'destination'],
-                                             "OBOL":Inventory.loc[row,'ocean_bill_of_lading'],
-                                             "grade":Inventory.loc[row,'grade'],"carrier_Id":Inventory.loc[row,'carrier_id'],
-                                             "vehicle":Inventory.loc[row,'vehicle'],"date":Inventory.loc[row,'issued']                        
+                        for unit in bills_df.loc[row,'loads'].keys():
+                            load_dict[unit]={"BOL":row,"RO":bills_df.loc[row,'release_order'],"destination":bills_df.loc[row,'destination'],
+                                             "OBOL":bills_df.loc[row,'ocean_bill_of_lading'],
+                                             "grade":bills_df.loc[row,'grade'],"carrier_Id":bills_df.loc[row,'carrier_id'],
+                                             "vehicle":bills_df.loc[row,'vehicle'],"date":bills_df.loc[row,'issued']                        
                                             }
                     Load_df=pd.DataFrame(load_dict).T  
                     st.dataframe(Load_df)

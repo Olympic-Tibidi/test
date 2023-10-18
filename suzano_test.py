@@ -1161,16 +1161,16 @@ if authentication_status:
         if select=="LOADOUT" :
         
             
-            bill_mapping=gcp_download("olym_suzano","bill_mapping.json")
+            bill_mapping=gcp_download(target_bucket,"bill_mapping.json")
             bill_mapping=json.loads(bill_mapping)
-            mill_info_=gcp_download("olym_suzano",rf"mill_info.json")
+            mill_info_=gcp_download(target_bucket,rf"mill_info.json")
             mill_info=json.loads(mill_info_)
             no_dispatch=0
             number=None
             if number not in st.session_state:
                 st.session_state.number=number
             try:
-                dispatched=gcp_download("olym_suzano","dispatched.json")
+                dispatched=gcp_download(target_bucket,"dispatched.json")
                 dispatched=json.loads(dispatched)
             except:
                 no_dispatch=1

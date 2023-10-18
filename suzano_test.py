@@ -349,7 +349,7 @@ if authentication_status:
                     """
                 
                     # The ID of your GCS bucket
-                    bucket_name = target_bucket
+                    
                 
                     # The directory on your computer to which to download all of the files. This
                     # string is prepended (with os.path.join()) to the name of each blob to form
@@ -357,7 +357,7 @@ if authentication_status:
                     # empty string means "the current working directory". Note that this
                     # parameter allows accepts directory traversal ("../" etc.) and is not
                     # intended for unsanitized end user input.
-                    destination_directory = r"C:\Users\afsin\Downloads"
+                    
                 
                     # The maximum number of processes to use for the operation. The performance
                     # impact of this value depends on the use case, but smaller files usually
@@ -392,7 +392,9 @@ if authentication_status:
                             print("Failed to download {} due to exception: {}".format(name, result))
                         else:
                             print("Downloaded {} to {}.".format(name, destination_directory + name))
-                
+                bucket_name = target_bucket
+                destination_directory = r"C:\Users\afsin\Downloads"
+                download_bucket_with_transfer_manager(bucket_name, destination_directory="", workers=8, max_results=1000)
               
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","MILL SHIPMENTS"])

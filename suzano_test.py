@@ -335,35 +335,38 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
-            def download_txt_files_from_folder(bucket_name, folder_path, local_directory):
-                storage_client = storage.Client()
-                bucket = storage_client.bucket(bucket_name)
+            if st.button("DOWN"):
+                
             
-                # List all blobs (files) in the bucket
-                all_blobs = bucket.list_blobs()
-            
-                # Filter blobs to include only those in the specified folder and ending with .txt
-                folder_files = [blob for blob in all_blobs if blob.name.startswith(folder_path) and blob.name.endswith('.txt')]
-            
-                # Download each .txt file to the local directory
-                for blob in folder_files:
-                    destination_file = os.path.join(local_directory, os.path.basename(blob.name))
-                    blob.download_to_filename(destination_file)
-            
-            # Define your GCS bucket name
-            bucket_name = target_bucket
-            
-            # Define the folder path within the bucket
-            folder_path = "EDIS/KIRKENES-2304"
-            
-            # Define the local directory to save the downloaded files
-            local_directory = "downloaded_files"
-            
-            # Create the local directory if it doesn't exist
-            os.makedirs(local_directory, exist_ok=True)
-            
-            # Download all .txt files from the specified folder
-            download_txt_files_from_folder(bucket_name, folder_path, local_directory)
+                def download_txt_files_from_folder(bucket_name, folder_path, local_directory):
+                    storage_client = storage.Client()
+                    bucket = storage_client.bucket(bucket_name)
+                
+                    # List all blobs (files) in the bucket
+                    all_blobs = bucket.list_blobs()
+                
+                    # Filter blobs to include only those in the specified folder and ending with .txt
+                    folder_files = [blob for blob in all_blobs if blob.name.startswith(folder_path) and blob.name.endswith('.txt')]
+                
+                    # Download each .txt file to the local directory
+                    for blob in folder_files:
+                        destination_file = os.path.join(local_directory, os.path.basename(blob.name))
+                        blob.download_to_filename(destination_file)
+                
+                # Define your GCS bucket name
+                bucket_name = target_bucket
+                
+                # Define the folder path within the bucket
+                folder_path = "EDIS/KIRKENES-2304"
+                
+                # Define the local directory to save the downloaded files
+                local_directory = "downloaded_files"
+                
+                # Create the local directory if it doesn't exist
+                os.makedirs(local_directory, exist_ok=True)
+                
+                # Download all .txt files from the specified folder
+                download_txt_files_from_folder(bucket_name, folder_path, local_directory)
                             
                 
               

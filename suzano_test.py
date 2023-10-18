@@ -335,25 +335,27 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
-            bucket_name = target_bucket
-            # Define the folder path within the bucket
-            folder_path = "EDIS/KIRKENES-2304"
-            
-            # Create a Streamlit app
-            st.title("Download Files from GCS")
-            
-            # Function to download files from the GCS bucket to local disk
-            def download_files_from_bucket():
-                storage_client = storage.Client()
-                bucket = storage_client.bucket(bucket_name)
-            
-                # List all blobs (files) in the bucket
-                all_blobs = bucket.list_blobs()
-            
-                # Filter blobs to include only those in the specified folder
-                folder_files = [blob for blob in all_blobs if blob.name.startswith(folder_path)]
-            
-                # Download each file to the local directory
+            if st.button("DD"):
+                
+                bucket_name = target_bucket
+                # Define the folder path within the bucket
+                folder_path = "EDIS/KIRKENES-2304"
+                
+                # Create a Streamlit app
+                st.title("Download Files from GCS")
+                
+                # Function to download files from the GCS bucket to local disk
+                def download_files_from_bucket():
+                    storage_client = storage.Client()
+                    bucket = storage_client.bucket(bucket_name)
+                
+                    # List all blobs (files) in the bucket
+                    all_blobs = bucket.list_blobs()
+                
+                    # Filter blobs to include only those in the specified folder
+                    folder_files = [blob for blob in all_blobs if blob.name.startswith(folder_path)]
+                
+                    # Download each file to the local directory
                 for blob in folder_files:
                     destination_file = os.path.join(local_directory, os.path.basename(blob.name))
                     blob.download_to_filename(destination_file)

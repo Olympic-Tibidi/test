@@ -1869,13 +1869,13 @@ if authentication_status:
                 trial=1
                 if trial==1:
                     load_dict={}
-                    for row in df.index[1:]:
+                    for row in Inventory.index[1:]:
                         #print(df.loc[row,'loads'])
-                        for unit in df.loc[row,'loads'].keys():
-                            load_dict[unit]={"BOL":row,"RO":df.loc[row,'release_order'],"destination":df.loc[row,'destination'],
-                                             "OBOL":df.loc[row,'ocean_bill_of_lading'],
-                                             "grade":df.loc[row,'grade'],"carrier_Id":df.loc[row,'carrier_id'],
-                                             "vehicle":df.loc[row,'vehicle'],"date":df.loc[row,'issued']                        
+                        for unit in Inventory.loc[row,'loads'].keys():
+                            load_dict[unit]={"BOL":row,"RO":Inventory.loc[row,'release_order'],"destination":Inventory.loc[row,'destination'],
+                                             "OBOL":Inventory.loc[row,'ocean_bill_of_lading'],
+                                             "grade":Inventory.loc[row,'grade'],"carrier_Id":Inventory.loc[row,'carrier_id'],
+                                             "vehicle":Inventory.loc[row,'vehicle'],"date":Inventory.loc[row,'issued']                        
                                             }
                     Load_df=pd.DataFrame(load_dict).T  
                     st.dataframe(Load_df)

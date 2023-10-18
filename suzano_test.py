@@ -369,40 +369,7 @@ if authentication_status:
                         blob = bucket.blob(file_to_download)
                         blob.download_to_filename(f'./{blob.name}')
                 
-                # Create a zip archive of the downloaded files
-                with zipfile.ZipFile('downloaded_files.zip', 'w') as zipf:
-                    for file_to_download in list_files_to_download:
-                        zipf.write(file_to_download)
-            
-                # Provide a download button for the zip file
-            with open('downloaded_files.zip', 'rb') as zip_file:
-                zip_file_binary = zip_file.read()
-            st.download_button(
-                label="Download All Files",
-                data=zip_file_binary,
-                file_name='downloaded_files.zip',
-                key='download_button'
-            )
-            client = storage.Client()
-            bucket = client.bucket(target_bucket)
-            list_folders_to_download = ['EDIS/', 'release_orders/']
-            str_folder_name_on_gcs = 'EDIS/'
-
-            # Create the directory locally
-            Path(str_folder_name_on_gcs).mkdir(parents=True, exist_ok=True)
-            
-            blobs = bucket.list_blobs(prefix=str_folder_name_on_gcs)
-            for blob in blobs:
-                if not blob.name.endswith('/'):
-                    # This blob is not a directory!
-                    print(f'Downloading file [{blob.name}]')
-                    blob.download_to_filename(f'./{blob.name}')
-            with zipfile.ZipFile('downloaded_folders.zip', 'w') as zipf:
-                    for file_to_download in list_files_to_download:
-                        zipf.write(file_to_download)
-            pass
-            if st.button("BACKUP DATA"):
-                pass
+                
               
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","MILL SHIPMENTS"])

@@ -338,36 +338,27 @@ if authentication_status:
             if st.button("DOWN"):
                 
             
-                def download_txt_files_from_folder(bucket_name, folder_path, local_directory):
-                    storage_client = storage.Client()
-                    bucket = storage_client.bucket(bucket_name)
+                folder='/google-cloud/download/{}'.format(table_id)
+                delimiter='/'
+                bucket=storage_client.get_bucket(target_bucket)
+                blobs=bucket.list_blobs(prefix=table_id, delimiter=delimiter) #List all objects that satisfy the filter.
                 
-                    # List all blobs (files) in the bucket
-                    all_blobs = bucket.list_blobs()
-                
-                    # Filter blobs to include only those in the specified folder and ending with .txt
-                    folder_files = [blob for blob in all_blobs if blob.name.startswith(folder_path) and blob.name.endswith('.txt')]
-                
-                    # Download each .txt file to the local directory
-                    for blob in folder_files:
-                        destination_file = os.path.join(local_directory, os.path.basename(blob.name))
-                        blob.download_to_filename(destination_file)
-                
-                # Define your GCS bucket name
-                bucket_name = target_bucket
-                
-                # Define the folder path within the bucket
-                folder_path = "EDIS/KIRKENES-2304"
-                
-                # Define the local directory to save the downloaded files
-                local_directory = "downloaded_files"
-                
-                # Create the local directory if it doesn't exist
-                os.makedirs(local_directory, exist_ok=True)
-                
-                # Download all .txt files from the specified folder
-                download_txt_files_from_folder(bucket_name, folder_path, local_directory)
-                            
+                # Download the file to a destination 
+                def download_to_local():
+                   logging.info('File download Started…. Wait for the job to complete.')
+                 
+                #  Create this folder locally if not exists
+                   if not os.path.exists(folder):
+                     os.makedirs(folder)
+                 
+                # Iterating through for loop one by one using API call
+                   for blob in blobs:
+                     logging.info('Blobs: {}'.format(blob.name))
+                     destination_uri = '{}/{}'.format(folder, blob.name) 
+                     blob.download_to_filename(destination_uri)
+                     logging.info('Exported {} to {}'.format(
+                     blob.name, destination_uri))
+                                            
                 
               
         if select=="ADMIN" :

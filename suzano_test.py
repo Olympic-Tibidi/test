@@ -2627,7 +2627,20 @@ if authentication_status:
                         
                 ####   IF NOT double load
                 else:
+                    units_shipped=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                        
+                    units_shipped=pd.read_json(units_shipped).T
                     
+                    #st.write(units_shipped)
+                    load_dict={}
+                    for row in units_shipped.index[1:]:
+                       
+                        for unit in units_shipped.loc[row,'loads'].keys():
+                            load_dict[unit]={"BOL":row,"RO":units_shipped.loc[row,'release_order'],"destination":units_shipped.loc[row,'destination'],
+                                             "OBOL":units_shipped.loc[row,'ocean_bill_of_lading'],
+                                             "grade":units_shipped.loc[row,'grade'],"carrier_Id":units_shipped.loc[row,'carrier_id'],
+                                             "vehicle":units_shipped.loc[row,'vehicle'],"date":units_shipped.loc[row,'issued']                        
+                                            }
                 
                     faults=[]
                     bale_faults=[]
@@ -2649,7 +2662,10 @@ if authentication_status:
                                     st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                     faults.append(1)
                                     st.markdown("**:red[This unit has been scanned TWICE!]**")
-                                    
+                                if x in load_dict.keys():
+                                    st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                    faults.append(1)
+                                    st.markdown("**:red[This unit has been SHIPPED!]**")  
                                 else:
                                     st.write(f"**Unit No : {i+1}-{x}**")
                                     faults.append(0)

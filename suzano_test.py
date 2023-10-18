@@ -344,36 +344,36 @@ if authentication_status:
             
             # Function to download files from the GCS bucket to local disk
             def download_files_from_bucket():
-                storage_client = storage.Client()
-                bucket = storage_client.bucket(bucket_name)
-            
-                # List all blobs (files) in the bucket
-                all_blobs = bucket.list_blobs()
-            
-                # Filter blobs to include only those in the specified folder
-                folder_files = [blob for blob in all_blobs if blob.name.startswith(folder_path)]
-            
-                # Download each file to the local directory
-                for blob in folder_files:
-                    destination_file = os.path.join(local_directory, os.path.basename(blob.name))
-                    blob.download_to_filename(destination_file)
-            
-            # Local directory where you want to save the downloaded files
-            local_directory = "downloaded_files"
-            os.makedirs(local_directory, exist_ok=True)
-            
-            # Button to initiate the download
-            if st.button("Download Files"):
-                download_files_from_bucket()
-                st.success("Download completed!")
-            
-            # List of downloaded files
-            downloaded_files = os.listdir(local_directory)
-            st.write("List of downloaded files:")
-            for file in downloaded_files:
-                file_path = os.path.join(local_directory, file)
-                st.markdown(f"[Download {file}](data:application/txt;charset=utf-8;base64,{base64.b64encode(open(file_path, 'rb').read()).decode()})", unsafe_allow_html=True)
-                                            
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+
+    # List all blobs (files) in the bucket
+    all_blobs = bucket.list_blobs()
+
+    # Filter blobs to include only those in the specified folder
+    folder_files = [blob for blob in all_blobs if blob.name.startswith(folder_path)]
+
+    # Download each file to the local directory
+    for blob in folder_files:
+        destination_file = os.path.join(local_directory, os.path.basename(blob.name))
+        blob.download_to_filename(destination_file)
+
+    # Local directory where you want to save the downloaded files
+    local_directory = "C:\Users\afsin\Downloads"
+    os.makedirs(local_directory, exist_ok=True)
+    
+    # Button to initiate the download
+    if st.button("Download Files"):
+        download_files_from_bucket()
+        st.success("Download completed!")
+    
+    # List of downloaded files
+    downloaded_files = os.listdir(local_directory)
+    st.write("List of downloaded files:")
+    for file in downloaded_files:
+        file_path = os.path.join(local_directory, file)
+        st.markdown(f"[Download {file}](data:application/txt;charset=utf-8;base64,{base64.b64encode(open(file_path, 'rb').read()).decode()})", unsafe_allow_html=True)
+                                                
                 
               
         if select=="ADMIN" :

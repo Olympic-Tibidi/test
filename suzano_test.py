@@ -1868,12 +1868,27 @@ if authentication_status:
             with inv4:
                 trial=1
                 if trial==1:
+                    load_dict={}
+                    for row in df.index[1:]:
+                        #print(df.loc[row,'loads'])
+                        for unit in df.loc[row,'loads'].keys():
+                            load_dict[unit]={"BOL":row,"RO":df.loc[row,'release_order'],"destination":df.loc[row,'destination'],
+                                             "OBOL":df.loc[row,'ocean_bill_of_lading'],
+                                             "grade":df.loc[row,'grade'],"carrier_Id":df.loc[row,'carrier_id'],
+                                             "vehicle":df.loc[row,'vehicle'],"date":df.loc[row,'issued']                        
+                                            }
+                    Load_df=pd.DataFrame(load_dict).T  
+                    st.dataframe(Load_df)
+    
+   
+    
                     wrh=Inventory["Remaining"].sum()*250/1000
                     shp=Inventory["Shipped"].sum()*250/1000
                     
                     st.markdown(f"**IN WAREHOUSE = {wrh} tons**")
                     st.markdown(f"**TOTAL SHIPPED = {shp} tons**")
                     st.markdown(f"**TOTAL OVERALL = {wrh+shp} tons**")
+                    
                 else:
                     dab1,dab2=st.tabs(["IN WAREHOUSE","SHIPPED BY DATE"])
                     df=Inventory[(Inventory["Location"]=="OLYM")|(Inventory["Location"]=="PARTIAL")][["Lot","Bales","Shipped","Remaining","Batch","Ocean B/L","Grade","DryWeight","ADMT","Location","Warehouse_In"]]

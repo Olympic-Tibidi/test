@@ -335,40 +335,36 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
-            def download_files_in_folder(bucket, folder_name, output_directory):
-                blob_iterator = bucket.list_blobs(prefix=folder_name)
+            def download_txt_files_from_folder(bucket_name, folder_path, local_directory):
+                storage_client = storage.Client()
+                bucket = storage_client.bucket(bucket_name)
             
-                for blob in blob_iterator:
-                    # Skip folders (objects ending with '/')
-                    if blob.name.endswith('/'):
-                        continue
+                # List all blobs (files) in the bucket
+                all_blobs = bucket.list_blobs()
             
-                    # Download the file to the specified output directory
-                    output_path = os.path.join(output_directory, os.path.basename(blob.name))
-                    blob.download_to_filename(output_path)
-            if st.button("DOWNLOAD EDI",key="112334"):
-                
-                client = storage.Client()
-                bucket = client.bucket(target_bucket)
-                # Create a blob object from the filepath
-                blob = bucket.blob("EDIS/KIRKENES-2304/11502402.txt")
-                # Download the file to a destination
-                blob.download_to_filename(a.txt)
-
-            if st.button("BACKUP DATA"):
-                st.write("OK")
-                client = storage.Client()
-                bucket = client.bucket(target_bucket)
+                # Filter blobs to include only those in the specified folder and ending with .txt
+                folder_files = [blob for blob in all_blobs if blob.name.startswith(folder_path) and blob.name.endswith('.txt')]
             
-                list_files_to_download = ['dispatched.json','terminal_bill_of_ladings.json','truck_schedule.xlsx','suzano_report.json',
-                                          'mill_progress.json', 'Inventory.csv']
-                
-                # Create a temporary directory to store the downloaded files
-                with st.spinner("Downloading files..."):
-                    for file_to_download in list_files_to_download:
-                        blob = bucket.blob(file_to_download)
-                        blob.download_to_filename(f'./{blob.name}')
-                
+                # Download each .txt file to the local directory
+                for blob in folder_files:
+                    destination_file = os.path.join(local_directory, os.path.basename(blob.name))
+                    blob.download_to_filename(destination_file)
+            
+            # Define your GCS bucket name
+            bucket_name = target_bucket
+            
+            # Define the folder path within the bucket
+            folder_path = "EDIS/KIRKENES-2304"
+            
+            # Define the local directory to save the downloaded files
+            local_directory = "downloaded_files"
+            
+            # Create the local directory if it doesn't exist
+            os.makedirs(local_directory, exist_ok=True)
+            
+            # Download all .txt files from the specified folder
+            download_txt_files_from_folder(bucket_name, folder_path, local_directory)
+                            
                 
               
         if select=="ADMIN" :

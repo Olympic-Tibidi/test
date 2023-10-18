@@ -341,7 +341,7 @@ if authentication_status:
                 dl_dir = 'C:/Users/afsin/Downloads/'
                 
                 storage_client = storage.Client()
-                bucket = storage_client.get_bucket(bucket_name=bucket_name)
+                bucket = storage_client.bucket(bucket_name=bucket_name)
                 blobs = bucket.list_blobs(prefix=prefix)  # Get list of files
                 for blob in blobs:
                     filename = blob.name.replace('/', '_') 

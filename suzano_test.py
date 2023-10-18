@@ -261,7 +261,7 @@ def process():
         number_of_lines=len(loads)+3
     end_initial="0"*(4-len(str(number_of_lines)))
     end=f"9TRL:{end_initial}{number_of_lines}"
-    Inventory=gcp_csv_to_df("olym_suzano", "Inventory.csv")
+    Inventory=gcp_csv_to_df(target_bucket, "Inventory.csv")
     for i in loads:
         try:              
             Inventory.loc[Inventory["Lot"]==i,"Location"]="PARTIAL"
@@ -276,7 +276,7 @@ def process():
             st.write("Check Unit Number,Unit Not In Inventory")         
         
         temp=Inventory.to_csv("temp.csv")
-        upload_cs_file("olym_suzano", 'temp.csv',"Inventory.csv") 
+        upload_cs_file(target_bucket, 'temp.csv',"Inventory.csv") 
     with open(f'placeholder.txt', 'w') as f:
         f.write(line1)
         f.write('\n')
@@ -295,7 +295,7 @@ def process():
        
         f.write(end)
 def gen_bill_of_lading():
-    data=gcp_download("olym_suzano",rf"terminal_bill_of_ladings.json")
+    data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
     bill_of_ladings=json.loads(data)
     list_of_ladings=[]
     try:
@@ -1651,7 +1651,7 @@ if authentication_status:
                                                 
                             bill_of_ladings=json.dumps(bill_of_ladings)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket("olym_suzano")
+                            bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"terminal_bill_of_ladings.json")
                             blob.upload_from_string(bill_of_ladings)
                             

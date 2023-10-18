@@ -335,30 +335,30 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
-            def download_bucket_with_transfer_manager(bucket_name, destination_directory, workers=8, max_results=1000):
+            bucket_name = "olym_suzano_test"
+            folder_name = "EDIS/KIRKENES-2304"
+            destination_directory = r"C:\Users\afsin\Downloads"
+            
+            def download_files_from_gcs(bucket_name, folder_name, destination_directory):
                 storage_client = storage.Client()
                 bucket = storage_client.bucket(bucket_name)
-                blob_names = [blob.name for blob in bucket.list_blobs(max_results=max_results)]
                 
-                for name in blob_names:
-                    # Use os.path.join to create the correct path with backslashes
-                    file_path = os.path.join(destination_directory, name.replace('/', '\\'))
-                    if not os.path.exists(os.path.dirname(file_path)):
-                        os.makedirs(os.path.dirname(file_path))
+                # List the objects in the specified folder
+                blob_names = [blob.name for blob in bucket.list_blobs(prefix=folder_name)]
                 
-                results = transfer_manager.download_many_to_path(bucket, blob_names, destination_directory, max_workers=workers)
+                for blob_name in blob_names:
+                    # Create the local file path by joining the destination directory and blob name
+                    local_file_path = os.path.join(destination_directory, os.path.basename(blob_name))
+                    
+                    # Download the file from GCS to the local file path
+                    blob = bucket.blob(blob_name)
+                    blob.download_to_filename(local_file_path)
+                    
+                    st.write(f"Downloaded {blob_name} to {local_file_path}")
             
-                for name, result in zip(blob_names, results):
-                    if isinstance(result, Exception):
-                        st.write("Failed to download {} due to exception: {}".format(name, result))
-                    else:
-                        st.write("Downloaded {} to {}.".format(name, file_path))
-            
-            if st.button("DD"):
-                target_bucket = target_bucket  # Define the target bucket
-                destination_directory = r"C:/Users/afsin/Downloads"
-                download_bucket_with_transfer_manager(target_bucket, destination_directory, workers=8, max_results=1000)
-              
+            if st.button("Download EDIS"):
+                download_files_from_gcs(bucket_name, folder_name, destination_directory)
+                          
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","MILL SHIPMENTS"])
             with admin_tab2:

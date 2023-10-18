@@ -1520,6 +1520,7 @@ if authentication_status:
                                         faults.append(1)
                                         st.markdown("**:red[This unit has been scanned TWICE!]**")
                                     if x in load_dict.keys():
+                                        st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                         faults.append(1)
                                         st.markdown("**:red[This unit has been SHIPPED!]**")
                                     else:

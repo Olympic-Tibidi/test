@@ -356,9 +356,9 @@ if authentication_status:
                     folder_files = [blob for blob in all_blobs if blob.name.startswith(folder_path)]
                 
                     # Download each file to the local directory
-                for blob in folder_files:
-                    destination_file = os.path.join(local_directory, os.path.basename(blob.name))
-                    blob.download_to_filename(destination_file)
+                    for blob in folder_files:
+                        destination_file = os.path.join(local_directory, os.path.basename(blob.name))
+                        blob.download_to_filename(destination_file)
             
                 # Local directory where you want to save the downloaded files
                 local_directory =r"C:\Users\afsin\Downloads"

@@ -335,42 +335,19 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
-            
-            
-            
-            import shutil
-            
-            # Define your target bucket and folder
-            bucket_name = "olym_suzano_test"
-            folder_name = "EDIS/KIRKENES-2304"
-            destination_directory = r"C:\Users\afsin\Downloads"
-            
-            def download_files_from_gcs(bucket_name, folder_name, destination_directory):
-                storage_client = storage.Client()
-                bucket = storage_client.bucket(bucket_name)
-                
-                # List the objects in the specified folder
-                blob_names = [blob.name for blob in bucket.list_blobs(prefix=folder_name)]
-                
-                for blob_name in blob_names:
-                    # Create the local file path by joining the destination directory and the filename
-                    local_file_path = os.path.join(destination_directory, os.path.basename(blob_name))
-                    
-                    # Ensure the destination directory exists
-                    os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
-                    
-                    # Download the file from GCS to a temporary location
-                    temp_file_path = local_file_path + '.tmp'
-                    blob = bucket.blob(blob_name)
-                    blob.download_to_filename(temp_file_path)
-                    
-                    # Rename the temporary file to the final local file path
-                    os.rename(temp_file_path, local_file_path)
-                    
-                    st.write(f"Downloaded {blob_name} to {local_file_path}")
-
             if st.button("Download EDIS"):
-                download_files_from_gcs(bucket_name, folder_name, destination_directory)
+                bucket_name = target_bucket
+                prefix = 'EDIS/KIRKENES-2304'
+                dl_dir = 'C:/Users/afsin/Downloads/'
+                
+                storage_client = storage.Client()
+                bucket = storage_client.get_bucket(bucket_name=bucket_name)
+                blobs = bucket.list_blobs(prefix=prefix)  # Get list of files
+                for blob in blobs:
+                    filename = blob.name.replace('/', '_') 
+                    blob.download_to_filename(dl_dir + filename)  # Download
+            
+               
 
 
 

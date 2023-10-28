@@ -1822,7 +1822,7 @@ if authentication_status:
                         st.table(today_arrived_vehicles.T)
                     if select=="ALL ARRIVALS":
                         
-                        st.table(arrived_vehicles)
+                        st.table(arrived_vehicles.drop(columns=['ARRIVAL']))
             
             with inv2:
                 @st.cache

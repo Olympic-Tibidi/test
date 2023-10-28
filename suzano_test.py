@@ -1788,15 +1788,15 @@ if authentication_status:
                             estimated_arrival=combined_departure+datetime.timedelta(minutes=60*hours_togo+minutes_togo)
                             estimated_arrival_string=datetime.datetime.strftime(estimated_arrival,"%B %d,%Y -- %H:%M")
                             now=datetime.datetime.now()-datetime.timedelta(hours=7)
-                            now=now - datetime.timedelta(days=2)
-                            if estimated_arrival>now:
+                            nowe=now - datetime.timedelta(days=2)
+                            if estimated_arrival>nowe:
                                 #st.write(f"Truck No : {truck} is Enroute to {destination} with ETA {estimated_arrival_string}")
                                 enroute_vehicles[truck]={"DESTINATION":destination,"CARGO":bill_of_ladings[i]["ocean_bill_of_lading"],
                                                  "QUANTITY":f'{2*bill_of_ladings[i]["quantity"]} TONS',"LOADED TIME":f"{ship_date.date()}---{ship_time}","ETA":estimated_arrival_string}
                             else:
                                 with daily3:
                                     #st.write(f"Truck No : {truck} arrived at {destination} at {estimated_arrival_string}")
-                                    if estimated_arrival.date()==now.date():
+                                    if estimated_arrival.date()==nowe.date():
                                         arrived_vehicles[truck]={"DESTINATION":destination,"CARGO":bill_of_ladings[i]["ocean_bill_of_lading"],
                                                  "QUANTITY":f'{2*bill_of_ladings[i]["quantity"]} TONS',"LOADED TIME":f"{ship_date.date()}---{ship_time}","ARRIVAL TIME":estimated_arrival_string}
                              

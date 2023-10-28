@@ -1801,12 +1801,12 @@ if authentication_status:
                                 
                                 arrived_vehicles[truck]={"DESTINATION":destination,"CARGO":bill_of_ladings[i]["ocean_bill_of_lading"],
                                                  "QUANTITY":f'{2*bill_of_ladings[i]["quantity"]} TONS',"LOADED TIME":f"{ship_date.date()}---{ship_time}",
-                                                                 "ARRIVAL TIME":estimated_arrival_string}
+                                                                 "ARRIVAL TIME":estimated_arrival_string,"ARRIVAL":estimated_arrival}
                                         
                     arrived_vehicles=pd.DataFrame(arrived_vehicles)
                     arrived_vehicles=arrived_vehicles.rename_axis('TRUCK NO')
                     arrived_vehicles=arrived_vehicles.T
-                    arrived_vehicles=arrived_vehicles.sort_values(by="ARRIVAL TIME")
+                    arrived_vehicles=arrived_vehicles.sort_values(by="ARRIVAL")
                     today_arrived_vehicles=pd.DataFrame(today_arrived_vehicles)
                     today_arrived_vehicles=today_arrived_vehicles.rename_axis('TRUCK NO')
                     enroute_vehicles=pd.DataFrame(enroute_vehicles)

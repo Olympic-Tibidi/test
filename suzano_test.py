@@ -1804,7 +1804,9 @@ if authentication_status:
                                                                  "ARRIVAL TIME":estimated_arrival_string}
                                         
                     arrived_vehicles=pd.DataFrame(arrived_vehicles)
-                    arrived_vehicles=arrived_vehicles.rename_axis('TRUCK NO')               
+                    arrived_vehicles=arrived_vehicles.rename_axis('TRUCK NO')    
+                    today_arrived_vehicles=pd.DataFrame(arrived_vehicles)
+                    today_arrived_vehicles=today_arrived_vehicles.rename_axis('TRUCK NO')
                     enroute_vehicles=pd.DataFrame(enroute_vehicles)
                     enroute_vehicles=enroute_vehicles.rename_axis('TRUCK NO')
                     st.dataframe(enroute_vehicles.T)                      

@@ -1895,7 +1895,7 @@ if authentication_status:
                                              "vehicle":bills_df.loc[row,'vehicle'],"date":bills_df.loc[row,'issued']                        
                                             }
                     Load_df=pd.DataFrame(load_dict).T  
-                    
+                    st.dataframe(Load_df)
                     for line in bills_df.loads[1:]:
                         for unit in line.keys():
 
@@ -1903,7 +1903,7 @@ if authentication_status:
                             Inventory.loc[Inventory["Lot"]==unit[:-2],"Remaining"]=Inventory.loc[Inventory["Lot"]==unit[:-2],"Remaining"]-line[unit]*8
     
    
-                    st.dataframe(Inventory)
+                    #st.dataframe(Inventory)
                     wrh=Inventory["Remaining"].sum()*250/1000
                     shp=Inventory["Shipped"].sum()*250/1000
                     

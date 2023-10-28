@@ -1805,7 +1805,7 @@ if authentication_status:
                                         
                     arrived_vehicles=pd.DataFrame(arrived_vehicles)
                     arrived_vehicles=arrived_vehicles.rename_axis('TRUCK NO')
-                    arrived_vehicles=arrived_vehicles.sorted(by="ARRIVAL TIME")
+                    arrived_vehicles=arrived_vehicles.sort_values(by="ARRIVAL TIME")
                     today_arrived_vehicles=pd.DataFrame(today_arrived_vehicles)
                     today_arrived_vehicles=today_arrived_vehicles.rename_axis('TRUCK NO')
                     enroute_vehicles=pd.DataFrame(enroute_vehicles)

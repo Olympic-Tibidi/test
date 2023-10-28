@@ -224,12 +224,31 @@ def edit_release_order_data(file,vessel,release_order_number,destination,po_numb
     file[vessel][release_order_number][sales_order_item]["shipped"]= 0
     file[vessel][release_order_number][sales_order_item]["remaining"]= quantity
     
-    
+ 
        
 
     # Convert the dictionary to JSON format
     json_data = json.dumps(file)
     return json_data
+
+def edit_release_order(file,vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code):
+       
+    # Edit the loaded current dictionary.
+    file[vessel][release_order_number]["destination"]= destination
+    file[vessel][release_order_number]["po_number"]= po_number
+    if sales_order_item not in file[vessel][release_order_number]:
+        file[vessel][release_order_number][sales_order_item]={}
+    file[vessel][release_order_number][sales_order_item]["batch"]= batch
+    file[vessel][release_order_number][sales_order_item]["ocean_bill_of_lading"]= ocean_bill_of_lading
+    file[vessel][release_order_number][sales_order_item]["grade"]= wrap
+    file[vessel][release_order_number][sales_order_item]["dryness"]= dryness
+    file[vessel][release_order_number][sales_order_item]["transport_type"]= transport_type
+    file[vessel][release_order_number][sales_order_item]["carrier_code"]= carrier_code
+    file[vessel][release_order_number][sales_order_item]["unitized"]= unitized
+    file[vessel][release_order_number][sales_order_item]["quantity"]= quantity
+    file[vessel][release_order_number][sales_order_item]["tonnage"]= tonnage
+    file[vessel][release_order_number][sales_order_item]["shipped"]= shipped
+    file[vessel][release_order_number][sales_order_item]["remaining"]= quantity
 
 
 def process():
@@ -261,22 +280,7 @@ def process():
         number_of_lines=len(loads)+3
     end_initial="0"*(4-len(str(number_of_lines)))
     end=f"9TRL:{end_initial}{number_of_lines}"
-    Inventory=gcp_csv_to_df(target_bucket, "Inventory.csv")
-    for i in loads:
-        try:              
-            Inventory.loc[Inventory["Lot"]==i,"Location"]="PARTIAL"
-            Inventory.loc[Inventory["Lot"]==i,"Shipped"]=Inventory.loc[Inventory["Lot"]==i,"Shipped"].values[0]+loads[i]*8
-            Inventory.loc[Inventory["Lot"]==i,"Remaining"]=Inventory.loc[Inventory["Lot"]==i,"Remaining"].values[0]-loads[i]*8
-            Inventory.loc[Inventory["Lot"]==i,"Warehouse_Out"]=datetime.datetime.combine(file_date,file_time)
-            Inventory.loc[Inventory["Lot"]==i,"Vehicle_Id"]=str(vehicle_id)
-            Inventory.loc[Inventory["Lot"]==i,"Release_Order_Number"]=str(release_order_number)
-            Inventory.loc[Inventory["Lot"]==i,"Carrier_Code"]=str(carrier_code)
-            Inventory.loc[Inventory["Lot"]==i,"Terminal B/L"]=str(terminal_bill_of_lading)
-        except:
-            st.write("Check Unit Number,Unit Not In Inventory")         
-        
-        temp=Inventory.to_csv("temp.csv")
-        upload_cs_file(target_bucket, 'temp.csv',"Inventory.csv") 
+    
     with open(f'placeholder.txt', 'w') as f:
         f.write(line1)
         f.write('\n')
@@ -306,6 +310,8 @@ def gen_bill_of_lading():
     except:
         bill_of_lading_number=11502400
     return bill_of_lading_number,bill_of_ladings
+
+
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 pd.options.mode.chained_assignment = None  # default='warn'
@@ -1642,14 +1648,7 @@ if authentication_status:
                                 blob.upload_from_string(suzano_report)
     
                               
-                                mill_progress=json.loads(gcp_download(target_bucket,rf"mill_progress.json"))
-                                map={8:"SEP 2023",9:"SEP 2023",10:"OCT 2023",11:"NOV 2023",12:"DEC 2023"}
-                                mill_progress[destination][map[file_date.month]]["Shipped"]=mill_progress[destination][map[file_date.month]]["Shipped"]+len(textsplit)*2
-                                json_data = json.dumps(mill_progress)
-                                storage_client = storage.Client()
-                                bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"mill_progress.json")
-                                blob.upload_from_string(json_data)       
+                                
                             if double_load:
                                 info[vessel][current_release_order][current_sales_order]["shipped"]=info[vessel][current_release_order][current_sales_order]["shipped"]+len(first_textsplit)
                                 info[vessel][current_release_order][current_sales_order]["remaining"]=info[vessel][current_release_order][current_sales_order]["remaining"]-len(first_textsplit)
@@ -1672,7 +1671,7 @@ if authentication_status:
                                 
                                 json_data = json.dumps(dispatched)
                                 storage_client = storage.Client()
-                                bucket = storage_client.bucket("olym_suzano")
+                                bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"dispatched.json")
                                 blob.upload_from_string(json_data)       
                             
@@ -1795,7 +1794,8 @@ if authentication_status:
                             else:
                                 with daily3:
                                     #st.write(f"Truck No : {truck} arrived at {destination} at {estimated_arrival_string}")
-                                    arrived_vehicles[truck]={"DESTINATION":destination,"CARGO":bill_of_ladings[i]["ocean_bill_of_lading"],
+                                    if estimated_arrival.date()==now.date():
+                                        arrived_vehicles[truck]={"DESTINATION":destination,"CARGO":bill_of_ladings[i]["ocean_bill_of_lading"],
                                                  "QUANTITY":f'{2*bill_of_ladings[i]["quantity"]} TONS',"LOADED TIME":f"{ship_date.date()}---{ship_time}","ARRIVAL TIME":estimated_arrival_string}
                              
                     arrived_vehicles=pd.DataFrame(arrived_vehicles)

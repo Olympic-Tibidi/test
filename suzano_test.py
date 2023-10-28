@@ -1769,6 +1769,7 @@ if authentication_status:
                 with daily2:
                     enroute_vehicles={}
                     arrived_vehicles={}
+                    today_arrived_vehicles={}
                     for i in bill_of_ladings:
                         if i!="11502400":
                             date_strings=bill_of_ladings[i]["issued"].split(" ")
@@ -1787,6 +1788,7 @@ if authentication_status:
                             estimated_arrival=combined_departure+datetime.timedelta(minutes=60*hours_togo+minutes_togo)
                             estimated_arrival_string=datetime.datetime.strftime(estimated_arrival,"%B %d,%Y -- %H:%M")
                             now=datetime.datetime.now()-datetime.timedelta(hours=7)
+                            now=now - datetime.timedelta(days=2)
                             if estimated_arrival>now:
                                 #st.write(f"Truck No : {truck} is Enroute to {destination} with ETA {estimated_arrival_string}")
                                 enroute_vehicles[truck]={"DESTINATION":destination,"CARGO":bill_of_ladings[i]["ocean_bill_of_lading"],

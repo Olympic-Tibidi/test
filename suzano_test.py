@@ -1805,7 +1805,8 @@ if authentication_status:
                                         
                     arrived_vehicles=pd.DataFrame(arrived_vehicles)
                     arrived_vehicles=arrived_vehicles.rename_axis('TRUCK NO')
-                    #arrived_vehicles=arrived_vehicles.sort_values(by="ARRIVAL TIME")
+                    arrived_vehicles=arrived_vehicles.T
+                    arrived_vehicles=arrived_vehicles.sort_values(by="ARRIVAL TIME")
                     today_arrived_vehicles=pd.DataFrame(today_arrived_vehicles)
                     today_arrived_vehicles=today_arrived_vehicles.rename_axis('TRUCK NO')
                     enroute_vehicles=pd.DataFrame(enroute_vehicles)
@@ -1820,7 +1821,8 @@ if authentication_status:
                     if select=="TODAY'S ARRIVALS":
                         st.table(today_arrived_vehicles.T)
                     if select=="ALL ARRIVALS":
-                        st.table(arrived_vehicles.T)
+                        
+                        st.table(arrived_vehicles)
             
             with inv2:
                 @st.cache

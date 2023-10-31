@@ -358,17 +358,20 @@ if authentication_status:
                         if blob.name.endswith('.txt'):  # Download only .txt files
                             # Create a local file path based on the blob's name
                             local_file_path = f"{local_directory}/{blob.name.replace('/', '_')}"
+                
+                            # Create the directory if it doesn't exist
+                            os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
                             
                             # Download the file to the local directory
                             blob.download_to_filename(local_file_path)
                             print(f"Downloaded {blob.name} to {local_file_path}")
                 
                 # Local directory to save the downloaded files
-                local_directory_path = r'C:\Users\afsin\Desktop\EDIDOWNLOAD'
+                local_directory_path = '/path/to/local/directory'
                 
                 # Download files
                 download_files_in_folder(bucket_name, folder_path, local_directory_path)
-            
+                            
                
 
 

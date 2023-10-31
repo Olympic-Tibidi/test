@@ -357,7 +357,7 @@ if authentication_status:
                     for blob in blobs:
                         if blob.name.endswith('.txt'):  # Download only .txt files
                             # Create a local file path based on the blob's name
-                            local_file_path = f"{local_directory}/{blob.name.replace('\', '_')}"
+                            local_file_path = f"{local_directory}/{blob.name.replace('/', '_')}"
                 
                             # Create the directory if it doesn't exist
                             os.makedirs(os.path.dirname(local_file_path), exist_ok=True)

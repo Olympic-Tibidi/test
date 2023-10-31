@@ -342,17 +342,32 @@ if authentication_status:
             
         if select=="DATA BACKUP" :
             if st.button("Download EDIS"):
+                project_id = 'your-project-id'
                 bucket_name = target_bucket
-                prefix = 'EDIS/KIRKENES-2304'
-                dl_dir = 'C:/Users/afsin/Downloads/'
                 
-                storage_client = storage.Client()
-                bucket = storage_client.bucket(bucket_name=bucket_name)
-                blobs = bucket.list_blobs(prefix=prefix)  # Get list of files
-                st.write(blobs)
-                for blob in blobs:
-                    filename = blob.name.replace('/', '_') 
-                    blob.download_to_filename(dl_dir + filename)  # Download
+                # Folder path to download files from
+                folder_path = 'EDIS/KIRKENES-2304'
+                
+                def download_files_in_folder(bucket_name, folder_path, local_directory):
+                    storage_client = storage.Client(project=project_id)
+                    bucket = storage_client.get_bucket(bucket_name)
+                
+                    blobs = bucket.list_blobs(prefix=folder_path)
+                
+                    for blob in blobs:
+                        if blob.name.endswith('.txt'):  # Download only .txt files
+                            # Create a local file path based on the blob's name
+                            local_file_path = f"{local_directory}/{blob.name.replace('/', '_')}"
+                            
+                            # Download the file to the local directory
+                            blob.download_to_filename(local_file_path)
+                            print(f"Downloaded {blob.name} to {local_file_path}")
+                
+                # Local directory to save the downloaded files
+                local_directory_path = '/path/to/local/directory'
+                
+                # Download files
+                download_files_in_folder(bucket_name, folder_path, local_directory_path)
             
                
 

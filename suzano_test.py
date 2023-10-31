@@ -342,36 +342,22 @@ if authentication_status:
             
         if select=="DATA BACKUP" :
             if st.button("Download EDIS"):
-                project_id = 'your-project-id'
-                bucket_name = target_bucket
+                bucket_name= target_bucket
                 
-                # Folder path to download files from
-                folder_path = 'EDIS/KIRKENES-2304'
+                # The "folder" where the files you want to download are
+                folder="EDIS/KIRKENES-2304"
                 
-                def download_files_in_folder(bucket_name, folder_path, local_directory):
-                    storage_client = storage.Client(project=project_id)
-                    bucket = storage_client.get_bucket(bucket_name)
+                # Create this folder locally
+                if not os.path.exists(folder):
+                    os.makedirs(folder)
                 
-                    blobs = bucket.list_blobs(prefix=folder_path)
-                
-                    for blob in blobs:
-                        if blob.name.endswith('.txt'):  # Download only .txt files
-                            # Construct the local file path using os.path.join() to ensure correct path formatting
-                            local_file_path = os.path.join(local_directory, blob.name.replace('/', '_'))
-                
-                            # Create the directory if it doesn't exist
-                            os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
-                            
-                            # Download the file to the local directory
-                            blob.download_to_filename(local_file_path)
-                            print(f"Downloaded {blob.name} to {local_file_path}")
-
-                
-                # Local directory to save the downloaded files (using backslashes for Windows)
-                local_directory_path = 'C:\\Users\\afsin\\Desktop\\EDIDOWNLOAD\\'
-                                # Download files
-                download_files_in_folder(bucket_name, folder_path, local_directory_path)
-                            
+                # Retrieve all blobs with a prefix matching the folder
+                bucket=client.get_bucket(bucket_name)
+                blobs=list(bucket.list_blobs(prefix=folder))
+                for blob in blobs:
+                    if(not blob.name.endswith("/")):
+                        blob.download_to_filename(blob.name)
+                                            
                
 
 

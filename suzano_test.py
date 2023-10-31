@@ -368,7 +368,7 @@ if authentication_status:
 
                 
                 # Local directory to save the downloaded files (using backslashes for Windows)
-                local_directory_path = 'C:\\Users\\afsin\\Desktop\\EDIDOWNLOAD'
+                local_directory_path = 'C:\\Users\\afsin\\Desktop\\EDIDOWNLOAD\'
                                 # Download files
                 download_files_in_folder(bucket_name, folder_path, local_directory_path)
                             

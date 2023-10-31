@@ -364,7 +364,7 @@ if authentication_status:
                             print(f"Downloaded {blob.name} to {local_file_path}")
                 
                 # Local directory to save the downloaded files
-                local_directory_path = '/path/to/local/directory'
+                local_directory_path = 'C:\Users\afsin\Desktop\EDIDOWNLOAD'
                 
                 # Download files
                 download_files_in_folder(bucket_name, folder_path, local_directory_path)

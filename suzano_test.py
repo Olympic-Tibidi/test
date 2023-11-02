@@ -805,6 +805,7 @@ if authentication_status:
                         completed_release_orders=[]
                         
                         for key in release_order_database:
+                            st.write(key)
                             not_yet=0
                             #st.write(key)
                             for sales in release_order_database[key]:

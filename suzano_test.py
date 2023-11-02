@@ -519,7 +519,7 @@ if authentication_status:
                     if create_release_order:
                         
                         if edit: 
-                            data=gcp_download("olym_suzano",rf"release_orders/{vessel}/{release_order_number}.json")
+                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
                             to_edit=json.loads(data)
                             temp=edit_release_order_data(to_edit,vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
                             st.write(f"ADDED sales order item {sales_order_item} to release order {release_order_number}!")
@@ -528,15 +528,15 @@ if authentication_status:
                             temp=store_release_order_data(vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
                      
                         try:
-                            junk=gcp_download("olym_suzano",rf"release_orders/{vessel}/junk_release.json")
+                            junk=gcp_download(target_bucket,rf"release_orders/{vessel}/junk_release.json")
                         except:
-                            junk=gcp_download("olym_suzano",rf"junk_release.json")
+                            junk=gcp_download(target_bucket,rf"junk_release.json")
                         junk=json.loads(junk)
                         try:
                             del junk[release_order_number]
                             jason_data=json.dumps(junk)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket("olym_suzano")
+                            bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/{vessel}/junk_release.json")
                             blob.upload_from_string(jason_data)
                         except:
@@ -544,7 +544,7 @@ if authentication_status:
                         
 
                         storage_client = storage.Client()
-                        bucket = storage_client.bucket("olym_suzano")
+                        bucket = storage_client.bucket(target_bucket)
                         blob = bucket.blob(rf"release_orders/{vessel}/{release_order_number}.json")
                         blob.upload_from_string(temp)
 
@@ -558,7 +558,7 @@ if authentication_status:
                             release_order_database[release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}
                         release_orders_json=json.dumps(release_order_database)
                         storage_client = storage.Client()
-                        bucket = storage_client.bucket("olym_suzano")
+                        bucket = storage_client.bucket(target_bucket)
                         blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                         blob.upload_from_string(release_orders_json)
                         st.write(f"Recorded Release Order - {release_order_number} for Item No: {sales_order_item}")
@@ -846,7 +846,7 @@ if authentication_status:
                                     pass
                             st.markdown("**CURRENT DISPATCH QUEUE**")
                             try:
-                                dispatch=gcp_download("olym_suzano",rf"dispatched.json")
+                                dispatch=gcp_download(target_bucket,rf"dispatched.json")
                                 dispatch=json.loads(dispatch)
                                 try:
                                     for dispatched_release in dispatch.keys():

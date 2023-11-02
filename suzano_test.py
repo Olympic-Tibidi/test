@@ -1526,7 +1526,7 @@ if authentication_status:
                     
                             file_path = 'temp_file.txt'  # Use the path of the temporary file
                             upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}") 
-                            mf_numbers_for_load[vessel][release_order_number].pop(load_mf_number)
+                            mf_numbers_for_load[vessel][release_order_number].remove(load_mf_number)
                             mf_numbers_for_load=json.dumps(mf_numbers_for_load)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)

@@ -1386,7 +1386,7 @@ if authentication_status:
                         if proceed:
                             carrier_code=carrier_code.split("-")[0]
                             try:
-                                suzano_report_=gcp_download("olym_suzano",rf"suzano_report.json")
+                                suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
                                 suzano_report=json.loads(suzano_report_)
                             except:
                                 suzano_report={}

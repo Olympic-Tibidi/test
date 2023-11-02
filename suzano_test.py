@@ -1514,8 +1514,8 @@ if authentication_status:
                             body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                             st.write(body)           
                             sender = "warehouseoly@gmail.com"
-                            recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                            #recipients = ["afsiny@portolympia.com"]
+                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                            recipients = ["afsiny@portolympia.com"]
                             password = "xjvxkmzbpotzeuuv"
                     
                   
@@ -1526,6 +1526,12 @@ if authentication_status:
                     
                             file_path = 'temp_file.txt'  # Use the path of the temporary file
                             upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}") 
+                            mf_numbers_for_load[vessel][release_order_number].pop(load_mf_number)
+                            mf_numbers_for_load=json.dumps(mf_numbers_for_load)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"release_orders/mf_numbers.json")
+                            blob.upload_from_string(mf_numbers_for_load)
                             send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
                             
                             

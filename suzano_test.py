@@ -1419,7 +1419,7 @@ if authentication_status:
                                                 
                             bill_of_ladings=json.dumps(bill_of_ladings)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket("olym_suzano")
+                            bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"terminal_bill_of_ladings.json")
                             blob.upload_from_string(bill_of_ladings)
                             
@@ -1448,7 +1448,7 @@ if authentication_status:
                                                      "Metric Ton": quantity*2, "ADMT":admt,"Mode of Transportation":transport_type}})
                                 suzano_report=json.dumps(suzano_report)
                                 storage_client = storage.Client()
-                                bucket = storage_client.bucket("olym_suzano")
+                                bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"suzano_report.json")
                                 blob.upload_from_string(suzano_report)
     
@@ -1476,18 +1476,18 @@ if authentication_status:
                                 
                                 json_data = json.dumps(dispatched)
                                 storage_client = storage.Client()
-                                bucket = storage_client.bucket("olym_suzano")
+                                bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"dispatched.json")
                                 blob.upload_from_string(json_data)       
                             
                             json_data = json.dumps(info)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket("olym_suzano")
+                            bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/{vessel}/{current_release_order}.json")
                             blob.upload_from_string(json_data)
     
                             try:
-                                release_order_database=gcp_download("olym_suzano",rf"release_orders/RELEASE_ORDERS.json")
+                                release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                                 release_order_database=json.loads(release_order_database)
                             except:
                                 release_order_database={}
@@ -1495,7 +1495,7 @@ if authentication_status:
                             release_order_database[current_release_order][current_sales_order]["remaining"]=release_order_database[current_release_order][current_sales_order]["remaining"]-quantity
                             release_order_database=json.dumps(release_order_database)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket("olym_suzano")
+                            bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                             blob.upload_from_string(release_order_database)
                             with open('placeholder.txt', 'r') as f:
@@ -1525,9 +1525,9 @@ if authentication_status:
                                 f.write(file_content)
                     
                             file_path = 'temp_file.txt'  # Use the path of the temporary file
-                    
+                            upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}") 
                             send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
-                            upload_cs_file("olym_suzano", 'temp_file.txt',rf"EDIS/{vessel}/{file_name}") 
+                            
                             
                         else:   ###cancel bill of lading
                             pass

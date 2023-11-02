@@ -909,7 +909,11 @@ if authentication_status:
                         st.write(input_mf_numbers)
                         if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
                             mf_numbers[vessel_mf][release_order_number_mf]=input_mf_numbers
-                        
+                            mf_data=json.dumps(mf_numbers)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"release_orders/mf_numbers.json")
+                            blob.upload_from_string(mf_data)
                         st.write(mf_numbers)
                                 
         

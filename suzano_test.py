@@ -898,6 +898,9 @@ if authentication_status:
                         vessel_mf=st.selectbox("SELECT VESSEL",["KIRKENES-2304"],key="lalala")
                         #release_order_number_mf=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]),key="dadada")
                         release_order_number_mf=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders,key="tatata")
+                        mf_date=st.date_input("File Date",datetime.datetime.today(),disabled=False,key="popodd3")
+                        
+                        
                         mf_numbers_=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                         mf_numbers=json.loads(mf_numbers_)
                         st.write(mf_numbers)

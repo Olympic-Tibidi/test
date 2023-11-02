@@ -597,22 +597,22 @@ if authentication_status:
                         files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
                         files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
                         release_order_dest_map={}
-                        st.write(list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/"))
-                        st.write(files_in_folder)
-                        
+                                               
+                        try:
                             
-                        for i in release_order_dictionary:
-                            for sales in release_order_dictionary[i]:
-                                release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
-                        st.write(release_order_dest_map)  
-                        destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder]
-                        
-                                                                        
-                        requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
-                        requested_file=requested_file_.split(" ")[0]
-                        nofile=0
-                        
-                        st.write("NO RELEASE ORDERS YET")
+                            for i in release_order_dictionary:
+                                for sales in release_order_dictionary[i]:
+                                    release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
+                            
+                            destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder]
+                            
+                                                                            
+                            requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
+                            requested_file=requested_file_.split(" ")[0]
+                            nofile=0
+                        except:
+                            
+                            st.write("NO RELEASE ORDERS YET")
                         try:
                             data=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
                             release_order_json = json.loads(data)

@@ -799,7 +799,7 @@ if authentication_status:
                     vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304"],key="other")
                     rls_tab1,rls_tab2=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS"])
 
-                    data=gcp_download("olym_suzano",rf"release_orders/RELEASE_ORDERS.json")
+                    data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                     try:
                         release_order_dictionary=json.loads(data)
                     except: 

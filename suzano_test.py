@@ -805,7 +805,7 @@ if authentication_status:
                         completed_release_orders=[]
                         
                         for key in release_order_database:
-                            st.write(key)
+                            #st.write(key)
                             not_yet=0
                             #st.write(key)
                             for sales in release_order_database[key]:
@@ -831,7 +831,7 @@ if authentication_status:
                                     release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
                             
                             destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder]
-                        
+                            st.write(destinations_of_release_orders)
                                                                         
                             requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
                             requested_file=requested_file_.split(" ")[0]

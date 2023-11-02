@@ -452,12 +452,12 @@ if authentication_status:
                             if st.button("RECORD PARSED SHIPMENT TO DATABASE"):
                                 #st.write(list_cs_files("olym_suzano"))
                                 temp=new_df.to_csv("temp.csv")
-                                upload_cs_file("olym_suzano", 'temp.csv',rf"shipping_files/{gemi}-{voyage}-shipping_file.csv") 
+                                upload_cs_file(target_bucket, 'temp.csv',rf"shipping_files/{gemi}-{voyage}-shipping_file.csv") 
                                 st.write(f"Uploaded {gemi}-{voyage}-shipping_file.csv to database")
                         st.dataframe(new_df)
                     with shipment_tab2:
                         folder_name = "olym_suzano/shipping_files"  # Replace this with the folder path you want to read
-                        files_in_folder = list_files_in_folder("olym_suzano", "shipping_files")
+                        files_in_folder = list_files_in_folder(target_bucket, "shipping_files")
                         requested_file=st.selectbox("SHIPPING FILES IN DATABASE",files_in_folder[1:])
                         if st.button("LOAD SHIPPING FILE"):
                             requested_shipping_file=gcp_csv_to_df("olym_suzano", requested_file)

@@ -566,7 +566,7 @@ if authentication_status:
                 with release_order_tab2:
                     
                     vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304"],key="other")
-                    rls_tab1,rls_tab2=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS"])
+                    rls_tab1,rls_tab2,rls_tab3=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS","ENTER MF NUMBERS"])
 
                     data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                     try:
@@ -894,7 +894,10 @@ if authentication_status:
                         requested_file_=st.selectbox("COMPLETED RELEASE ORDERS",destinations_of_completed_release_orders,key=16)
                         requested_file=requested_file_.split(" ")[0]
                         nofile=0
-                        
+                    with rls_tab3:
+                        mf_numbers_=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
+                        mf_numbers=json.loads(mf_numbers_)
+                        st.write(mf_numbers)
                                 
         
                         

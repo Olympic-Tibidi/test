@@ -281,7 +281,7 @@ def process():
        
         f.write(end)
 def gen_bill_of_lading():
-    data=gcp_download("olym_suzano",rf"terminal_bill_of_ladings.json")
+    data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
     bill_of_ladings=json.loads(data)
     list_of_ladings=[]
     try:

@@ -901,8 +901,8 @@ if authentication_status:
                         vessel_mf=st.selectbox("SELECT VESSEL",["KIRKENES-2304"],key="lalala")
                         #release_order_number_mf=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]),key="dadada")
                         release_order_number_mf=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders,key="tatata")
-                        mf_date=st.date_input("MF Date",datetime.datetime.today(),disabled=False,key="popodd3")
-                        mf_date_str=datetime.datetime.strftime(mf_date,"%b,%d-%Y")
+                        #mf_date=st.date_input("MF Date",datetime.datetime.today(),disabled=False,key="popodd3")
+                        #mf_date_str=datetime.datetime.strftime(mf_date,"%b,%d-%Y")
                         input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
                         if input_mf_numbers is not None:
                             input_mf_numbers = input_mf_numbers.splitlines()
@@ -910,8 +910,8 @@ if authentication_status:
                         st.write(input_mf_numbers)
                         if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
                             if release_order_number_mf[:8] not in mf_numbers[vessel_mf].keys():
-                                mf_numbers[vessel_mf][release_order_number_mf[:8]]={}
-                            mf_numbers[vessel_mf][release_order_number_mf[:8]][mf_date_str]=input_mf_numbers
+                                mf_numbers[vessel_mf][release_order_number_mf[:8]]=[]
+                            mf_numbers[vessel_mf][release_order_number_mf[:8]]=input_mf_numbers
                             mf_data=json.dumps(mf_numbers)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)
@@ -1110,7 +1110,7 @@ if authentication_status:
                         transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=6)
                         vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
                         if carrier_code=="123456-KBX":
-                           mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number][datetime.datetime.strftime(file_date,"%b,%d-%Y")]]
+                           mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
                            load_mf_numberst.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
                         foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
                         foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)

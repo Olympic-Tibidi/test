@@ -1110,8 +1110,11 @@ if authentication_status:
                         transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=6)
                         vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
                         if carrier_code=="123456-KBX":
-                           mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
-                           load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
+                            if release_order_number in mf_numbers_for_load[vessel].keys():
+                                mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
+                                load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
+                            else:
+                                st.write("MF NUMBERS NOT IN!")
                         foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
                         foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
 

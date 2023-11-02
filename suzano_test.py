@@ -602,7 +602,7 @@ if authentication_status:
                         for i in release_order_dictionary:
                             for sales in release_order_dictionary[i]:
                                 release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
-                            
+                        st.write(release_order_dest_map)  
                         destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder]
                         
                                                                         

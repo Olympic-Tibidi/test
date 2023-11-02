@@ -702,6 +702,11 @@ if authentication_status:
                 carrier_list=json.loads(carrier_list_)
                 junk=gcp_download(target_bucket,rf"junk_release.json")
                 junk=json.loads(junk)
+                mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
+                mill_shipments=json.loads(mill_shipments)
+                mill_df=pd.DataFrame.from_dict(mill_shipments).T
+                mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
+                mill_df["New Product"]=mill_df["New Product"].astype(str)
                 try:
                     release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                     release_order_database=json.loads(release_order_database)
@@ -716,7 +721,7 @@ if authentication_status:
                     batch_mapping=gcp_download(target_bucket,rf"batch_mapping.json")
                     batch_mapping=json.loads(batch_mapping)
                     if edit:
-                        #release_order_number=st.selectbox("SELECT RELEASE ORDER",(list_files_in_folder("olym_suzano", "release_orders/{vessel}")))
+                        #release_order_number=st.selectbox("SELECT RELEASE ORDER",(list_files_in_folder(target_bucket, "release_orders/{vessel}")))
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder("olym_suzano", rf"release_orders/KIRKENES-2304/")] if i not in junk]))
                         po_number=st.text_input("PO No")
                     else:
@@ -745,7 +750,7 @@ if authentication_status:
                     if create_release_order:
                         
                         if edit: 
-                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
+                            data=gcp_download("olym_suzano",rf"release_orders/{vessel}/{release_order_number}.json")
                             to_edit=json.loads(data)
                             temp=edit_release_order_data(to_edit,vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
                             st.write(f"ADDED sales order item {sales_order_item} to release order {release_order_number}!")
@@ -754,15 +759,15 @@ if authentication_status:
                             temp=store_release_order_data(vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
                      
                         try:
-                            junk=gcp_download(target_bucket,rf"release_orders/{vessel}/junk_release.json")
+                            junk=gcp_download("olym_suzano",rf"release_orders/{vessel}/junk_release.json")
                         except:
-                            junk=gcp_download(target_bucket,rf"junk_release.json")
+                            junk=gcp_download("olym_suzano",rf"junk_release.json")
                         junk=json.loads(junk)
                         try:
                             del junk[release_order_number]
                             jason_data=json.dumps(junk)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
+                            bucket = storage_client.bucket("olym_suzano")
                             blob = bucket.blob(rf"release_orders/{vessel}/junk_release.json")
                             blob.upload_from_string(jason_data)
                         except:
@@ -770,7 +775,7 @@ if authentication_status:
                         
 
                         storage_client = storage.Client()
-                        bucket = storage_client.bucket(target_bucket)
+                        bucket = storage_client.bucket("olym_suzano")
                         blob = bucket.blob(rf"release_orders/{vessel}/{release_order_number}.json")
                         blob.upload_from_string(temp)
 
@@ -784,7 +789,7 @@ if authentication_status:
                             release_order_database[release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}
                         release_orders_json=json.dumps(release_order_database)
                         storage_client = storage.Client()
-                        bucket = storage_client.bucket(target_bucket)
+                        bucket = storage_client.bucket("olym_suzano")
                         blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                         blob.upload_from_string(release_orders_json)
                         st.write(f"Recorded Release Order - {release_order_number} for Item No: {sales_order_item}")
@@ -794,7 +799,7 @@ if authentication_status:
                     vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304"],key="other")
                     rls_tab1,rls_tab2=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS"])
 
-                    data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                    data=gcp_download("olym_suzano",rf"release_orders/RELEASE_ORDERS.json")
                     try:
                         release_order_dictionary=json.loads(data)
                     except: 
@@ -805,7 +810,6 @@ if authentication_status:
                         completed_release_orders=[]
                         
                         for key in release_order_database:
-                            #st.write(key)
                             not_yet=0
                             #st.write(key)
                             for sales in release_order_database[key]:
@@ -817,14 +821,13 @@ if authentication_status:
                             if not_yet==0:
                                 completed_release_orders.append(key)
                         
-                        files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")]   ### REMOVE json extension from name
+                        files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder("olym_suzano", rf"release_orders/KIRKENES-2304/")]   ### REMOVE json extension from name
                         
-                        junk=gcp_download(target_bucket,rf"junk_release.json")
+                        junk=gcp_download("olym_suzano",rf"junk_release.json")
                         junk=json.loads(junk)
                         files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
                         files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
                         release_order_dest_map={}
-                        st.write(release_order_dest_map)
                         try:
                             
                             for i in release_order_dictionary:
@@ -832,7 +835,7 @@ if authentication_status:
                                     release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
                             
                             destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder]
-                            ###########################st.write(destinations_of_release_orders)
+                        
                                                                         
                             requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
                             requested_file=requested_file_.split(" ")[0]
@@ -840,7 +843,7 @@ if authentication_status:
                         except:
                             st.write("NO RELEASE ORDERS YET")
                         try:
-                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
+                            data=gcp_download("olym_suzano",rf"release_orders/{vessel}/{requested_file}.json")
                             release_order_json = json.loads(data)
                             
                             
@@ -860,7 +863,7 @@ if authentication_status:
                         #### DISPATCHED CLEANUP  #######
                         
                         try:
-                            dispatched=gcp_download(target_bucket,rf"dispatched.json")
+                            dispatched=gcp_download("olym_suzano",rf"dispatched.json")
                             dispatched=json.loads(dispatched)
                             #st.write(dispatched)
                         except:
@@ -877,7 +880,7 @@ if authentication_status:
                            
                             json_data = json.dumps(dispatched)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
+                            bucket = storage_client.bucket("olym_suzano")
                             blob = bucket.blob(rf"dispatched.json")
                             blob.upload_from_string(json_data)
                         except:
@@ -1016,7 +1019,7 @@ if authentication_status:
                                     
                                     json_data = json.dumps(dispatch)
                                     storage_client = storage.Client()
-                                    bucket = storage_client.bucket(target_bucket)
+                                    bucket = storage_client.bucket("olym_suzano")
                                     blob = bucket.blob(rf"dispatched.json")
                                     blob.upload_from_string(json_data)
                                     st.markdown(f"**DISPATCHED Release Order Number {requested_file} Item No : {hangisi} to Warehouse**")
@@ -1024,24 +1027,24 @@ if authentication_status:
                                 
                                 if st.button("DELETE SALES ORDER ITEM",key="lalag"):
                                     
-                                    data_d=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
+                                    data_d=gcp_download("olym_suzano",rf"release_orders/{vessel}/{requested_file}.json")
                                     to_edit_d=json.loads(data_d)
                                     to_edit_d[vessel][requested_file].pop(hangisi)
                                     #st.write(to_edit_d)
                                     
                                     json_data = json.dumps(to_edit_d)
                                     storage_client = storage.Client()
-                                    bucket = storage_client.bucket(target_bucket)
+                                    bucket = storage_client.bucket("olym_suzano")
                                     blob = bucket.blob(rf"release_orders/{vessel}/{requested_file}.json")
                                     blob.upload_from_string(json_data)
                                 if st.button("DELETE RELEASE ORDER ITEM!",key="laladg"):
-                                    junk=gcp_download(target_bucket,rf"junk_release.json")
+                                    junk=gcp_download("olym_suzano",rf"junk_release.json")
                                     junk=json.loads(junk)
                                    
                                     junk[requested_file]=1
                                     json_data = json.dumps(junk)
                                     storage_client = storage.Client()
-                                    bucket = storage_client.bucket(target_bucket)
+                                    bucket = storage_client.bucket("olym_suzano")
                                     blob = bucket.blob(rf"junk_release.json")
                                     blob.upload_from_string(json_data)
                                            
@@ -1050,7 +1053,7 @@ if authentication_status:
                                     dispatch={}
                                     json_data = json.dumps(dispatch)
                                     storage_client = storage.Client()
-                                    bucket = storage_client.bucket(target_bucket)
+                                    bucket = storage_client.bucket("olym_suzano")
                                     blob = bucket.blob(rf"dispatched.json")
                                     blob.upload_from_string(json_data)
                                     st.markdown(f"**CLEARED ALL DISPATCHES**")   
@@ -1063,7 +1066,7 @@ if authentication_status:
                                         del dispatch[item]
                                         json_data = json.dumps(dispatch)
                                         storage_client = storage.Client()
-                                        bucket = storage_client.bucket(target_bucket)
+                                        bucket = storage_client.bucket("olym_suzano")
                                         blob = bucket.blob(rf"dispatched.json")
                                         blob.upload_from_string(json_data)
                                         st.markdown(f"**CLEARED DISPATCH ITEM {item}**")   
@@ -1071,7 +1074,7 @@ if authentication_status:
                                     pass
                             st.markdown("**CURRENT DISPATCH QUEUE**")
                             try:
-                                dispatch=gcp_download(target_bucket,rf"dispatched.json")
+                                dispatch=gcp_download("olym_suzano",rf"dispatched.json")
                                 dispatch=json.loads(dispatch)
                                 try:
                                     for dispatched_release in dispatch.keys():

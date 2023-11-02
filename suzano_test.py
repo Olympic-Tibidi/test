@@ -1514,7 +1514,7 @@ if authentication_status:
                 
                         
         if select=="INVENTORY" :
-            Inventory=gcp_csv_to_df(target_bucket, "Inventory.csv")
+            
             data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
             bill_of_ladings=json.loads(data)
             mill_info=json.loads(gcp_download(target_bucket,rf"mill_info.json"))

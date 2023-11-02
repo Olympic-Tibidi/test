@@ -1115,7 +1115,7 @@ if authentication_status:
                                 load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
                             else:
                                 st.write("MF NUMBERS NOT IN!")
-                                yes=False
+                                mf=False
                         foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
                         foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
 
@@ -1362,7 +1362,7 @@ if authentication_status:
                     
                     
                     
-                if yes:
+                if yes and mf:
                     
                     if st.button('**:blue[SUBMIT EDI]**'):
                      

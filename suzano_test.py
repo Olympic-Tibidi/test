@@ -626,6 +626,7 @@ if authentication_status:
                     
                         
                         except:
+                            st.write("this is the problem")
                             nofile=1
                         
                         rel_col1,rel_col2,rel_col3,rel_col4=st.columns([2,2,2,2])

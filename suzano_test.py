@@ -592,7 +592,7 @@ if authentication_status:
                         
                         files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")]   ### REMOVE json extension from name
                         
-                        junk=gcp_download("olym_suzano",rf"junk_release.json")
+                        junk=gcp_download(target_bucket,rf"junk_release.json")
                         junk=json.loads(junk)
                         files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
                         files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
@@ -612,7 +612,7 @@ if authentication_status:
                         except:
                             st.write("NO RELEASE ORDERS YET")
                         try:
-                            data=gcp_download("olym_suzano",rf"release_orders/{vessel}/{requested_file}.json")
+                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
                             release_order_json = json.loads(data)
                             
                             
@@ -632,7 +632,7 @@ if authentication_status:
                         #### DISPATCHED CLEANUP  #######
                         
                         try:
-                            dispatched=gcp_download("olym_suzano",rf"dispatched.json")
+                            dispatched=gcp_download(target_bucket,rf"dispatched.json")
                             dispatched=json.loads(dispatched)
                             #st.write(dispatched)
                         except:
@@ -649,7 +649,7 @@ if authentication_status:
                            
                             json_data = json.dumps(dispatched)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket("olym_suzano")
+                            bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"dispatched.json")
                             blob.upload_from_string(json_data)
                         except:

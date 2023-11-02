@@ -908,7 +908,7 @@ if authentication_status:
                             input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]
                         st.write(input_mf_numbers)
                         if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
-                            mf_numbers[vessel_mf][release_order_number_mf]=input_mf_numbers
+                            mf_numbers[vessel_mf][release_order_number_mf][mf_date]=input_mf_numbers
                             mf_data=json.dumps(mf_numbers)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)

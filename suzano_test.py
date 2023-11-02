@@ -901,8 +901,8 @@ if authentication_status:
                         mf_date=st.date_input("MF Date",datetime.datetime.today(),disabled=False,key="popodd3")
                         input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
                         if input_mf_numbers is not None:
-                            input_mf_numbers = mf_numbers.splitlines()
-                            input_mf_numbers=[i for i in first_textsplit if len(i)==10]
+                            input_mf_numbers = input_mf_numbers.splitlines()
+                            input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]
                         st.write(input_mf_numbers)
                         
                         mf_numbers_=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")

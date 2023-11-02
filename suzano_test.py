@@ -1109,6 +1109,7 @@ if authentication_status:
                         transport_sequential_number=st.selectbox("Transport Sequential",["TRUCK","RAIL"],disabled=True,key=51)
                         transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=6)
                         vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
+                        mf=True
                         if carrier_code=="123456-KBX":
                             if release_order_number in mf_numbers_for_load[vessel].keys():
                                 mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]

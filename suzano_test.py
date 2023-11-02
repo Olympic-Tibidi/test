@@ -824,7 +824,7 @@ if authentication_status:
                         files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
                         files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
                         release_order_dest_map={}
-                        st.write(release_order_dictionary)
+                        st.write(release_order_dest_map)
                         try:
                             
                             for i in release_order_dictionary:

@@ -1416,7 +1416,8 @@ if authentication_status:
                             
                             else:
                                 bill_of_lading_number,bill_of_ladings=gen_bill_of_lading()
-                                bill_of_lading_number=load_mf_number
+                                if carrier_code=="123456-KBX":
+                                    bill_of_lading_number=load_mf_number
                                 edi_name= f'{bill_of_lading_number}.txt'
                                 bill_of_ladings[str(bill_of_lading_number)]={"vessel":vessel,"release_order":release_order_number,"destination":destination,"sales_order":current_sales_order,
                                                                              "ocean_bill_of_lading":ocean_bill_of_lading,"grade":wrap,"carrier_id":carrier_code,"vehicle":vehicle_id,

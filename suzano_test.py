@@ -933,6 +933,8 @@ if authentication_status:
             bill_mapping=json.loads(bill_mapping)
             mill_info_=gcp_download(target_bucket,rf"mill_info.json")
             mill_info=json.loads(mill_info_)
+            mf_numbers_for_load=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
+            mf_numbers_for_load=json.loads(mf_numbers_for_load)
             no_dispatch=0
             number=None
             if number not in st.session_state:
@@ -1118,6 +1120,9 @@ if authentication_status:
                            transport_sequential_number=st.selectbox("Transport Sequential",["TRUCK","RAIL"],disabled=True,key=10)
                            transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=11)
                            vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=12)
+                           if carrier_code=="123456":
+                               mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number][datetime.datetime.strftime(file_date,"%b,%d-%Y")]]
+                               load_mf_numberst.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
                            foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=193)
                            foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=13)
 

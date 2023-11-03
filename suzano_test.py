@@ -1362,7 +1362,7 @@ if authentication_status:
                     b_=(datetime.datetime.now()-datetime.timedelta(hours=7)).strftime("%H:%M:%S")
                     c=datetime.datetime.strftime(eta_date,"%Y%m%d")
                     
-                    
+                st.write(carrier_code)
                     
                 if yes and mf:
                     

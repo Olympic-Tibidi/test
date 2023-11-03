@@ -285,7 +285,7 @@ def gen_bill_of_lading():
     bill_of_ladings=json.loads(data)
     list_of_ladings=[]
     try:
-        for key in bill_of_ladings:
+        for key in [k for k in bill_of_ladings if len(k)==8]:
             if int(key) % 2 == 0:
                 list_of_ladings.append(int(key))
         bill_of_lading_number=max(list_of_ladings)+2

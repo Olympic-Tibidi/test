@@ -912,6 +912,7 @@ if authentication_status:
                             if release_order_number_mf[:8] not in mf_numbers[vessel_mf].keys():
                                 mf_numbers[vessel_mf][release_order_number_mf[:8]]=[]
                             mf_numbers[vessel_mf][release_order_number_mf[:8]]+=input_mf_numbers
+                            mf_numbers[vessel_mf][release_order_number_mf[:8]]=list(set(mf_numbers[vessel_mf][release_order_number_mf[:8]]))
                             mf_data=json.dumps(mf_numbers)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)

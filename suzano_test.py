@@ -909,10 +909,10 @@ if authentication_status:
                             input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]
                         st.write(input_mf_numbers)
                         if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
-                            if release_order_number_mf[:8] not in mf_numbers[vessel_mf].keys():
-                                mf_numbers[vessel_mf][release_order_number_mf[:8]]=[]
-                            mf_numbers[vessel_mf][release_order_number_mf[:8]]+=input_mf_numbers
-                            mf_numbers[vessel_mf][release_order_number_mf[:8]]=list(set(mf_numbers[vessel_mf][release_order_number_mf[:8]]))
+                            if release_order_number_mf[:7] not in mf_numbers[vessel_mf].keys():
+                                mf_numbers[vessel_mf][release_order_number_mf[:7]]=[]
+                            mf_numbers[vessel_mf][release_order_number_mf[:7]]+=input_mf_numbers
+                            mf_numbers[vessel_mf][release_order_number_mf[:7]]=list(set(mf_numbers[vessel_mf][release_order_number_mf[:7]]))
                             mf_data=json.dumps(mf_numbers)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)

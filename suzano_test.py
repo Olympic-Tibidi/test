@@ -1537,12 +1537,13 @@ if authentication_status:
                     
                             file_path = 'temp_file.txt'  # Use the path of the temporary file
                             upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}") 
-                            mf_numbers_for_load[vessel][release_order_number].remove(load_mf_number)
-                            mf_numbers_for_load=json.dumps(mf_numbers_for_load)
-                            storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"release_orders/mf_numbers.json")
-                            blob.upload_from_string(mf_numbers_for_load)
+                            if load_mf_number_issued:
+                                mf_numbers_for_load[vessel][release_order_number].remove(load_mf_number)
+                                mf_numbers_for_load=json.dumps(mf_numbers_for_load)
+                                storage_client = storage.Client()
+                                bucket = storage_client.bucket(target_bucket)
+                                blob = bucket.blob(rf"release_orders/mf_numbers.json")
+                                blob.upload_from_string(mf_numbers_for_load)
                             send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
                             
                             

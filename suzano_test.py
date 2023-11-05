@@ -494,11 +494,13 @@ if authentication_status:
                     if edit:
                         #release_order_number=st.selectbox("SELECT RELEASE ORDER",(list_files_in_folder(target_bucket, "release_orders/{vessel}")))
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]))
-                        po_number=st.text_input("PO No")
+                        to_edit=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
+                        po_number_edit=st.text_input("PO No",to_edit[vessel][release_order_number][po_number])
+                        destination_edit=st.text_input("PO No",to_edit[vessel][release_order_number][destination])
+                        sales_order_item_edit=st.text_input("Sales Order Item",to_edit[vessel][release_order_number].keys()[0])
                     if add:
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]))
-                        to_edit=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
-                        po_number=st.text_input("PO No",to_edit[vessel][release_order_number][po_number])
+                        
                         
                     else:
                         

@@ -460,7 +460,7 @@ if authentication_status:
                         files_in_folder = list_files_in_folder(target_bucket, "shipping_files")
                         requested_file=st.selectbox("SHIPPING FILES IN DATABASE",files_in_folder[1:])
                         if st.button("LOAD SHIPPING FILE"):
-                            requested_shipping_file=gcp_csv_to_df("olym_suzano", requested_file)
+                            requested_shipping_file=gcp_csv_to_df(target_bucket, requested_file)
                             filtered_df=requested_shipping_file[["Lot","Lot Qty","Batch","Grade","Ocean B/L","DryWeight","ADMT","Location",
                                                                                       "Warehouse_In","Warehouse_Out","Vehicle_Id","Release_Order_Number","Carrier_Code"]]
                             #st.data_editor(filtered_df, use_container_width=True)
@@ -493,7 +493,7 @@ if authentication_status:
                     batch_mapping=json.loads(batch_mapping)
                     if edit:
                         #release_order_number=st.selectbox("SELECT RELEASE ORDER",(list_files_in_folder(target_bucket, "release_orders/{vessel}")))
-                        release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]))
+                        release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")[1:0] if i not in junk]))
                         to_edit=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
                         to_edit=json.loads(to_edit)
                         po_number_edit=st.text_input("PO No",to_edit[vessel][release_order_number]["po_number"],disabled=True)

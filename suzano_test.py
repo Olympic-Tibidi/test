@@ -498,7 +498,7 @@ if authentication_status:
                         to_edit=json.loads(to_edit)
                         po_number_edit=st.text_input("PO No",to_edit[vessel][release_order_number]["po_number"])
                         destination_edit=st.text_input("PO No",to_edit[vessel][release_order_number]["destination"])
-                        sales_order_item_edit=st.text_input("Sales Order Item",to_edit[vessel][release_order_number].keys()[0])
+                        sales_order_item_edit=st.text_input("Sales Order Item",to_edit[vessel][release_order_number].keys().to_list()[0])
                         ocean_bill_of_lading_edit=st.textbox("Ocean Bill Of Lading",to_edit[vessel][release_order_number][sales_order_item_edit]["ocean_bill_of_lading"])
                         wrap_edit=st.text_input("Grade",to_edit[vessel][release_order_number][sales_order_item_edit]["grade"],disabled=True)
                         batch_edit=st.text_input("Batch No",to_edit[vessel][release_order_number][sales_order_item_edit]["batch"],disabled=True)

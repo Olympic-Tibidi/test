@@ -496,9 +496,20 @@ if authentication_status:
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]))
                         to_edit=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
                         to_edit=json.loads(to_edit)
-                        po_number_edit=st.text_input("PO No",to_edit[vessel][release_order_number][po_number])
-                        destination_edit=st.text_input("PO No",to_edit[vessel][release_order_number][destination])
+                        po_number_edit=st.text_input("PO No",to_edit[vessel][release_order_number]["po_number"])
+                        destination_edit=st.text_input("PO No",to_edit[vessel][release_order_number]["destination"])
                         sales_order_item_edit=st.text_input("Sales Order Item",to_edit[vessel][release_order_number].keys()[0])
+                        ocean_bill_of_lading_edit=st.textbox("Ocean Bill Of Lading",to_edit[vessel][release_order_number][sales_order_item_edit]["ocean_bill_of_lading"])
+                        wrap_edit=st.text_input("Grade",to_edit[vessel][release_order_number][sales_order_item_edit]["grade"],disabled=True)
+                        batch_edit=st.text_input("Batch No",to_edit[vessel][release_order_number][sales_order_item_edit]["batch"],disabled=True)
+                        dryness_edit=st.text_input("Dryness",to_edit[vessel][release_order_number][sales_order_item_edit]["dryness"],disabled=True)
+                        admt_edit=st.text_input("ADMT PER UNIT",to_edit[vessel][release_order_number][sales_order_item_edit]["admt"],disabled=True)
+                        unitized_edit=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
+                        quantity_edit=st.number_input("Quantity of Units", min_value=1, max_value=5000, value=1, step=1,  key=None, help=None, on_change=None, disabled=False, label_visibility="visible")
+                        tonnage_edit=2*quantity
+                        shipped_edit=st.number_input("Shipped # of Units",to_edit[vessel][release_order_number][sales_order_item_edit]["shipped"],disabled=True)
+                        remaining_edit=st.number_input("Remaining # of Units",
+                                                       quantity_edit-to_edit[vessel][release_order_number][sales_order_item_edit]["shipped"],disabled=True)
                     if add:
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]))
                         

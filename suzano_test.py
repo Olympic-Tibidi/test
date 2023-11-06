@@ -502,7 +502,7 @@ if authentication_status:
                 release_order_tab1,release_order_tab2=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE"])
                 with release_order_tab1:
                     vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304"])
-                    add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER")
+                    add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER",disabled=True)
                     edit=st.checkbox("CHECK TO EDIT EXISTING RELEASE ORDER")
                     
                     batch_mapping=gcp_download(target_bucket,rf"batch_mapping.json")

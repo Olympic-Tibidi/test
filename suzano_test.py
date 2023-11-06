@@ -592,7 +592,7 @@ if authentication_status:
                         blob.upload_from_string(temp)
 
                         if edit:
-                            release_order_database[release_order_number][sales_order_item_edit]={"destination":destination,"total":quantity_edit,"remaining":remaining_edit}
+                            release_order_database[release_order_number][sales_order_item_edit]={"destination":destination_edit,"total":quantity_edit,"remaining":remaining_edit}
                         else:
                                                     
                             try:

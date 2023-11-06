@@ -43,7 +43,7 @@ st.set_page_config(layout="wide")
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"
 target_bucket="olym_suzano_test"
-openai.api_key = "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"
+
 
 def query_gpt(prompt):
     response = openai.Completion.create(

@@ -602,12 +602,13 @@ if authentication_status:
                                 
                                 release_order_database[release_order_number]={}
                                 release_order_database[release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}
+                            st.write(f"Recorded Release Order - {release_order_number} for Item No: {sales_order_item}")
                         release_orders_json=json.dumps(release_order_database)
                         storage_client = storage.Client()
                         bucket = storage_client.bucket(target_bucket)
                         blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                         blob.upload_from_string(release_orders_json)
-                        st.write(f"Recorded Release Order - {release_order_number} for Item No: {sales_order_item}")
+                        
                         
                 with release_order_tab2:
                     

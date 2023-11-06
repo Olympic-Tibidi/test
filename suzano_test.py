@@ -591,14 +591,17 @@ if authentication_status:
                         blob = bucket.blob(rf"release_orders/{vessel}/{release_order_number}.json")
                         blob.upload_from_string(temp)
 
-                        
-                        try:
-                            release_order_database[release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}
-                            
-                        except:
-                            
-                            release_order_database[release_order_number]={}
-                            release_order_database[release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}
+                        if edit:
+                            release_order_database[release_order_number][sales_order_item]={"destination":destination,"total":quantity_edit,"remaining":remaining_edit}
+                        else:
+                                                    
+                            try:
+                                release_order_database[release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}
+                                
+                            except:
+                                
+                                release_order_database[release_order_number]={}
+                                release_order_database[release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}
                         release_orders_json=json.dumps(release_order_database)
                         storage_client = storage.Client()
                         bucket = storage_client.bucket(target_bucket)

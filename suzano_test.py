@@ -36,13 +36,24 @@ import math
 import plotly.express as px               #to create interactive charts
 import plotly.graph_objects as go         #to create interactive charts
 import zipfile
-
+import openai
 
 import plotly.graph_objects as go
 st.set_page_config(layout="wide")
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"
 target_bucket="olym_suzano_test"
+openai.api_key = "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"
+
+def query_gpt(prompt):
+    response = openai.Completion.create(
+      engine="davinci",
+      prompt=prompt,
+      max_tokens=100
+    )
+    return response.choices[0].text.strip()
+
+
 def check_password():
     """Returns `True` if the user had a correct password."""
 
@@ -348,7 +359,11 @@ if authentication_status:
                     # Download the file to the specified output directory
                     output_path = os.path.join(output_directory, os.path.basename(blob.name))
                     blob.download_to_filename(output_path)
+            user_query = st.text_input("How can I help you?")
 
+            if user_query:
+                response = query_gpt(user_query)
+                st.write("Response: ", response)
             if st.button("BACKUP DATA"):
                 st.write("OK")
                 client = storage.Client()

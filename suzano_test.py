@@ -205,8 +205,7 @@ def store_release_order_data(vessel,release_order_number,destination,po_number,s
     # Convert the dictionary to JSON format
     json_data = json.dumps(release_order_data)
     return json_data
-
-def edit_release_order_data(file,vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code):
+def add_release_order_data(file,vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code):
        
     # Edit the loaded current dictionary.
     file[vessel][release_order_number]["destination"]= destination
@@ -224,6 +223,23 @@ def edit_release_order_data(file,vessel,release_order_number,destination,po_numb
     file[vessel][release_order_number][sales_order_item]["tonnage"]= tonnage
     file[vessel][release_order_number][sales_order_item]["shipped"]= file[vessel][release_order_number][sales_order_item]["shipped"]
     file[vessel][release_order_number][sales_order_item]["remaining"]= quantity
+    
+    
+       
+
+    # Convert the dictionary to JSON format
+    json_data = json.dumps(file)
+    return json_data
+
+
+def edit_release_order_data(file,quantity,tonnage,shipped,remaining):
+       
+    # Edit the loaded current dictionary.
+    
+    file[vessel][release_order_number][sales_order_item]["quantity"]= quantity
+    file[vessel][release_order_number][sales_order_item]["tonnage"]= tonnage
+    file[vessel][release_order_number][sales_order_item]["shipped"]= shipped
+    file[vessel][release_order_number][sales_order_item]["remaining"]= remaining
     
     
        
@@ -492,7 +508,7 @@ if authentication_status:
                     batch_mapping=gcp_download(target_bucket,rf"batch_mapping.json")
                     batch_mapping=json.loads(batch_mapping)
                     if edit:
-                        #release_order_number=st.selectbox("SELECT RELEASE ORDER",(list_files_in_folder(target_bucket, "release_orders/{vessel}")))
+                        
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")[1:]] if i not in junk]))
                         to_edit=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
                         to_edit=json.loads(to_edit)
@@ -539,11 +555,17 @@ if authentication_status:
                     create_release_order=st.button("SUBMIT")
                     if create_release_order:
                         
-                        if edit: 
+                        if add: 
                             data=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
                             to_edit=json.loads(data)
-                            temp=edit_release_order_data(to_edit,vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
+                            temp=add_release_order_data(to_edit,vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
                             st.write(f"ADDED sales order item {sales_order_item} to release order {release_order_number}!")
+                        elif edit:
+                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
+                            to_edit=json.loads(data)
+                            temp=edit_release_order_data(to_edit,quantity_edit,tonnage_edit,shipped_edit,remaining_edit)
+                            st.write(f"Edited release order {release_order_number} successfully!")
+                            
                         else:
                             
                             temp=store_release_order_data(vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)

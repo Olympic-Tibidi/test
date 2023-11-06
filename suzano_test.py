@@ -359,9 +359,9 @@ if authentication_status:
                     # Download the file to the specified output directory
                     output_path = os.path.join(output_directory, os.path.basename(blob.name))
                     blob.download_to_filename(output_path)
-            user_query = st.text_input("How can I help you?")
+          
 
-            if user_query:
+          
                 
             if st.button("BACKUP DATA"):
                 st.write("OK")

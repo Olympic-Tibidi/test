@@ -36,7 +36,7 @@ import math
 import plotly.express as px               #to create interactive charts
 import plotly.graph_objects as go         #to create interactive charts
 import zipfile
-import openai
+
 
 import plotly.graph_objects as go
 st.set_page_config(layout="wide")
@@ -362,8 +362,7 @@ if authentication_status:
             user_query = st.text_input("How can I help you?")
 
             if user_query:
-                response = query_gpt(user_query)
-                st.write("Response: ", response)
+                
             if st.button("BACKUP DATA"):
                 st.write("OK")
                 client = storage.Client()

@@ -957,8 +957,7 @@ if authentication_status:
                         vessel_mf=st.selectbox("SELECT VESSEL",["KIRKENES-2304"],key="lalala")
                         #release_order_number_mf=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]),key="dadada")
                         release_order_number_mf=st.selectbox("ACTIVE RELEASE ORDERS",gp_release_orders,key="tatata")
-                        #mf_date=st.date_input("MF Date",datetime.datetime.today(),disabled=False,key="popodd3")
-                        #mf_date_str=datetime.datetime.strftime(mf_date,"%b,%d-%Y")
+                        
                         input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
                         if input_mf_numbers is not None:
                             input_mf_numbers = input_mf_numbers.splitlines()
@@ -969,6 +968,15 @@ if authentication_status:
                                 mf_numbers[vessel_mf][release_order_number_mf[:7]]=[]
                             mf_numbers[vessel_mf][release_order_number_mf[:7]]+=input_mf_numbers
                             mf_numbers[vessel_mf][release_order_number_mf[:7]]=list(set(mf_numbers[vessel_mf][release_order_number_mf[:7]]))
+                            mf_data=json.dumps(mf_numbers)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"release_orders/mf_numbers.json")
+                            blob.upload_from_string(mf_data)
+                        if st.button("REMOVE MF NUMBERS",key="ioerssu" ):
+                            for i in input_mf_numbers:
+                                if i in mf_numbers[vessel_mf][release_order_number_mf[:7]]:
+                                    mf_numbers[vessel_mf][release_order_number_mf[:7]].remove(i)
                             mf_data=json.dumps(mf_numbers)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)

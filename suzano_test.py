@@ -506,7 +506,7 @@ if authentication_status:
                 except:
                     release_order_database={}
                 
-                gp_release_orders=[i for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"]]
+                
                 release_order_tab1,release_order_tab2=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE"])
                 with release_order_tab1:
                     vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304"])
@@ -952,6 +952,7 @@ if authentication_status:
                     with rls_tab3:
                         mf_numbers_=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                         mf_numbers=json.loads(mf_numbers_)
+                        gp_release_orders=[i for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and release_order_database[i]["001"]["remaining"]>2]
                         
                         vessel_mf=st.selectbox("SELECT VESSEL",["KIRKENES-2304"],key="lalala")
                         #release_order_number_mf=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]),key="dadada")

@@ -45,13 +45,7 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"
 target_bucket="olym_suzano_test"
 
 
-def query_gpt(prompt):
-    response = openai.Completion.create(
-      engine="davinci",
-      prompt=prompt,
-      max_tokens=100
-    )
-    return response.choices[0].text.strip()
+
 
 
 def check_password():
@@ -512,7 +506,7 @@ if authentication_status:
                 except:
                     release_order_database={}
                 
-              
+                gp_release_orders=[i for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"]]
                 release_order_tab1,release_order_tab2=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE"])
                 with release_order_tab1:
                     vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304"])
@@ -961,7 +955,7 @@ if authentication_status:
                         
                         vessel_mf=st.selectbox("SELECT VESSEL",["KIRKENES-2304"],key="lalala")
                         #release_order_number_mf=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]),key="dadada")
-                        release_order_number_mf=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders,key="tatata")
+                        release_order_number_mf=st.selectbox("ACTIVE RELEASE ORDERS",gp_release_orders,key="tatata")
                         #mf_date=st.date_input("MF Date",datetime.datetime.today(),disabled=False,key="popodd3")
                         #mf_date_str=datetime.datetime.strftime(mf_date,"%b,%d-%Y")
                         input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")

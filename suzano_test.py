@@ -342,17 +342,17 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
-            def print_button():
-                # Create a button that, when pressed, saves the Streamlit content to an HTML file
-                if st.button("Print"):
-                    with tempfile.NamedTemporaryFile(delete=False, suffix='.html') as tmp_file:
-                        # Write Streamlit content to the temporary HTML file
-                        tmp_file.write(st.markdown("This is the content you want to print.").encode('utf-8'))
-                        tmp_file_path = tmp_file.name
+      
+            # Create a button that, when pressed, saves the Streamlit content to an HTML file
+            if st.button("Print"):
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.html') as tmp_file:
+                    # Write Streamlit content to the temporary HTML file
+                    tmp_file.write(st.markdown("This is the content you want to print.").encode('utf-8'))
+                    tmp_file_path = tmp_file.name
 
-        # Using browser's print function with the path to the HTML file
-        import os
-        os.system(f"cmd /c rundll32 mshtml.dll,PrintHTML \"{tmp_file_path}\"")
+                # Using browser's print function with the path to the HTML file
+                import os
+                os.system(f"cmd /c rundll32 mshtml.dll,PrintHTML \"{tmp_file_path}\"")
             
             def download_files_in_folder(bucket, folder_name, output_directory):
                 blob_iterator = bucket.list_blobs(prefix=folder_name)

@@ -345,14 +345,24 @@ if authentication_status:
       
             # Create a button that, when pressed, saves the Streamlit content to an HTML file
             if st.button("Print"):
-                with tempfile.NamedTemporaryFile(delete=False, suffix='.html') as tmp_file:
-                    # Write Streamlit content to the temporary HTML file
-                    tmp_file.write(st.markdown("This is the content you want to print.").encode('utf-8'))
-                    tmp_file_path = tmp_file.name
-
-                # Using browser's print function with the path to the HTML file
+                # Write content to an HTML file
+                content = """
+                <html>
+                <head>
+                    <title>Print Example</title>
+                </head>
+                <body>
+                    <h1>This is the content you want to print</h1>
+                    <p>You can place any Streamlit content here that you wish to print.</p>
+                </body>
+                </html>
+                """
+                with open("streamlit_print.html", "w") as file:
+                    file.write(content)
+        
+                # Using a command to open the file (specifically, replace the file path with your appropriate path)
                 import os
-                os.system(f"cmd /c rundll32 mshtml.dll,PrintHTML \"{tmp_file_path}\"")
+                os.system("cmd /c start streamlit_print.html")
             
             def download_files_in_folder(bucket, folder_name, output_directory):
                 blob_iterator = bucket.list_blobs(prefix=folder_name)

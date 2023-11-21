@@ -356,52 +356,72 @@ if authentication_status:
                 occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
                 st.write(occ_codes)
                
+                # Sample data for the occupation codes
+                occ_codes = {
+                    "A001": "Occupation 1",
+                    "A002": "Occupation 2",
+                    "A003": "Occupation 3",
+                }
+                
                 if "scores" not in st.session_state:
-                    st.session_state.scores = [
-                        {"code": "", "qty": 0, "hours": 0, "ot": 0},
-                    ]
+                    st.session_state.scores = []
                 
-                if "code" not in st.session_state:
-                    st.session_state.code = None
-                if "qty" not in st.session_state:
-                    st.session_state.qty = 0
-                if "hours" not in st.session_state:
-                    st.session_state.hours = 0
-                if "ot" not in st.session_state:
-                    st.session_state.ot = 0
-                
-                
+                # Function to add a new score to the DataFrame
                 def new_scores():
                     st.session_state.scores.append(
                         {
-                            "code": st.session_state.code,
-                            "qty": st.session_state.qty,
-                            "hours": st.session_state.hours,
-                            "ot": st.session_state.ot,
+                            "Code": st.session_state.code,
+                            "Quantity": st.session_state.qty,
+                            "Hours": st.session_state.hours,
+                            "OT": st.session_state.ot,
                         }
                     )
                 
+                # Main Streamlit app
+                st.write("# Score Table")
                 
-                st.write("# Score table")
+                # Display existing scores
+                if st.session_state.scores:
+                    score_df = pd.DataFrame(st.session_state.scores)
+                    st.write(score_df)
+                else:
+                    st.write("No scores yet.")
                 
+                # Form for adding a new score
+                st.write("# Add a New Score")
+                with st.form("new_score_form"):
+                    # Dropdown for selecting Code
+                    st.session_state.code = st.selectbox(
+                        "Occupation Code", options=list(occ_codes.keys())
+                    )
+                
+                    # Number input for Quantity
+                    st.session_state.qty = st.number_input(
+                        "Quantity", step=1, value=0, min_value=0
+                    )
+                
+                    # Number input for Hours
+                    st.session_state.hours = st.number_input(
+                        "Hours", step=1, value=0, min_value=0
+                    )
+                
+                    # Number input for OT
+                    st.session_state.ot = st.number_input(
+                        "OT", step=1, value=0, min_value=0
+                    )
+                
+                    # Form submit button
+                    submitted = st.form_submit_button("Submit")
+                
+                # If form is submitted, add the new score
+                if submitted:
+                    new_scores()
+                    st.success("Score added successfully!")
+                
+                # Display the updated DataFrame
+                st.write("# Updated Score Table")
                 score_df = pd.DataFrame(st.session_state.scores)
                 st.write(score_df)
-                
-                st.write("# Add a new score")
-                with st.form("new_score", clear_on_submit=True):
-                    st.session_state.code = st.selectbox(
-                        "Occupation Code", [i for i in occ_codes.index], key="nameff"
-                    )
-                    st.session_state.qty = st.number_input(
-                        "Quantity", key="pushups", step=1, value=0, min_value=0
-                    )
-                    st.session_state.hours = st.number_input(
-                        "Hours", key="situpsq", step=1, value=0, min_value=0
-                    )
-                    st.session_state.ot = st.number_input(
-                        "OT", key="situps", step=1, value=0, min_value=0
-                    )
-                    st.form_submit_button("Submit", on_click=new_scores)
             def download_files_in_folder(bucket, folder_name, output_directory):
                 blob_iterator = bucket.list_blobs(prefix=folder_name)
             

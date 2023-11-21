@@ -356,7 +356,6 @@ if authentication_status:
                 occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
                 st.write(occ_codes)
                
-                # Sample data for the occupation codes
                 occ_codes = {
                     "A001": "Occupation 1",
                     "A002": "Occupation 2",
@@ -364,7 +363,9 @@ if authentication_status:
                 }
                 
                 if "scores" not in st.session_state:
-                    st.session_state.scores = []
+                    st.session_state.scores = pd.DataFrame(
+                        {"Code": [], "Quantity": [], "Hours": [], "OT": []}
+                    )
                 
                 # Function to add a new score to the DataFrame
                 def new_scores():
@@ -379,15 +380,13 @@ if authentication_status:
                     st.session_state.scores = pd.concat(
                         [st.session_state.scores, new_score], ignore_index=True
                     )
-
                 
                 # Main Streamlit app
                 st.write("# Score Table")
                 
                 # Display existing scores
-                if st.session_state.scores:
-                    score_df = pd.DataFrame(st.session_state.scores)
-                    st.write(score_df)
+                if not st.session_state.scores.empty:
+                    st.write(st.session_state.scores)
                 else:
                     st.write("No scores yet.")
                 
@@ -424,8 +423,7 @@ if authentication_status:
                 
                 # Display the updated DataFrame
                 st.write("# Updated Score Table")
-                score_df = pd.DataFrame(st.session_state.scores)
-                st.write(score_df)
+                st.write(st.session_state.scores)
             def download_files_in_folder(bucket, folder_name, output_directory):
                 blob_iterator = bucket.list_blobs(prefix=folder_name)
             

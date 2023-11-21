@@ -356,7 +356,7 @@ if authentication_status:
                 occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
                 st.write(occ_codes)
                
-               if "scores" not in st.session_state:
+                if "scores" not in st.session_state:
                     st.session_state.scores = [
                         {"code": "", "qty": 0, "hours": 0, "ot": 0},
                     ]

@@ -353,6 +353,7 @@ if authentication_status:
                 assessment_rates=json.loads(assessment_rates)
                 occ_codes=pd.DataFrame(assessment_rates).T
                 occ_codes=occ_codes.rename_axis('Occ_Code')
+                occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
                 st.write(occ_codes)
                 scorecard = pd.DataFrame(columns=['User', 'Hour', 'Ot', 'Totaled'])
     

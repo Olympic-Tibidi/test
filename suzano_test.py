@@ -358,7 +358,7 @@ if authentication_status:
                
                 if "scores" not in st.session_state:
                     st.session_state.scores = [
-                        {"Code": "", "Qty":0,"Hours": 0, "OT": 0},
+                        {"code": "", "qty":0,"hours": 0, "OT": 0},
                     ]
                 
                 

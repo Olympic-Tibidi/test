@@ -382,7 +382,7 @@ if authentication_status:
                 
                 st.write("# Add a new score")
                 with st.form("new_score", clear_on_submit=True):
-                    code = st.selectbox("Occupation Code",[i for i in occ_codes.index()], key="name")
+                    code = st.selectbox("Occupation Code",[i for i in occ_codes.index], key="name")
                     qt = st.number_input("Quantity", key="pushups", step=1, value=0, min_value=0)
                     hours = st.number_input("Hours", key="situpsq", step=1, value=0, min_value=0),
                     ot = st.number_input("OT", key="situps", step=1, value=0, min_value=0)

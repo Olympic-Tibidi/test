@@ -360,9 +360,16 @@ if authentication_status:
                     st.session_state.scores = [
                         {"code": "", "qty":0,"hours": 0, "OT": 0},
                     ]
-                if code,qty,hours,ot not in st.session_state:
+                
+                if code not in st.session_state:
                     st.session_state.code=None
+                if qty not in st.session_state:
                     st.session_state.qty=0
+                if hours not in st.session_state:
+                    st.session_state.hours=0
+                if ot not in st.session_state:
+                    st.session_state.ot=0
+                    
                 
                 
                 

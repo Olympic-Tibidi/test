@@ -360,6 +360,10 @@ if authentication_status:
                     st.session_state.scores = [
                         {"code": "", "qty":0,"hours": 0, "OT": 0},
                     ]
+                if code,qty,hours,ot not in st.session_state:
+                    st.session_state.code=None
+                    st.session_state.qty=0
+                
                 
                 
                 def new_scores():
@@ -368,7 +372,7 @@ if authentication_status:
                             "code": st.session_state.code,
                             "qty": st.session_state.qty,
                             "hours": st.session_state.hours,
-                            "OT": st.session_state.ot
+                            "ot": st.session_state.ot
                         }
                     )
                 

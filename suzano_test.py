@@ -376,7 +376,7 @@ if authentication_status:
                 st.write("# Score table")
                 
                 score_df = pd.DataFrame(st.session_state.scores)
-                score_df["Total Hours"] = score_df["hours"] + score_df["OT"]
+                #score_df["Total Hours"] = score_df["hours"] + score_df["OT"]
                 
                 st.write(score_df)
                 

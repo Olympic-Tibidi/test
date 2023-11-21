@@ -352,6 +352,7 @@ if authentication_status:
                 assessment_rates=gcp_download(target_bucket,rf"occ_codes.json")
                 assessment_rates=json.loads(assessment_rates)
                 occ_codes=pd.DataFrame(assessment_rates).T
+                occ_codes=occ_codes.rename_axis('Occ_Code')
                 st.write(occ_codes)
                 scorecard = pd.DataFrame(columns=['User', 'Hour', 'Ot', 'Totaled'])
     

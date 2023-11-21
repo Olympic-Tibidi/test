@@ -351,7 +351,8 @@ if authentication_status:
             if try_lan:
                 assessment_rates=gcp_download(target_bucket,rf"occ_codes.json")
                 assessment_rates=json.loads(assessment_rates)
-                st.write(pd.DataFrame(assessment_rates))
+                occ_codes=pd.DataFrame(assessment_rates).T
+                st.write(occ_codes)
                 scorecard = pd.DataFrame(columns=['User', 'Hour', 'Ot', 'Totaled'])
     
                 # Input your data using experimental data editor

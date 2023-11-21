@@ -36,17 +36,15 @@ import math
 import plotly.express as px               #to create interactive charts
 import plotly.graph_objects as go         #to create interactive charts
 import zipfile
-import tempfile
+
 
 import plotly.graph_objects as go
 st.set_page_config(layout="wide")
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"
+
 target_bucket="olym_suzano_test"
-
-
-
-
+utc_difference=8
 
 def check_password():
     """Returns `True` if the user had a correct password."""
@@ -210,6 +208,7 @@ def store_release_order_data(vessel,release_order_number,destination,po_number,s
     # Convert the dictionary to JSON format
     json_data = json.dumps(release_order_data)
     return json_data
+
 def add_release_order_data(file,vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code):
        
     # Edit the loaded current dictionary.
@@ -226,7 +225,7 @@ def add_release_order_data(file,vessel,release_order_number,destination,po_numbe
     file[vessel][release_order_number][sales_order_item]["unitized"]= unitized
     file[vessel][release_order_number][sales_order_item]["quantity"]= quantity
     file[vessel][release_order_number][sales_order_item]["tonnage"]= tonnage
-    file[vessel][release_order_number][sales_order_item]["shipped"]= file[vessel][release_order_number][sales_order_item]["shipped"]
+    file[vessel][release_order_number][sales_order_item]["shipped"]= 0
     file[vessel][release_order_number][sales_order_item]["remaining"]= quantity
     
     
@@ -235,7 +234,6 @@ def add_release_order_data(file,vessel,release_order_number,destination,po_numbe
     # Convert the dictionary to JSON format
     json_data = json.dumps(file)
     return json_data
-
 
 def edit_release_order_data(file,sales_order_item,quantity,tonnage,shipped,remaining):
        
@@ -252,7 +250,6 @@ def edit_release_order_data(file,sales_order_item,quantity,tonnage,shipped,remai
     # Convert the dictionary to JSON format
     json_data = json.dumps(file)
     return json_data
-
 
 def process():
            
@@ -313,6 +310,13 @@ def gen_bill_of_lading():
     except:
         bill_of_lading_number=11502400
     return bill_of_lading_number,bill_of_ladings
+
+def convert_df(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv().encode('utf-8')
+
+
+
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 pd.options.mode.chained_assignment = None  # default='warn'
@@ -342,28 +346,56 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
-      
-            # Create a button that, when pressed, saves the Streamlit content to an HTML file
-            if st.button("Print"):
-                # Write content to an HTML file
-                content = """
-                <html>
-                <head>
-                    <title>Print Example</title>
-                </head>
-                <body>
-                    <h1>This is the content you want to print</h1>
-                    <p>You can place any Streamlit content here that you wish to print.</p>
-                </body>
-                </html>
-                """
-                with open("streamlit_print.html", "w") as file:
-                    file.write(content)
-        
-                # Using a command to open the file (specifically, replace the file path with your appropriate path)
-                import os
-                os.system("cmd /c start streamlit_print.html")
-            
+            st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
+            try_lan=False
+            if try_lan:
+                
+                scorecard = pd.DataFrame(columns=['User', 'Hour', 'Ot', 'Totaled'])
+    
+                # Input your data using experimental data editor
+                st.write("Input your data below:")
+                input_data = pd.DataFrame(index=[1,2,3,4,5], columns=['Rank', 'Shift', 'Hour','Ot'])
+                input_data = input_data.fillna(0)  # fill with zeros
+                
+                edited_data = st.experimental_data_editor(input_data)
+                
+                # Handle user input
+                if st.button('Submit'):
+                    edited_data['Totaled'] = edited_data['Hour'] + edited_data['Ot']
+                    scorecard = scorecard.append(edited_data, ignore_index=True)
+                
+                # Display the updated scorecard
+                st.write("Updated Scorecard:")
+                st.table(scorecard)
+                if "scores" not in st.session_state:
+                    st.session_state.scores = [
+                        {"name": "Josh", "Pushups": 10, "Situps": 20},
+                    ]
+                
+                
+                def new_scores():
+                    st.session_state.scores.append(
+                        {
+                            "name": st.session_state.name,
+                            "Pushups": st.session_state.pushups,
+                            "Situps": st.session_state.situps,
+                        }
+                    )
+                
+                
+                st.write("# Score table")
+                
+                score_df = pd.DataFrame(st.session_state.scores)
+                score_df["total_points"] = score_df["Pushups"] + score_df["Situps"]
+                
+                st.write(score_df)
+                
+                st.write("# Add a new score")
+                with st.form("new_score", clear_on_submit=True):
+                    name = st.text_input("Name", key="name")
+                    pushups = st.number_input("Pushups", key="pushups", step=1, value=0, min_value=0)
+                    situps = st.number_input("Situps", key="situps", step=1, value=0, min_value=0)
+                    st.form_submit_button("Submit", on_click=new_scores)
             def download_files_in_folder(bucket, folder_name, output_directory):
                 blob_iterator = bucket.list_blobs(prefix=folder_name)
             
@@ -375,10 +407,7 @@ if authentication_status:
                     # Download the file to the specified output directory
                     output_path = os.path.join(output_directory, os.path.basename(blob.name))
                     blob.download_to_filename(output_path)
-          
 
-          
-                
             if st.button("BACKUP DATA"):
                 st.write("OK")
                 client = storage.Client()
@@ -399,11 +428,476 @@ if authentication_status:
             
               
         if select=="ADMIN" :
-            admin_tab1,admin_tab2,admin_tab3,admin_tab4=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES"])
+            admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","LABOR"])
+            with admin_tab5:
+                labor_issue=True
+                if labor_issue:
+                    ranks={"FOREMAN":{"code":"129","DAY":{"hr":74.04,"ot":111.06},"NIGHT":{"hr":98.72,"ot":111.06},"WEEKEND":{"hr":111.06,"ot":111.06},
+                                      "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
+                           "COMPUTER CLERK":{"code":"115","DAY":{"hr":57.52,"ot":86.28},"NIGHT":{"hr":76.69,"ot":86.28},"WEEKEND":{"hr":86.28,"ot":86.28},
+                                    "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
+                           "TRACTOR-SEMI-DOCK":{"code":"036","DAY":{"hr":55.25,"ot":82.88},"NIGHT":{"hr":73.67,"ot":82.88},"WEEKEND":{"hr":82.88,"ot":82.88},
+                                                "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
+                           "UTILITY LIFT DRIVER":{"code":"037","DAY":{"hr":55.25,"ot":82.88},"NIGHT":{"hr":73.67,"ot":82.88},"WEEKEND":{"hr":82.88,"ot":82.88},
+                                                  "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
+                           "LIFT TRUCK HEAVY":{"code":"055","DAY":{"hr":57.52,"ot":86.28},"NIGHT":{"hr":76.69,"ot":86.28},"WEEKEND":{"hr":86.28,"ot":86.28},
+                                               "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
+                           "BASIC CLERK-DOCK":{"code":"101","DAY":{"hr":52.85,"ot":79.28},"NIGHT":{"hr":70.47,"ot":79.28},"WEEKEND":{"hr":79.28,"ot":79.28},
+                                               "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
+                           "LINESMAN":{"code":"213","DAY":{"hr":52.85,"ot":79.28},"NIGHT":{"hr":70.47,"ot":79.28},"WEEKEND":{"hr":79.28,"ot":79.28},
+                                       "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
+                          "CLERK":{"code":"103","DAY":{"hr":55.25,"ot":82.88},"NIGHT":{"hr":73.67,"ot":82.88},"WEEKEND":{"hr":82.88,"ot":82.88},
+                                                "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0}}
+                    assessment_rates=gcp_download(target_bucket,rf"assessment_rates.json")
+                    assessment_rates=json.loads(assessment_rates)
+                    #st.write(assessment_rates)
+                    siu=st.number_input("ENTER SIU PERCENTAGE",step=1,key="32324")
+                    markup=st.number_input("ENTER MARKUP PERCENTAGE",step=1,key="3e2324")
+                    lab_col7,lab_col8,lab_col9,lab_col10,lab_col11,lab_col12=st.columns([3,2,1,1,1,1])
+                    with lab_col10:
+                        st.markdown("**BENEFITS**")
+                    with lab_col7:
+                        shift=st.radio("**SELECT SHIFT**",["DAY","NIGHT","WEEKEND"],horizontal=True)
+                        for i in ranks:
+                            ranks[i]["shift"]=shift
+                    with lab_col8:
+                        st.markdown("**HOURS/OT**")
+                    with lab_col9:
+                        st.markdown("**WAGES**")
+                    
+                    with lab_col11:
+                        st.markdown("**TOTAL**")
+
+                    with lab_col12:
+                        st.markdown("**WITH MARKUP**")
+                    
+                    lab_col1,lab_col2,lab_col3,lab_col4,lab_col5,lab_col6,lab_colend=st.columns([1,1,2,2,1,1,1])
+                    with lab_col4:
+                            
+                            st.write(" ")
+                            st.write(" ")
+                                          
+                    with lab_col1:
+                        st.write(" ")
+                        st.write(" ")
+                        
+                        foreman=st.checkbox("FOREMAN")
+                        
+                        if foreman:
+                            with lab_col2:
+                                number_of_foreman=st.number_input("How Many?",step=1,key="1150368")
+                                ranks["FOREMAN"]["qt"]=number_of_foreman
+                            with lab_col3:
+                                a1,a2=st.columns([2,2])
+                                with a1:
+                                    hours=st.number_input("HOURS",step=1,key="1150369")
+                                    ranks["FOREMAN"]["hours"]=hours
+                                    ranks["FOREMAN"]["standard_wage"]=hours*ranks["FOREMAN"][shift]["hr"]*ranks["FOREMAN"]["qt"]
+                                with a2:
+                                    ot=st.number_input("OT",step=1,key="1150370")
+                                    ranks["FOREMAN"]["ot"]=ot
+                                    ranks["FOREMAN"]["ot_wage"]=ot*ranks["FOREMAN"][shift]["ot"]*ranks["FOREMAN"]["qt"]
+                                ranks["FOREMAN"]["cost"]=ranks["FOREMAN"]["standard_wage"]+ranks["FOREMAN"]["ot_wage"]
+                                ranks["FOREMAN"]["state"]=ranks["FOREMAN"]["cost"]*0.062+ranks["FOREMAN"]["cost"]*0.0145+ranks["FOREMAN"]["cost"]*0.0021792+ranks["FOREMAN"]["cost"]*siu/100
+                                ranks["FOREMAN"]["pma"]=(hours+ot)*1.58*ranks["FOREMAN"]["qt"]+(hours+ot)*0.14*ranks["FOREMAN"]["qt"]+(hours+ot)*29.15*ranks["FOREMAN"]["qt"]+(hours+ot)*2.81*ranks["FOREMAN"]["qt"]
+                            with lab_col4:
+                                st.markdown(f"Standard:${ranks['FOREMAN']['standard_wage']}, OT:${ranks['FOREMAN']['ot_wage']}")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col5:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(f'${round(ranks["FOREMAN"]["state"]+ranks["FOREMAN"]["pma"],2)}')
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col6:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(f"$ {round(ranks['FOREMAN']['cost']+ranks['FOREMAN']['state']+ranks['FOREMAN']['pma'],2)}")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_colend:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(f"$ {round((markup+100)/100*(ranks['FOREMAN']['cost']+ranks['FOREMAN']['state']+ranks['FOREMAN']['pma']),2)}")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                        elif not foreman:
+                            with lab_col2:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                        
+                            with lab_col3:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col4:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col5:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col6:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_colend:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                        st.write(" ")
+                        st.write(" ")
+                        st.write(" ")
+                        clerk=st.checkbox("CLERK")
+                        if clerk:
+                            with lab_col2:
+                                number_of_clerk=st.number_input("How Many?",step=1,key="115071")
+                                ranks["CLERK"]["qt"]=number_of_clerk
+                            with lab_col3:
+                                b1,b2=st.columns([2,2])
+                                with b1:
+                                    hours=st.number_input("HOURS",step=1,key="1150372")
+                                    ranks["CLERK"]["hours"]=hours
+                                    ranks["CLERK"]["standard_wage"]=hours*ranks["CLERK"][shift]["hr"]*ranks["CLERK"]["qt"]
+                                with b2:
+                                    ot=st.number_input("OT",step=1,key="1150373")
+                                    ranks["CLERK"]["ot"]=ot
+                                    ranks["CLERK"]["ot_wage"]=ot*ranks["CLERK"][shift]["ot"]*ranks["CLERK"]["qt"]
+                                ranks["CLERK"]["cost"]=ranks["CLERK"]["standard_wage"]+ranks["CLERK"]["ot_wage"]
+                                ranks["CLERK"]["state"]=ranks["CLERK"]["cost"]*0.062+ranks["CLERK"]["cost"]*0.0145+ranks["CLERK"]["cost"]*0.0021792+ranks["CLERK"]["cost"]*siu/100
+                                ranks["CLERK"]["pma"]=(hours+ot)*1.58*ranks["CLERK"]["qt"]+(hours+ot)*0.14*ranks["CLERK"]["qt"]+(hours+ot)*29.15*ranks["CLERK"]["qt"]+(hours+ot)*0.75*ranks["CLERK"]["qt"]
+                            with lab_col4:
+                                st.write(f"Standard: $ {ranks['CLERK']['standard_wage']}, OT: $ {ranks['CLERK']['ot_wage']}")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col5:
+                                st.write(f'${round(ranks["CLERK"]["state"]+ranks["CLERK"]["pma"],2)}')
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col6:
+                                st.write(f"$ {round(ranks['CLERK']['cost']+ranks['CLERK']['state']+ranks['CLERK']['pma'],2)}")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_colend:
+                                st.write(f"$ {round((markup+100)/100*(ranks['CLERK']['cost']+ranks['CLERK']['state']+ranks['CLERK']['pma']),2)}")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                        elif not clerk:
+                            with lab_col2:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                        
+                            with lab_col3:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col4:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col5:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col6:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_colend:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            
+                            
+                                
+                        st.write(" ")
+                        st.write(" ")
+                        st.write(" ")
+                        heavy=st.checkbox("HEAVY")
+                        if heavy:
+                            with lab_col2:
+                                number_of_heavy=st.number_input("How Many?",step=1,key="11503748")
+                                ranks["LIFT TRUCK HEAVY"]["qt"]=number_of_heavy
+                            with lab_col3:
+                                b1,b2=st.columns([2,2])
+                                with b1:
+                                    hours=st.number_input("HOURS",step=1,key="1150375sa")
+                                    ranks["LIFT TRUCK HEAVY"]["hours"]=hours
+                                    ranks["LIFT TRUCK HEAVY"]["standard_wage"]=hours*ranks["LIFT TRUCK HEAVY"][shift]["hr"]*ranks["LIFT TRUCK HEAVY"]["qt"]
+                                with b2:
+                                    ot=st.number_input("OT",step=1,key="1150376")
+                                    ranks["LIFT TRUCK HEAVY"]["ot"]=ot
+                                    ranks["LIFT TRUCK HEAVY"]["ot_wage"]=ot*ranks["LIFT TRUCK HEAVY"][shift]["ot"]*ranks["LIFT TRUCK HEAVY"]["qt"]
+                                ranks["LIFT TRUCK HEAVY"]["cost"]=ranks["LIFT TRUCK HEAVY"]["standard_wage"]+ranks["LIFT TRUCK HEAVY"]["ot_wage"]
+                                ranks["LIFT TRUCK HEAVY"]["state"]=ranks["LIFT TRUCK HEAVY"]["cost"]*0.062+ranks["LIFT TRUCK HEAVY"]["cost"]*0.0145+ranks["LIFT TRUCK HEAVY"]["cost"]*0.0021792+ranks["LIFT TRUCK HEAVY"]["cost"]*siu/100
+                                ranks["LIFT TRUCK HEAVY"]["pma"]=(hours+ot)*1.58*ranks["LIFT TRUCK HEAVY"]["qt"]+(hours+ot)*0.14*ranks["LIFT TRUCK HEAVY"]["qt"]+(hours+ot)*29.15*ranks["LIFT TRUCK HEAVY"]["qt"]+(hours+ot)*0.75*ranks["LIFT TRUCK HEAVY"]["qt"]
+                                with lab_col4:
+                                    st.write(f"Standard: $ {ranks['LIFT TRUCK HEAVY']['standard_wage']}, OT: $ {ranks['LIFT TRUCK HEAVY']['ot_wage']}")
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                                with lab_col5:
+                                    st.write(f'${round(ranks["LIFT TRUCK HEAVY"]["state"]+ranks["LIFT TRUCK HEAVY"]["pma"],2)}')
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                                with lab_col6:
+                                    st.write(f"$ {round(ranks['LIFT TRUCK HEAVY']['cost']+ranks['LIFT TRUCK HEAVY']['state']+ranks['LIFT TRUCK HEAVY']['pma'],2)}")
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                                with lab_colend:
+                                    st.write(f"$ {round((markup+100)/100*(ranks['LIFT TRUCK HEAVY']['cost']+ranks['LIFT TRUCK HEAVY']['state']+ranks['LIFT TRUCK HEAVY']['pma']),2)}")
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                        elif not heavy:
+                            with lab_col2:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                        
+                            with lab_col3:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col4:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col5:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col6:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_colend:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                        st.write(" ")
+                        st.write(" ")  
+                        st.write(" ")
+                        ut=st.checkbox("UT")
+                        if ut:
+                            with lab_col2:
+                                number_of_ut=st.number_input("How Many?",step=1,key="1150377")
+                                ranks["UTILITY LIFT DRIVER"]["qt"]=number_of_ut
+                            with lab_col3:
+                                b1,b2=st.columns([2,2])
+                                with b1:
+                                    hours=st.number_input("HOURS",step=1,key="1150378")
+                                    ranks["UTILITY LIFT DRIVER"]["hours"]=hours
+                                    ranks["UTILITY LIFT DRIVER"]["standard_wage"]=hours*ranks["UTILITY LIFT DRIVER"][shift]["hr"]*ranks["UTILITY LIFT DRIVER"]["qt"]
+                                with b2:
+                                    ot=st.number_input("OT",step=1,key="1150379")
+                                    ranks["UTILITY LIFT DRIVER"]["ot"]=ot
+                                    ranks["UTILITY LIFT DRIVER"]["ot_wage"]=ot*ranks["UTILITY LIFT DRIVER"][shift]["ot"]*ranks["UTILITY LIFT DRIVER"]["qt"]
+                                ranks["UTILITY LIFT DRIVER"]["cost"]=ranks["UTILITY LIFT DRIVER"]["standard_wage"]+ranks["UTILITY LIFT DRIVER"]["ot_wage"]
+                                ranks["UTILITY LIFT DRIVER"]["state"]=ranks["UTILITY LIFT DRIVER"]["cost"]*0.062+ranks["UTILITY LIFT DRIVER"]["cost"]*0.0145+ranks["UTILITY LIFT DRIVER"]["cost"]*0.0021792+ranks["UTILITY LIFT DRIVER"]["cost"]*siu/100
+                                ranks["UTILITY LIFT DRIVER"]["pma"]=(hours+ot)*1.58*ranks["UTILITY LIFT DRIVER"]["qt"]+(hours+ot)*0.14*ranks["UTILITY LIFT DRIVER"]["qt"]+(hours+ot)*29.15*ranks["UTILITY LIFT DRIVER"]["qt"]+(hours+ot)*0.75*ranks["UTILITY LIFT DRIVER"]["qt"]
+                                with lab_col4:
+                                    st.write(f"Standard: $ {ranks['UTILITY LIFT DRIVER']['standard_wage']}, OT: $ {ranks['UTILITY LIFT DRIVER']['ot_wage']}")
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                                with lab_col5:
+                                    st.write(f'${round(ranks["UTILITY LIFT DRIVER"]["state"]+ranks["UTILITY LIFT DRIVER"]["pma"],2)}')
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                                with lab_col6:
+                                    st.write(f"$ {round(ranks['UTILITY LIFT DRIVER']['cost']+ranks['UTILITY LIFT DRIVER']['state']+ranks['UTILITY LIFT DRIVER']['pma'],2)}")
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                                with lab_colend:
+                                    st.write(f"$ {round((markup+100)/100*(ranks['UTILITY LIFT DRIVER']['cost']+ranks['UTILITY LIFT DRIVER']['state']+ranks['UTILITY LIFT DRIVER']['pma']),2)}")
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                                
+                        elif not ut:
+                            with lab_col2:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                        
+                            with lab_col3:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col4:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col5:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_col6:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                            with lab_colend:
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                        st.write(" ")
+                        st.write(" ")
+                        tractor_semi=st.checkbox("TRACTOR-SEMI")
+                        if tractor_semi:
+                            with lab_col2:
+                                number_of_tractor_semi=st.number_input("How Many?",step=1,key="isuada4")
+                                ranks["TRACTOR-SEMI-DOCK"]["qt"]=number_of_tractor_semi
+
+                            with lab_col3:
+                                b1,b2=st.columns([2,2])
+                                with b1:
+                                    hours=st.number_input("HOURS",step=1,key="1150380")
+                                    ranks["TRACTOR-SEMI-DOCK"]["hours"]=hours
+                                    ranks["TRACTOR-SEMI-DOCK"]["standard_wage"]=hours*ranks["TRACTOR-SEMI-DOCK"][shift]["hr"]*ranks["TRACTOR-SEMI-DOCK"]["qt"]
+                                with b2:
+                                    ot=st.number_input("OT",step=1,key="1150381")
+                                    ranks["TRACTOR-SEMI-DOCK"]["ot"]=ot
+                                    ranks["TRACTOR-SEMI-DOCK"]["ot_wage"]=ot*ranks["TRACTOR-SEMI-DOCK"][shift]["ot"]*ranks["TRACTOR-SEMI-DOCK"]["qt"]
+                                ranks["TRACTOR-SEMI-DOCK"]["cost"]=ranks["TRACTOR-SEMI-DOCK"]["standard_wage"]+ranks["TRACTOR-SEMI-DOCK"]["ot_wage"]
+                                ranks["TRACTOR-SEMI-DOCK"]["state"]=ranks["TRACTOR-SEMI-DOCK"]["cost"]*0.062+ranks["TRACTOR-SEMI-DOCK"]["cost"]*0.0145+ranks["TRACTOR-SEMI-DOCK"]["cost"]*0.0021792+ranks["TRACTOR-SEMI-DOCK"]["cost"]*siu/100
+                                ranks["TRACTOR-SEMI-DOCK"]["pma"]=(hours+ot)*1.58*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*0.14*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*29.15*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*0.75*ranks["TRACTOR-SEMI-DOCK"]["qt"]
+                                with lab_col4:
+                                    st.write(f"Standard: $ {ranks['TRACTOR-SEMI-DOCK']['standard_wage']}, OT: $ {ranks['TRACTOR-SEMI-DOCK']['ot_wage']}")
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                                with lab_col5:
+                                    st.write(f'${round(ranks["TRACTOR-SEMI-DOCK"]["state"]+ranks["TRACTOR-SEMI-DOCK"]["pma"],2)}')
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                                with lab_col6:
+                                    st.write(f"$ {round(ranks['TRACTOR-SEMI-DOCK']['cost']+ranks['TRACTOR-SEMI-DOCK']['state']+ranks['TRACTOR-SEMI-DOCK']['pma'],2)}")
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                                with lab_colend:
+                                    st.write(f"$ {round((markup+100)/100*(ranks['TRACTOR-SEMI-DOCK']['cost']+ranks['TRACTOR-SEMI-DOCK']['state']+ranks['TRACTOR-SEMI-DOCK']['pma']),2)}")
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                                
+                        
+                   
+                    total_=round(sum([ranks[key]['cost'] for key in ranks])+sum([ranks[key]['state'] for key in ranks])+sum([ranks[key]['pma'] for key in ranks]),2)
+                    st.subheader(f"     TOTAL COST FOR SHIFT: $ {round(total_,2)}")
+                    st.subheader(f"     TOTAL CHARGE WITH MARKUP: $ {round((100+markup)/100*total_,2)}")
+                            
+                        
+                        
+                
+            
+            
             with admin_tab2:
                 bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 admin_bill_of_ladings=json.loads(bill_data)
-                st.dataframe(pd.DataFrame.from_dict(admin_bill_of_ladings).T[1:])
+                admin_bill_of_ladings=pd.DataFrame.from_dict(admin_bill_of_ladings).T[1:]
+                @st.cache
+                def convert_df(df):
+                    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+                    return df.to_csv().encode('utf-8')
+                use=True
+                if use:
+                    now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
+                    
+                    daily_admin_bill_of_ladings=admin_bill_of_ladings.copy()
+                    
+                    daily_admin_bill_of_ladings["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in admin_bill_of_ladings["issued"]]
+                    daily_admin_bill_of_ladings_=daily_admin_bill_of_ladings[daily_admin_bill_of_ladings["Date"]==now.date()]
+                    choose = st.radio(
+                                    "Select Today's Bill of Ladings or choose by Date or choose ALL",
+                                    ["DAILY", "ACCUMULATIVE", "FIND BY DATE"],key="wewas")
+                    if choose=="DAILY":
+                        st.dataframe(daily_admin_bill_of_ladings_)
+                        csv=convert_df(daily_admin_bill_of_ladings_)
+                        file_name=f'OLYMPIA_DAILY_BILL_OF_LADINGS-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
+                    elif choose=="FIND BY DATE":
+                        required_date=st.date_input("CHOOSE DATE",key="dssar")
+                        filtered_daily_admin_bill_of_ladings=daily_admin_bill_of_ladings[daily_admin_bill_of_ladings["Date"]==required_date]
+                        
+                        st.dataframe(filtered_daily_admin_bill_of_ladings)
+                        csv=convert_df(filtered_daily_admin_bill_of_ladings)
+                        file_name=f'OLYMPIA_BILL_OF_LADINGS_FOR-{datetime.datetime.strftime(required_date,"%m-%d,%Y")}.csv'
+                    else:
+                        st.dataframe(admin_bill_of_ladings)
+                        csv=convert_df(admin_bill_of_ladings)
+                        file_name=f'OLYMPIA_ALL_BILL_OF_LADINGS to {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
             with admin_tab3:
                 edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/KIRKENES-2304/")
                 requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
@@ -496,7 +990,6 @@ if authentication_status:
                                 st.markdown(f"**{bls[i]} units of Bill of Lading {bls.keys()[i]} - -{wrap_dict[wraps[i]]}-{wraps[i]}**")
                         with col2:
                             if st.button("RECORD PARSED SHIPMENT TO DATABASE"):
-                                #st.write(list_cs_files("olym_suzano"))
                                 temp=new_df.to_csv("temp.csv")
                                 upload_cs_file(target_bucket, 'temp.csv',rf"shipping_files/{gemi}-{voyage}-shipping_file.csv") 
                                 st.write(f"Uploaded {gemi}-{voyage}-shipping_file.csv to database")
@@ -506,9 +999,8 @@ if authentication_status:
                         files_in_folder = list_files_in_folder(target_bucket, "shipping_files")
                         requested_file=st.selectbox("SHIPPING FILES IN DATABASE",files_in_folder[1:])
                         if st.button("LOAD SHIPPING FILE"):
-                            requested_shipping_file=gcp_csv_to_df(target_bucket, requested_file)
-                            filtered_df=requested_shipping_file[["Lot","Lot Qty","Batch","Grade","Ocean B/L","DryWeight","ADMT","Location",
-                                                                                      "Warehouse_In","Warehouse_Out","Vehicle_Id","Release_Order_Number","Carrier_Code"]]
+                            requested_shipping_file=gcp_csv_to_df(target_bucket,requested_file)
+                            filtered_df=requested_shipping_file[["Lot","Lot Qty","Batch","Grade","Ocean B/L","DryWeight","ADMT"]]
                             #st.data_editor(filtered_df, use_container_width=True)
                             st.data_editor(filtered_df)
                           
@@ -528,13 +1020,12 @@ if authentication_status:
                 except:
                     release_order_database={}
                 
-                
+              
                 release_order_tab1,release_order_tab2=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE"])
                 with release_order_tab1:
                     vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304"])
                     add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER",disabled=True)
                     edit=st.checkbox("CHECK TO EDIT EXISTING RELEASE ORDER")
-                    
                     batch_mapping=gcp_download(target_bucket,rf"batch_mapping.json")
                     batch_mapping=json.loads(batch_mapping)
                     if edit:
@@ -600,6 +1091,7 @@ if authentication_status:
                             
                             temp=store_release_order_data(vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
                      
+                        
                         try:
                             junk=gcp_download(target_bucket,rf"release_orders/{vessel}/junk_release.json")
                         except:
@@ -639,13 +1131,11 @@ if authentication_status:
                         blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                         blob.upload_from_string(release_orders_json)
                         
-                        
                 with release_order_tab2:
                     
                     vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304"],key="other")
                     rls_tab1,rls_tab2,rls_tab3=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS","ENTER MF NUMBERS"])
-
-                    data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                    data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")  #################
                     try:
                         release_order_dictionary=json.loads(data)
                     except: 
@@ -667,14 +1157,13 @@ if authentication_status:
                             if not_yet==0:
                                 completed_release_orders.append(key)
                         
-                        files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")[1:]]   ### REMOVE json extension from name
+                        files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/{vessel}/")]   ### REMOVE json extension from name
                         
                         junk=gcp_download(target_bucket,rf"junk_release.json")
                         junk=json.loads(junk)
                         files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
                         files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
                         release_order_dest_map={}
-                                               
                         try:
                             
                             for i in release_order_dictionary:
@@ -682,13 +1171,12 @@ if authentication_status:
                                     release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
                             
                             destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder]
-                            
-                                                                            
+                        
+                                                                        
                             requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
                             requested_file=requested_file_.split(" ")[0]
                             nofile=0
                         except:
-                            
                             st.write("NO RELEASE ORDERS YET")
                         try:
                             data=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
@@ -705,7 +1193,6 @@ if authentication_status:
                     
                         
                         except:
-                            st.write("this is the problem")
                             nofile=1
                         
                         rel_col1,rel_col2,rel_col3,rel_col4=st.columns([2,2,2,2])
@@ -868,7 +1355,7 @@ if authentication_status:
                                     
                                     json_data = json.dumps(dispatch)
                                     storage_client = storage.Client()
-                                    bucket = storage_client.bucket(target_bucket)
+                                    bucket = storage_client.bucket("olym_suzano")
                                     blob = bucket.blob(rf"dispatched.json")
                                     blob.upload_from_string(json_data)
                                     st.markdown(f"**DISPATCHED Release Order Number {requested_file} Item No : {hangisi} to Warehouse**")
@@ -876,7 +1363,7 @@ if authentication_status:
                                 
                                 if st.button("DELETE SALES ORDER ITEM",key="lalag"):
                                     
-                                    data_d=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
+                                    data_d=gcp_download("olym_suzano",rf"release_orders/{vessel}/{requested_file}.json")
                                     to_edit_d=json.loads(data_d)
                                     to_edit_d[vessel][requested_file].pop(hangisi)
                                     #st.write(to_edit_d)
@@ -923,7 +1410,7 @@ if authentication_status:
                                     pass
                             st.markdown("**CURRENT DISPATCH QUEUE**")
                             try:
-                                dispatch=gcp_download(target_bucket,rf"dispatched.json")
+                                dispatch=gcp_download("olym_suzano",rf"dispatched.json")
                                 dispatch=json.loads(dispatch)
                                 try:
                                     for dispatched_release in dispatch.keys():
@@ -955,7 +1442,7 @@ if authentication_status:
                                 completed_release_orders.append(key)
                         
                         for completed in completed_release_orders:
-                            st.write(completed)
+                            #st.write(completed)
                             data=gcp_download(target_bucket,rf"release_orders/{vessel}/{completed}.json")
                             comp_rel_order=json.loads(data)
                         
@@ -963,8 +1450,8 @@ if authentication_status:
                   
                         for i in release_order_dictionary:
                             if i in completed_release_orders:
-                                completed_release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
-                        st.write(completed_release_order_dest_map)
+                                completed_release_order_dest_map[i]=release_order_dictionary[i][sales]#["destination"]
+                        st.write(pd.DataFrame(completed_release_order_dest_map).T)
                         destinations_of_completed_release_orders=[f"{i} to {completed_release_order_dest_map[i]}" for i in completed_release_orders]
                     
                                                                     
@@ -975,16 +1462,14 @@ if authentication_status:
                         mf_numbers_=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                         mf_numbers=json.loads(mf_numbers_)
                         gp_release_orders=[i for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and release_order_database[i]["001"]["remaining"]>2]
-                        
                         vessel_mf=st.selectbox("SELECT VESSEL",["KIRKENES-2304"],key="lalala")
-                        #release_order_number_mf=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]),key="dadada")
-                        release_order_number_mf=st.selectbox("ACTIVE RELEASE ORDERS",gp_release_orders,key="tatata")
-                        
+                        destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and release_order_database[i]["001"]["remaining"]>2]
+                        release_order_number_mf=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders,key="tatata")
                         input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
                         if input_mf_numbers is not None:
                             input_mf_numbers = input_mf_numbers.splitlines()
                             input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]
-                        st.write(input_mf_numbers)
+                        #st.write(input_mf_numbers)
                         if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
                             if release_order_number_mf[:7] not in mf_numbers[vessel_mf].keys():
                                 mf_numbers[vessel_mf][release_order_number_mf[:7]]=[]
@@ -1004,21 +1489,22 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/mf_numbers.json")
                             blob.upload_from_string(mf_data)
-                        st.write(pd.DataFrame(mf_numbers).T)
+                        st.table(pd.DataFrame(mf_numbers))
+                        
                                 
         
                         
         
-        ##########  LOAD OUT  ##############################################################
+        ##########  LOAD OUT  ##############
         
         
         
         if select=="LOADOUT" :
         
             
-            bill_mapping=gcp_download(target_bucket,"bill_mapping.json")
+            bill_mapping=gcp_download("olym_suzano","bill_mapping.json")
             bill_mapping=json.loads(bill_mapping)
-            mill_info_=gcp_download(target_bucket,rf"mill_info.json")
+            mill_info_=gcp_download("olym_suzano",rf"mill_info.json")
             mill_info=json.loads(mill_info_)
             mf_numbers_for_load=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
             mf_numbers_for_load=json.loads(mf_numbers_for_load)
@@ -1156,11 +1642,11 @@ if authentication_status:
                 with col1:
                 
                     terminal_code=st.text_input("Terminal Code","OLYM",disabled=True)
-                    file_date=st.date_input("File Date",datetime.datetime.today()-datetime.timedelta(hours=7),key="file_dates",disabled=True)
+                    file_date=st.date_input("File Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="file_dates",disabled=True)
                     if file_date not in st.session_state:
                         st.session_state.file_date=file_date
-                    file_time = st.time_input('FileTime', datetime.datetime.now()-datetime.timedelta(hours=7),step=60,disabled=False)
-                    delivery_date=st.date_input("Delivery Date",datetime.datetime.today()-datetime.timedelta(hours=7),key="delivery_date",disabled=True)
+                    file_time = st.time_input('FileTime', datetime.datetime.now()-datetime.timedelta(hours=utc_difference),step=60,disabled=False)
+                    delivery_date=st.date_input("Delivery Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="delivery_date",disabled=True)
                     eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
                     
                 with col2:
@@ -1199,15 +1685,15 @@ if authentication_status:
                         mf=True
                         load_mf_number_issued=False
                         if carrier_code=="123456-KBX":
-                            if release_order_number in mf_numbers_for_load[vessel].keys():
-                                mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
-                                load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
-                                mf=True
-                                load_mf_number_issued=True
-                            else:
-                                st.write("MF NUMBERS NOT IN!")
-                                mf=False
-                                load_mf_number_issued=False
+                           if release_order_number in mf_numbers_for_load[vessel].keys():
+                               mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
+                               load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
+                               mf=True
+                               load_mf_number_issued=True
+                           else:
+                               st.write("MF NUMBERS NOT IN!")
+                               mf=False
+                               load_mf_number_issued=False  
                         foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
                         foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
 
@@ -1439,7 +1925,7 @@ if authentication_status:
                     file_date=st.date_input("File Date",datetime.datetime.today(),disabled=False,key="popo3")
                     a=datetime.datetime.strftime(file_date,"%Y%m%d")
                     a_=datetime.datetime.strftime(file_date,"%Y-%m-%d")
-                    file_time = st.time_input('FileTime', datetime.datetime.now()-datetime.timedelta(hours=7),step=60,disabled=False,key="popop")
+                    file_time = st.time_input('FileTime', datetime.datetime.now()-datetime.timedelta(hours=utc_difference),step=60,disabled=False,key="popop")
                     b=file_time.strftime("%H%M%S")
                     b_=file_time.strftime("%H:%M:%S")
                     c=datetime.datetime.strftime(eta_date,"%Y%m%d")
@@ -1448,13 +1934,13 @@ if authentication_status:
                     a=datetime.datetime.strftime(file_date,"%Y%m%d")
                     a_=datetime.datetime.strftime(file_date,"%Y-%m-%d")
                     b=file_time.strftime("%H%M%S")
-                    b=(datetime.datetime.now()-datetime.timedelta(hours=7)).strftime("%H%M%S")
-                    b_=(datetime.datetime.now()-datetime.timedelta(hours=7)).strftime("%H:%M:%S")
+                    b=(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).strftime("%H%M%S")
+                    b_=(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).strftime("%H:%M:%S")
                     c=datetime.datetime.strftime(eta_date,"%Y%m%d")
                     
-                st.write(carrier_code)
                     
-                if yes and mf:
+                    
+                if yes:
                     
                     if st.button('**:blue[SUBMIT EDI]**'):
                      
@@ -1491,9 +1977,9 @@ if authentication_status:
                             consignee_state=mill_info[destination]["state"]
                             vessel_suzano,voyage_suzano=vessel.split("-")
                             if manual_time:
-                                eta=datetime.datetime.strftime(file_date+datetime.timedelta(hours=mill_info[destination]['hours']-7)+datetime.timedelta(minutes=mill_info[destination]['minutes']+30),"%Y-%m-%d  %H:%M:%S")
+                                eta=datetime.datetime.strftime(file_date+datetime.timedelta(hours=mill_info[destination]['hours']-utc_difference)+datetime.timedelta(minutes=mill_info[destination]['minutes']+30),"%Y-%m-%d  %H:%M:%S")
                             else:
-                                eta=datetime.datetime.strftime(datetime.datetime.now()+datetime.timedelta(hours=mill_info[destination]['hours']-7)+datetime.timedelta(minutes=mill_info[destination]['minutes']+30),"%Y-%m-%d  %H:%M:%S")
+                                eta=datetime.datetime.strftime(datetime.datetime.now()+datetime.timedelta(hours=mill_info[destination]['hours']-utc_difference)+datetime.timedelta(minutes=mill_info[destination]['minutes']+30),"%Y-%m-%d  %H:%M:%S")
     
                             if double_load:
                                 bill_of_lading_number,bill_of_ladings=gen_bill_of_lading()
@@ -1516,7 +2002,7 @@ if authentication_status:
                                                 
                             bill_of_ladings=json.dumps(bill_of_ladings)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
+                            bucket = storage_client.bucket("olym_suzano")
                             blob = bucket.blob(rf"terminal_bill_of_ladings.json")
                             blob.upload_from_string(bill_of_ladings)
                             
@@ -1545,7 +2031,7 @@ if authentication_status:
                                                      "Metric Ton": quantity*2, "ADMT":admt,"Mode of Transportation":transport_type}})
                                 suzano_report=json.dumps(suzano_report)
                                 storage_client = storage.Client()
-                                bucket = storage_client.bucket(target_bucket)
+                                bucket = storage_client.bucket("olym_suzano")
                                 blob = bucket.blob(rf"suzano_report.json")
                                 blob.upload_from_string(suzano_report)
     
@@ -1611,8 +2097,8 @@ if authentication_status:
                             body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                             st.write(body)           
                             sender = "warehouseoly@gmail.com"
-                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                            recipients = ["afsiny@portolympia.com"]
+                            recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                            #recipients = ["afsiny@portolympia.com"]
                             password = "xjvxkmzbpotzeuuv"
                     
                   
@@ -1622,7 +2108,9 @@ if authentication_status:
                                 f.write(file_content)
                     
                             file_path = 'temp_file.txt'  # Use the path of the temporary file
-                            upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}") 
+                    
+                            
+                            upload_cs_file("olym_suzano", 'temp_file.txt',rf"EDIS/{vessel}/{file_name}")
                             if load_mf_number_issued:
                                 mf_numbers_for_load[vessel][release_order_number].remove(load_mf_number)
                                 mf_numbers_for_load=json.dumps(mf_numbers_for_load)
@@ -1631,7 +2119,6 @@ if authentication_status:
                                 blob = bucket.blob(rf"release_orders/mf_numbers.json")
                                 blob.upload_from_string(mf_numbers_for_load)
                             send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
-                            
                             
                         else:   ###cancel bill of lading
                             pass
@@ -1646,12 +2133,12 @@ if authentication_status:
             
                     
                         
-        
+        ##########################################################################
         
                 
                         
         if select=="INVENTORY" :
-            
+            Inventory=gcp_csv_to_df(target_bucket, "kirkenes_with_ghosts_found.csv")
             data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
             bill_of_ladings=json.loads(data)
             mill_info=json.loads(gcp_download(target_bucket,rf"mill_info.json"))
@@ -1738,7 +2225,7 @@ if authentication_status:
                     # IMPORTANT: Cache the conversion to prevent computation on every rerun
                     return df.to_csv().encode('utf-8')
                 try:
-                    now=datetime.datetime.now()-datetime.timedelta(hours=7)
+                    now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
                     suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
                     suzano_report=json.loads(suzano_report_)
                     suzano_report=pd.DataFrame(suzano_report).T
@@ -1747,16 +2234,30 @@ if authentication_status:
                     suzano_report["Batch#"]=[str(i) for i in suzano_report["Batch#"]]
                     daily_suzano=suzano_report.copy()
                     daily_suzano["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suzano_report["Date Shipped"]]
-                    daily_suzano=daily_suzano[daily_suzano["Date"]==now.date()]
+                    daily_suzano_=daily_suzano[daily_suzano["Date"]==now.date()]
                     choose = st.radio(
                                     "Select Daily or Accumulative Report",
-                                    ["DAILY", "ACCUMULATIVE"])
+                                    ["DAILY", "ACCUMULATIVE", "FIND BY DATE"])
                     if choose=="DAILY":
-                        st.dataframe(daily_suzano)
-                        csv=convert_df(daily_suzano)
+                        daily_suzano_=daily_suzano_.reset_index(drop=True)
+                        daily_suzano_.index=[i+1 for i in daily_suzano_.index]
+                        daily_suzano_.loc["TOTAL"]=daily_suzano_[["Quantity","Metric Ton","ADMT"]].sum()
+                        st.dataframe(daily_suzano_)
+                        csv=convert_df(daily_suzano_)
+                        file_name=f'OLYMPIA_DAILY_REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
+                    elif choose=="FIND BY DATE":
+                        required_date=st.date_input("CHOOSE DATE",key="dssar")
+                        filtered_suzano=daily_suzano[daily_suzano["Date"]==required_date]
+                        filtered_suzano=filtered_suzano.reset_index(drop=True)
+                        filtered_suzano.index=[i+1 for i in filtered_suzano.index]
+                        filtered_suzano.loc["TOTAL"]=filtered_suzano[["Quantity","Metric Ton","ADMT"]].sum()
+                        st.dataframe(filtered_suzano)
+                        csv=convert_df(filtered_suzano)
+                        file_name=f'OLYMPIA_SHIPMENT_REPORT-{datetime.datetime.strftime(required_date,"%m-%d,%Y")}.csv'
                     else:
                         st.dataframe(suzano_report)
                         csv=convert_df(suzano_report)
+                        file_name=f'OLYMPIA_ALL_SHIPMENTS to {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
                     
                     
                     
@@ -1766,7 +2267,7 @@ if authentication_status:
                     st.download_button(
                         label="DOWNLOAD REPORT AS CSV",
                         data=csv,
-                        file_name=f'OLYMPIA_DAILY_REPORT{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%Y_%m_%d")}.csv',
+                        file_name=file_name,
                         mime='text/csv')
                 except:
                     st.write("NO REPORTS RECORDED")
@@ -1792,43 +2293,77 @@ if authentication_status:
             with inv4:
                 inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
+                
                 maintenance=False
+                                
                 if maintenance:
                     st.title("CURRENTLY UNDER MAINTENANCE, CHECK BACK LATER")
+
+                               
                 else:
-                    kf=inv_bill_of_ladings.iloc[1:].copy()
-                    kf['issued'] = pd.to_datetime(kf['issued'])
-                    kf['Date'] = kf['issued'].dt.date
-                    kf['Date'] = pd.to_datetime(kf['Date'])
-                    # Create a date range from the minimum to maximum date in the 'issued' column
-                    date_range = pd.date_range(start=kf['Date'].min(), end=kf['Date'].max(), freq='D')
-                    
-                    # Create a DataFrame with the date range
-                    date_df = pd.DataFrame({'Date': date_range})
-                    # Merge the date range DataFrame with the original DataFrame based on the 'Date' column
-                    merged_df = pd.merge(date_df, kf, how='left', on='Date')
-                    merged_df['quantity'].fillna(0, inplace=True)
-                    merged_df_grouped=merged_df.groupby('Date')[['quantity']].sum()
-                    merged_df_grouped['Accumulated_Quantity'] = merged_df_grouped['quantity'].cumsum()
-                    merged_df_grouped["Accumulated_Tonnage"]=merged_df_grouped['Accumulated_Quantity']*2
-                    merged_df_grouped["Remaining_Units"]=[9200-i for i in merged_df_grouped['Accumulated_Quantity']]
-                    merged_df_grouped["Remaining_Tonnage"]=merged_df_grouped["Remaining_Units"]*2
-                    merged_df_grouped.rename(columns={'quantity':"Shipped Quantity", 'Accumulated_Quantity':"Shipped Qty To_Date",
-                                                      'Accumulated_Tonnage':"Shipped Tonnage To_Date"},inplace=True)
-                    merged_df_grouped=merged_df_grouped.reset_index()
-                    merged_df_grouped["Date"]=merged_df_grouped['Date'].dt.strftime('%m-%d-%Y, %A')
-                    merged_df_grouped=merged_df_grouped.set_index("Date",drop=True)
-                    st.dataframe(merged_df_grouped)
-                    csv_inventory=convert_df(merged_df_grouped)
-                    st.download_button(
-                        label="DOWNLOAD INVENTORY REPORT AS CSV",
-                        data=csv_inventory,
-                        file_name=f'INVENTORY REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%Y_%m_%d")}.csv',
-                        mime='text/csv')            
+                    inv4tab1,inv4tab2=st.tabs(["DAILY SHIPMENT REPORT","INVENTORY"])
+                    with inv4tab1:
                         
-                           
+                        kf=inv_bill_of_ladings.iloc[1:].copy()
+                        kf['issued'] = pd.to_datetime(kf['issued'])
+                        kf['Date'] = kf['issued'].dt.date
+                        kf['Date'] = pd.to_datetime(kf['Date'])
+                        # Create a date range from the minimum to maximum date in the 'issued' column
+                        date_range = pd.date_range(start=kf['Date'].min(), end=kf['Date'].max(), freq='D')
                         
-                        
+                        # Create a DataFrame with the date range
+                        date_df = pd.DataFrame({'Date': date_range})
+                        # Merge the date range DataFrame with the original DataFrame based on the 'Date' column
+                        merged_df = pd.merge(date_df, kf, how='left', on='Date')
+                        merged_df['quantity'].fillna(0, inplace=True)
+                        merged_df['Shipped Tonnage']=merged_df['quantity']*2
+                        merged_df_grouped=merged_df.groupby('Date')[['quantity','Shipped Tonnage']].sum()
+                        merged_df_grouped['Accumulated_Quantity'] = merged_df_grouped['quantity'].cumsum()
+                        merged_df_grouped["Accumulated_Tonnage"]=merged_df_grouped['Accumulated_Quantity']*2
+                        merged_df_grouped["Remaining_Units"]=[9200-i for i in merged_df_grouped['Accumulated_Quantity']]
+                        merged_df_grouped["Remaining_Tonnage"]=merged_df_grouped["Remaining_Units"]*2
+                        merged_df_grouped.rename(columns={'quantity':"Shipped Quantity", 'Accumulated_Quantity':"Shipped Qty To_Date",
+                                                          'Accumulated_Tonnage':"Shipped Tonnage To_Date"},inplace=True)
+                        merged_df_grouped=merged_df_grouped.reset_index()
+                        merged_df_grouped["Date"]=merged_df_grouped['Date'].dt.strftime('%m-%d-%Y, %A')
+                        merged_df_grouped=merged_df_grouped.set_index("Date",drop=True)
+                        st.dataframe(merged_df_grouped)
+                        csv_inventory=convert_df(merged_df_grouped)
+                        st.download_button(
+                            label="DOWNLOAD INVENTORY REPORT AS CSV",
+                            data=csv_inventory,
+                            file_name=f'INVENTORY REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
+                            mime='text/csv')            
+                    with inv4tab2:
+                        kirkenes_updated=gcp_csv_to_df(target_bucket,rf"kirkenes_updated.csv")
+                        kirkenes_updated["Batch"]=kirkenes_updated["Batch"].astype(str)
+                        st.write(kirkenes_updated)
+                        if st.button("CLICK TO RE-RUN INVENTORY",key="tyuris"):
+                            kirkenes_updated=gcp_csv_to_df(target_bucket,rf"kirkenes_with_ghosts_found.csv")
+                            for line in inv_bill_of_ladings.loads[1:]:
+                                for unit in line.keys():
+                                    kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Shipped"]=kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Shipped"]+line[unit]*8
+                                    kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Remaining"]=kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Remaining"]-line[unit]*8
+                            
+                            
+                            temp=kirkenes_updated.to_csv("temp.csv",index=False)
+                            upload_cs_file(target_bucket, 'temp.csv',rf"kirkenes_updated.csv") 
+                        no_of_unaccounted=Inventory[Inventory["Accounted"]==False]["Bales"].sum()/8
+                        st.write(f'**Unaccounted Units Registered : {no_of_unaccounted} Units/{no_of_unaccounted*2} Tons**')
+                        temp1=kirkenes_updated.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
+                        temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
+                        temp.insert(0,"Total",temp1.Bales.values)
+                        temp["Remaining"]=temp.Total-temp.quantity
+                        temp.columns=["Total","Shipped","Remaining"]
+                        temp.loc["TOTAL"]=temp.sum(axis=0)
+                        tempo=temp*2
+                        inv_col1,inv_col2=st.columns([2,2])
+                        with inv_col1:
+                            st.subheader("By Ocean BOL,UNITS")
+                            st.dataframe(temp)
+                        with inv_col2:
+                            st.subheader("By Ocean BOL,TONS")
+                            st.dataframe(tempo)
                    
             with inv5:
                 inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
@@ -1856,7 +2391,7 @@ if authentication_status:
                     st.download_button(
                     label="DOWNLOAD WEEKLY REPORT AS CSV",
                     data=csv_weekly,
-                    file_name=f'WEEKLY SHIPMENT REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%Y_%m_%d")}.csv',
+                    file_name=f'WEEKLY SHIPMENT REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
                     mime='text/csv')
 
 
@@ -1886,16 +2421,18 @@ if authentication_status:
     ########################                                WAREHOUSE                            ####################
     
     elif username == 'warehouse':
-        bill_mapping=gcp_download("olym_suzano","bill_mapping.json")
+        bill_mapping=gcp_download(target_bucket,"bill_mapping.json")
         bill_mapping=json.loads(bill_mapping)
-        mill_info_=gcp_download("olym_suzano",rf"mill_info.json")
+        mill_info_=gcp_download(target_bucket,rf"mill_info.json")
         mill_info=json.loads(mill_info_)
+        mf_numbers_for_load=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
+        mf_numbers_for_load=json.loads(mf_numbers_for_load)
         no_dispatch=0
         number=None
         if number not in st.session_state:
             st.session_state.number=number
         try:
-            dispatched=gcp_download("olym_suzano","dispatched.json")
+            dispatched=gcp_download(target_bucket,"dispatched.json")
             dispatched=json.loads(dispatched)
         except:
             no_dispatch=1
@@ -2024,11 +2561,11 @@ if authentication_status:
             with col1:
             
                 terminal_code=st.text_input("Terminal Code","OLYM",disabled=True)
-                file_date=st.date_input("File Date",datetime.datetime.today()-datetime.timedelta(hours=7),key="file_dates",disabled=True)
+                file_date=st.date_input("File Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="file_dates",disabled=True)
                 if file_date not in st.session_state:
                     st.session_state.file_date=file_date
-                file_time = st.time_input('FileTime', datetime.datetime.now()-datetime.timedelta(hours=7),step=60,disabled=False)
-                delivery_date=st.date_input("Delivery Date",datetime.datetime.today()-datetime.timedelta(hours=7),key="delivery_date",disabled=True)
+                file_time = st.time_input('FileTime', datetime.datetime.now()-datetime.timedelta(hours=utc_difference),step=60,disabled=False)
+                delivery_date=st.date_input("Delivery Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="delivery_date",disabled=True)
                 eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
                 
             with col2:
@@ -2064,6 +2601,18 @@ if authentication_status:
                     transport_sequential_number=st.selectbox("Transport Sequential",["TRUCK","RAIL"],disabled=True,key=51)
                     transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=6)
                     vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
+                    mf=True
+                    load_mf_number_issued=False
+                    if carrier_code=="123456-KBX":
+                       if release_order_number in mf_numbers_for_load[vessel].keys():
+                           mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
+                           load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
+                           mf=True
+                           load_mf_number_issued=True
+                       else:
+                           st.write("MF NUMBERS NOT IN!")
+                           mf=False
+                           load_mf_number_issued=False  
                     foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
                     foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
 
@@ -2075,6 +2624,7 @@ if authentication_status:
                        transport_sequential_number=st.selectbox("Transport Sequential",["TRUCK","RAIL"],disabled=True,key=10)
                        transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=11)
                        vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=12)
+                       
                        foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=193)
                        foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=13)
 
@@ -2112,7 +2662,7 @@ if authentication_status:
                 if double_load:
                     
                     try:
-                        next_item=gcp_download("olym_suzano",rf"release_orders/{dispatched['2']['vessel']}/{dispatched['2']['release_order']}.json")
+                        next_item=gcp_download(target_bucket,rf"release_orders/{dispatched['2']['vessel']}/{dispatched['2']['release_order']}.json")
                         
                         first_load_input=st.text_area("**FIRST SKU LOADS**",height=300)
                         first_quantity=0
@@ -2172,9 +2722,8 @@ if authentication_status:
              
                
             with col5:
-             
+                
                 if double_load:
-                    
                     first_faults=[]
                     if first_load_input is not None:
                         first_textsplit = first_load_input.splitlines()
@@ -2218,7 +2767,6 @@ if authentication_status:
                                              "OBOL":units_shipped.loc[row,'ocean_bill_of_lading'],
                                              "grade":units_shipped.loc[row,'grade'],"carrier_Id":units_shipped.loc[row,'carrier_id'],
                                              "vehicle":units_shipped.loc[row,'vehicle'],"date":units_shipped.loc[row,'issued'] }
-            
                     faults=[]
                     bale_faults=[]
                     fault_messaging={}
@@ -2242,7 +2790,7 @@ if authentication_status:
                                 if x in load_dict.keys():
                                     st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                     faults.append(1)
-                                    st.markdown("**:red[This unit has been SHIPPED!]**")  
+                                    st.markdown("**:red[This unit has been SHIPPED!]**")   
                                 else:
                                     st.write(f"**Unit No : {i+1}-{x}**")
                                     faults.append(0)
@@ -2290,15 +2838,25 @@ if authentication_status:
                             loads[k[:-2]]+=0.125
                             pure_loads[k]+=0.125
             manual_time=False   
-            
+            #st.write(faults)                  
+            if st.checkbox("Check for Manual Entry for Date/Time"):
+                manual_time=True
+                file_date=st.date_input("File Date",datetime.datetime.today(),disabled=False,key="popo3")
+                a=datetime.datetime.strftime(file_date,"%Y%m%d")
+                a_=datetime.datetime.strftime(file_date,"%Y-%m-%d")
+                file_time = st.time_input('FileTime', datetime.datetime.now()-datetime.timedelta(hours=utc_difference),step=60,disabled=False,key="popop")
+                b=file_time.strftime("%H%M%S")
+                b_=file_time.strftime("%H:%M:%S")
+                c=datetime.datetime.strftime(eta_date,"%Y%m%d")
+            else:     
                 
-            a=datetime.datetime.strftime(file_date,"%Y%m%d")
-            a_=datetime.datetime.strftime(file_date,"%Y-%m-%d")
-            b=file_time.strftime("%H%M%S")
-            b=(datetime.datetime.now()-datetime.timedelta(hours=7)).strftime("%H%M%S")
-            b_=(datetime.datetime.now()-datetime.timedelta(hours=7)).strftime("%H:%M:%S")
-            c=datetime.datetime.strftime(eta_date,"%Y%m%d")
-            manual_time=False    
+                a=datetime.datetime.strftime(file_date,"%Y%m%d")
+                a_=datetime.datetime.strftime(file_date,"%Y-%m-%d")
+                b=file_time.strftime("%H%M%S")
+                b=(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).strftime("%H%M%S")
+                b_=(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).strftime("%H:%M:%S")
+                c=datetime.datetime.strftime(eta_date,"%Y%m%d")
+                
                 
                 
             if yes:
@@ -2329,7 +2887,7 @@ if authentication_status:
                     if proceed:
                         carrier_code=carrier_code.split("-")[0]
                         try:
-                            suzano_report_=gcp_download("olym_suzano",rf"suzano_report.json")
+                            suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
                             suzano_report=json.loads(suzano_report_)
                         except:
                             suzano_report={}
@@ -2338,9 +2896,9 @@ if authentication_status:
                         consignee_state=mill_info[destination]["state"]
                         vessel_suzano,voyage_suzano=vessel.split("-")
                         if manual_time:
-                            eta=datetime.datetime.strftime(file_date+datetime.timedelta(hours=mill_info[destination]['hours']-7)+datetime.timedelta(minutes=mill_info[destination]['minutes']+30),"%Y-%m-%d  %H:%M:%S")
+                            eta=datetime.datetime.strftime(file_date+datetime.timedelta(hours=mill_info[destination]['hours']-utc_difference)+datetime.timedelta(minutes=mill_info[destination]['minutes']+30),"%Y-%m-%d  %H:%M:%S")
                         else:
-                            eta=datetime.datetime.strftime(datetime.datetime.now()+datetime.timedelta(hours=mill_info[destination]['hours']-7)+datetime.timedelta(minutes=mill_info[destination]['minutes']+30),"%Y-%m-%d  %H:%M:%S")
+                            eta=datetime.datetime.strftime(datetime.datetime.now()+datetime.timedelta(hours=mill_info[destination]['hours']-utc_difference)+datetime.timedelta(minutes=mill_info[destination]['minutes']+30),"%Y-%m-%d  %H:%M:%S")
 
                         if double_load:
                             bill_of_lading_number,bill_of_ladings=gen_bill_of_lading()
@@ -2354,6 +2912,8 @@ if authentication_status:
                         
                         else:
                             bill_of_lading_number,bill_of_ladings=gen_bill_of_lading()
+                            if load_mf_number_issued:
+                                bill_of_lading_number=load_mf_number
                             edi_name= f'{bill_of_lading_number}.txt'
                             bill_of_ladings[str(bill_of_lading_number)]={"vessel":vessel,"release_order":release_order_number,"destination":destination,"sales_order":current_sales_order,
                                                                          "ocean_bill_of_lading":ocean_bill_of_lading,"grade":wrap,"carrier_id":carrier_code,"vehicle":vehicle_id,
@@ -2379,19 +2939,18 @@ if authentication_status:
                             
                             suzano_report.update({next_report_no:{"Date Shipped":f"{a_} {b_}","Vehicle":vehicle_id, "Shipment ID #": bill_of_lading_number, "Consignee":consignee,"Consignee City":consignee_city,
                                                  "Consignee State":consignee_state,"Release #":release_order_number,"Carrier":carrier_code,
-                                                 "ETA":eta,"Ocean BOL#":ocean_bill_of_lading,"Batch#":ocean_bol_to_batch[ocean_bill_of_lading],
-                                                 "Warehouse":"OLYM","Vessel":vessel_suzano,"Voyage #":voyage_suzano,"Grade":wrap,"Quantity":quantity,
+                                                 "ETA":eta,"Ocean BOL#":ocean_bill_of_lading,"Warehouse":"OLYM","Vessel":vessel_suzano,"Voyage #":voyage_suzano,"Grade":wrap,"Quantity":quantity,
                                                  "Metric Ton": quantity*2, "ADMT":admt,"Mode of Transportation":transport_type}})
                         else:
                            
                             suzano_report.update({next_report_no:{"Date Shipped":f"{a_} {b_}","Vehicle":vehicle_id, "Shipment ID #": bill_of_lading_number, "Consignee":consignee,"Consignee City":consignee_city,
                                                  "Consignee State":consignee_state,"Release #":release_order_number,"Carrier":carrier_code,
                                                  "ETA":eta,"Ocean BOL#":ocean_bill_of_lading,"Batch#":batch,
-                                                                  "Warehouse":"OLYM","Vessel":vessel_suzano,"Voyage #":voyage_suzano,"Grade":wrap,"Quantity":quantity,
+                                                 "Warehouse":"OLYM","Vessel":vessel_suzano,"Voyage #":voyage_suzano,"Grade":wrap,"Quantity":quantity,
                                                  "Metric Ton": quantity*2, "ADMT":admt,"Mode of Transportation":transport_type}})
                             suzano_report=json.dumps(suzano_report)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket("olym_suzano")
+                            bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"suzano_report.json")
                             blob.upload_from_string(suzano_report)
 
@@ -2425,12 +2984,12 @@ if authentication_status:
                         
                         json_data = json.dumps(info)
                         storage_client = storage.Client()
-                        bucket = storage_client.bucket("olym_suzano")
+                        bucket = storage_client.bucket(target_bucket)
                         blob = bucket.blob(rf"release_orders/{vessel}/{current_release_order}.json")
                         blob.upload_from_string(json_data)
 
                         try:
-                            release_order_database=gcp_download("olym_suzano",rf"release_orders/RELEASE_ORDERS.json")
+                            release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                             release_order_database=json.loads(release_order_database)
                         except:
                             release_order_database={}
@@ -2438,7 +2997,7 @@ if authentication_status:
                         release_order_database[current_release_order][current_sales_order]["remaining"]=release_order_database[current_release_order][current_sales_order]["remaining"]-quantity
                         release_order_database=json.dumps(release_order_database)
                         storage_client = storage.Client()
-                        bucket = storage_client.bucket("olym_suzano")
+                        bucket = storage_client.bucket(target_bucket)
                         blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                         blob.upload_from_string(release_order_database)
                         with open('placeholder.txt', 'r') as f:
@@ -2469,8 +3028,16 @@ if authentication_status:
                 
                         file_path = 'temp_file.txt'  # Use the path of the temporary file
                 
+                        
+                        upload_cs_file("olym_suzano", 'temp_file.txt',rf"EDIS/{vessel}/{file_name}")
+                        if load_mf_number_issued:
+                            mf_numbers_for_load[vessel][release_order_number].remove(load_mf_number)
+                            mf_numbers_for_load=json.dumps(mf_numbers_for_load)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"release_orders/mf_numbers.json")
+                            blob.upload_from_string(mf_numbers_for_load)
                         send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
-                        upload_cs_file("olym_suzano", 'temp_file.txt',rf"EDIS/{vessel}/{file_name}") 
                         
                     else:   ###cancel bill of lading
                         pass
@@ -2488,7 +3055,7 @@ if authentication_status:
  
     elif username == 'olysuzanodash':
         
-        Inventory=gcp_csv_to_df(target_bucket, "Inventory.csv")
+        Inventory=gcp_csv_to_df(target_bucket, "kirkenes_with_ghosts_found.csv")
         data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
         bill_of_ladings=json.loads(data)
         mill_info=json.loads(gcp_download(target_bucket,rf"mill_info.json"))
@@ -2497,7 +3064,7 @@ if authentication_status:
             
             daily1,daily2,daily3=st.tabs(["TODAY'SHIPMENTS","TRUCKS ENROUTE","TRUCKS AT DESTINATION"])
             with daily1:
-                now=datetime.datetime.now()-datetime.timedelta(hours=7)
+                now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
                 st.markdown(f"**SHIPPED TODAY ON {datetime.datetime.strftime(now.date(),'%b %d, %Y')} - Indexed By Terminal Bill Of Lading**")     
                 df_bill=pd.DataFrame(bill_of_ladings).T
                 df_bill=df_bill[["vessel","release_order","destination","sales_order","ocean_bill_of_lading","grade","carrier_id","vehicle","quantity","issued"]]
@@ -2585,16 +3152,30 @@ if authentication_status:
                 suzano_report["Batch#"]=[str(i) for i in suzano_report["Batch#"]]
                 daily_suzano=suzano_report.copy()
                 daily_suzano["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suzano_report["Date Shipped"]]
-                daily_suzano=daily_suzano[daily_suzano["Date"]==now.date()]
+                daily_suzano_=daily_suzano[daily_suzano["Date"]==now.date()]
                 choose = st.radio(
                                 "Select Daily or Accumulative Report",
-                                ["DAILY", "ACCUMULATIVE"])
+                                ["DAILY", "ACCUMULATIVE", "FIND BY DATE"])
                 if choose=="DAILY":
-                    st.dataframe(daily_suzano)
-                    csv=convert_df(daily_suzano)
+                    daily_suzano_=daily_suzano_.reset_index(drop=True)
+                    daily_suzano_.index=[i+1 for i in daily_suzano_.index]
+                    daily_suzano_.loc["TOTAL"]=daily_suzano_[["Quantity","Metric Ton","ADMT"]].sum()
+                    st.dataframe(daily_suzano_)
+                    csv=convert_df(daily_suzano_)
+                    file_name=f'OLYMPIA_DAILY_REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
+                elif choose=="FIND BY DATE":
+                    required_date=st.date_input("CHOOSE DATE",key="dssar")
+                    filtered_suzano=daily_suzano[daily_suzano["Date"]==required_date]
+                    filtered_suzano=filtered_suzano.reset_index(drop=True)
+                    filtered_suzano.index=[i+1 for i in filtered_suzano.index]
+                    filtered_suzano.loc["TOTAL"]=filtered_suzano[["Quantity","Metric Ton","ADMT"]].sum()
+                    st.dataframe(filtered_suzano)
+                    csv=convert_df(filtered_suzano)
+                    file_name=f'OLYMPIA_SHIPMENT_REPORT-{datetime.datetime.strftime(required_date,"%m-%d,%Y")}.csv'
                 else:
                     st.dataframe(suzano_report)
                     csv=convert_df(suzano_report)
+                    file_name=f'OLYMPIA_ALL_SHIPMENTS to {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
                 
                 
                 
@@ -2604,7 +3185,7 @@ if authentication_status:
                 st.download_button(
                     label="DOWNLOAD REPORT AS CSV",
                     data=csv,
-                    file_name=f'OLYMPIA_DAILY_REPORT{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%Y_%m_%d")}.csv',
+                    file_name=file_name,
                     mime='text/csv')
             except:
                 st.write("NO REPORTS RECORDED")
@@ -2628,41 +3209,80 @@ if authentication_status:
 
             
         with inv4:
+        
             inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
             inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
+            
             maintenance=False
+                            
             if maintenance:
                 st.title("CURRENTLY UNDER MAINTENANCE, CHECK BACK LATER")
+
+                           
             else:
-                kf=inv_bill_of_ladings.iloc[1:].copy()
-                kf['issued'] = pd.to_datetime(kf['issued'])
-                kf['Date'] = kf['issued'].dt.date
-                kf['Date'] = pd.to_datetime(kf['Date'])
-                # Create a date range from the minimum to maximum date in the 'issued' column
-                date_range = pd.date_range(start=kf['Date'].min(), end=kf['Date'].max(), freq='D')
-                
-                # Create a DataFrame with the date range
-                date_df = pd.DataFrame({'Date': date_range})
-                # Merge the date range DataFrame with the original DataFrame based on the 'Date' column
-                merged_df = pd.merge(date_df, kf, how='left', on='Date')
-                merged_df['quantity'].fillna(0, inplace=True)
-                merged_df_grouped=merged_df.groupby('Date')[['quantity']].sum()
-                merged_df_grouped['Accumulated_Quantity'] = merged_df_grouped['quantity'].cumsum()
-                merged_df_grouped["Accumulated_Tonnage"]=merged_df_grouped['Accumulated_Quantity']*2
-                merged_df_grouped["Remaining_Units"]=[9200-i for i in merged_df_grouped['Accumulated_Quantity']]
-                merged_df_grouped["Remaining_Tonnage"]=merged_df_grouped["Remaining_Units"]*2
-                merged_df_grouped.rename(columns={'quantity':"Shipped Quantity", 'Accumulated_Quantity':"Shipped Qty To_Date",
-                                                  'Accumulated_Tonnage':"Shipped Tonnage To_Date"},inplace=True)
-                merged_df_grouped=merged_df_grouped.reset_index()
-                merged_df_grouped["Date"]=merged_df_grouped['Date'].dt.strftime('%m-%d-%Y, %A')
-                merged_df_grouped=merged_df_grouped.set_index("Date",drop=True)
-                st.dataframe(merged_df_grouped)
-                csv_inventory=convert_df(merged_df_grouped)
-                st.download_button(
+                inv4tab1,inv4tab2=st.tabs(["DAILY SHIPMENT REPORT","INVENTORY"])
+                with inv4tab1:
+                    
+                    kf=inv_bill_of_ladings.iloc[1:].copy()
+                    kf['issued'] = pd.to_datetime(kf['issued'])
+                    kf['Date'] = kf['issued'].dt.date
+                    kf['Date'] = pd.to_datetime(kf['Date'])
+                    # Create a date range from the minimum to maximum date in the 'issued' column
+                    date_range = pd.date_range(start=kf['Date'].min(), end=kf['Date'].max(), freq='D')
+                    
+                    # Create a DataFrame with the date range
+                    date_df = pd.DataFrame({'Date': date_range})
+                    # Merge the date range DataFrame with the original DataFrame based on the 'Date' column
+                    merged_df = pd.merge(date_df, kf, how='left', on='Date')
+                    merged_df['quantity'].fillna(0, inplace=True)
+                    merged_df['Shipped Tonnage']=merged_df['quantity']*2
+                    merged_df_grouped=merged_df.groupby('Date')[['quantity','Shipped Tonnage']].sum()
+                    merged_df_grouped['Accumulated_Quantity'] = merged_df_grouped['quantity'].cumsum()
+                    merged_df_grouped["Accumulated_Tonnage"]=merged_df_grouped['Accumulated_Quantity']*2
+                    merged_df_grouped["Remaining_Units"]=[9200-i for i in merged_df_grouped['Accumulated_Quantity']]
+                    merged_df_grouped["Remaining_Tonnage"]=merged_df_grouped["Remaining_Units"]*2
+                    merged_df_grouped.rename(columns={'quantity':"Shipped Quantity", 'Accumulated_Quantity':"Shipped Qty To_Date",
+                                                      'Accumulated_Tonnage':"Shipped Tonnage To_Date"},inplace=True)
+                    merged_df_grouped=merged_df_grouped.reset_index()
+                    merged_df_grouped["Date"]=merged_df_grouped['Date'].dt.strftime('%m-%d-%Y, %A')
+                    merged_df_grouped=merged_df_grouped.set_index("Date",drop=True)
+                    st.dataframe(merged_df_grouped)
+                    csv_inventory=convert_df(merged_df_grouped)
+                    st.download_button(
                         label="DOWNLOAD INVENTORY REPORT AS CSV",
                         data=csv_inventory,
-                        file_name=f'INVENTORY REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%Y_%m_%d")}.csv',
+                        file_name=f'INVENTORY REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
                         mime='text/csv')            
+                with inv4tab2:
+                    kirkenes_updated=gcp_csv_to_df(target_bucket,rf"kirkenes_updated.csv")
+                    kirkenes_updated["Batch"]=kirkenes_updated["Batch"].astype(str)
+                    st.write(kirkenes_updated)
+                   #if st.button("CLICK TO RE-RUN INVENTORY",key="tyuris"):
+                   #     kirkenes_updated=gcp_csv_to_df(target_bucket,rf"kirkenes_with_ghosts_found.csv")
+                    #    for line in inv_bill_of_ladings.loads[1:]:
+                    #        for unit in line.keys():
+                    #            kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Shipped"]=kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Shipped"]+line[unit]*8
+                     #           kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Remaining"]=kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Remaining"]-line[unit]*8
+                        
+                        
+                     #   temp=kirkenes_updated.to_csv("temp.csv",index=False)
+                     #   upload_cs_file(target_bucket, 'temp.csv',rf"kirkenes_updated.csv") 
+                    no_of_unaccounted=Inventory[Inventory["Accounted"]==False]["Bales"].sum()/8
+                    st.write(f'**Unaccounted Units Registered : {no_of_unaccounted} Units/{no_of_unaccounted*2} Tons**')
+                    temp1=kirkenes_updated.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
+                    temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
+                    temp.insert(0,"Total",temp1.Bales.values)
+                    temp["Remaining"]=temp.Total-temp.quantity
+                    temp.columns=["Total","Shipped","Remaining"]
+                    temp.loc["TOTAL"]=temp.sum(axis=0)
+                    tempo=temp*2
+                    inv_col1,inv_col2=st.columns([2,2])
+                    with inv_col1:
+                        st.subheader("By Ocean BOL,UNITS")
+                        st.dataframe(temp)
+                    with inv_col2:
+                        st.subheader("By Ocean BOL,TONS")
+                        st.dataframe(tempo)     
                        
                     
                     
@@ -2692,7 +3312,7 @@ if authentication_status:
                 st.download_button(
                     label="DOWNLOAD WEEKLY REPORT AS CSV",
                     data=csv_weekly,
-                    file_name=f'OLYMPIA WEEKLY SHIPMENT REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%Y_%m_%d")}.csv',
+                    file_name=f'OLYMPIA WEEKLY SHIPMENT REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
                     mime='text/csv')
                 zf['issued'] = pd.to_datetime(zf['issued'])                   
                    

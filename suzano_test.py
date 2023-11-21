@@ -385,7 +385,7 @@ if authentication_status:
                 st.write("# Score Table")
                 
                 # Display existing scores
-                if not st.session_state.scores.empty:
+                if not len(st.session_state.scores)>0:
                     st.write(st.session_state.scores)
                 else:
                     st.write("No scores yet.")

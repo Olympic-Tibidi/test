@@ -356,21 +356,19 @@ if authentication_status:
                 occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
                 st.write(occ_codes)
                
-                if "scores" not in st.session_state:
+               if "scores" not in st.session_state:
                     st.session_state.scores = [
-                        {"code": "", "qty":0,"hours": 0, "OT": 0},
+                        {"code": "", "qty": 0, "hours": 0, "ot": 0},
                     ]
                 
-                if code not in st.session_state:
-                    st.session_state.code=None
-                if qty not in st.session_state:
-                    st.session_state.qty=0
-                if hours not in st.session_state:
-                    st.session_state.hours=0
-                if ot not in st.session_state:
-                    st.session_state.ot=0
-                    
-                
+                if "code" not in st.session_state:
+                    st.session_state.code = None
+                if "qty" not in st.session_state:
+                    st.session_state.qty = 0
+                if "hours" not in st.session_state:
+                    st.session_state.hours = 0
+                if "ot" not in st.session_state:
+                    st.session_state.ot = 0
                 
                 
                 def new_scores():
@@ -379,7 +377,7 @@ if authentication_status:
                             "code": st.session_state.code,
                             "qty": st.session_state.qty,
                             "hours": st.session_state.hours,
-                            "ot": st.session_state.ot
+                            "ot": st.session_state.ot,
                         }
                     )
                 
@@ -387,16 +385,22 @@ if authentication_status:
                 st.write("# Score table")
                 
                 score_df = pd.DataFrame(st.session_state.scores)
-                #score_df["Total Hours"] = score_df["hours"] + score_df["OT"]
-                
                 st.write(score_df)
                 
                 st.write("# Add a new score")
                 with st.form("new_score", clear_on_submit=True):
-                    code = st.selectbox("Occupation Code",[i for i in occ_codes.index], key="name")
-                    qt = st.number_input("Quantity", key="pushups", step=1, value=0, min_value=0)
-                    hours = st.number_input("Hours", key="situpsq", step=1, value=0, min_value=0),
-                    ot = st.number_input("OT", key="situps", step=1, value=0, min_value=0)
+                    st.session_state.code = st.selectbox(
+                        "Occupation Code", [i for i in occ_codes.index], key="name"
+                    )
+                    st.session_state.qty = st.number_input(
+                        "Quantity", key="pushups", step=1, value=0, min_value=0
+                    )
+                    st.session_state.hours = st.number_input(
+                        "Hours", key="situpsq", step=1, value=0, min_value=0
+                    )
+                    st.session_state.ot = st.number_input(
+                        "OT", key="situps", step=1, value=0, min_value=0
+                    )
                     st.form_submit_button("Submit", on_click=new_scores)
             def download_files_in_folder(bucket, folder_name, output_directory):
                 blob_iterator = bucket.list_blobs(prefix=folder_name)

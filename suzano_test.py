@@ -365,9 +365,9 @@ if authentication_status:
                 def new_scores():
                     st.session_state.scores.append(
                         {
-                            "Code": st.session_state.code,
-                            "Qty": st.session_state.qty,
-                            "Hours": st.session_state.hours,
+                            "code": st.session_state.code,
+                            "qty": st.session_state.qty,
+                            "hours": st.session_state.hours,
                             "OT": st.session_state.ot
                         }
                     )
@@ -376,7 +376,7 @@ if authentication_status:
                 st.write("# Score table")
                 
                 score_df = pd.DataFrame(st.session_state.scores)
-                score_df["Total Hours"] = score_df["Hours"] + score_df["OT"]
+                score_df["Total Hours"] = score_df["hours"] + score_df["OT"]
                 
                 st.write(score_df)
                 

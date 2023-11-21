@@ -368,14 +368,18 @@ if authentication_status:
                 
                 # Function to add a new score to the DataFrame
                 def new_scores():
-                    st.session_state.scores.append(
+                    new_score = pd.DataFrame(
                         {
-                            "Code": st.session_state.code,
-                            "Quantity": st.session_state.qty,
-                            "Hours": st.session_state.hours,
-                            "OT": st.session_state.ot,
+                            "Code": [st.session_state.code],
+                            "Quantity": [st.session_state.qty],
+                            "Hours": [st.session_state.hours],
+                            "OT": [st.session_state.ot],
                         }
                     )
+                    st.session_state.scores = pd.concat(
+                        [st.session_state.scores, new_score], ignore_index=True
+                    )
+
                 
                 # Main Streamlit app
                 st.write("# Score Table")

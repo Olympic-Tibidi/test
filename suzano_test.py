@@ -390,7 +390,7 @@ if authentication_status:
                 st.write("# Add a new score")
                 with st.form("new_score", clear_on_submit=True):
                     st.session_state.code = st.selectbox(
-                        "Occupation Code", [i for i in occ_codes.index], key="name"
+                        "Occupation Code", [i for i in occ_codes.index], key="nameff"
                     )
                     st.session_state.qty = st.number_input(
                         "Quantity", key="pushups", step=1, value=0, min_value=0

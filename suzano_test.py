@@ -347,9 +347,11 @@ if authentication_status:
             
         if select=="DATA BACKUP" :
             st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
-            try_lan=False
+            try_lan=True
             if try_lan:
-                
+                assessment_rates=gcp_download(target_bucket,rf"occ_codes.json")
+                assessment_rates=json.loads(assessment_rates)
+                st.write(assessment_rates)
                 scorecard = pd.DataFrame(columns=['User', 'Hour', 'Ot', 'Totaled'])
     
                 # Input your data using experimental data editor

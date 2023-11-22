@@ -381,7 +381,7 @@ if authentication_status:
                             "Shift": [st.session_state.shift],
                             "Quantity": [st.session_state.qty],
                             "Hours": [st.session_state.hours]*qty,
-                            "OT": [st.session_state.ot]*qty,
+                            "OT": [st.session_state.ot*qty,]
                             "Hour Cost": hour_cost*qty,
                             "OT Cost": ot_cost*qty,
                             "Total Wage": round(wage_cost*qty,2),

@@ -394,7 +394,7 @@ if authentication_status:
                
                 
                 # Form for adding a new score
-                st.write("# Add a New Score")
+                st.write("# Add a New Rank")
                 with st.form("new_score_form"):
                     # Dropdown for selecting Code
                     st.session_state.code = st.selectbox(
@@ -422,10 +422,10 @@ if authentication_status:
                 # If form is submitted, add the new score
                 if submitted:
                     new_scores()
-                    st.success("Score added successfully!")
+                    st.success("Rank added successfully!")
                 
                 # Display the updated DataFrame
-                st.write("# Updated Score Table")
+                st.write("# Updated Cost Table")
                 st.experimental_data_editor(pd.DataFrame(st.session_state.scores))
                 
                 index=st.number_input("Enter Index To Delete",step=1,key="1224aa")

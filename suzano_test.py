@@ -370,9 +370,9 @@ if authentication_status:
                     total_hours=st.session_state.hours+st.session_state.ot
                     hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,"1ST"]
                     ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,"1OT"]
-                    
+                    401k=2.81 if st.session_state.code=="FOREMAN - DOCK" else 0.75
                     wage_cost=hour_cost+ot_cost
-                    benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*siu/100+total_hours*1.58+total_hours*0.14+total_hours*29.15+total_hours*0.75
+                    benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*siu/100+total_hours*1.58+total_hours*0.14+total_hours*29.15+total_hours*401k
                     new_score = pd.DataFrame(
                         {
                             "Code": [st.session_state.code],
@@ -428,7 +428,7 @@ if authentication_status:
                 st.write("# Updated Score Table")
                 st.experimental_data_editor(pd.DataFrame(st.session_state.scores))
                 
-                index=st.number_input("Enter Index Number",step=1,key="1224aa")
+                index=st.number_input("Enter Index To Delete",step=1,key="1224aa")
                 if st.button("DELETE BY INDEX"):
                     st.session_state.scores=st.session_state.scores.drop(index)
                     st.session_state.scores.reset_index(drop=True,inplace=True)

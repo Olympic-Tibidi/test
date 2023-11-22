@@ -349,6 +349,7 @@ if authentication_status:
             st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
             try_lan=True
             if try_lan:
+                foreman=False
                 select_year=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
                 year=select_year.split(' ')[1]
                 assessment_rates=gcp_download(target_bucket,rf"occ_codes{year}.json")
@@ -373,7 +374,7 @@ if authentication_status:
                 ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"]}
                 # Function to add a new score to the DataFrame
                 def new_scores():
-                    foreman=False
+                    
                     if st.session_state.code==('FOREMAN - DOCK','0129'):
                         foreman=True
                     pension=pma_rates[year]["LS_401k"]

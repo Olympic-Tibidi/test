@@ -374,7 +374,7 @@ if authentication_status:
                     new_score = pd.DataFrame(
                         {
                             "Code": [st.session_state.code],
-                            "Shift": [st.session_state.shift]
+                            "Shift": [st.session_state.shift],
                             "Quantity": [st.session_state.qty],
                             "Hours": [st.session_state.hours],
                             "OT": [st.session_state.ot],

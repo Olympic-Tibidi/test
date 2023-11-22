@@ -350,7 +350,7 @@ if authentication_status:
             try_lan=True
             if try_lan:
                 select_year=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
-                assessment_rates=gcp_download(target_bucket,rf"occ_codes{select_year.split(" ")[1].json")
+                assessment_rates=gcp_download(target_bucket,rf"occ_codes{select_year.split(' ')[1].json")
                 assessment_rates=json.loads(assessment_rates)
                 occ_codes=pd.DataFrame(assessment_rates).T
                 occ_codes=occ_codes.rename_axis('Occ_Code')

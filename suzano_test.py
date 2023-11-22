@@ -434,6 +434,7 @@ if authentication_status:
                 # Display the updated DataFrame
                 st.write("# Updated Score Table")
                 st.experimental_data_editor(pd.DataFrame(st.session_state.scores))
+                st.write(st.session_state.scores)
                 if st.button("DELETE BY INDEX"):
                     st.session_state.scores.drop([0])
             def download_files_in_folder(bucket, folder_name, output_directory):

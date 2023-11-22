@@ -373,17 +373,23 @@ if authentication_status:
                 ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"]}
                 # Function to add a new score to the DataFrame
                 def new_scores():
-                    st.write(st.session_state.code)
+                    
                     qty=st.session_state.qty
                     total_hours=st.session_state.hours+st.session_state.ot
                     hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
                     ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
-                    pension=pma_rates[year]["Foreman_401k"] if st.session_state.code=="FOREMAN - DOCK" else pma_rates[year]["LS_401k"]
                     wage_cost=hour_cost+ot_cost
                     benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*st.session_state.siu/100+total_hours*pma_rates[year]["Cargo_Dues"]+total_hours*pma_rates[year]["Electronic_Input"]+total_hours*pma_rates[year]["Benefits"]+total_hours*pension
                     total_cost=wage_cost+benefits
-                    
-                    markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100
+                    foreman=False
+                    if st.session_state.code==('FOREMAN - DOCK','0129'):
+                        markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100
+                        pension=pma_rates[year]["Foreman_401k"]
+                        foreman=True
+                        
+                    else:
+                        markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100
+                        pension=pma_rates[year]["LS_401k"]
                     invoice=total_cost+markup
                     new_score = pd.DataFrame(
                         {
@@ -444,6 +450,8 @@ if authentication_status:
                 # If form is submitted, add the new score
                 if submitted:
                     new_scores()
+                    if foreman:
+                        st.write(st.session_state.code)
                     st.success("Rank added successfully!")
                 
                 # Display the updated DataFrame

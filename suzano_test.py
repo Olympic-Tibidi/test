@@ -353,7 +353,7 @@ if authentication_status:
                 year=select_year.split(' ')[1]
                 assessment_rates=gcp_download(target_bucket,rf"occ_codes{year}.json")
                 assessment_rates=json.loads(assessment_rates)
-                pma_rates=gcp_download(target_bucket,rf"pma_rates.json")
+                pma_rates=gcp_download(target_bucket,rf"pma_dues.json")
                 pma_rates=json.loads(pma_rates)
                 pma_rates_=pd.DataFrame(pma_rates).T
                 occ_codes=pd.DataFrame(assessment_rates).T

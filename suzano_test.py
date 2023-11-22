@@ -360,11 +360,14 @@ if authentication_status:
                 occ_codes=pd.DataFrame(assessment_rates).T
                 occ_codes=occ_codes.rename_axis('Occ_Code')
                 occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
-                lan1,lan2=st.columns([2,2])
-                with lan1:
-                    st.write(occ_codes)
-                with lan2:
-                    st.write(pma_rates[year])
+                rates=st.radio("SELECT TO DISPLAY RATE TABLE FOR THE YEAR",key="iueis")
+                if rates:
+                    
+                    lan1,lan2=st.columns([2,2])
+                    with lan1:
+                        st.write(occ_codes)
+                    with lan2:
+                        st.write(pma_rates[year])
                 
                 
                 if "scores" not in st.session_state:
@@ -457,15 +460,13 @@ if authentication_status:
                 num_code=st.session_state.code[1].strip()
                 if submitted:
                     new_scores()
-                    if foreman:
-                        st.success("senin amina koyim!")
+                    
                     st.success("Rank added successfully!")
                 # Display the updated DataFrame
                 st.write("# Updated Cost Table")
-                st.write(st.session_state.code)
-                st.write(num_code)
-                if foreman:
-                    st.write(st.session_state.code)
+                
+               
+                
                 display=pd.DataFrame(st.session_state.scores)
                 display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Mark UP","INVOICE"]].sum()
                 display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Mark UP","INVOICE"]]

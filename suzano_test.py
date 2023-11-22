@@ -373,6 +373,7 @@ if authentication_status:
                 ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"]}
                 # Function to add a new score to the DataFrame
                 def new_scores():
+                    st.write(st.session_state.code)
                     qty=st.session_state.qty
                     total_hours=st.session_state.hours+st.session_state.ot
                     hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
@@ -381,6 +382,7 @@ if authentication_status:
                     wage_cost=hour_cost+ot_cost
                     benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*st.session_state.siu/100+total_hours*pma_rates[year]["Cargo_Dues"]+total_hours*pma_rates[year]["Electronic_Input"]+total_hours*pma_rates[year]["Benefits"]+total_hours*pension
                     total_cost=wage_cost+benefits
+                    
                     markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100
                     invoice=total_cost+markup
                     new_score = pd.DataFrame(
@@ -412,6 +414,7 @@ if authentication_status:
 
                     st.session_state.siu=st.number_input("ENTER SIU PERCENTAGE",step=1,key="kdsha")
                     st.session_state.markup=st.number_input("ENTER MARKUP",step=1,key="wer")
+                    st.session_state.f_markup=st.number_input("ENTER FOREMAN MARKUP (IF DIFFERENT)",step=1,key="wer")
                     st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND"])
 
                     

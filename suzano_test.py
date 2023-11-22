@@ -426,7 +426,7 @@ if authentication_status:
                 with sub_rate1:
                     
                     # Form for adding a new score
-                    st.write("## Add a New Rank")
+                    st.write("### Add a New Rank")
                     with st.form("new_score_form"):
     
                         st.session_state.siu=st.number_input("ENTER SIU PERCENTAGE",step=1,key="kdsha")
@@ -467,7 +467,7 @@ if authentication_status:
                 with sub_rate2:
                     
                     # Display the updated DataFrame
-                    st.write("# Updated Cost Table")
+                    st.write("### Updated Cost Table")
                     
                    
                     

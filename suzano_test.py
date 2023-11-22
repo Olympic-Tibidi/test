@@ -372,7 +372,7 @@ if authentication_status:
                             "Quantity": [st.session_state.qty],
                             "Hours": [st.session_state.hours],
                             "OT": [st.session_state.ot],
-                            "Hour Cost": [st.session_state.ot*occ_codes.loc[("DESCRIPTION","Occ_Code"),"1ST"]],
+                            "Hour Cost": [st.session_state.ot*occ_codes.loc[st.session_state.code,"1ST"]],
                         }
                     )
                     st.session_state.scores = pd.concat(

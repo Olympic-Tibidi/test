@@ -433,7 +433,7 @@ if authentication_status:
                 
                 # Display the updated DataFrame
                 st.write("# Updated Cost Table")
-                st.session_state.scores.loc["Total"]=st.session_state.scores.sum()
+                st.session_state.scores.loc["Total"]=st.session_state.scores["Quantity","Hours","OT","Hours Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Markup","INVOICE"].sum()
                 st.dataframe(pd.DataFrame(st.session_state.scores))
                 
                 index=st.number_input("Enter Index To Delete",step=1,key="1224aa")

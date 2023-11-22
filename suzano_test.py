@@ -391,14 +391,7 @@ if authentication_status:
                         [st.session_state.scores, new_score], ignore_index=True
                     )
                 
-                # Main Streamlit app
-                st.write("# Score Table")
-                
-                # Display existing scores
-                if not len(st.session_state.scores)>0:
-                    st.write(st.session_state.scores)
-                else:
-                    st.write("No scores yet.")
+               
                 
                 # Form for adding a new score
                 st.write("# Add a New Score")

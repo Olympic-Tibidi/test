@@ -433,7 +433,7 @@ if authentication_status:
                 
                 # Display the updated DataFrame
                 st.write("# Updated Score Table")
-                st.experimental_dataframe(pd.DataFrame(st.session_state.scores))
+                st.experimental_data_editor(pd.DataFrame(st.session_state.scores))
             def download_files_in_folder(bucket, folder_name, output_directory):
                 blob_iterator = bucket.list_blobs(prefix=folder_name)
             

@@ -384,8 +384,8 @@ if authentication_status:
                             "Total Wage": wage_cost,
                             "Benefits&PMA":benefits,
                             "TOTAL COST":wage_cost+benefits,
-                            "Mark UP":(wage_cost+benefits)*markup,
-                            "INVOICE":wage_cost+benefits+((wage_cost+benefits)*markup)
+                            "Mark UP":(wage_cost+benefits)*markup/100,
+                            "INVOICE":wage_cost+benefits+((wage_cost+benefits)*markup/100)
                             
                         }
                     )

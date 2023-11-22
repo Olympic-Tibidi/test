@@ -357,7 +357,8 @@ if authentication_status:
                 st.write(occ_codes)
                
                 
-                
+                siu=st.number_input("ENTER SIU PERCENTAGE",key="kdsha")
+                markup=st.number_input("ENTER MARKUP",key="wer")
                 if "scores" not in st.session_state:
                     st.session_state.scores = pd.DataFrame(
                         {"Code": [], "Quantity": [], "Hours": [], "OT": []}
@@ -366,13 +367,23 @@ if authentication_status:
                # ranks["TRACTOR-SEMI-DOCK"]["pma"]=(hours+ot)*1.58*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*0.14*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*29.15*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*0.75*ranks["TRACTOR-SEMI-DOCK"]["qt"]
                 # Function to add a new score to the DataFrame
                 def new_scores():
+                    total_hours=st.session_state.hours+st.session_state.ot
+                    hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,"1ST"]
+                    ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,"1OT"]
+                    benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*siu/100+total_hours*1.58+total_hours*0.14+total_hours*29.15+total_hours*0.75
+                    wage_cost=hour_cost+ot_cost
                     new_score = pd.DataFrame(
                         {
                             "Code": [st.session_state.code],
                             "Quantity": [st.session_state.qty],
                             "Hours": [st.session_state.hours],
                             "OT": [st.session_state.ot],
-                            "Hour Cost": [st.session_state.ot*occ_codes.loc[st.session_state.code,"1ST"]],
+                            "Hour Cost": hour_cost,
+                            "OT Cost": ot_cost,
+                            "Total Wage": wage_cost,
+                            "Benefits&PMA":benefits
+                            "TOTAL COST":wage_cost+benefits
+                            
                         }
                     )
                     st.session_state.scores = pd.concat(

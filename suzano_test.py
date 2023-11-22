@@ -449,6 +449,15 @@ if authentication_status:
                 display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Mark UP","INVOICE"]].sum()
                 display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Mark UP","INVOICE"]]
                 st.dataframe(display)
+                csv=convert_df(display)
+                file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
+                st.download_button(
+                        label="DOWNLOAD GANG COST",
+                        data=csv,
+                        file_name=file_name,
+                        mime='text/csv')
+
+                
                 index=st.number_input("Enter Index To Delete",step=1,key="1224aa")
                 if st.button("DELETE BY INDEX"):
                     try:
@@ -456,6 +465,9 @@ if authentication_status:
                         st.session_state.scores.reset_index(drop=True,inplace=True)
                     except:
                         pass
+            
+            
+            
             def download_files_in_folder(bucket, folder_name, output_directory):
                 blob_iterator = bucket.list_blobs(prefix=folder_name)
             

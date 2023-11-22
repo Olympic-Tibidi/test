@@ -375,7 +375,7 @@ if authentication_status:
                 # Function to add a new score to the DataFrame
                 def new_scores():
                     
-                    if st.session_state.code=='FOREMAN - DOCK', '0129':
+                    if st.session_state.code==('FOREMAN - DOCK', '0129'):
                         foreman=True
                     else:
                         foreman=False

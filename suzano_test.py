@@ -455,7 +455,7 @@ if authentication_status:
                     submitted = st.form_submit_button("Submit")
                 
                 # If form is submitted, add the new score
-                num_code=st.session_state.code.split(" ")[-1].strip()
+                num_code=st.session_state.code.[1].strip()
                 if submitted:
                     new_scores()
                     if foreman:

@@ -365,6 +365,7 @@ if authentication_status:
                 ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"]}
                 # Function to add a new score to the DataFrame
                 def new_scores():
+                    qty=st.session_state.qty
                     total_hours=st.session_state.hours+st.session_state.ot
                     hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
                     ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
@@ -376,15 +377,15 @@ if authentication_status:
                             "Code": [st.session_state.code],
                             "Shift": [st.session_state.shift],
                             "Quantity": [st.session_state.qty],
-                            "Hours": [st.session_state.hours],
-                            "OT": [st.session_state.ot],
-                            "Hour Cost": hour_cost,
-                            "OT Cost": ot_cost,
-                            "Total Wage": round(wage_cost,2),
-                            "Benefits&PMA":round(benefits,2),
-                            "TOTAL COST":round(wage_cost+benefits,2),
-                            "Mark UP":round((wage_cost+benefits)*st.session_state.markup/100,2),
-                            "INVOICE":round(wage_cost+benefits+((wage_cost+benefits)*st.session_state.markup/100),2)
+                            "Hours": [st.session_state.hours]*qty,
+                            "OT": [st.session_state.ot]*qty,
+                            "Hour Cost": hour_cost*qty,
+                            "OT Cost": ot_cost*qty,
+                            "Total Wage": round(wage_cost*qty,2),
+                            "Benefits&PMA":round(benefits*qty,2),
+                            "TOTAL COST":round((wage_cost+benefits)*qty,2),
+                            "Mark UP":round(((wage_cost+benefits))*qty*st.session_state.markup/100,2),
+                            "INVOICE":round((wage_cost+benefits+((wage_cost+benefits))*qty*st.session_state.markup/100),2)
                             
                         }
                     )

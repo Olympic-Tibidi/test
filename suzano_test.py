@@ -383,7 +383,7 @@ if authentication_status:
                     if foreman:
                         pension=pma_rates[year]["Foreman_401k"]
                                  
-                  
+                    
                     qty=st.session_state.qty
                     total_hours=st.session_state.hours+st.session_state.ot
                     hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
@@ -450,11 +450,12 @@ if authentication_status:
                     st.session_state.ot = st.number_input(
                         "OT", step=1, value=0, min_value=0
                     )
-                
+                    
                     # Form submit button
                     submitted = st.form_submit_button("Submit")
                 
                 # If form is submitted, add the new score
+                num_code=st.session_state.code.split(" ")[-1].strip()
                 if submitted:
                     new_scores()
                     if foreman:
@@ -463,6 +464,7 @@ if authentication_status:
                 # Display the updated DataFrame
                 st.write("# Updated Cost Table")
                 st.write(st.session_state.code)
+                st.write(num_code)
                 if foreman:
                     st.write(st.session_state.code)
                 display=pd.DataFrame(st.session_state.scores)

@@ -373,7 +373,15 @@ if authentication_status:
                 ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"]}
                 # Function to add a new score to the DataFrame
                 def new_scores():
+                    foreman=False
+                    if st.session_state.code==('FOREMAN - DOCK','0129'):
+                        foreman=True
+                    pension=pma_rates[year]["LS_401k"]
+                    if foreman:
+                        pension=pma_rates[year]["Foreman_401k"]
                     
+                        
+                    invoice=total_cost+markup
                     qty=st.session_state.qty
                     total_hours=st.session_state.hours+st.session_state.ot
                     hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
@@ -381,15 +389,11 @@ if authentication_status:
                     wage_cost=hour_cost+ot_cost
                     benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*st.session_state.siu/100+total_hours*pma_rates[year]["Cargo_Dues"]+total_hours*pma_rates[year]["Electronic_Input"]+total_hours*pma_rates[year]["Benefits"]+total_hours*pension
                     total_cost=wage_cost+benefits
-                    foreman=False
-                    if st.session_state.code==('FOREMAN - DOCK','0129'):
-                        markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100
-                        pension=pma_rates[year]["Foreman_401k"]
-                        foreman=True
-                        
-                    else:
-                        markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100
-                        pension=pma_rates[year]["LS_401k"]
+                    markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100
+                    if foreman:
+                        markup=wage_cost*st.session_state.f_markup/100+benefits*st.session_state.f_markup/100
+                                      
+                   
                     invoice=total_cost+markup
                     new_score = pd.DataFrame(
                         {

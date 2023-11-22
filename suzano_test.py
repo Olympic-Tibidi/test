@@ -380,11 +380,11 @@ if authentication_status:
                             "OT": [st.session_state.ot],
                             "Hour Cost": hour_cost,
                             "OT Cost": ot_cost,
-                            "Total Wage": wage_cost,
-                            "Benefits&PMA":benefits,
-                            "TOTAL COST":wage_cost+benefits,
-                            "Mark UP":(wage_cost+benefits)*st.session_state.markup/100,
-                            "INVOICE":wage_cost+benefits+((wage_cost+benefits)*st.session_state.markup/100)
+                            "Total Wage": round(wage_cost,2)
+                            "Benefits&PMA":round(benefits,2),
+                            "TOTAL COST":round(wage_cost+benefits,2),
+                            "Mark UP":round((wage_cost+benefits)*st.session_state.markup/100,2),
+                            "INVOICE":round(wage_cost+benefits+((wage_cost+benefits)*st.session_state.markup/100),2)
                             
                         }
                     )

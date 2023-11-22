@@ -381,7 +381,7 @@ if authentication_status:
                             "Hour Cost": hour_cost,
                             "OT Cost": ot_cost,
                             "Total Wage": wage_cost,
-                            "Benefits&PMA":benefits
+                            "Benefits&PMA":benefits,
                             "TOTAL COST":wage_cost+benefits
                             
                         }

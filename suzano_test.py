@@ -436,7 +436,7 @@ if authentication_status:
                 st.experimental_data_editor(pd.DataFrame(st.session_state.scores))
                 st.write(st.session_state.scores)
                 if st.button("DELETE BY INDEX"):
-                    st.session_state.scores.drop([0])
+                    st.session_state.scores=st.session_state.scores.drop(0)
             def download_files_in_folder(bucket, folder_name, output_directory):
                 blob_iterator = bucket.list_blobs(prefix=folder_name)
             

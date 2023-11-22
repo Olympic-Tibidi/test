@@ -433,7 +433,7 @@ if authentication_status:
                 
                 # Display the updated DataFrame
                 st.write("# Updated Cost Table")
-                st.experimental_data_editor(pd.DataFrame(st.session_state.scores))
+                st.dataframe(pd.DataFrame(st.session_state.scores))
                 
                 index=st.number_input("Enter Index To Delete",step=1,key="1224aa")
                 if st.button("DELETE BY INDEX"):

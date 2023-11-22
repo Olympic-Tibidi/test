@@ -356,11 +356,7 @@ if authentication_status:
                 occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
                 st.write(occ_codes)
                
-                occ_codes = {
-                    "A001": "Occupation 1",
-                    "A002": "Occupation 2",
-                    "A003": "Occupation 3",
-                }
+                
                 
                 if "scores" not in st.session_state:
                     st.session_state.scores = pd.DataFrame(
@@ -395,7 +391,7 @@ if authentication_status:
                 with st.form("new_score_form"):
                     # Dropdown for selecting Code
                     st.session_state.code = st.selectbox(
-                        "Occupation Code", options=list(occ_codes.keys())
+                        "Occupation Code", options=list(occ_codes.index)
                     )
                 
                     # Number input for Quantity

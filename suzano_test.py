@@ -380,15 +380,15 @@ if authentication_status:
                             "Code": [st.session_state.code],
                             "Shift": [st.session_state.shift],
                             "Quantity": [st.session_state.qty],
-                            "Hours": [st.session_state.hours]*qty,
+                            "Hours": [st.session_state.hours*qty],
                             "OT": [st.session_state.ot*qty],
-                            "Hour Cost": hour_cost*qty,
-                            "OT Cost": ot_cost*qty,
-                            "Total Wage": round(wage_cost*qty,2),
-                            "Benefits&PMA":round(benefits*qty,2),
-                            "TOTAL COST":round(total_cost*qty,2),
-                            "Mark UP":round(markup*qty,2),
-                            "INVOICE":round(invoice*qty,2)
+                            "Hour Cost": [hour_cost*qty],
+                            "OT Cost": [ot_cost*qty],
+                            "Total Wage": [round(wage_cost*qty,2)],
+                            "Benefits&PMA":[round(benefits*qty,2)],
+                            "TOTAL COST":[round(total_cost*qty,2)],
+                            "Mark UP":[round(markup*qty,2)],
+                            "INVOICE":[round(invoice*qty,2)]
                             
                         }
                     )

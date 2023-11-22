@@ -370,8 +370,9 @@ if authentication_status:
                     total_hours=st.session_state.hours+st.session_state.ot
                     hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,"1ST"]
                     ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,"1OT"]
-                    benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*siu/100+total_hours*1.58+total_hours*0.14+total_hours*29.15+total_hours*0.75
+                    
                     wage_cost=hour_cost+ot_cost
+                    benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*siu/100+total_hours*1.58+total_hours*0.14+total_hours*29.15+total_hours*0.75
                     new_score = pd.DataFrame(
                         {
                             "Code": [st.session_state.code],

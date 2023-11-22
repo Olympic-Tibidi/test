@@ -377,6 +377,8 @@ if authentication_status:
                     
                     if st.session_state.code==('FOREMAN-DOCK','0129'):
                         foreman=True
+                    else:
+                        foreman=False
                     pension=pma_rates[year]["LS_401k"]
                     if foreman:
                         pension=pma_rates[year]["Foreman_401k"]
@@ -455,8 +457,6 @@ if authentication_status:
                 # If form is submitted, add the new score
                 if submitted:
                     new_scores()
-                    if foreman:
-                        st.write(st.session_state.code)
                     st.success("Rank added successfully!")
                 
                 # Display the updated DataFrame

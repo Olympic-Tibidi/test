@@ -391,7 +391,7 @@ if authentication_status:
                     st.session_state.scores = pd.concat(
                         [st.session_state.scores, new_score], ignore_index=True
                     )
-                
+                 
                
                 
                 # Form for adding a new score
@@ -433,6 +433,7 @@ if authentication_status:
                 
                 # Display the updated DataFrame
                 st.write("# Updated Cost Table")
+                st.session_state.scores.loc["Total"]=st.session_state.scores.sum()
                 st.dataframe(pd.DataFrame(st.session_state.scores))
                 
                 index=st.number_input("Enter Index To Delete",step=1,key="1224aa")

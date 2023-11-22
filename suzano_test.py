@@ -357,12 +357,10 @@ if authentication_status:
                 st.write(occ_codes)
                
                 
-                siu=st.number_input("ENTER SIU PERCENTAGE",step=1,key="kdsha")
-                markup=st.number_input("ENTER MARKUP",step=1,key="wer")
-                shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND"])
+                
                 if "scores" not in st.session_state:
                     st.session_state.scores = pd.DataFrame(
-                        {"Code": [], "Quantity": [], "Hours": [], "OT": []}
+                        {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": []}
                     )
                 ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"]}
                 # Function to add a new score to the DataFrame
@@ -376,6 +374,7 @@ if authentication_status:
                     new_score = pd.DataFrame(
                         {
                             "Code": [st.session_state.code],
+                            "Shift": [st.session_state.shift]
                             "Quantity": [st.session_state.qty],
                             "Hours": [st.session_state.hours],
                             "OT": [st.session_state.ot],
@@ -398,6 +397,12 @@ if authentication_status:
                 # Form for adding a new score
                 st.write("# Add a New Rank")
                 with st.form("new_score_form"):
+
+                    st.session_state.siu=st.number_input("ENTER SIU PERCENTAGE",step=1,key="kdsha")
+                    st.session_state.markup=st.number_input("ENTER MARKUP",step=1,key="wer")
+                    st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND"])
+
+                    
                     # Dropdown for selecting Code
                     st.session_state.code = st.selectbox(
                         "Occupation Code", options=list(occ_codes.index)

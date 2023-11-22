@@ -350,13 +350,20 @@ if authentication_status:
             try_lan=True
             if try_lan:
                 select_year=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
-                assessment_rates=gcp_download(target_bucket,rf"occ_codes{select_year.split(' ')[1]}.json")
+                year=select_year.split(' ')[1]
+                assessment_rates=gcp_download(target_bucket,rf"occ_codes{year}.json")
                 assessment_rates=json.loads(assessment_rates)
+                pma_rates=gcp_download(target_bucket,rf"pma_rates.json")
+                pma_rates=json.loads(pma_rates)
+                pma_rates_=pd.DataFrame(pma_rates).T
                 occ_codes=pd.DataFrame(assessment_rates).T
                 occ_codes=occ_codes.rename_axis('Occ_Code')
                 occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
-                st.write(occ_codes)
-               
+                lan1,lan2=st.columns([2,2])
+                with lan1:
+                    st.write(occ_codes)
+               with lan2:
+                   st.write(pma_rates[year])
                 
                 
                 if "scores" not in st.session_state:
@@ -370,9 +377,9 @@ if authentication_status:
                     total_hours=st.session_state.hours+st.session_state.ot
                     hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
                     ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
-                    pension=2.81 if st.session_state.code=="FOREMAN - DOCK" else 0.75
+                    pension=pma_rates[year]["Foreman_401k"] if st.session_state.code=="FOREMAN - DOCK" else pma_rates[year]["LS_401k"]
                     wage_cost=hour_cost+ot_cost
-                    benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*st.session_state.siu/100+total_hours*1.58+total_hours*0.14+total_hours*29.15+total_hours*pension
+                    benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*st.session_state.siu/100+total_hours*pma_rates[year]["Cargo_Dues"]+total_hours*pma_rates[year]["Electronic_Input"]+total_hours*pma_rates[year]["Benefits"]+total_hours*pension
                     total_cost=wage_cost+benefits
                     markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100
                     invoice=total_cost+markup

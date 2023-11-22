@@ -362,7 +362,8 @@ if authentication_status:
                     st.session_state.scores = pd.DataFrame(
                         {"Code": [], "Quantity": [], "Hours": [], "OT": []}
                     )
-                
+                ranks["TRACTOR-SEMI-DOCK"]["state"]=ranks["TRACTOR-SEMI-DOCK"]["cost"]*0.062+ranks["TRACTOR-SEMI-DOCK"]["cost"]*0.0145+ranks["TRACTOR-SEMI-DOCK"]["cost"]*0.0021792+ranks["TRACTOR-SEMI-DOCK"]["cost"]*siu/100
+                ranks["TRACTOR-SEMI-DOCK"]["pma"]=(hours+ot)*1.58*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*0.14*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*29.15*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*0.75*ranks["TRACTOR-SEMI-DOCK"]["qt"]
                 # Function to add a new score to the DataFrame
                 def new_scores():
                     new_score = pd.DataFrame(
@@ -371,6 +372,7 @@ if authentication_status:
                             "Quantity": [st.session_state.qty],
                             "Hours": [st.session_state.hours],
                             "OT": [st.session_state.ot],
+                            "Hour Cost": [st.session_state.ot*occ_codes.loc[("DESCRIPTION","Occ_Code"),"1ST"],
                         }
                     )
                     st.session_state.scores = pd.concat(

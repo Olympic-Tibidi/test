@@ -359,12 +359,12 @@ if authentication_status:
                 
                 siu=st.number_input("ENTER SIU PERCENTAGE",key="kdsha")
                 markup=st.number_input("ENTER MARKUP",key="wer")
+                shift=st.selectbox(["DAY","NIGHT","WEEKEND"])
                 if "scores" not in st.session_state:
                     st.session_state.scores = pd.DataFrame(
                         {"Code": [], "Quantity": [], "Hours": [], "OT": []}
                     )
-                #ranks["TRACTOR-SEMI-DOCK"]["state"]=ranks["TRACTOR-SEMI-DOCK"]["cost"]*0.062+ranks["TRACTOR-SEMI-DOCK"]["cost"]*0.0145+ranks["TRACTOR-SEMI-DOCK"]["cost"]*0.0021792+ranks["TRACTOR-SEMI-DOCK"]["cost"]*siu/100
-               # ranks["TRACTOR-SEMI-DOCK"]["pma"]=(hours+ot)*1.58*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*0.14*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*29.15*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*0.75*ranks["TRACTOR-SEMI-DOCK"]["qt"]
+              
                 # Function to add a new score to the DataFrame
                 def new_scores():
                     total_hours=st.session_state.hours+st.session_state.ot
@@ -434,7 +434,7 @@ if authentication_status:
                 # Display the updated DataFrame
                 st.write("# Updated Score Table")
                 st.experimental_data_editor(pd.DataFrame(st.session_state.scores))
-                st.write(st.session_state.scores)
+                
                 index=st.number_input("Enter Index Number",step=1,key="1224aa")
                 if st.button("DELETE BY INDEX"):
                     st.session_state.scores=st.session_state.scores.drop(index)

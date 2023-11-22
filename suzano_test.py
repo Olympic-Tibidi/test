@@ -377,8 +377,7 @@ if authentication_status:
                     
                     if num_code=='0129':
                         foreman=True
-                    else:
-                        foreman=False
+                    
                     pension=pma_rates[year]["LS_401k"]
                     if foreman:
                         pension=pma_rates[year]["Foreman_401k"]

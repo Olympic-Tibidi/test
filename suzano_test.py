@@ -435,7 +435,7 @@ if authentication_status:
                 st.write("# Updated Score Table")
                 st.experimental_data_editor(pd.DataFrame(st.session_state.scores))
                 st.write(st.session_state.scores)
-                index=st.number_input("Enter Index Number",key="1224aa")
+                index=st.number_input("Enter Index Number",step=1,key="1224aa")
                 if st.button("DELETE BY INDEX"):
                     st.session_state.scores=st.session_state.scores.drop(index)
                     st.session_state.scores.reset_index(drop=True,inplace=True)

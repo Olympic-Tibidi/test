@@ -461,6 +461,8 @@ if authentication_status:
                 
                 # Display the updated DataFrame
                 st.write("# Updated Cost Table")
+                if foreman:
+                    st.write(st.session_state.code)
                 display=pd.DataFrame(st.session_state.scores)
                 display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Mark UP","INVOICE"]].sum()
                 display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Mark UP","INVOICE"]]

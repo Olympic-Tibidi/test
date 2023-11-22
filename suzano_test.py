@@ -457,8 +457,9 @@ if authentication_status:
                 # If form is submitted, add the new score
                 if submitted:
                     new_scores()
+                    if foreman:
+                        st.success("senin amina koyim!")
                     st.success("Rank added successfully!")
-                
                 # Display the updated DataFrame
                 st.write("# Updated Cost Table")
                 if foreman:

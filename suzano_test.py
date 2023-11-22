@@ -366,8 +366,8 @@ if authentication_status:
                 # Function to add a new score to the DataFrame
                 def new_scores():
                     total_hours=st.session_state.hours+st.session_state.ot
-                    hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[shift][0]]
-                    ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[shift][1]]
+                    hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
+                    ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
                     pension=2.81 if st.session_state.code=="FOREMAN - DOCK" else 0.75
                     wage_cost=hour_cost+ot_cost
                     benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*st.session_state.siu/100+total_hours*1.58+total_hours*0.14+total_hours*29.15+total_hours*pension

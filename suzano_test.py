@@ -359,7 +359,7 @@ if authentication_status:
                 
                 siu=st.number_input("ENTER SIU PERCENTAGE",key="kdsha")
                 markup=st.number_input("ENTER MARKUP",key="wer")
-                shift=st.selectbox(["DAY","NIGHT","WEEKEND"])
+                shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND"])
                 if "scores" not in st.session_state:
                     st.session_state.scores = pd.DataFrame(
                         {"Code": [], "Quantity": [], "Hours": [], "OT": []}

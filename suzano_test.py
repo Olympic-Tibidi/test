@@ -360,7 +360,7 @@ if authentication_status:
                 
                 if "scores" not in st.session_state:
                     st.session_state.scores = pd.DataFrame(
-                        {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": []}
+                        {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":0,"OT Cost":0,"Total Wage":0,"Benefits&PMA":0,"TOTAL COST":0,"Mark UP":0,"INVOICE":0}
                     )
                 ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"]}
                 # Function to add a new score to the DataFrame

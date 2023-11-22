@@ -383,7 +383,9 @@ if authentication_status:
                             "OT Cost": ot_cost,
                             "Total Wage": wage_cost,
                             "Benefits&PMA":benefits,
-                            "TOTAL COST":wage_cost+benefits
+                            "TOTAL COST":wage_cost+benefits,
+                            "Mark UP":(wage_cost+benefits)*markup,
+                            "INVOICE":wage_cost+benefits+((wage_cost+benefits)*markup)
                             
                         }
                     )

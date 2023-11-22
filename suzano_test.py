@@ -346,7 +346,7 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
-            st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
+            
             try_lan=True
             if try_lan:
                 foreman=False
@@ -422,71 +422,75 @@ if authentication_status:
                     )
                  
                
-                
-                # Form for adding a new score
-                st.write("# Add a New Rank")
-                with st.form("new_score_form"):
-
-                    st.session_state.siu=st.number_input("ENTER SIU PERCENTAGE",step=1,key="kdsha")
-                    st.session_state.markup=st.number_input("ENTER MARKUP",step=1,key="wer")
-                    st.session_state.f_markup=st.number_input("ENTER FOREMAN MARKUP (IF DIFFERENT)",step=1,key="wfder")
-                    st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND"])
-
+                sub_rate1,sub_rate2=st.columns([3,7])
+                with subrate1:
                     
-                    # Dropdown for selecting Code
-                    st.session_state.code = st.selectbox(
-                        "Occupation Code", options=list(occ_codes.index)
-                    )
-                
-                    # Number input for Quantity
-                    st.session_state.qty = st.number_input(
-                        "Quantity", step=1, value=0, min_value=0
-                    )
-                
-                    # Number input for Hours
-                    st.session_state.hours = st.number_input(
-                        "Hours", step=1, value=0, min_value=0
-                    )
-                
-                    # Number input for OT
-                    st.session_state.ot = st.number_input(
-                        "OT", step=1, value=0, min_value=0
-                    )
+                    # Form for adding a new score
+                    st.write("# Add a New Rank")
+                    with st.form("new_score_form"):
+    
+                        st.session_state.siu=st.number_input("ENTER SIU PERCENTAGE",step=1,key="kdsha")
+                        st.session_state.markup=st.number_input("ENTER MARKUP",step=1,key="wer")
+                        st.session_state.f_markup=st.number_input("ENTER FOREMAN MARKUP (IF DIFFERENT)",step=1,key="wfder")
+                        st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND"])
+    
+                        
+                        # Dropdown for selecting Code
+                        st.session_state.code = st.selectbox(
+                            "Occupation Code", options=list(occ_codes.index)
+                        )
                     
-                    # Form submit button
-                    submitted = st.form_submit_button("Submit")
-                
-                # If form is submitted, add the new score
-                num_code=st.session_state.code[1].strip()
-                if submitted:
-                    new_scores()
+                        # Number input for Quantity
+                        st.session_state.qty = st.number_input(
+                            "Quantity", step=1, value=0, min_value=0
+                        )
                     
-                    st.success("Rank added successfully!")
-                # Display the updated DataFrame
-                st.write("# Updated Cost Table")
-                
-               
-                
-                display=pd.DataFrame(st.session_state.scores)
-                display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Mark UP","INVOICE"]].sum()
-                display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Mark UP","INVOICE"]]
-                st.dataframe(display)
-                csv=convert_df(display)
-                file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
-                st.download_button(
-                        label="DOWNLOAD GANG COST",
-                        data=csv,
-                        file_name=file_name,
-                        mime='text/csv')
-
-                
-                index=st.number_input("Enter Index To Delete",step=1,key="1224aa")
-                if st.button("DELETE BY INDEX"):
-                    try:
-                        st.session_state.scores=st.session_state.scores.drop(index)
-                        st.session_state.scores.reset_index(drop=True,inplace=True)
-                    except:
-                        pass
+                        # Number input for Hours
+                        st.session_state.hours = st.number_input(
+                            "Hours", step=1, value=0, min_value=0
+                        )
+                    
+                        # Number input for OT
+                        st.session_state.ot = st.number_input(
+                            "OT", step=1, value=0, min_value=0
+                        )
+                        
+                        # Form submit button
+                        submitted = st.form_submit_button("Submit")
+                    
+                    # If form is submitted, add the new score
+                    num_code=st.session_state.code[1].strip()
+                    if submitted:
+                        new_scores()
+                        
+                        st.success("Rank added successfully!")
+                with sub_rate2:
+                    
+                    # Display the updated DataFrame
+                    st.write("# Updated Cost Table")
+                    
+                   
+                    
+                    display=pd.DataFrame(st.session_state.scores)
+                    display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Mark UP","INVOICE"]].sum()
+                    display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Mark UP","INVOICE"]]
+                    st.dataframe(display)
+                    csv=convert_df(display)
+                    file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
+                    st.download_button(
+                            label="DOWNLOAD GANG COST",
+                            data=csv,
+                            file_name=file_name,
+                            mime='text/csv')
+    
+                    
+                    index=st.number_input("Enter Index To Delete",step=1,key="1224aa")
+                    if st.button("DELETE BY INDEX"):
+                        try:
+                            st.session_state.scores=st.session_state.scores.drop(index)
+                            st.session_state.scores.reset_index(drop=True,inplace=True)
+                        except:
+                            pass
             
             
             

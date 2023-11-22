@@ -439,7 +439,7 @@ if authentication_status:
                     )
                 
                     # Form submit button
-                    submitted = st.form_submit_button("Submit",key="dff")
+                    submitted = st.form_submit_button("Submit")
                 
                 # If form is submitted, add the new score
                 if submitted:

@@ -380,7 +380,7 @@ if authentication_status:
                             "OT": [st.session_state.ot],
                             "Hour Cost": hour_cost,
                             "OT Cost": ot_cost,
-                            "Total Wage": round(wage_cost,2)
+                            "Total Wage": round(wage_cost,2),
                             "Benefits&PMA":round(benefits,2),
                             "TOTAL COST":round(wage_cost+benefits,2),
                             "Mark UP":round((wage_cost+benefits)*st.session_state.markup/100,2),

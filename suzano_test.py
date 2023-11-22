@@ -357,8 +357,8 @@ if authentication_status:
                 st.write(occ_codes)
                
                 
-                siu=st.number_input("ENTER SIU PERCENTAGE",key="kdsha")
-                markup=st.number_input("ENTER MARKUP",key="wer")
+                siu=st.number_input("ENTER SIU PERCENTAGE",step=1,key="kdsha")
+                markup=st.number_input("ENTER MARKUP",step=1,key="wer")
                 shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND"])
                 if "scores" not in st.session_state:
                     st.session_state.scores = pd.DataFrame(

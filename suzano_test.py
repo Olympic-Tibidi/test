@@ -462,6 +462,7 @@ if authentication_status:
                     st.success("Rank added successfully!")
                 # Display the updated DataFrame
                 st.write("# Updated Cost Table")
+                st.write(st.session_state.code)
                 if foreman:
                     st.write(st.session_state.code)
                 display=pd.DataFrame(st.session_state.scores)

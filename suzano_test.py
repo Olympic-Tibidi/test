@@ -373,7 +373,7 @@ if authentication_status:
                     wage_cost=hour_cost+ot_cost
                     benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*st.session_state.siu/100+total_hours*1.58+total_hours*0.14+total_hours*29.15+total_hours*pension
                     total_cost=wage_cost+benefits
-                    markup=(wage_cost+benefits)*st.session_state.markup/100,
+                    markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100
                     invoice=total_cost+markup
                     new_score = pd.DataFrame(
                         {

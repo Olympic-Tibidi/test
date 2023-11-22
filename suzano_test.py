@@ -443,8 +443,11 @@ if authentication_status:
                 st.dataframe(display)
                 index=st.number_input("Enter Index To Delete",step=1,key="1224aa")
                 if st.button("DELETE BY INDEX"):
-                    st.session_state.scores=st.session_state.scores.drop(index)
-                    st.session_state.scores.reset_index(drop=True,inplace=True)
+                    try:
+                        st.session_state.scores=st.session_state.scores.drop(index)
+                        st.session_state.scores.reset_index(drop=True,inplace=True)
+                    except:
+                        pass
             def download_files_in_folder(bucket, folder_name, output_directory):
                 blob_iterator = bucket.list_blobs(prefix=folder_name)
             

@@ -360,7 +360,7 @@ if authentication_status:
                 occ_codes=pd.DataFrame(assessment_rates).T
                 occ_codes=occ_codes.rename_axis('Occ_Code')
                 occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
-                rates=st.toggle("SELECT TO DISPLAY RATE TABLE FOR THE YEAR",key="iueis")
+                rates=st.checkbox("SELECT TO DISPLAY RATE TABLE FOR THE YEAR",key="iueis")
                 if rates:
                     
                     lan1,lan2=st.columns([2,2])

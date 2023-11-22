@@ -422,7 +422,7 @@ if authentication_status:
                     )
                  
                
-                sub_rate1,sub_rate2=st.columns([3,7])
+                sub_rate1,sub_rate2=st.columns([2,8])
                 with sub_rate1:
                     
                     # Form for adding a new score

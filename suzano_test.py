@@ -423,7 +423,7 @@ if authentication_status:
                  
                
                 sub_rate1,sub_rate2=st.columns([3,7])
-                with subrate1:
+                with sub_rate1:
                     
                     # Form for adding a new score
                     st.write("# Add a New Rank")

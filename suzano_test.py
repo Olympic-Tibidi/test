@@ -350,8 +350,14 @@ if authentication_status:
             try_lan=True
             if try_lan:
                 foreman=False
-                select_year=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
+                tinker,tailor=st.columns([5,5])
+                with tinker:
+                    select_year=st.selectbox("SELECT ILWU PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
+                with tailor:
+                    select_pmayear=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
+                
                 year=select_year.split(' ')[1]
+                pma_year=select_pmayear.split(' ')[1]
                 assessment_rates=gcp_download(target_bucket,rf"occ_codes{year}.json")
                 assessment_rates=json.loads(assessment_rates)
                 pma_rates=gcp_download(target_bucket,rf"pma_dues.json")
@@ -383,9 +389,9 @@ if authentication_status:
                     else:
                         foreman=False
                     
-                    pension=pma_rates[year]["LS_401k"]
+                    pension=pma_rates[pma_year]["LS_401k"]
                     if foreman:
-                        pension=pma_rates[year]["Foreman_401k"]
+                        pension=pma_rates[pma_year]["Foreman_401k"]
                                  
                     
                     qty=st.session_state.qty
@@ -393,7 +399,7 @@ if authentication_status:
                     hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
                     ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
                     wage_cost=hour_cost+ot_cost
-                    benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*st.session_state.siu/100+total_hours*pma_rates[year]["Cargo_Dues"]+total_hours*pma_rates[year]["Electronic_Input"]+total_hours*pma_rates[year]["Benefits"]+total_hours*pension
+                    benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*st.session_state.siu/100+total_hours*pma_rates[pma_year]["Cargo_Dues"]+total_hours*pma_rates[pma_year]["Electronic_Input"]+total_hours*pma_rates[pma_year]["Benefits"]+total_hours*pension
                     total_cost=wage_cost+benefits
                     
                     markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100

@@ -373,7 +373,7 @@ if authentication_status:
                     with lan1:
                         st.write(occ_codes)
                     with lan2:
-                        st.write(pma_rates[year])
+                        st.write(pma_rates[pma_year])
                 
                 
                 if "scores" not in st.session_state:

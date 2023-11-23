@@ -482,8 +482,8 @@ if authentication_status:
                    
                     
                     display=pd.DataFrame(st.session_state.scores)
-                    display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Mark UP","INVOICE"]].sum()
-                    display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits&PMA","TOTAL COST","Mark UP","INVOICE"]]
+                    display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]].sum()
+                    display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]]
                     st.dataframe(display)
                     csv=convert_df(display)
                     file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'

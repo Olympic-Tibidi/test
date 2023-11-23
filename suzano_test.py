@@ -457,7 +457,7 @@ if authentication_status:
                     
                         # Number input for Hours
                         st.session_state.hours = st.number_input(
-                            "Hours", step=0.5, value=0, min_value=0
+                            "Hours", step=0.5, value=0.0, min_value=0.0
                         )
                     
                         # Number input for OT

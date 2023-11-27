@@ -116,7 +116,7 @@ def gcp_download(bucket_name, source_file_name):
     data = blob.download_as_text()
     return data
     
-def gcp_download_x(bucket_name, source_file_name,dest):
+def gcp_download_x(bucket_name, source_file_name):
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(source_file_name)
@@ -128,7 +128,7 @@ def gcp_csv_to_df(bucket_name, source_file_name):
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(source_file_name)
     data = blob.download_as_bytes()
-    df = pd.read_csv(io.BytesIO(data))
+    df = pd.read_csv(io.BytesIO(data),index_col=None)
     print(f'Pulled down file from bucket {bucket_name}, file name: {source_file_name}')
     return df
 def upload_cs_file(bucket_name, source_file_name, destination_file_name): 
@@ -138,6 +138,14 @@ def upload_cs_file(bucket_name, source_file_name, destination_file_name):
 
     blob = bucket.blob(destination_file_name)
     blob.upload_from_filename(source_file_name)
+    return True
+def upload_json_file(bucket_name, source_file_name, destination_file_name): 
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket_name)
+
+    blob = bucket.blob(destination_file_name)
+    blob.upload_from_filename(source_file_name,content_type="application/json")
     return True
 def upload_xl_file(bucket_name, uploaded_file, destination_blob_name):
     storage_client = storage.Client()
@@ -346,164 +354,98 @@ if authentication_status:
             #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
             
         if select=="DATA BACKUP" :
-            
-            try_lan=True
-            if try_lan:
-                foreman=False
-                tinker,tailor=st.columns([5,5])
-                with tinker:
-                    select_year=st.selectbox("SELECT ILWU PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
-                with tailor:
-                    select_pmayear=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
-                
-                year=select_year.split(' ')[1]
-                pma_year=select_pmayear.split(' ')[1]
-                assessment_rates=gcp_download(target_bucket,rf"occ_codes{year}.json")
-                assessment_rates=json.loads(assessment_rates)
-                pma_rates=gcp_download(target_bucket,rf"pma_dues.json")
-                pma_rates=json.loads(pma_rates)
-                pma_rates_=pd.DataFrame(pma_rates).T
-                occ_codes=pd.DataFrame(assessment_rates).T
-                occ_codes=occ_codes.rename_axis('Occ_Code')
-                occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
-                rates=st.checkbox("SELECT TO DISPLAY RATE TABLE FOR THE YEAR",key="iueis")
-                if rates:
-                    
-                    lan1,lan2=st.columns([2,2])
-                    with lan1:
-                        st.write(occ_codes)
-                    with lan2:
-                        st.write(pma_rates[pma_year])
-                
-                
-                if "scores" not in st.session_state:
-                    st.session_state.scores = pd.DataFrame(
-                        {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]}
-                    )
-                ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"]}
-                # Function to add a new score to the DataFrame
-                def new_scores():
-                    
-                    if num_code=='0129':
-                        foreman=True
-                    else:
-                        foreman=False
-                    
-                    pension=pma_rates[pma_year]["LS_401k"]
-                    if foreman:
-                        pension=pma_rates[pma_year]["Foreman_401k"]
-                                 
-                    
-                    qty=st.session_state.qty
-                    total_hours=st.session_state.hours+st.session_state.ot
-                    hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
-                    ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
-                    wage_cost=hour_cost+ot_cost
-                    benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*st.session_state.siu/100
-                    assessments=total_hours*pma_rates[pma_year]["Cargo_Dues"]+total_hours*pma_rates[pma_year]["Electronic_Input"]+total_hours*pma_rates[pma_year]["Benefits"]+total_hours*pension
-                    total_cost=wage_cost+benefits+assessments
-                    
-                    markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
-                    if foreman:
-                        markup=wage_cost*st.session_state.f_markup/100+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
-                                      
-                   
-                    invoice=total_cost+markup
-                    new_score = pd.DataFrame(
-                        {
-                            "Code": [st.session_state.code],
-                            "Shift": [st.session_state.shift],
-                            "Quantity": [st.session_state.qty],
-                            "Hours": [st.session_state.hours*qty],
-                            "OT": [st.session_state.ot*qty],
-                            "Hour Cost": [hour_cost*qty],
-                            "OT Cost": [ot_cost*qty],
-                            "Total Wage": [round(wage_cost*qty,2)],
-                            "Benefits":[round(benefits*qty,2)],
-                            "PMA Assessments":[round(assessments*qty,2)],
-                            "TOTAL COST":[round(total_cost*qty,2)],
-                            "Mark UP":[round(markup*qty,2)],
-                            "INVOICE":[round(invoice*qty,2)]
+            st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
+            try_lan=False
                             
+
+            if try_lan:
+                st.markdown(
+                    """
+                    <style>
+                        /* Add custom CSS styles here */
+                        body {
+                            font-family: 'Arial', sans-serif;
+                            background-color: #f4f4f4;
+                            color: #333333;
+                        }
+                        h1 {
+                            color: #009688; /* Teal */
+                        }
+                        p {
+                            font-size: 36px;
+                        }
+                        .blue-text {
+                            color: #2196F3; /* Blue */
+                        }
+                        .red-text {
+                            color: #FF5252; /* Red */
+                        }
+                        .green-text {
+                            color: #4CAF50; /* Green */
+                        }
+                    </style>
+                    
+                    # Custom Styling with HTML and CSS
+                    
+                    This is a Streamlit app with custom styling.
+                
+                    - You can include bullet points.
+                    - Add more text and formatting.
+                    - Use *Markdown* syntax.
+                
+                    <p class="blue-text">This text is in blue.</p>
+                    <p class="red-text">This text is in red.</p>
+                    <p class="green-text">This text is in green.</p>
+                    """,
+                    unsafe_allow_html=True
+                )
+                
+                scorecard = pd.DataFrame(columns=['User', 'Hour', 'Ot', 'Totaled'])
+    
+                # Input your data using experimental data editor
+                st.write("Input your data below:")
+                input_data = pd.DataFrame(index=[1,2,3,4,5], columns=['Rank', 'Shift', 'Hour','Ot'])
+                input_data = input_data.fillna(0)  # fill with zeros
+                
+                edited_data = st.experimental_data_editor(input_data)
+                
+                # Handle user input
+                if st.button('Submit'):
+                    edited_data['Totaled'] = edited_data['Hour'] + edited_data['Ot']
+                    scorecard = scorecard.append(edited_data, ignore_index=True)
+                
+                # Display the updated scorecard
+                st.write("Updated Scorecard:")
+                st.table(scorecard)
+                if "scores" not in st.session_state:
+                    st.session_state.scores = [
+                        {"name": "Josh", "Pushups": 10, "Situps": 20},
+                    ]
+                
+                
+                def new_scores():
+                    st.session_state.scores.append(
+                        {
+                            "name": st.session_state.name,
+                            "Pushups": st.session_state.pushups,
+                            "Situps": st.session_state.situps,
                         }
                     )
-                    st.session_state.scores = pd.concat(
-                        [st.session_state.scores, new_score], ignore_index=True
-                    )
-                 
-               
-                sub_rate1,sub_rate2=st.columns([2,8])
-                with sub_rate1:
-                    
-                    # Form for adding a new score
-                    st.write("### Add a New Rank")
-                    with st.form("new_score_form"):
-    
-                        st.session_state.siu=st.number_input("ENTER SIU PERCENTAGE",step=1,key="kdsha")
-                        st.session_state.markup=st.number_input("ENTER MARKUP",step=1,key="wer")
-                        st.session_state.f_markup=st.number_input("ENTER FOREMAN MARKUP (IF DIFFERENT)",step=1,key="wfder")
-                        st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND"])
-    
-                        
-                        # Dropdown for selecting Code
-                        st.session_state.code = st.selectbox(
-                            "Occupation Code", options=list(occ_codes.index)
-                        )
-                    
-                        # Number input for Quantity
-                        st.session_state.qty = st.number_input(
-                            "Quantity", step=1, value=0, min_value=0
-                        )
-                    
-                        # Number input for Hours
-                        st.session_state.hours = st.number_input(
-                            "Hours", step=0.5, value=0.0, min_value=0.0
-                        )
-                    
-                        # Number input for OT
-                        st.session_state.ot = st.number_input(
-                            "OT", step=1, value=0, min_value=0
-                        )
-                        
-                        # Form submit button
-                        submitted = st.form_submit_button("Submit")
-                    
-                    # If form is submitted, add the new score
-                    num_code=st.session_state.code[1].strip()
-                    if submitted:
-                        new_scores()
-                        
-                        st.success("Rank added successfully!")
-                with sub_rate2:
-                    
-                    # Display the updated DataFrame
-                    st.write("### Updated Cost Table")
-                    
-                   
-                    
-                    display=pd.DataFrame(st.session_state.scores)
-                    display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]].sum()
-                    display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]]
-                    st.dataframe(display)
-                    csv=convert_df(display)
-                    file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
-                    st.download_button(
-                            label="DOWNLOAD GANG COST",
-                            data=csv,
-                            file_name=file_name,
-                            mime='text/csv')
-    
-                    
-                    index=st.number_input("Enter Index To Delete",step=1,key="1224aa")
-                    if st.button("DELETE BY INDEX"):
-                        try:
-                            st.session_state.scores=st.session_state.scores.drop(index)
-                            st.session_state.scores.reset_index(drop=True,inplace=True)
-                        except:
-                            pass
-            
-            
-            
+                
+                
+                st.write("# Score table")
+                
+                score_df = pd.DataFrame(st.session_state.scores)
+                score_df["total_points"] = score_df["Pushups"] + score_df["Situps"]
+                
+                st.write(score_df)
+                
+                st.write("# Add a new score")
+                with st.form("new_score", clear_on_submit=True):
+                    name = st.text_input("Name", key="name")
+                    pushups = st.number_input("Pushups", key="pushups", step=1, value=0, min_value=0)
+                    situps = st.number_input("Situps", key="situps", step=1, value=0, min_value=0)
+                    st.form_submit_button("Submit", on_click=new_scores)
             def download_files_in_folder(bucket, folder_name, output_directory):
                 blob_iterator = bucket.list_blobs(prefix=folder_name)
             
@@ -538,438 +480,202 @@ if authentication_status:
         if select=="ADMIN" :
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","LABOR"])
             with admin_tab5:
-                labor_issue=True
-                if labor_issue:
-                    ranks={"FOREMAN":{"code":"129","DAY":{"hr":74.04,"ot":111.06},"NIGHT":{"hr":98.72,"ot":111.06},"WEEKEND":{"hr":111.06,"ot":111.06},
-                                      "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
-                           "COMPUTER CLERK":{"code":"115","DAY":{"hr":57.52,"ot":86.28},"NIGHT":{"hr":76.69,"ot":86.28},"WEEKEND":{"hr":86.28,"ot":86.28},
-                                    "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
-                           "TRACTOR-SEMI-DOCK":{"code":"036","DAY":{"hr":55.25,"ot":82.88},"NIGHT":{"hr":73.67,"ot":82.88},"WEEKEND":{"hr":82.88,"ot":82.88},
-                                                "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
-                           "UTILITY LIFT DRIVER":{"code":"037","DAY":{"hr":55.25,"ot":82.88},"NIGHT":{"hr":73.67,"ot":82.88},"WEEKEND":{"hr":82.88,"ot":82.88},
-                                                  "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
-                           "LIFT TRUCK HEAVY":{"code":"055","DAY":{"hr":57.52,"ot":86.28},"NIGHT":{"hr":76.69,"ot":86.28},"WEEKEND":{"hr":86.28,"ot":86.28},
-                                               "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
-                           "BASIC CLERK-DOCK":{"code":"101","DAY":{"hr":52.85,"ot":79.28},"NIGHT":{"hr":70.47,"ot":79.28},"WEEKEND":{"hr":79.28,"ot":79.28},
-                                               "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
-                           "LINESMAN":{"code":"213","DAY":{"hr":52.85,"ot":79.28},"NIGHT":{"hr":70.47,"ot":79.28},"WEEKEND":{"hr":79.28,"ot":79.28},
-                                       "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0},
-                          "CLERK":{"code":"103","DAY":{"hr":55.25,"ot":82.88},"NIGHT":{"hr":73.67,"ot":82.88},"WEEKEND":{"hr":82.88,"ot":82.88},
-                                                "qt":0,"shift":None,"hours":0,"ot":0,"standard_wage":0,"ot_wage":0,"cost":0,"state":0,"pma":0}}
-                    assessment_rates=gcp_download(target_bucket,rf"assessment_rates.json")
+                labor_issue=False
+                secondary=True
+                if secondary:
+        
+                    foreman=False
+                    tinker,tailor=st.columns([5,5])
+                    with tinker:
+                        select_year=st.selectbox("SELECT ILWU PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
+                    with tailor:
+                        select_pmayear=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
+                    
+                    year=select_year.split(' ')[1]
+                    month=select_year.split(' ')[0]
+                    pma_year=select_pmayear.split(' ')[1]
+                    pma_rates=gcp_download(target_bucket,rf"pma_dues.json")
+                    pma_rates=json.loads(pma_rates)
+                    pma_rates_=pd.DataFrame(pma_rates).T
+                    assessment_rates=gcp_download(target_bucket,rf"occ_codes{year}.json")
                     assessment_rates=json.loads(assessment_rates)
-                    #st.write(assessment_rates)
-                    siu=st.number_input("ENTER SIU PERCENTAGE",step=1,key="32324")
-                    markup=st.number_input("ENTER MARKUP PERCENTAGE",step=1,key="3e2324")
-                    lab_col7,lab_col8,lab_col9,lab_col10,lab_col11,lab_col12=st.columns([3,2,1,1,1,1])
-                    with lab_col10:
-                        st.markdown("**BENEFITS**")
-                    with lab_col7:
-                        shift=st.radio("**SELECT SHIFT**",["DAY","NIGHT","WEEKEND"],horizontal=True)
-                        for i in ranks:
-                            ranks[i]["shift"]=shift
-                    with lab_col8:
-                        st.markdown("**HOURS/OT**")
-                    with lab_col9:
-                        st.markdown("**WAGES**")
+                    occ_codes=pd.DataFrame(assessment_rates).T
+                    occ_codes=occ_codes.rename_axis('Occ_Code')
+                    shortened_occ_codes=occ_codes.loc[["0036","0037","0055","0092","0101","0103","0115","0129","0213","0215"]]
+                    shortened_occ_codes=shortened_occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
+                    occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
+                    rates=st.checkbox("SELECT TO DISPLAY RATE TABLE FOR THE YEAR",key="iueis")
+                    if rates:
+                        
+                        lan1,lan2=st.columns([2,2])
+                        with lan1:
+                            st.write(occ_codes)
+                        with lan2:
+                            st.write(pma_rates[pma_year])
                     
-                    with lab_col11:
-                        st.markdown("**TOTAL**")
-
-                    with lab_col12:
-                        st.markdown("**WITH MARKUP**")
                     
-                    lab_col1,lab_col2,lab_col3,lab_col4,lab_col5,lab_col6,lab_colend=st.columns([1,1,2,2,1,1,1])
-                    with lab_col4:
-                            
-                            st.write(" ")
-                            st.write(" ")
-                                          
-                    with lab_col1:
-                        st.write(" ")
-                        st.write(" ")
-                        
-                        foreman=st.checkbox("FOREMAN")
-                        
-                        if foreman:
-                            with lab_col2:
-                                number_of_foreman=st.number_input("How Many?",step=1,key="1150368")
-                                ranks["FOREMAN"]["qt"]=number_of_foreman
-                            with lab_col3:
-                                a1,a2=st.columns([2,2])
-                                with a1:
-                                    hours=st.number_input("HOURS",step=1,key="1150369")
-                                    ranks["FOREMAN"]["hours"]=hours
-                                    ranks["FOREMAN"]["standard_wage"]=hours*ranks["FOREMAN"][shift]["hr"]*ranks["FOREMAN"]["qt"]
-                                with a2:
-                                    ot=st.number_input("OT",step=1,key="1150370")
-                                    ranks["FOREMAN"]["ot"]=ot
-                                    ranks["FOREMAN"]["ot_wage"]=ot*ranks["FOREMAN"][shift]["ot"]*ranks["FOREMAN"]["qt"]
-                                ranks["FOREMAN"]["cost"]=ranks["FOREMAN"]["standard_wage"]+ranks["FOREMAN"]["ot_wage"]
-                                ranks["FOREMAN"]["state"]=ranks["FOREMAN"]["cost"]*0.062+ranks["FOREMAN"]["cost"]*0.0145+ranks["FOREMAN"]["cost"]*0.0021792+ranks["FOREMAN"]["cost"]*siu/100
-                                ranks["FOREMAN"]["pma"]=(hours+ot)*1.58*ranks["FOREMAN"]["qt"]+(hours+ot)*0.14*ranks["FOREMAN"]["qt"]+(hours+ot)*29.15*ranks["FOREMAN"]["qt"]+(hours+ot)*2.81*ranks["FOREMAN"]["qt"]
-                            with lab_col4:
-                                st.markdown(f"Standard:${ranks['FOREMAN']['standard_wage']}, OT:${ranks['FOREMAN']['ot_wage']}")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col5:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(f'${round(ranks["FOREMAN"]["state"]+ranks["FOREMAN"]["pma"],2)}')
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col6:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(f"$ {round(ranks['FOREMAN']['cost']+ranks['FOREMAN']['state']+ranks['FOREMAN']['pma'],2)}")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_colend:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(f"$ {round((markup+100)/100*(ranks['FOREMAN']['cost']+ranks['FOREMAN']['state']+ranks['FOREMAN']['pma']),2)}")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                        elif not foreman:
-                            with lab_col2:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                        
-                            with lab_col3:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col4:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col5:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col6:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_colend:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                        st.write(" ")
-                        st.write(" ")
-                        st.write(" ")
-                        clerk=st.checkbox("CLERK")
-                        if clerk:
-                            with lab_col2:
-                                number_of_clerk=st.number_input("How Many?",step=1,key="115071")
-                                ranks["CLERK"]["qt"]=number_of_clerk
-                            with lab_col3:
-                                b1,b2=st.columns([2,2])
-                                with b1:
-                                    hours=st.number_input("HOURS",step=1,key="1150372")
-                                    ranks["CLERK"]["hours"]=hours
-                                    ranks["CLERK"]["standard_wage"]=hours*ranks["CLERK"][shift]["hr"]*ranks["CLERK"]["qt"]
-                                with b2:
-                                    ot=st.number_input("OT",step=1,key="1150373")
-                                    ranks["CLERK"]["ot"]=ot
-                                    ranks["CLERK"]["ot_wage"]=ot*ranks["CLERK"][shift]["ot"]*ranks["CLERK"]["qt"]
-                                ranks["CLERK"]["cost"]=ranks["CLERK"]["standard_wage"]+ranks["CLERK"]["ot_wage"]
-                                ranks["CLERK"]["state"]=ranks["CLERK"]["cost"]*0.062+ranks["CLERK"]["cost"]*0.0145+ranks["CLERK"]["cost"]*0.0021792+ranks["CLERK"]["cost"]*siu/100
-                                ranks["CLERK"]["pma"]=(hours+ot)*1.58*ranks["CLERK"]["qt"]+(hours+ot)*0.14*ranks["CLERK"]["qt"]+(hours+ot)*29.15*ranks["CLERK"]["qt"]+(hours+ot)*0.75*ranks["CLERK"]["qt"]
-                            with lab_col4:
-                                st.write(f"Standard: $ {ranks['CLERK']['standard_wage']}, OT: $ {ranks['CLERK']['ot_wage']}")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col5:
-                                st.write(f'${round(ranks["CLERK"]["state"]+ranks["CLERK"]["pma"],2)}')
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col6:
-                                st.write(f"$ {round(ranks['CLERK']['cost']+ranks['CLERK']['state']+ranks['CLERK']['pma'],2)}")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_colend:
-                                st.write(f"$ {round((markup+100)/100*(ranks['CLERK']['cost']+ranks['CLERK']['state']+ranks['CLERK']['pma']),2)}")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                        elif not clerk:
-                            with lab_col2:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                        
-                            with lab_col3:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col4:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col5:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col6:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_colend:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            
-                            
-                                
-                        st.write(" ")
-                        st.write(" ")
-                        st.write(" ")
-                        heavy=st.checkbox("HEAVY")
-                        if heavy:
-                            with lab_col2:
-                                number_of_heavy=st.number_input("How Many?",step=1,key="11503748")
-                                ranks["LIFT TRUCK HEAVY"]["qt"]=number_of_heavy
-                            with lab_col3:
-                                b1,b2=st.columns([2,2])
-                                with b1:
-                                    hours=st.number_input("HOURS",step=1,key="1150375sa")
-                                    ranks["LIFT TRUCK HEAVY"]["hours"]=hours
-                                    ranks["LIFT TRUCK HEAVY"]["standard_wage"]=hours*ranks["LIFT TRUCK HEAVY"][shift]["hr"]*ranks["LIFT TRUCK HEAVY"]["qt"]
-                                with b2:
-                                    ot=st.number_input("OT",step=1,key="1150376")
-                                    ranks["LIFT TRUCK HEAVY"]["ot"]=ot
-                                    ranks["LIFT TRUCK HEAVY"]["ot_wage"]=ot*ranks["LIFT TRUCK HEAVY"][shift]["ot"]*ranks["LIFT TRUCK HEAVY"]["qt"]
-                                ranks["LIFT TRUCK HEAVY"]["cost"]=ranks["LIFT TRUCK HEAVY"]["standard_wage"]+ranks["LIFT TRUCK HEAVY"]["ot_wage"]
-                                ranks["LIFT TRUCK HEAVY"]["state"]=ranks["LIFT TRUCK HEAVY"]["cost"]*0.062+ranks["LIFT TRUCK HEAVY"]["cost"]*0.0145+ranks["LIFT TRUCK HEAVY"]["cost"]*0.0021792+ranks["LIFT TRUCK HEAVY"]["cost"]*siu/100
-                                ranks["LIFT TRUCK HEAVY"]["pma"]=(hours+ot)*1.58*ranks["LIFT TRUCK HEAVY"]["qt"]+(hours+ot)*0.14*ranks["LIFT TRUCK HEAVY"]["qt"]+(hours+ot)*29.15*ranks["LIFT TRUCK HEAVY"]["qt"]+(hours+ot)*0.75*ranks["LIFT TRUCK HEAVY"]["qt"]
-                                with lab_col4:
-                                    st.write(f"Standard: $ {ranks['LIFT TRUCK HEAVY']['standard_wage']}, OT: $ {ranks['LIFT TRUCK HEAVY']['ot_wage']}")
-                                    st.write(" ")
-                                    st.write(" ")
-                                    st.write(" ")
-                                with lab_col5:
-                                    st.write(f'${round(ranks["LIFT TRUCK HEAVY"]["state"]+ranks["LIFT TRUCK HEAVY"]["pma"],2)}')
-                                    st.write(" ")
-                                    st.write(" ")
-                                    st.write(" ")
-                                with lab_col6:
-                                    st.write(f"$ {round(ranks['LIFT TRUCK HEAVY']['cost']+ranks['LIFT TRUCK HEAVY']['state']+ranks['LIFT TRUCK HEAVY']['pma'],2)}")
-                                    st.write(" ")
-                                    st.write(" ")
-                                    st.write(" ")
-                                with lab_colend:
-                                    st.write(f"$ {round((markup+100)/100*(ranks['LIFT TRUCK HEAVY']['cost']+ranks['LIFT TRUCK HEAVY']['state']+ranks['LIFT TRUCK HEAVY']['pma']),2)}")
-                                    st.write(" ")
-                                    st.write(" ")
-                                    st.write(" ")
-                        elif not heavy:
-                            with lab_col2:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                        
-                            with lab_col3:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col4:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col5:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col6:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_colend:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                        st.write(" ")
-                        st.write(" ")  
-                        st.write(" ")
-                        ut=st.checkbox("UT")
-                        if ut:
-                            with lab_col2:
-                                number_of_ut=st.number_input("How Many?",step=1,key="1150377")
-                                ranks["UTILITY LIFT DRIVER"]["qt"]=number_of_ut
-                            with lab_col3:
-                                b1,b2=st.columns([2,2])
-                                with b1:
-                                    hours=st.number_input("HOURS",step=1,key="1150378")
-                                    ranks["UTILITY LIFT DRIVER"]["hours"]=hours
-                                    ranks["UTILITY LIFT DRIVER"]["standard_wage"]=hours*ranks["UTILITY LIFT DRIVER"][shift]["hr"]*ranks["UTILITY LIFT DRIVER"]["qt"]
-                                with b2:
-                                    ot=st.number_input("OT",step=1,key="1150379")
-                                    ranks["UTILITY LIFT DRIVER"]["ot"]=ot
-                                    ranks["UTILITY LIFT DRIVER"]["ot_wage"]=ot*ranks["UTILITY LIFT DRIVER"][shift]["ot"]*ranks["UTILITY LIFT DRIVER"]["qt"]
-                                ranks["UTILITY LIFT DRIVER"]["cost"]=ranks["UTILITY LIFT DRIVER"]["standard_wage"]+ranks["UTILITY LIFT DRIVER"]["ot_wage"]
-                                ranks["UTILITY LIFT DRIVER"]["state"]=ranks["UTILITY LIFT DRIVER"]["cost"]*0.062+ranks["UTILITY LIFT DRIVER"]["cost"]*0.0145+ranks["UTILITY LIFT DRIVER"]["cost"]*0.0021792+ranks["UTILITY LIFT DRIVER"]["cost"]*siu/100
-                                ranks["UTILITY LIFT DRIVER"]["pma"]=(hours+ot)*1.58*ranks["UTILITY LIFT DRIVER"]["qt"]+(hours+ot)*0.14*ranks["UTILITY LIFT DRIVER"]["qt"]+(hours+ot)*29.15*ranks["UTILITY LIFT DRIVER"]["qt"]+(hours+ot)*0.75*ranks["UTILITY LIFT DRIVER"]["qt"]
-                                with lab_col4:
-                                    st.write(f"Standard: $ {ranks['UTILITY LIFT DRIVER']['standard_wage']}, OT: $ {ranks['UTILITY LIFT DRIVER']['ot_wage']}")
-                                    st.write(" ")
-                                    st.write(" ")
-                                    st.write(" ")
-                                with lab_col5:
-                                    st.write(f'${round(ranks["UTILITY LIFT DRIVER"]["state"]+ranks["UTILITY LIFT DRIVER"]["pma"],2)}')
-                                    st.write(" ")
-                                    st.write(" ")
-                                    st.write(" ")
-                                with lab_col6:
-                                    st.write(f"$ {round(ranks['UTILITY LIFT DRIVER']['cost']+ranks['UTILITY LIFT DRIVER']['state']+ranks['UTILITY LIFT DRIVER']['pma'],2)}")
-                                    st.write(" ")
-                                    st.write(" ")
-                                    st.write(" ")
-                                with lab_colend:
-                                    st.write(f"$ {round((markup+100)/100*(ranks['UTILITY LIFT DRIVER']['cost']+ranks['UTILITY LIFT DRIVER']['state']+ranks['UTILITY LIFT DRIVER']['pma']),2)}")
-                                    st.write(" ")
-                                    st.write(" ")
-                                    st.write(" ")
-                                
-                        elif not ut:
-                            with lab_col2:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                        
-                            with lab_col3:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col4:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col5:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_col6:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                            with lab_colend:
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                                st.write(" ")
-                        st.write(" ")
-                        st.write(" ")
-                        tractor_semi=st.checkbox("TRACTOR-SEMI")
-                        if tractor_semi:
-                            with lab_col2:
-                                number_of_tractor_semi=st.number_input("How Many?",step=1,key="isuada4")
-                                ranks["TRACTOR-SEMI-DOCK"]["qt"]=number_of_tractor_semi
-
-                            with lab_col3:
-                                b1,b2=st.columns([2,2])
-                                with b1:
-                                    hours=st.number_input("HOURS",step=1,key="1150380")
-                                    ranks["TRACTOR-SEMI-DOCK"]["hours"]=hours
-                                    ranks["TRACTOR-SEMI-DOCK"]["standard_wage"]=hours*ranks["TRACTOR-SEMI-DOCK"][shift]["hr"]*ranks["TRACTOR-SEMI-DOCK"]["qt"]
-                                with b2:
-                                    ot=st.number_input("OT",step=1,key="1150381")
-                                    ranks["TRACTOR-SEMI-DOCK"]["ot"]=ot
-                                    ranks["TRACTOR-SEMI-DOCK"]["ot_wage"]=ot*ranks["TRACTOR-SEMI-DOCK"][shift]["ot"]*ranks["TRACTOR-SEMI-DOCK"]["qt"]
-                                ranks["TRACTOR-SEMI-DOCK"]["cost"]=ranks["TRACTOR-SEMI-DOCK"]["standard_wage"]+ranks["TRACTOR-SEMI-DOCK"]["ot_wage"]
-                                ranks["TRACTOR-SEMI-DOCK"]["state"]=ranks["TRACTOR-SEMI-DOCK"]["cost"]*0.062+ranks["TRACTOR-SEMI-DOCK"]["cost"]*0.0145+ranks["TRACTOR-SEMI-DOCK"]["cost"]*0.0021792+ranks["TRACTOR-SEMI-DOCK"]["cost"]*siu/100
-                                ranks["TRACTOR-SEMI-DOCK"]["pma"]=(hours+ot)*1.58*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*0.14*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*29.15*ranks["TRACTOR-SEMI-DOCK"]["qt"]+(hours+ot)*0.75*ranks["TRACTOR-SEMI-DOCK"]["qt"]
-                                with lab_col4:
-                                    st.write(f"Standard: $ {ranks['TRACTOR-SEMI-DOCK']['standard_wage']}, OT: $ {ranks['TRACTOR-SEMI-DOCK']['ot_wage']}")
-                                    st.write(" ")
-                                    st.write(" ")
-                                    st.write(" ")
-                                with lab_col5:
-                                    st.write(f'${round(ranks["TRACTOR-SEMI-DOCK"]["state"]+ranks["TRACTOR-SEMI-DOCK"]["pma"],2)}')
-                                    st.write(" ")
-                                    st.write(" ")
-                                    st.write(" ")
-                                with lab_col6:
-                                    st.write(f"$ {round(ranks['TRACTOR-SEMI-DOCK']['cost']+ranks['TRACTOR-SEMI-DOCK']['state']+ranks['TRACTOR-SEMI-DOCK']['pma'],2)}")
-                                    st.write(" ")
-                                    st.write(" ")
-                                    st.write(" ")
-                                with lab_colend:
-                                    st.write(f"$ {round((markup+100)/100*(ranks['TRACTOR-SEMI-DOCK']['cost']+ranks['TRACTOR-SEMI-DOCK']['state']+ranks['TRACTOR-SEMI-DOCK']['pma']),2)}")
-                                    st.write(" ")
-                                    st.write(" ")
-                                    st.write(" ")
-                                
-                        
+                    if "scores" not in st.session_state:
+                        st.session_state.scores = pd.DataFrame(
+                            {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]}
+                        )
+                    ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"]}
                    
-                    total_=round(sum([ranks[key]['cost'] for key in ranks])+sum([ranks[key]['state'] for key in ranks])+sum([ranks[key]['pma'] for key in ranks]),2)
-                    st.subheader(f"     TOTAL COST FOR SHIFT: $ {round(total_,2)}")
-                    st.subheader(f"     TOTAL CHARGE WITH MARKUP: $ {round((100+markup)/100*total_,2)}")
+                    def new_scores():
+                        
+                        if num_code=='0129':
+                            foreman=True
+                        else:
+                            foreman=False
+                        
+                        pension=pma_rates[pma_year]["LS_401k"]
+                        if foreman:
+                            pension=pma_rates[pma_year]["Foreman_401k"]
+                                     
+                        
+                        qty=st.session_state.qty
+                        total_hours=st.session_state.hours+st.session_state.ot
+                        hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
+                        ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
+                        wage_cost=hour_cost+ot_cost
+                        benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*st.session_state.siu/100
+                        assessments=total_hours*pma_rates[pma_year]["Cargo_Dues"]+total_hours*pma_rates[pma_year]["Electronic_Input"]+total_hours*pma_rates[pma_year]["Benefits"]+total_hours*pension
+                        total_cost=wage_cost+benefits+assessments
+                        
+                        markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
+                        if foreman:
+                            markup=wage_cost*st.session_state.f_markup/100+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
+                                          
+                       
+                        invoice=total_cost+markup
+                        new_score = pd.DataFrame(
+                            {
+                                "Code": [st.session_state.code],
+                                "Shift": [st.session_state.shift],
+                                "Quantity": [st.session_state.qty],
+                                "Hours": [st.session_state.hours*qty],
+                                "OT": [st.session_state.ot*qty],
+                                "Hour Cost": [hour_cost*qty],
+                                "OT Cost": [ot_cost*qty],
+                                "Total Wage": [round(wage_cost*qty,2)],
+                                "Benefits":[round(benefits*qty,2)],
+                                "PMA Assessments":[round(assessments*qty,2)],
+                                "TOTAL COST":[round(total_cost*qty,2)],
+                                "Mark UP":[round(markup*qty,2)],
+                                "INVOICE":[round(invoice*qty,2)]
+                                
+                            }
+                        )
+                        st.session_state.scores = pd.concat(
+                            [st.session_state.scores, new_score], ignore_index=True
+                        )
+                     
+                   
+                    #sub_rate1,sub_rate2=st.columns([2,8])
+                    
+                        
+                    # Form for adding a new score
+                    st.write("### Add a New Rank")
+                    with st.form("new_score_form"):
+                        form_col1,form_col2,form_col3=st.columns([3,3,4])
+                        with form_col1:
                             
+                            st.session_state.siu=st.number_input("ENTER SIU (UNEMPLOYMENT) PERCENTAGE",step=1,key="kdsha")
+                            st.session_state.markup=st.number_input("ENTER MARKUP",step=1,key="wer")
+                            st.session_state.f_markup=st.number_input("ENTER FOREMAN MARKUP",step=1,key="wfder")
+                        with form_col2:
+                            st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND"])
+    
                         
+                            # Dropdown for selecting Code
+                            st.session_state.code = st.selectbox(
+                                "Occupation Code", options=list(shortened_occ_codes.index)
+                            )
+                    
+                            # Number input for Quantity
+                            st.session_state.qty = st.number_input(
+                                "Quantity", step=1, value=0, min_value=0
+                        )
+                        with form_col3:
+                            
+                            # Number input for Hours
+                            st.session_state.hours = st.number_input(
+                                "Hours", step=0.5, value=0.0, min_value=0.0
+                            )
                         
-                
+                            # Number input for OT
+                            st.session_state.ot = st.number_input(
+                                "OT", step=1, value=0, min_value=0
+                            )
+                            
+                            # Form submit button
+                            submitted = st.form_submit_button("Submit")
+                    
+                    # If form is submitted, add the new score
+                    num_code=st.session_state.code[1].strip()
+                    if submitted:
+                        new_scores()
+                        
+                        st.success("Rank added successfully!")
+                    
+                        
+                    sub_col1,sub_col2,sub_col3=st.columns([3,3,4])
+                    with sub_col1:
+                        # Display the updated DataFrame
+                        st.write("### Updated Cost Table")
+                    with sub_col2:
+                        template_check=st.checkbox("LOAD FROM TEMPLATE")
+                        if template_check:
+                            with sub_col3:
+                                template_choice_valid=False
+                                template_choice=st.selectbox("Select Recorded Template",["Pick From List"]+[i for i in list_files_in_subfolder(target_bucket, rf"labor_templates/")],
+                                                              label_visibility="collapsed")
+                                if template_choice!="Pick From List":
+                                    template_choice_valid=True 
+                                if template_choice_valid:
+                                    loaded_template=gcp_csv_to_df(target_bucket,rf"labor_templates/{template_choice}")
+                                
+                                
+                       
+                   
+                    display=pd.DataFrame(st.session_state.scores)
+                    display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]].sum()
+                    display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]]
+                    
+                    if template_check and template_choice_valid:
+                        st.dataframe(loaded_template)
+                    else:
+                        st.dataframe(display)
+                    csv=convert_df(display)
+                    file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
+                    down_col1,down_col2,down_col3=st.columns([2,2,6])
+                    with down_col1:
+                        st.download_button(
+                            label="DOWNLOAD GANG COST",
+                            data=csv,
+                            file_name=file_name,
+                            mime='text/csv')
+                    with down_col2:
+                        filename=st.text_input("Name the Template",key="7dr3")
+                    with down_col3:
+                        template=st.button("SAVE AS TEMPLATE",key="srfqw")
+                        if template:
+                            temp=display.to_csv(index=False)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            
+                            # Upload CSV string to GCS
+                            blob = bucket.blob(rf"labor_templates/{filename}.csv")
+                            blob.upload_from_string(temp, content_type="text/csv")
+                                               
+                    
+                    index=st.number_input("Enter Index To Delete",step=1,key="1224aa")
+                    if st.button("DELETE BY INDEX"):
+                        try:
+                            st.session_state.scores=st.session_state.scores.drop(index)
+                            st.session_state.scores.reset_index(drop=True,inplace=True)
+                        except:
+                            pass
+
             
             
             with admin_tab2:
@@ -2256,7 +1962,8 @@ if authentication_status:
                 daily1,daily2,daily3=st.tabs(["TODAY'SHIPMENTS","TRUCKS ENROUTE","TRUCKS AT DESTINATION"])
                 with daily1:
                     now=datetime.datetime.now()-datetime.timedelta(hours=7)
-                    st.markdown(f"**SHIPPED TODAY ON {datetime.datetime.strftime(now.date(),'%b %d, %Y')} - Indexed By Terminal Bill Of Lading**")     
+                    text=f"**SHIPPED TODAY ON {datetime.datetime.strftime(now.date(),'%b %d, %Y')} - Indexed By Terminal Bill Of Lading**"
+                    st.markdown(f"<p style='font-family:cursive;'>{text}</p>",unsafe_allow_html=True)     
                     df_bill=pd.DataFrame(bill_of_ladings).T
                     df_bill=df_bill[["vessel","release_order","destination","sales_order","ocean_bill_of_lading","grade","carrier_id","vehicle","quantity","issued"]]
                     df_bill.columns=["VESSEL","RELEASE ORDER","DESTINATION","SALES ORDER","OCEAN BILL OF LADING","GRADE","CARRIER ID","VEHICLE NO","QUANTITY (UNITS)","ISSUED"]

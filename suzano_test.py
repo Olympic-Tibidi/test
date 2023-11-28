@@ -403,6 +403,42 @@ if authentication_status:
             st.markdown(tides.to_html(), unsafe_allow_html=True)    
                     
         if select=="FINANCE":
+            class Account:
+                def __init__(self, code, description,parent,root):
+                    self.code = code
+                    self.description = description
+                    self.parent=parent
+                    self.root=root
+            def find_main_root(dictionary, target_key, path=[]):
+                """
+                Recursively search the nested dictionary for the given target key and return the main root key and the path to the target key.
+                """
+                for key, value in dictionary.items():
+                    new_path = path + [key]
+                    if isinstance(value, dict):
+                        subresult, subpath = find_main_root(value, target_key, new_path)
+                        if subresult:
+                            return subresult, subpath
+                    elif key == target_key:
+                        return dictionary, new_path
+            
+                return None, None  # target key not found
+            def get_all_keys_(d,keys):
+                for k, v in d.items():
+                    if isinstance(v, dict):
+                        get_all_keys(v,keys)
+                    else:
+                        keys.append(k)
+                return keys
+
+            def get_all_keys(d,keys):
+                
+                for k, v in d.items():
+                    if isinstance(v, dict):
+                        get_all_keys(v,keys)
+                    else:
+                        keys[k]=v
+                return keys
             tt=f"MARINE TERMINAL FINANCIALS"
             original_title = f'<p style="font-family:Arial;font-weight: bold; color:Black; font-size: 20px;">{tt}</p>'
             st.markdown(original_title, unsafe_allow_html=True)

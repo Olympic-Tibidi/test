@@ -1069,7 +1069,9 @@ if authentication_status:
                 #months=5
                 temp1["2023 Monthly Budgeted"]=[round(i/12,2) for i in temp1["2023 Adopted"]]
                 temp1["2023 Monthly"]=[round(temp2023[temp2023["Account"]==i]["Net"].sum()/months,1) for i in temp1.Account]
-                temp1["2024 PROPOSED"]= pd.read_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')["2024 PROPOSED"]
+                x=gcp_download_x(target_bucket,rf"FIN/2024annual-try.pkl")
+                x=pd.read_feather(io.BytesIO(x))
+                temp1["2024 PROPOSED"]= pd.read_pickle(x)["2024 PROPOSED"]
                 temp1["2024 Monthly"]=[round(i/12,1) for i in temp1["2024 PROPOSED"]]
                 temp1=st.experimental_data_editor(temp1)
                 if st.button("SAVE 2024 BUDGET EDITS"):

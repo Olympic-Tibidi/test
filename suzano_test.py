@@ -1106,7 +1106,11 @@ if authentication_status:
             with fintab4:
                 ear=st.selectbox("Select Year",["2023","2022","2021"],key="yeartab2")
         
-                ledgers=pd.read_feather(fr"C:\Users\AfsinY\Desktop\LEDGERS\main{ear}.ftr")
+                ledgers=gcp_download_x(target_bucket,rf"FIN/main{ear}.ftr")
+                ledgers=pd.read_feather(io.BytesIO(ledgers))
+                ledgers["Account"]=ledgers["Account"].astype("str")
+                ledgers.set_index("index",drop=True,inplace=True)
+
                 for_search_ledger=ledgers.fillna("")
                 
                 vendor,job=st.tabs(["SEARCH BY VENDOR","SEARCH BY JOB"])

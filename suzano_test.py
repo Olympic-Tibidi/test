@@ -411,7 +411,7 @@ if authentication_status:
                 if fin_password=="marineterm98501!":
                     hadi=True
         
-            hadi=True
+            
             if hadi:
             
             

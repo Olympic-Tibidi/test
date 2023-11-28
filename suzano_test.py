@@ -368,7 +368,7 @@ if authentication_status:
             selected_date=st.date_input("SELECT DATE")
             day_range=st.selectbox("Select Day Range (info on how many days)",range(1,5))
             
-            begin_date=dt.date(selected_date)
+            begin_date=selected_date
             end_date=begin_date+dt.timedelta(days=int(day_range))
             begin_date=dt.datetime.strftime(begin_date,"%Y%m%d")
             end_date=dt.datetime.strftime(end_date,"%Y%m%d")

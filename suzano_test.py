@@ -365,11 +365,14 @@ if authentication_status:
                     "Sep":"09","Oct":"10","Nov":"11","Dec":"12"}
             month=st.selectbox("Select Month",months)
             day=st.selectbox("Select Day",range(1,31))
-            selected_date=st.date_input("SELECT DATE")
-            day_range=st.selectbox("Select Day Range (info on how many days)",range(1,5))
+            a1,a2,a3=st.columns([2,2,6])
+            with a1:
+                begin_date=st.date_input("FROM")
+            with a2:
+                end_date=st.date_input("TO",key="erresa")
+           
             
-            begin_date=selected_date
-            end_date=begin_date+dt.timedelta(days=int(day_range))
+       
             begin_date=dt.datetime.strftime(begin_date,"%Y%m%d")
             end_date=dt.datetime.strftime(end_date,"%Y%m%d")
             

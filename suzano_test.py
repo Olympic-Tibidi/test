@@ -481,7 +481,9 @@ if authentication_status:
                     st.session_state.year=year
                     
                 ### LOAD LEDGERS by year
-                ledgers=pd.read_feather(fr"C:\Users\AfsinY\Desktop\LEDGERS\main{year}.ftr")
+                ledgers=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
+               
+                ledgers=pd.read_feather(io.BytesIO(ledgers))
                 ledgers["Account"]=ledgers["Account"].astype("str")
                 ledgers.set_index("index",drop=True,inplace=True)
                 

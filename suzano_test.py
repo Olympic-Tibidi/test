@@ -1039,8 +1039,8 @@ if authentication_status:
         
             with fintab3:
                 resim=gcp_download_x(target_bucket,rf"FIN/2023Adopted.png")
-                resim=io.BytesIO(ledgers)
-                resim=Image.open(r"C:/Users/AfsinY/Desktop/Dashboard/")
+                resim=Image.open(io.BytesIO(resim))
+                
                 agree = st.checkbox('CHECK BOX TO SEE 2023 BUDGET STRUCTURE')
         
                 if agree:

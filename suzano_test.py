@@ -482,7 +482,6 @@ if authentication_status:
                     
                 ### LOAD LEDGERS by year
                 ledgers=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
-               
                 ledgers=pd.read_feather(io.BytesIO(ledgers))
                 ledgers["Account"]=ledgers["Account"].astype("str")
                 ledgers.set_index("index",drop=True,inplace=True)
@@ -784,8 +783,9 @@ if authentication_status:
                 
                     
                 ### LOAD LEDGERS by year
-                ledger_b=pd.read_feather(fr"C:\Users\AfsinY\Desktop\LEDGERS\main{year}.ftr")
-                #main["Account"]=ledgers["Account"].astype("str")
+                ledger_b=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
+                ledger_b=pd.read_feather(io.BytesIO(ledger_b))
+                ledger_b["Account"]=ledger_b["Account"].astype("str")
                 ledger_b.set_index("index",drop=True,inplace=True)
                 
                 ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32

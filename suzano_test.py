@@ -1046,8 +1046,10 @@ if authentication_status:
                 if agree:
                     st.image(resim)
                 
-                temp=pd.read_feather(fr"C:\Users\AfsinY\Desktop\LEDGERS\main2022.ftr")
-                temp2023=pd.read_feather(fr"C:\Users\AfsinY\Desktop\LEDGERS\main2023.ftr")
+                temp=gcp_download_x(target_bucket,rf"FIN/main2022.ftr")
+                temp=pd.read_feather(io.BytesIO(temp)) 
+                temp2023=gcp_download_x(target_bucket,rf"FIN/main2023.ftr")
+                temp2023=pd.read_feather(io.BytesIO(temp2023))
                 temp["Account"]=temp["Account"].astype("str")
                 temp.set_index("index",drop=True,inplace=True)
                 temp.Account=[str(i)+"-"+str(j) for i,j in zip(temp.Account,temp.Sub_Cat)]

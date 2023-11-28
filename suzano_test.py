@@ -415,8 +415,8 @@ if authentication_status:
             budget_codes=gcp_download_x(target_bucket,rf"FIN/budget_codes.feather")
             budget_codes=pd.read_feather(io.BytesIO(budget_codes))
             budget_codes.set_index("index",drop=True,inplace=True)
-            with open(fr'c:\Users\Afsiny\Desktop\Dashboard\budget.pkl', 'rb') as f:
-                budget = pickle.load(f)
+            budget=gcp_download_x(target_bucket,rf"FIN/budget.pkl")
+            budget = pickle.load(io.BytesIO(budget))
             keys={}
             revenues_codes=list(get_all_keys(budget["Revenues"],keys).keys())
             keys={}
@@ -431,10 +431,8 @@ if authentication_status:
             expenses=operations_codes+maintenance_codes+overhead_codes
             expenses_dep=expenses+depreciation_codes
         
-            with open(fr"C:\Users\AfsinY\Desktop\Dashboard\accounts_classes.pkl", "rb") as f:
-                accounts_= pickle.load(f)
-            with open(fr'c:\Users\Afsiny\Desktop\Dashboard\budget.pkl', 'rb') as f:
-                 budget = pickle.load(f)
+            accounts_classes=gcp_download_x(target_bucket,rf"FIN/accounts_classes.pkl")
+            accounts_classes = pickle.load(io.BytesIO(accounts_classes))
         
              
         

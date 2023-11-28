@@ -1124,9 +1124,10 @@ if authentication_status:
                     
                     pattern = r'^([A-Z&]{3}\d{3})\s+(.+)$'
                     vendors={}
+                    tata=[]
                     # Loop over the strings and print the vendor codes and names
                     for s in ledgers["Description"].values.tolist():
-                        
+                        tata.append(s)
                         try:
                             match = re.match(pattern, s)
                             if match:
@@ -1136,9 +1137,9 @@ if authentication_status:
                                 #print(f'{vendor_code} {vendor_name}')
                         except:
                             pass
-                        
                     
-            #             string_=st.text_input("Search by name, use all or part of string,e.g CUM for cummins, case does not matter.")
+                    
+                    st.write(tata)
         
                     string_=st.selectbox("Select Vendor",vendors.keys(),key="vendor")
                

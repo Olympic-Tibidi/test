@@ -764,7 +764,9 @@ if authentication_status:
                         yillar=["2023","2022","2021","2020","2019","2018", "2017","2016"]
                         results=[]
                         for k in yillar:
-                            temp=pd.read_feather(fr"C:\Users\AfsinY\Desktop\LEDGERS\main{k}.ftr")
+                            temp=gcp_download_x(target_bucket,rf"FIN/main{k}.ftr")
+                            temp=pd.read_feather(io.BytesIO(temp))
+                            
                         
                             temp.set_index("index",drop=True,inplace=True)
         

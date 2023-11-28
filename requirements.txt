@@ -12,3 +12,4 @@ git+https://github.com/streamlit/files-connection
 plotly
 google-cloud-storage
 xlsxwriter
+beautifulsoup4==4.9.3

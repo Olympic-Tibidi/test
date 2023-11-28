@@ -1201,7 +1201,7 @@ if authentication_status:
                 year=st.selectbox("SELECT YEAR",["2023","2022","2021","2020","2019","2018","2017"],key="depreciation")
                 terminal_depreciation=gcp_download_x(target_bucket,rf"FIN/main{year}-30.ftr")
                 terminal_depreciation=pd.read_feather(io.BytesIO(terminal_depreciation)).set_index("index",drop=True).reset_index(drop=True)
-                terminal_depreciation=pd.read_feather(fr"C:\Users\AfsinY\Desktop\LEDGERS\main{year}-30.ftr")
+                
                 a=terminal_depreciation[terminal_depreciation["Account"].isin( [i for i in terminal_depreciation.Account.unique().tolist() if i>1700000 and  i<2000000])]
                 a=a.groupby(["Account"])[["Credit"]].sum()
                 a.insert(0,"Name",[terminal_depreciation.loc[terminal_depreciation["Account"]==i,"Name"].values[0] for i in a.index])

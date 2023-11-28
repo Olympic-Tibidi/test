@@ -1140,7 +1140,7 @@ if authentication_status:
                             pass
                     
                     
-                    st.write(tata[15])
+                    st.write(tata[1500])
         
                     string_=st.selectbox("Select Vendor",vendors.keys(),key="vendor")
                

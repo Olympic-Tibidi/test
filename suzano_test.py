@@ -349,10 +349,65 @@ if authentication_status:
         st.subheader("PORT OF OLYMPIA TOS")
         st.write(f'Welcome *{name}*')
         select=st.sidebar.radio("SELECT FUNCTION",
-            ('ADMIN', 'LOADOUT', 'INVENTORY','DATA BACKUP'))
+            ('FINANCE','ADMIN', 'LOADOUT', 'INVENTORY','TIDES','WEATHER','DATA BACKUP'))
         
-            #tab1,tab2,tab3,tab4= st.tabs(["UPLOAD SHIPMENT FILE","ENTER LOADOUT DATA","INVENTORY","CAPTURE"])
+        if select=="TIDES":
+   
+            #components.iframe("https://www.moonconnection.com/current_moon_phase.phtml")
+            #components.iframe("<div id='weatherwidget' class='weatherwidget' style='width:45%;float:left;'></div><script src='//widget.meteomatics.com/widget/<Location>/<47.0379_-122.9007>/<width>/on/<target_id>/<unit>' type='text/javascript'></script>")
+            st.header("OLYMPIA TIDES")
+            st.subheader("FROM NOAA API  - STATION 9446969")
+            st.write("Don't go further ahead than 1 year")
+            months={"Jan":"01","Feb":"02","Mar":"03","Apr":"04",
+                    "May":"05","Jun":"06","Jul":"07","Aug":"08",
+                    "Sep":"09","Oct":"10","Nov":"11","Dec":"12"}
+            month=st.selectbox("Select Month",months)
+            day=st.selectbox("Select Day",range(1,31))
+            day_range=st.selectbox("Select Day Range (info on how many days)",range(1,5))
             
+            begin_date=dt.date(2023,int(months[month]),int(day))
+            end_date=begin_date+dt.timedelta(days=int(day_range))
+            begin_date=dt.datetime.strftime(begin_date,"%Y%m%d")
+            end_date=dt.datetime.strftime(end_date,"%Y%m%d")
+            
+            url = f'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date={begin_date}&end_date={end_date}&station=9446969&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=hilo&units=english&application=DataAPI_Sample&format=xml'
+            headers = { 
+                                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36', 
+                            'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 
+                            'Accept-Language' : 'en-US,en;q=0.5', 
+                            'Accept-Encoding' : 'gzip', 
+                            'DNT' : '1', # Do Not Track Request Header 
+                            'Connection' : 'close' }
+            # Send a GET request to the URL and retrieve the response
+            response = requests.get(url,headers=headers)
+            soup = BeautifulSoup(response.content, 'xml')
+        
+            # Find all the <a> tags in the HTML content
+            tides=defaultdict()
+        
+            link_tags = soup.find_all('pr')
+            #print(link_tags)
+            tides["Time"]=[]
+            tides["Tide"]=[]
+            tides["Height"]=[]
+            for i in link_tags:
+                tides["Time"].append(i.get("t"))
+                tides["Tide"].append(i.get("type"))
+                tides["Height"].append(i.get("v"))
+            tides=pd.DataFrame(tides)
+            tides["Tide"]=["Low" if i=="L" else "High" for i in tides["Tide"]]
+            #print(tides["Time"].dtype)
+            tides["Time"]=[dt.datetime.strftime(dt.datetime.strptime(i,"%Y-%m-%d %H:%M"),"%B-%d,%a--%H:%M") for i in tides["Time"]]
+            tides.set_index("Time",drop=True,inplace=True)
+            #st.table(tides)
+            st.markdown(tides.to_html(), unsafe_allow_html=True)    
+                    
+        if select=="FINANCE":
+            pass
+        if select=="WEATHER":
+            pass
+        
+        
         if select=="DATA BACKUP" :
             st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
             try_lan=False

@@ -1127,7 +1127,7 @@ if authentication_status:
                     tata=[]
                     # Loop over the strings and print the vendor codes and names
                     for s in ledgers["Description"].values.tolist():
-                        s=s.string()
+                        s=str(s)
                         tata.append(s)
                         try:
                             match = re.match(pattern, s)

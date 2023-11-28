@@ -40,6 +40,7 @@ import requests
 from bs4 import BeautifulSoup
 from PIL import Image
 import plotly.graph_objects as go
+import re
 st.set_page_config(layout="wide")
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"

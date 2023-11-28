@@ -412,7 +412,8 @@ if authentication_status:
         
             #### LOAD BUDGET CODES, has information on 2022 and 2023 budget by account number
         
-            budget_codes=pd.read_feather(fr"C:\Users\AfsinY\Desktop\Dashboard\budget_codes.feather")
+            budget_codes=gcp_download(target_bucket,rf"FIN\budget_codes.feather")
+            budget_codes=pd.read_feather(budget_codes)
             budget_codes.set_index("index",drop=True,inplace=True)
             with open(fr'c:\Users\Afsiny\Desktop\Dashboard\budget.pkl', 'rb') as f:
                 budget = pickle.load(f)

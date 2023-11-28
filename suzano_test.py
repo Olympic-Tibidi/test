@@ -1129,13 +1129,14 @@ if authentication_status:
                         
                         try:
                             match = re.match(pattern, s)
+                            if match:
+                                vendor_code = match.group(1)
+                                vendor_name = match.group(2)
+                                vendors[vendor_name]=vendor_code
+                                #print(f'{vendor_code} {vendor_name}')
                         except:
                             pass
-                        if match:
-                            vendor_code = match.group(1)
-                            vendor_name = match.group(2)
-                            vendors[vendor_name]=vendor_code
-                            #print(f'{vendor_code} {vendor_name}')
+                        
                     
             #             string_=st.text_input("Search by name, use all or part of string,e.g CUM for cummins, case does not matter.")
         

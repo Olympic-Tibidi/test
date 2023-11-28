@@ -38,6 +38,7 @@ import plotly.graph_objects as go         #to create interactive charts
 import zipfile
 import requests
 from bs4 import BeautifulSoup
+from PIL import Image
 import plotly.graph_objects as go
 st.set_page_config(layout="wide")
 
@@ -1037,8 +1038,9 @@ if authentication_status:
         
         
             with fintab3:
-                
-                resim=Image.open(r"C:/Users/AfsinY/Desktop/Dashboard/2023Adopted.png")
+                resim=gcp_download_x(target_bucket,rf"FIN/2023Adopted.png")
+                resim=io.BytesIO(ledgers)
+                resim=Image.open(r"C:/Users/AfsinY/Desktop/Dashboard/")
                 agree = st.checkbox('CHECK BOX TO SEE 2023 BUDGET STRUCTURE')
         
                 if agree:

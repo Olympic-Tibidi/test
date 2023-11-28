@@ -507,7 +507,7 @@ if authentication_status:
         
                 # Lets check if Deep categories or shallow (Revenue versus Depreciation)
                 deep=True if category in ["Revenues","Operating Expenses","Maintenance Expenses"] else False
-                
+                structure=budget.copy()
                 # LOAD a list of sub_cats to display. If not deep the keys becomes the names of subcats due to shallow depth.(last nodes)
                 liste=[f"ALL {category.upper()}"]+list(structure[category].keys()) if deep else [f"ALL {category.upper()}"]+list(structure[category].values())
                     

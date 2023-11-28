@@ -360,11 +360,7 @@ if authentication_status:
             st.header("OLYMPIA TIDES")
             st.subheader("FROM NOAA API  - STATION 9446969")
             st.write("Don't go further ahead than 1 year")
-            months={"Jan":"01","Feb":"02","Mar":"03","Apr":"04",
-                    "May":"05","Jun":"06","Jul":"07","Aug":"08",
-                    "Sep":"09","Oct":"10","Nov":"11","Dec":"12"}
-            month=st.selectbox("Select Month",months)
-            day=st.selectbox("Select Day",range(1,31))
+            
             a1,a2,a3=st.columns([2,2,6])
             with a1:
                 begin_date=st.date_input("FROM")

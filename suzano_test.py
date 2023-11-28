@@ -382,7 +382,7 @@ if authentication_status:
                             'Connection' : 'close' }
             # Send a GET request to the URL and retrieve the response
             response = requests.get(url,headers=headers)
-            soup = BeautifulSoup(response.content, 'xml')
+            soup = BeautifulSoup(response.content, 'html5lib')
         
             # Find all the <a> tags in the HTML content
             tides=defaultdict()

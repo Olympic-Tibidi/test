@@ -440,6 +440,11 @@ if authentication_status:
                     else:
                         keys[k]=v
                 return keys
+            def dollar_format(x):
+                if isinstance(x, (int, float)):
+                    return '${:,.1f}'.format(x)
+                else:
+                    return x
             tt=f"MARINE TERMINAL FINANCIALS"
             original_title = f'<p style="font-family:Arial;font-weight: bold; color:Black; font-size: 20px;">{tt}</p>'
             st.markdown(original_title, unsafe_allow_html=True)

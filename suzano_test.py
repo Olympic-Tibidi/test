@@ -1116,7 +1116,7 @@ if authentication_status:
                 ledgers=pd.read_feather(io.BytesIO(ledgers))
                 ledgers["Account"]=ledgers["Account"].astype("str")
                 ledgers.set_index("index",drop=True,inplace=True)
-                st.write(ledgers)
+                
 
                 for_search_ledger=ledgers.fillna("")
                 
@@ -1141,9 +1141,7 @@ if authentication_status:
                             pass
                     
                     
-                    st.write(tata[1500])
-                    match = re.match(pattern, tata[1500])
-                    st.write(match.group(1))
+                    
         
                     string_=st.selectbox("Select Vendor",vendors.keys(),key="vendor")
                

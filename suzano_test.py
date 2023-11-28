@@ -1108,8 +1108,8 @@ if authentication_status:
         
                 ledgers=gcp_download_x(target_bucket,rf"FIN/main{ear}.ftr")
                 ledgers=pd.read_feather(io.BytesIO(ledgers))
-                ledgers["Account"]=ledgers["Account"].astype("str")
-                ledgers.set_index("index",drop=True,inplace=True)
+                #ledgers["Account"]=ledgers["Account"].astype("str")
+                #ledgers.set_index("index",drop=True,inplace=True)
 
                 for_search_ledger=ledgers.fillna("")
                 

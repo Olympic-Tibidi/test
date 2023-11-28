@@ -493,8 +493,7 @@ if authentication_status:
                 
                 
                 ##### LOAD THE MARINE ACCOUNT STRUCTURE dictionary from pickle file - AFSIN budget structure
-                with open(fr'c:\Users\afsiny\Desktop\Dashboard\budget.pkl', 'rb') as f:
-                    structure = pickle.load(f)
+               
                     
                 st.session_state.category=None
                 st.session_state.sub_category=None

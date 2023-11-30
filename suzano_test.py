@@ -545,7 +545,7 @@ if authentication_status:
                 with ttab2:
                     
                     if st.checkbox("UPLOAD LEDGER CSV",key="fsdsw"):
-                        led_col1,led_col2,led_col3=st.columns([3,3,4])
+                        led_col1,led_col2,led_col3,led_col4=st.columns([3,2,2,2])
                         with led_col1:
                             
                             m30 = st.file_uploader("**Upload Ledger 030 csv**", type=["csv"],key="34wss")
@@ -607,7 +607,7 @@ if authentication_status:
                                     set=pd.read_feather(feather_data).set_index("index",drop=True).reset_index(drop=True)
                                     if k==m30:
                                         with led_col3:
-                                            st.write("Processing Depreciation and Overhead from Ledger 030...")
+                                            st.write("Processing Depreciation/Overhead")
                                         set["Net"]=set["Credit"]-set["Debit"]
                                         depreciation=set[set.Account.astype(str).str.startswith("17")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
                                         overhead=set[set.Account.astype(str).str.startswith("735")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
@@ -634,34 +634,34 @@ if authentication_status:
                                         blob = bucket.blob(rf"FIN/main2023-30.ftr")
                                         blob.upload_from_filename(temp_file_path)
                                     if k==m32:
-                                        with led_col2:
-                                            st.write("Processing Ledger 032...")
+                                        
                                         set["Net"]=set["Credit"]-set["Debit"]
                                         
                                         first=set.copy()
-                                        st.write(f"Main 032 (First)")
-                                        st.write("Total Credit :${:,}".format(round(first.Credit.sum(),2)))
-                                        st.write("Total Debit  :${:,}".format(round(first.Debit.sum(),2)))
-                                        st.write("Net          :${:,}".format(round(first.Credit.sum()-first.Debit.sum(),2)))
+                                        with led_col4:
+                                            st.write("Processing Ledger 032...")
+                                            st.write("Total Credit :${:,}".format(round(first.Credit.sum(),2)))
+                                            st.write("Total Debit  :${:,}".format(round(first.Debit.sum(),2)))
+                                            st.write("Net          :${:,}".format(round(first.Credit.sum()-first.Debit.sum(),2)))
                                    
                                     if k==m36:
-                                        with led_col2:
-                                            st.write("Processing Ledger 036...")
+                                        
                                         set["Net"]=set["Credit"]-set["Debit"]
                                         third=set.copy()
-                                        st.write(f"Main 036 (Third)")
-                                        st.write("Total Credit :${:,}".format(round(third.Credit.sum(),2)))
-                                        st.write("Total Debit  :${:,}".format(round(third.Debit.sum(),2)))
-                                        st.write("Net          :${:,}".format(round(third.Credit.sum()-third.Debit.sum(),2)))
+                                        with led_col4:
+                                            st.write("Processing Ledger 036...")
+                                            st.write("Total Credit :${:,}".format(round(third.Credit.sum(),2)))
+                                            st.write("Total Debit  :${:,}".format(round(third.Debit.sum(),2)))
+                                            st.write("Net          :${:,}".format(round(third.Credit.sum()-third.Debit.sum(),2)))
                                     if k==m40:
-                                        with led_col2:
-                                            st.write("Processing Ledger 040...")
+                                        
                                         set["Net"]=set["Credit"]-set["Debit"]
                                         fourth=set.copy()
-                                        st.write(f"Main 040 (Fourth)")
-                                        st.write("Total Credit :${:,}".format(round(fourth.Credit.sum(),2)))
-                                        st.write("Total Debit  :${:,}".format(round(fourth.Debit.sum(),2)))
-                                        st.write("Net          :${:,}".format(round(fourth.Credit.sum()-fourth.Debit.sum(),2)))
+                                        with led_col4:
+                                            st.write("Processing Ledger 040...")
+                                            st.write("Total Credit :${:,}".format(round(fourth.Credit.sum(),2)))
+                                            st.write("Total Debit  :${:,}".format(round(fourth.Debit.sum(),2)))
+                                            st.write("Net          :${:,}".format(round(fourth.Credit.sum()-fourth.Debit.sum(),2)))
                                 store=pd.concat([first,main30,overhead,third,fourth])
                                     
                                     

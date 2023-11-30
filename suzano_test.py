@@ -606,23 +606,23 @@ if authentication_status:
                                 
                                     set=pd.read_feather(feather_data).set_index("index",drop=True).reset_index(drop=True)
                                     if k==m30:
-                                        with led_col2:
+                                        with led_col3:
                                             st.write("Processing Depreciation and Overhead from Ledger 030...")
                                         set["Net"]=set["Credit"]-set["Debit"]
                                         depreciation=set[set.Account.astype(str).str.startswith("17")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
                                         overhead=set[set.Account.astype(str).str.startswith("735")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
                                         main30=set[set.Account.astype(str).str.startswith("731")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
-                                        with led_col2:
+                                        with led_col3:
                                             st.write(f"Depreciation")
                                             st.write("Total Credit :${:,}".format(round(depreciation.Credit.sum(),2)))
                                             st.write("Total Debit  :${:,}".format(round(depreciation.Debit.sum(),2)))
                                             st.write("Net          :${:,}".format(round(depreciation.Credit.sum()-depreciation.Debit.sum(),2)))
-                                        with led_col2:
+                                        with led_col3:
                                             st.write(f"Overhead")
                                             st.write("Total Credit :${:,}".format(round(overhead.Credit.sum(),2)))
                                             st.write("Total Debit  :${:,}".format(round(overhead.Debit.sum(),2)))
                                             st.write("Net          :${:,}".format(round(overhead.Credit.sum()-overhead.Debit.sum(),2)))
-                                        with led_col2:
+                                        with led_col3:
                                             st.write(f"Main 030")
                                             st.write("Total Credit :${:,}".format(round(main30.Credit.sum(),2)))
                                             st.write("Total Debit  :${:,}".format(round(main30.Debit.sum(),2)))

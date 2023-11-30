@@ -613,17 +613,17 @@ if authentication_status:
                                         overhead=set[set.Account.astype(str).str.startswith("735")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
                                         main30=set[set.Account.astype(str).str.startswith("731")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
                                         with led_col3:
-                                            st.write(f"Depreciation")
+                                            st.markdown(f"**Depreciation**")
                                             st.write("Total Credit :${:,}".format(round(depreciation.Credit.sum(),2)))
                                             st.write("Total Debit  :${:,}".format(round(depreciation.Debit.sum(),2)))
                                             st.write("Net          :${:,}".format(round(depreciation.Credit.sum()-depreciation.Debit.sum(),2)))
                                         with led_col3:
-                                            st.write(f"Overhead")
+                                            st.markdown(f"**Overhead**")
                                             st.write("Total Credit :${:,}".format(round(overhead.Credit.sum(),2)))
                                             st.write("Total Debit  :${:,}".format(round(overhead.Debit.sum(),2)))
                                             st.write("Net          :${:,}".format(round(overhead.Credit.sum()-overhead.Debit.sum(),2)))
                                         with led_col3:
-                                            st.write(f"Main 030")
+                                            st.markdown(f"**Main Ledger 030**")
                                             st.write("Total Credit :${:,}".format(round(main30.Credit.sum(),2)))
                                             st.write("Total Debit  :${:,}".format(round(main30.Debit.sum(),2)))
                                             st.write("Net          :${:,}".format(round(main30.Credit.sum()-main30.Debit.sum(),2)))
@@ -639,7 +639,7 @@ if authentication_status:
                                         
                                         first=set.copy()
                                         with led_col4:
-                                            st.write("Processing Ledger 032...")
+                                            st.markdown(f"**Re-processing Ledger 032**")
                                             st.write("Total Credit :${:,}".format(round(first.Credit.sum(),2)))
                                             st.write("Total Debit  :${:,}".format(round(first.Debit.sum(),2)))
                                             st.write("Net          :${:,}".format(round(first.Credit.sum()-first.Debit.sum(),2)))
@@ -649,7 +649,7 @@ if authentication_status:
                                         set["Net"]=set["Credit"]-set["Debit"]
                                         third=set.copy()
                                         with led_col4:
-                                            st.write("Processing Ledger 036...")
+                                            st.markdown(f"**Re-processing Ledger 036**")
                                             st.write("Total Credit :${:,}".format(round(third.Credit.sum(),2)))
                                             st.write("Total Debit  :${:,}".format(round(third.Debit.sum(),2)))
                                             st.write("Net          :${:,}".format(round(third.Credit.sum()-third.Debit.sum(),2)))
@@ -658,7 +658,7 @@ if authentication_status:
                                         set["Net"]=set["Credit"]-set["Debit"]
                                         fourth=set.copy()
                                         with led_col4:
-                                            st.write("Processing Ledger 040...")
+                                            st.markdown(f"**Re-processing Ledger 040**")
                                             st.write("Total Credit :${:,}".format(round(fourth.Credit.sum(),2)))
                                             st.write("Total Debit  :${:,}".format(round(fourth.Debit.sum(),2)))
                                             st.write("Net          :${:,}".format(round(fourth.Credit.sum()-fourth.Debit.sum(),2)))

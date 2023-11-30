@@ -545,6 +545,19 @@ if authentication_status:
                 with ttab2:
                     
                     if st.checkbox("UPLOAD LEDGER CSV",key="fsdsw"):
+                        file_name = "celeb.mp3"
+
+                        # Download the MP3 file from GCS to a temporary local file
+                        storage_client = storage.Client()
+                        bucket = storage_client.bucket(target_bucket)
+                        blob = bucket.blob(file_name)
+                        
+                        # Create a temporary local file to store the downloaded MP3 file
+                        temp_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3").name
+                        blob.download_to_filename(temp_file_path)
+
+                        audio_file = open(temp_file_path, "rb").read()
+                        st.audio(audio_file, format="audio/mp3")
                         led_col1,led_col2,led_col3,led_col4=st.columns([3,2,2,2])
                         with led_col1:
                             

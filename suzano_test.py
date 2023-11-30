@@ -1388,7 +1388,7 @@ if authentication_status:
                         ledgers=pd.read_feather(io.BytesIO(ledgers))
                         ledgers["Account"]=ledgers["Account"].astype("str")
                         ledgers.set_index("index",drop=True,inplace=True)
-                        st.write(ledgers)
+                        #st.write(ledgers)
         
                         for_search_ledger=ledgers.fillna("")
                         

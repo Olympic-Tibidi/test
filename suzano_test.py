@@ -653,7 +653,7 @@ if authentication_status:
                                         st.write("Total Credit :${:,}".format(round(third.Credit.sum(),2)))
                                         st.write("Total Debit  :${:,}".format(round(third.Debit.sum(),2)))
                                         st.write("Net          :${:,}".format(round(third.Credit.sum()-third.Debit.sum(),2)))
-                                    if k==m36:
+                                    if k==m40:
                                         with led_col2:
                                             st.write("Processing Ledger 040...")
                                         set["Net"]=set["Credit"]-set["Debit"]

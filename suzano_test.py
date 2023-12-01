@@ -2089,6 +2089,7 @@ if authentication_status:
                                     release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
                                     st.write(release_order_dest_map[i])
                             st.write(release_order_dest_map)
+                            st.write(files_in_folder)
                             destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder]
                             
                                    ################################################ FAIL ####################################                                     

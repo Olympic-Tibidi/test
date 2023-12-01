@@ -2080,7 +2080,7 @@ if authentication_status:
                         files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
                         release_order_dest_map={}
                         st.write(files_in_folder)
-                        
+                        st.write(release_order_dictionary)
                         try:
                             
                             for i in release_order_dictionary:
@@ -2091,7 +2091,7 @@ if authentication_status:
                             destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder]
                             st.write(destinations_of_release_orders)
                                                                         
-                            requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
+                            requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders,key="tgsdfs")
                             requested_file=requested_file_.split(" ")[0]
                             nofile=0
                             

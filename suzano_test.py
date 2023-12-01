@@ -252,7 +252,7 @@ def edit_release_order_data(file,vessel,release_order_number,sales_order_item,de
        
       
     # Edit the loaded current dictionary.
-    file[vessel]=vessel
+    
     file[vessel][release_order_number]["destination"]= destination
     file[vessel][release_order_number]["po_number"]= po_number
     
@@ -268,7 +268,7 @@ def edit_release_order_data(file,vessel,release_order_number,sales_order_item,de
     file[vessel][release_order_number][sales_order_item]["shipped"]= shipped
     file[vessel][release_order_number][sales_order_item]["remaining"]=remaining
     
-    
+
        
 
     # Convert the dictionary to JSON format
@@ -1944,6 +1944,7 @@ if authentication_status:
                         vessel_edit=st.text_input("Vessel",list(to_edit.keys())[0])
                         po_number_edit=st.text_input("PO No",to_edit[vessel][release_order_number]["po_number"],disabled=False)
                         destination_edit=st.text_input("Destination",to_edit[vessel][release_order_number]["destination"],disabled=False)
+                        
                         sales_order_item_edit=st.text_input("Sales Order Item",list(to_edit[vessel][release_order_number].keys())[2],disabled=False)
                         ocean_bill_of_lading_edit=st.text_input("Ocean Bill Of Lading",to_edit[vessel][release_order_number][sales_order_item_edit]["ocean_bill_of_lading"],disabled=False)
                         wrap_edit=st.text_input("Grade",to_edit[vessel][release_order_number][sales_order_item_edit]["grade"],disabled=False)

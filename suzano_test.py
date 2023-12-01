@@ -2087,10 +2087,11 @@ if authentication_status:
                                 for sales in release_order_dictionary[i]:
                                     st.write(i,sales)
                                     release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
+                                    st.write(release_order_dest_map[i])
                             
                             destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder]
                             st.write(destinations_of_release_orders)
-                                                                        
+                                   ################################################ FAIL ####################################                                     
                             requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders,key="tgsdfs")
                             requested_file=requested_file_.split(" ")[0]
                             nofile=0

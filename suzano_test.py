@@ -1995,7 +1995,7 @@ if authentication_status:
                         elif edit:
                             data=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
                             to_edit=json.loads(data)
-                            temp=edit_release_order_data(to_edit,vessel_edit,release_order_number,sales_order_item,destination_edit,po_number_edit,batch_edit,ocean_bill_of_lading_edit,wrap_edit,
+                            temp=edit_release_order_data(to_edit,vessel_edit,release_order_number,sales_order_item_edit,destination_edit,po_number_edit,batch_edit,ocean_bill_of_lading_edit,wrap_edit,
                                                          dryness_edit,unitized_edit,quantity_edit,shipped_edit,remaining_edit,tonnage_edit,transport_type_edit,carrier_code_edit)
                             st.write(f"Edited release order {release_order_number} successfully!")
                             

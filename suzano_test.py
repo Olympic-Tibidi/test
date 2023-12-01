@@ -1951,6 +1951,7 @@ if authentication_status:
                         dryness_edit=st.text_input("Dryness",to_edit[vessel][release_order_number][sales_order_item_edit]["dryness"],disabled=False)
                         admt_edit=st.text_input("ADMT PER UNIT",round(int(batch_mapping[ocean_bill_of_lading_edit]["dryness"])/90,6),disabled=False)
                         unitized_edit=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
+                        transport_type_edit=st.selectbox("Transport Type",["TRUCK","RAIL"])
                         carrier_code_edit=st.selectbox("Carrier Code",to_edit[vessel][release_order_number][sales_order_item_edit]["carrier_code"])     
                         quantity_edit=st.number_input("Quantity of Units", to_edit[vessel][release_order_number][sales_order_item_edit]["quantity"], disabled=False, label_visibility="visible")
                         

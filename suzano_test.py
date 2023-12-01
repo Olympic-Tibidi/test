@@ -1940,7 +1940,7 @@ if authentication_status:
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")[1:]] if i not in junk]))
                         to_edit=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
                         to_edit=json.loads(to_edit)
-                        vessel_edit=st.text_input("Vessel",to_edit.keys[0])
+                        vessel_edit=st.text_input("Vessel",list(to_edit.keys())[0])
                         po_number_edit=st.text_input("PO No",to_edit[vessel][release_order_number]["po_number"],disabled=False)
                         destination_edit=st.text_input("Destination",to_edit[vessel][release_order_number]["destination"],disabled=False)
                         sales_order_item_edit=st.text_input("Sales Order Item",list(to_edit[vessel][release_order_number].keys())[2],disabled=False)

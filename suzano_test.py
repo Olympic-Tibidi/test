@@ -2086,13 +2086,14 @@ if authentication_status:
                                     release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
                             
                             destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder]
-                        
+                            st.write(destinations_of_release_orders)
                                                                         
                             requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
                             requested_file=requested_file_.split(" ")[0]
                             nofile=0
+                            
                         except:
-                            st.write("NO RELEASE ORDERS YET")
+                            st.write("NO RELEASE ORDERS YET THIS FAILS")
                         try:
                             data=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
                             release_order_json = json.loads(data)

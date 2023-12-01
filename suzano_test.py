@@ -2079,6 +2079,8 @@ if authentication_status:
                         files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
                         files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
                         release_order_dest_map={}
+                        st.write(files_in_folder)
+                        
                         try:
                             
                             for i in release_order_dictionary:
@@ -2094,6 +2096,9 @@ if authentication_status:
                             
                         except:
                             st.write("NO RELEASE ORDERS YET THIS FAILS")
+
+
+                        
                         try:
                             data=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
                             release_order_json = json.loads(data)

@@ -2090,7 +2090,7 @@ if authentication_status:
                                     st.write(release_order_dest_map[i])
                             st.write(release_order_dest_map)
                             st.write(files_in_folder)
-                            destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder]
+                            destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder if i!=""]
                             
                                    ################################################ FAIL ####################################                                     
                             requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders,key="tgsdfs")

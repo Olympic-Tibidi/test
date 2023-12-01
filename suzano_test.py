@@ -1938,6 +1938,7 @@ if authentication_status:
                     if edit:
                         
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")[1:]] if i not in junk]))
+                        
                         to_edit=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
                         to_edit=json.loads(to_edit)
                         vessel_edit=st.text_input("Vessel",list(to_edit.keys())[0])
@@ -1994,7 +1995,7 @@ if authentication_status:
                         elif edit:
                             data=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
                             to_edit=json.loads(data)
-                            temp=edit_release_order_data(to_edit,vessel_edit,release_order_number_edit,sales_order_item,destination_edit,po_number_edit,batch_edit,ocean_bill_of_lading_edit,wrap_edit,
+                            temp=edit_release_order_data(to_edit,vessel_edit,release_order_number,sales_order_item,destination_edit,po_number_edit,batch_edit,ocean_bill_of_lading_edit,wrap_edit,
                                                          dryness_edit,unitized_edit,quantity_edit,shipped_edit,remaining_edit,tonnage_edit,transport_type_edit,carrier_code_edit)
                             st.write(f"Edited release order {release_order_number} successfully!")
                             

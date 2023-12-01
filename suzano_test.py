@@ -43,6 +43,7 @@ import plotly.graph_objects as go
 import re
 import tempfile
 import plotly.graph_objects as go
+
 st.set_page_config(layout="wide")
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"
@@ -545,26 +546,6 @@ if authentication_status:
                 with ttab2:
                     
                     if st.checkbox("UPLOAD LEDGER CSV",key="fsdsw"):
-                        file_name = "celeb.mp3"
-
-                        # Download the MP3 file from GCS to a temporary local file
-                        storage_client = storage.Client()
-                        bucket = storage_client.bucket(target_bucket)
-                        blob = bucket.blob(file_name)
-                        
-                        # Create a temporary local file to store the downloaded MP3 file
-                        temp_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3").name
-                        blob.download_to_filename(temp_file_path)
-                        st.write(
-                                """
-                                <script>
-                                    const audio = new Audio("{temp_file_path}");
-                                    audio.play();
-                                </script>
-                                """
-    )
-                        audio_file = open(temp_file_path, "rb").read()
-                        st.audio(audio_file, format="audio/mp3")
                         led_col1,led_col2,led_col3,led_col4=st.columns([3,2,2,2])
                         with led_col1:
                             
@@ -2079,26 +2060,20 @@ if authentication_status:
                         files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
                         files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
                         release_order_dest_map={}
-                       
                         try:
                             
                             for i in release_order_dictionary:
                                 for sales in release_order_dictionary[i]:
-                                   
                                     release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
-                                 
-                            destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder if i!=""]
                             
-                                   ################################################ FAIL ####################################                                     
-                            requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders,key="tgsdfs")
+                            destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder if i!=""]
+                        
+                                                                        
+                            requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
                             requested_file=requested_file_.split(" ")[0]
                             nofile=0
-                            
                         except:
-                            st.write("NO RELEASE ORDERS YET THIS FAILS")
-
-
-                        
+                            st.write("NO RELEASE ORDERS YET")
                         try:
                             data=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
                             release_order_json = json.loads(data)
@@ -2423,9 +2398,9 @@ if authentication_status:
         if select=="LOADOUT" :
         
             
-            bill_mapping=gcp_download(target_bucket,"bill_mapping.json")
+            bill_mapping=gcp_download("olym_suzano","bill_mapping.json")
             bill_mapping=json.loads(bill_mapping)
-            mill_info_=gcp_download(target_bucket,rf"mill_info.json")
+            mill_info_=gcp_download("olym_suzano",rf"mill_info.json")
             mill_info=json.loads(mill_info_)
             mf_numbers_for_load=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
             mf_numbers_for_load=json.loads(mf_numbers_for_load)
@@ -3256,7 +3231,8 @@ if authentication_status:
                                                           'Accumulated_Tonnage':"Shipped Tonnage To_Date"},inplace=True)
                         merged_df_grouped=merged_df_grouped.reset_index()
                         merged_df_grouped["Date"]=merged_df_grouped['Date'].dt.strftime('%m-%d-%Y, %A')
-                        merged_df_grouped=merged_df_grouped.set_index("Date",drop=True)
+                        #merged_df_grouped=merged_df_grouped.set_index("Date",drop=True)
+                      
                         st.dataframe(merged_df_grouped)
                         csv_inventory=convert_df(merged_df_grouped)
                         st.download_button(

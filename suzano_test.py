@@ -433,7 +433,7 @@ if authentication_status:
 
             storage_client = Client()
             bucket = storage_client.bucket(target_bucket)
-        
+            max_results=5
             blob_names = [blob.name for blob in bucket.list_blobs(max_results=max_results)]
             destination_directory=r"C:\Users\afsiny\Desktop\PLAY"
             results = transfer_manager.download_many_to_path(

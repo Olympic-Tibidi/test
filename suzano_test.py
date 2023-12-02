@@ -432,119 +432,37 @@ if authentication_status:
             try_lan=False
                             
 
-            if try_lan:
-                st.markdown(
-                    """
-                    <style>
-                        /* Add custom CSS styles here */
-                        body {
-                            font-family: 'Arial', sans-serif;
-                            background-color: #f4f4f4;
-                            color: #333333;
-                        }
-                        h1 {
-                            color: #009688; /* Teal */
-                        }
-                        p {
-                            font-size: 36px;
-                        }
-                        .blue-text {
-                            color: #2196F3; /* Blue */
-                        }
-                        .red-text {
-                            color: #FF5252; /* Red */
-                        }
-                        .green-text {
-                            color: #4CAF50; /* Green */
-                        }
-                    </style>
-                    
-                    # Custom Styling with HTML and CSS
-                    
-                    This is a Streamlit app with custom styling.
-                
-                    - You can include bullet points.
-                    - Add more text and formatting.
-                    - Use *Markdown* syntax.
-                
-                    <p class="blue-text">This text is in blue.</p>
-                    <p class="red-text">This text is in red.</p>
-                    <p class="green-text">This text is in green.</p>
-                    """,
-                    unsafe_allow_html=True
-                )
-                
-                scorecard = pd.DataFrame(columns=['User', 'Hour', 'Ot', 'Totaled'])
-    
-                # Input your data using experimental data editor
-                st.write("Input your data below:")
-                input_data = pd.DataFrame(index=[1,2,3,4,5], columns=['Rank', 'Shift', 'Hour','Ot'])
-                input_data = input_data.fillna(0)  # fill with zeros
-                
-                edited_data = st.experimental_data_editor(input_data)
-                
-                # Handle user input
-                if st.button('Submit'):
-                    edited_data['Totaled'] = edited_data['Hour'] + edited_data['Ot']
-                    scorecard = scorecard.append(edited_data, ignore_index=True)
-                
-                # Display the updated scorecard
-                st.write("Updated Scorecard:")
-                st.table(scorecard)
-                if "scores" not in st.session_state:
-                    st.session_state.scores = [
-                        {"name": "Josh", "Pushups": 10, "Situps": 20},
-                    ]
-                
-                
-                def new_scores():
-                    st.session_state.scores.append(
-                        {
-                            "name": st.session_state.name,
-                            "Pushups": st.session_state.pushups,
-                            "Situps": st.session_state.situps,
-                        }
-                    )
-                
-                
-                st.write("# Score table")
-                
-                score_df = pd.DataFrame(st.session_state.scores)
-                score_df["total_points"] = score_df["Pushups"] + score_df["Situps"]
-                
-                st.write(score_df)
-                
-                st.write("# Add a new score")
-                with st.form("new_score", clear_on_submit=True):
-                    name = st.text_input("Name", key="name")
-                    pushups = st.number_input("Pushups", key="pushups", step=1, value=0, min_value=0)
-                    situps = st.number_input("Situps", key="situps", step=1, value=0, min_value=0)
-                    st.form_submit_button("Submit", on_click=new_scores)
-            def download_files_in_folder(bucket, folder_name, output_directory):
-                blob_iterator = bucket.list_blobs(prefix=folder_name)
-            
-                for blob in blob_iterator:
-                    # Skip folders (objects ending with '/')
-                    if blob.name.endswith('/'):
-                        continue
-            
-                    # Download the file to the specified output directory
-                    output_path = os.path.join(output_directory, os.path.basename(blob.name))
-                    blob.download_to_filename(output_path)
 
-            if st.button("BACKUP DATA"):
-                st.write("OK")
-                client = storage.Client()
-                bucket = client.bucket(target_bucket)
+            # Function to download files from GCS
+            def download_files(bucket_name, prefix):
+                # Set up GCS client
+                credentials, project = storage.auth.default()
+                client = storage.Client(credentials=credentials, project=project)
             
-                list_files_to_download = ['dispatched.json','terminal_bill_of_ladings.json','truck_schedule.xlsx','suzano_report.json',
-                                          'mill_progress.json', 'Inventory.csv']
-                
-                # Create a temporary directory to store the downloaded files
-                with st.spinner("Downloading files..."):
-                    for file_to_download in list_files_to_download:
-                        blob = bucket.blob(file_to_download)
-                        blob.download_to_filename(f'./{blob.name}')
+                bucket = client.get_bucket(bucket_name)
+                blobs = bucket.list_blobs(prefix=prefix)
+            
+                file_paths = []
+            
+                for blob in blobs:
+                    file_path = f"./downloads/{blob.name}"
+                    blob.download_to_filename(file_path)
+                    file_paths.append(file_path)
+            
+                return file_paths
+
+            # Streamlit app
+            st.title("GCS Batch File Downloader")
+
+# Input for GCS bucket name and prefix
+
+            prefix = st.text_input("Enter File Prefix (optional):")
+
+            if st.button("Download Files"):
+                st.info("Downloading files. Please wait...")
+                file_paths = download_files(target_name, prefix)
+                st.success(f"Files downloaded successfully! Downloaded files: {file_paths}")
+
                 
                 
         if select=="FINANCE":

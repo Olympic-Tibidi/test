@@ -431,6 +431,9 @@ if authentication_status:
             st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
           
             storage_client = storage.Client()
+           
+            bucket = storage_client.bucket(target_bucket)
+            
             list_files_to_download = ['terminal_bill_of_ladings.json']
             for file_to_download in list_files_to_download:
                 blob = bucket.blob(file_to_download)

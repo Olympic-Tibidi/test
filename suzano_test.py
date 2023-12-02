@@ -2398,9 +2398,9 @@ if authentication_status:
         if select=="LOADOUT" :
         
             
-            bill_mapping=gcp_download("olym_suzano","bill_mapping.json")
+            bill_mapping=gcp_download(target_bucket,"bill_mapping.json")
             bill_mapping=json.loads(bill_mapping)
-            mill_info_=gcp_download("olym_suzano",rf"mill_info.json")
+            mill_info_=gcp_download(target_bucket,rf"mill_info.json")
             mill_info=json.loads(mill_info_)
             mf_numbers_for_load=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
             mf_numbers_for_load=json.loads(mf_numbers_for_load)

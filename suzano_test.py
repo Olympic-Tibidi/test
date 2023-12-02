@@ -441,7 +441,7 @@ if authentication_status:
             blob = bucket.blob("terminal_bill_of_ladings.json")
             # Download the file to a destination
             blob.download_to_filename(destination_file_name)
-            st.write(json.loads(temp.json))
+            st.write(json.loads(destination_file_name))
                 
         if select=="FINANCE":
             hadi=False

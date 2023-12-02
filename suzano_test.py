@@ -429,37 +429,13 @@ if authentication_status:
                 
         if select=="DATA BACKUP" :
             st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
-            import logging
-            import os
-            from google.cloud import storage
-            global table_id
-            global bucket_name
-            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG) 
-            bucket_name = target_bucket
-            table_id = 'terminal'
+          
             storage_client = storage.Client()
-            
-            # The "folder" where the files you want to download are
-            folder='/EDIS/'
-            delimiter='/'
-            bucket=storage_client.get_bucket(bucket_name)
-            blobs=bucket.list_blobs(prefix=table_id, delimiter=delimiter) #List all objects that satisfy the filter.
-            
-            # Download the file to a destination 
-            def download_to_local():
-               logging.info('File download Started…. Wait for the job to complete.')
-             
-            #  Create this folder locally if not exists
-               if not os.path.exists(folder):
-                 os.makedirs(folder)
-             
-            # Iterating through for loop one by one using API call
-               for blob in blobs:
-                 logging.info('Blobs: {}'.format(blob.name))
-                 destination_uri = '{}/{}'.format(folder, blob.name) 
-                 blob.download_to_filename(destination_uri)
-                 logging.info('Exported {} to {}'.format(
-                 blob.name, destination_uri))
+            list_files_to_download = ['terminal_bill_of_ladings.json']
+            for file_to_download in list_files_to_download:
+                blob = bucket.blob(file_to_download)
+                blob.download_to_filename(f'./{blob.name}')
+                       
 
                 
         if select=="FINANCE":

@@ -434,7 +434,7 @@ if authentication_status:
 
 
             storage_client = storage.Client("[Your project name here]")
-            destination_file_name=temp.json
+            destination_file_name="temp.json"
             # Create a bucket object for our bucket
             bucket = storage_client.get_bucket(target_bucket)
             # Create a blob object from the filepath

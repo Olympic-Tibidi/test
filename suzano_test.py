@@ -248,27 +248,16 @@ def add_release_order_data(file,vessel,release_order_number,destination,po_numbe
     json_data = json.dumps(file)
     return json_data
 
-def edit_release_order_data(file,vessel,release_order_number,sales_order_item,destination,po_number,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,shipped,remaining,tonnage,transport_type,carrier_code):
+def edit_release_order_data(file,sales_order_item,quantity,tonnage,shipped,remaining):
        
-      
     # Edit the loaded current dictionary.
     
-    file[vessel][release_order_number]["destination"]= destination
-    file[vessel][release_order_number]["po_number"]= po_number
-    
-    file[vessel][release_order_number][sales_order_item]["batch"]= batch
-    file[vessel][release_order_number][sales_order_item]["ocean_bill_of_lading"]= ocean_bill_of_lading
-    file[vessel][release_order_number][sales_order_item]["grade"]= wrap
-    file[vessel][release_order_number][sales_order_item]["dryness"]= dryness
-    file[vessel][release_order_number][sales_order_item]["transport_type"]= transport_type
-    file[vessel][release_order_number][sales_order_item]["carrier_code"]= carrier_code
-    file[vessel][release_order_number][sales_order_item]["unitized"]= unitized
     file[vessel][release_order_number][sales_order_item]["quantity"]= quantity
     file[vessel][release_order_number][sales_order_item]["tonnage"]= tonnage
     file[vessel][release_order_number][sales_order_item]["shipped"]= shipped
-    file[vessel][release_order_number][sales_order_item]["remaining"]=remaining
+    file[vessel][release_order_number][sales_order_item]["remaining"]= remaining
     
-
+    
        
 
     # Convert the dictionary to JSON format
@@ -429,17 +418,123 @@ if authentication_status:
                 
         if select=="DATA BACKUP" :
             st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
-          
-            storage_client = storage.Client()
-           
-            bucket = storage_client.bucket(target_bucket)
-            
-            list_files_to_download = ['terminal_bill_of_ladings.json']
-            for file_to_download in list_files_to_download:
-                blob = bucket.blob(file_to_download)
-                blob.download_to_filename(f'./{blob.name}')
-                       
+            try_lan=False
+                            
 
+            if try_lan:
+                st.markdown(
+                    """
+                    <style>
+                        /* Add custom CSS styles here */
+                        body {
+                            font-family: 'Arial', sans-serif;
+                            background-color: #f4f4f4;
+                            color: #333333;
+                        }
+                        h1 {
+                            color: #009688; /* Teal */
+                        }
+                        p {
+                            font-size: 36px;
+                        }
+                        .blue-text {
+                            color: #2196F3; /* Blue */
+                        }
+                        .red-text {
+                            color: #FF5252; /* Red */
+                        }
+                        .green-text {
+                            color: #4CAF50; /* Green */
+                        }
+                    </style>
+                    
+                    # Custom Styling with HTML and CSS
+                    
+                    This is a Streamlit app with custom styling.
+                
+                    - You can include bullet points.
+                    - Add more text and formatting.
+                    - Use *Markdown* syntax.
+                
+                    <p class="blue-text">This text is in blue.</p>
+                    <p class="red-text">This text is in red.</p>
+                    <p class="green-text">This text is in green.</p>
+                    """,
+                    unsafe_allow_html=True
+                )
+                
+                scorecard = pd.DataFrame(columns=['User', 'Hour', 'Ot', 'Totaled'])
+    
+                # Input your data using experimental data editor
+                st.write("Input your data below:")
+                input_data = pd.DataFrame(index=[1,2,3,4,5], columns=['Rank', 'Shift', 'Hour','Ot'])
+                input_data = input_data.fillna(0)  # fill with zeros
+                
+                edited_data = st.experimental_data_editor(input_data)
+                
+                # Handle user input
+                if st.button('Submit'):
+                    edited_data['Totaled'] = edited_data['Hour'] + edited_data['Ot']
+                    scorecard = scorecard.append(edited_data, ignore_index=True)
+                
+                # Display the updated scorecard
+                st.write("Updated Scorecard:")
+                st.table(scorecard)
+                if "scores" not in st.session_state:
+                    st.session_state.scores = [
+                        {"name": "Josh", "Pushups": 10, "Situps": 20},
+                    ]
+                
+                
+                def new_scores():
+                    st.session_state.scores.append(
+                        {
+                            "name": st.session_state.name,
+                            "Pushups": st.session_state.pushups,
+                            "Situps": st.session_state.situps,
+                        }
+                    )
+                
+                
+                st.write("# Score table")
+                
+                score_df = pd.DataFrame(st.session_state.scores)
+                score_df["total_points"] = score_df["Pushups"] + score_df["Situps"]
+                
+                st.write(score_df)
+                
+                st.write("# Add a new score")
+                with st.form("new_score", clear_on_submit=True):
+                    name = st.text_input("Name", key="name")
+                    pushups = st.number_input("Pushups", key="pushups", step=1, value=0, min_value=0)
+                    situps = st.number_input("Situps", key="situps", step=1, value=0, min_value=0)
+                    st.form_submit_button("Submit", on_click=new_scores)
+            def download_files_in_folder(bucket, folder_name, output_directory):
+                blob_iterator = bucket.list_blobs(prefix=folder_name)
+            
+                for blob in blob_iterator:
+                    # Skip folders (objects ending with '/')
+                    if blob.name.endswith('/'):
+                        continue
+            
+                    # Download the file to the specified output directory
+                    output_path = os.path.join(output_directory, os.path.basename(blob.name))
+                    blob.download_to_filename(output_path)
+
+            if st.button("BACKUP DATA"):
+                st.write("OK")
+                client = storage.Client()
+                bucket = client.bucket(target_bucket)
+            
+                list_files_to_download = ['dispatched.json','terminal_bill_of_ladings.json','truck_schedule.xlsx','suzano_report.json',
+                                          'mill_progress.json', 'Inventory.csv']
+                
+                # Create a temporary directory to store the downloaded files
+                with st.spinner("Downloading files..."):
+                    for file_to_download in list_files_to_download:
+                        blob = bucket.blob(file_to_download)
+                        blob.download_to_filename(f'./{blob.name}')
+                
                 
         if select=="FINANCE":
             hadi=False
@@ -1319,9 +1414,9 @@ if authentication_status:
                                     pass
                             
                             
-                            st.write(tata[1500])
+                            
                             match = re.match(pattern, tata[1500])
-                            st.write(match.group(1))
+                       
                 
                             string_=st.selectbox("Select Vendor",vendors.keys(),key="vendor")
                        
@@ -1824,7 +1919,7 @@ if authentication_status:
               
                 release_order_tab1,release_order_tab2=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE"])
                 with release_order_tab1:
-                    vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])
+                    vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304"])
                     add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER",disabled=True)
                     edit=st.checkbox("CHECK TO EDIT EXISTING RELEASE ORDER")
                     batch_mapping=gcp_download(target_bucket,rf"batch_mapping.json")
@@ -1832,24 +1927,18 @@ if authentication_status:
                     if edit:
                         
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")[1:]] if i not in junk]))
-                        
                         to_edit=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
                         to_edit=json.loads(to_edit)
-                        vessel_edit=st.text_input("Vessel",list(to_edit.keys())[0])
                         po_number_edit=st.text_input("PO No",to_edit[vessel][release_order_number]["po_number"],disabled=False)
                         destination_edit=st.text_input("Destination",to_edit[vessel][release_order_number]["destination"],disabled=False)
-                        
                         sales_order_item_edit=st.text_input("Sales Order Item",list(to_edit[vessel][release_order_number].keys())[2],disabled=False)
                         ocean_bill_of_lading_edit=st.text_input("Ocean Bill Of Lading",to_edit[vessel][release_order_number][sales_order_item_edit]["ocean_bill_of_lading"],disabled=False)
-                        wrap_edit=st.text_input("Grade",batch_mapping[ocean_bill_of_lading_edit]["grade"],disabled=True)
-                        batch_edit=st.text_input("Batch No",batch_mapping[ocean_bill_of_lading_edit]["batch"],disabled=True)
-                        dryness_edit=st.text_input("Dryness",batch_mapping[ocean_bill_of_lading_edit]["dryness"],disabled=True)
-                        admt_edit=st.text_input("ADMT PER UNIT",round(int(batch_mapping[ocean_bill_of_lading_edit]["dryness"])/90,6),disabled=True)
+                        wrap_edit=st.text_input("Grade",to_edit[vessel][release_order_number][sales_order_item_edit]["grade"],disabled=False)
+                        batch_edit=st.text_input("Batch No",to_edit[vessel][release_order_number][sales_order_item_edit]["batch"],disabled=False)
+                        dryness_edit=st.text_input("Dryness",to_edit[vessel][release_order_number][sales_order_item_edit]["dryness"],disabled=False)
+                        admt_edit=st.text_input("ADMT PER UNIT",round(int(batch_mapping[ocean_bill_of_lading_edit]["dryness"])/90,6),disabled=False)
                         unitized_edit=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
-                        transport_type_edit=st.selectbox("Transport Type",["TRUCK","RAIL"])
-                        carrier_code_edit=st.selectbox("Carrier Code",[f"{key}-{item}" for key,item in carrier_list.items()],index=[f"{key}-{item}" for key,item in carrier_list.items()].index(to_edit[vessel][release_order_number][sales_order_item_edit]["carrier_code"]))     
-                        quantity_edit=st.number_input("Quantity of Units", to_edit[vessel][release_order_number][sales_order_item_edit]["quantity"], disabled=False, label_visibility="visible")
-                        
+                        quantity_edit=st.number_input("Quantity of Units", 0, disabled=False, label_visibility="visible")
                         tonnage_edit=2*quantity_edit
                         shipped_edit=st.number_input("Shipped # of Units",to_edit[vessel][release_order_number][sales_order_item_edit]["shipped"],disabled=True)
                         remaining_edit=st.number_input("Remaining # of Units",
@@ -1891,8 +1980,7 @@ if authentication_status:
                         elif edit:
                             data=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
                             to_edit=json.loads(data)
-                            temp=edit_release_order_data(to_edit,vessel_edit,release_order_number,sales_order_item_edit,destination_edit,po_number_edit,batch_edit,ocean_bill_of_lading_edit,wrap_edit,
-                                                         dryness_edit,unitized_edit,quantity_edit,shipped_edit,remaining_edit,tonnage_edit,transport_type_edit,carrier_code_edit)
+                            temp=edit_release_order_data(to_edit,sales_order_item_edit,quantity_edit,tonnage_edit,shipped_edit,remaining_edit)
                             st.write(f"Edited release order {release_order_number} successfully!")
                             
                         else:
@@ -2163,7 +2251,7 @@ if authentication_status:
                                     
                                     json_data = json.dumps(dispatch)
                                     storage_client = storage.Client()
-                                    bucket = storage_client.bucket(target_bucket)
+                                    bucket = storage_client.bucket("olym_suzano")
                                     blob = bucket.blob(rf"dispatched.json")
                                     blob.upload_from_string(json_data)
                                     st.markdown(f"**DISPATCHED Release Order Number {requested_file} Item No : {hangisi} to Warehouse**")
@@ -2218,7 +2306,7 @@ if authentication_status:
                                     pass
                             st.markdown("**CURRENT DISPATCH QUEUE**")
                             try:
-                                dispatch=gcp_download(target_bucket,rf"dispatched.json")
+                                dispatch=gcp_download("olym_suzano",rf"dispatched.json")
                                 dispatch=json.loads(dispatch)
                                 try:
                                     for dispatched_release in dispatch.keys():
@@ -2310,9 +2398,9 @@ if authentication_status:
         if select=="LOADOUT" :
         
             
-            bill_mapping=gcp_download(target_bucket,"bill_mapping.json")
+            bill_mapping=gcp_download("olym_suzano","bill_mapping.json")
             bill_mapping=json.loads(bill_mapping)
-            mill_info_=gcp_download(target_bucket,rf"mill_info.json")
+            mill_info_=gcp_download("olym_suzano",rf"mill_info.json")
             mill_info=json.loads(mill_info_)
             mf_numbers_for_load=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
             mf_numbers_for_load=json.loads(mf_numbers_for_load)

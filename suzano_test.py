@@ -436,7 +436,7 @@ if authentication_status:
             global bucket_name
             logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG) 
             bucket_name = target_bucket
-            table_id = 'shakespeare'
+            table_id = 'terminal'
             storage_client = storage.Client()
             
             # The "folder" where the files you want to download are

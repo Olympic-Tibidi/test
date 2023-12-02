@@ -429,19 +429,25 @@ if authentication_status:
                 
         if select=="DATA BACKUP" :
             st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
-            try_lan=False
-                            
+            from google.cloud.storage import Client, transfer_manager
 
-
-            storage_client = storage.Client("[Your project name here]")
-            destination_file_name="temp.json"
-            # Create a bucket object for our bucket
-            bucket = storage_client.get_bucket(target_bucket)
-            # Create a blob object from the filepath
-            blob = bucket.blob("terminal_bill_of_ladings.json")
-            # Download the file to a destination
-            blob.download_to_filename(destination_file_name)
-            st.write(json.loads(destination_file_name))
+            storage_client = Client()
+            bucket = storage_client.bucket(target_bucket)
+        
+            blob_names = [blob.name for blob in bucket.list_blobs(max_results=max_results)]
+            destination_directory=r"C:\Users\afsiny\Desktop\PLAY"
+            results = transfer_manager.download_many_to_path(
+                bucket, blob_names, destination_directory=destination_directory, max_workers=workers
+            )
+        
+            for name, result in zip(blob_names, results):
+                # The results list is either `None` or an exception for each blob in
+                # the input list, in order.
+        
+                if isinstance(result, Exception):
+                    print("Failed to download {} due to exception: {}".format(name, result))
+                else:
+                    print("Downloaded {} to {}.".format(name, destination_directory + name))
                 
         if select=="FINANCE":
             hadi=False

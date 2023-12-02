@@ -436,10 +436,10 @@ if authentication_status:
             # Function to download files from GCS
             def download_files(bucket_name, prefix):
                 # Set up GCS client
-                credentials, project = storage.auth.default()
-                client = storage.Client(credentials=credentials, project=project)
-            
-                bucket = client.get_bucket(bucket_name)
+                
+                storage_client = storage.Client()
+                bucket = storage_client.bucket(bucket_name)
+                
                 blobs = bucket.list_blobs(prefix=prefix)
             
                 file_paths = []

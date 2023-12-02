@@ -1931,7 +1931,7 @@ if authentication_status:
                             #st.write(key)
                             for sales in release_order_database[vessel][key]:
                                 #st.write(sales)
-                                if release_order_database[key][sales]["remaining"]>0:
+                                if release_order_database[vessel][key][sales]["remaining"]>0:
                                     not_yet=1
                                 else:
                                     pass#st.write(f"{key}{sales} seems to be finished")

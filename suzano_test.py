@@ -1929,7 +1929,7 @@ if authentication_status:
                         for key in release_order_database[vessel]:
                             not_yet=0
                             #st.write(key)
-                            for sales in release_order_database[key]:
+                            for sales in release_order_database[vessel][key]:
                                 #st.write(sales)
                                 if release_order_database[key][sales]["remaining"]>0:
                                     not_yet=1

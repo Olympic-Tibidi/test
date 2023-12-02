@@ -461,7 +461,7 @@ if authentication_status:
             if st.button("Download Files"):
                
                 st.info("Downloading files. Please wait...")
-                blobs = download_files(bucket_name, prefix)
+                blobs = download_files(target_bucket, prefix)
         
                 for blob in blobs:
                     st.info(f"Downloading {blob.name}")

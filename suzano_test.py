@@ -1947,7 +1947,7 @@ if authentication_status:
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]))
                         
                         
-                    else:
+                    else:  ### If creating new release order
                         
                         release_order_number=st.text_input("Release Order Number")
                         po_number=st.text_input("PO No")
@@ -1955,12 +1955,12 @@ if authentication_status:
                         destination_list=list(set([f"{i}-{j}" for i,j in zip(mill_df["Group"].tolist(),mill_df["Final Destination"].tolist())]))
                         #st.write(destination_list)
                         destination=st.selectbox("SELECT DESTINATION",destination_list)
-                        sales_order_item=st.text_input("Sales Order Item")
-                        ocean_bill_of_lading=st.selectbox("Ocean Bill Of Lading",batch_mapping.keys())
-                        wrap=st.text_input("Grade",batch_mapping[ocean_bill_of_lading]["grade"],disabled=True)
-                        batch=st.text_input("Batch No",batch_mapping[ocean_bill_of_lading]["batch"],disabled=True)
-                        dryness=st.text_input("Dryness",batch_mapping[ocean_bill_of_lading]["dryness"],disabled=True)
-                        admt=st.text_input("ADMT PER UNIT",round(int(batch_mapping[ocean_bill_of_lading]["dryness"])/90,6),disabled=True)
+                        sales_order_item=st.text_input("Sales Order Item")  
+                        ocean_bill_of_lading=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel].keys())   #######
+                        wrap=st.text_input("Grade",batch_mapping[vessel][ocean_bill_of_lading]["grade"],disabled=True)   ##### batch mapping injection
+                        batch=st.text_input("Batch No",batch_mapping[vessel][ocean_bill_of_lading]["batch"],disabled=True)   #####
+                        dryness=st.text_input("Dryness",batch_mapping[vessel][ocean_bill_of_lading]["dryness"],disabled=True)   #####
+                        admt=st.text_input("ADMT PER UNIT",round(int(batch_mapping[vessel][ocean_bill_of_lading]["dryness"])/90,6),disabled=True)  #####
                         unitized=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
                         quantity=st.number_input("Quantity of Units", min_value=1, max_value=5000, value=1, step=1,  key=None, help=None, on_change=None, disabled=False, label_visibility="visible")
                         tonnage=2*quantity

@@ -460,7 +460,7 @@ if authentication_status:
 
             if st.button("Download Files"):
                 st.info("Downloading files. Please wait...")
-                file_paths = download_files(target_name, prefix)
+                file_paths = download_files(target_bucket, prefix)
                 st.success(f"Files downloaded successfully! Downloaded files: {file_paths}")
 
                 

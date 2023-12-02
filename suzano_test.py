@@ -437,7 +437,7 @@ if authentication_status:
             logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG) 
             bucket_name = target_bucket
             table_id = 'shakespeare'
-            
+            storage_client = storage.Client()
             
             # The "folder" where the files you want to download are
             folder='/EDIS/'

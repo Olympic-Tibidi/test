@@ -429,26 +429,38 @@ if authentication_status:
                 
         if select=="DATA BACKUP" :
             st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
-            from google.cloud.storage import Client, transfer_manager
+            import logging
+            import os
+            from google.cloud import storage
+            global table_id
+            global bucket_name
+            logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG) 
+            bucket_name = target_bucket
+            table_id = 'shakespeare'
+            
+            
+            # The "folder" where the files you want to download are
+            folder='/EDIS/'
+            delimiter='/'
+            bucket=storage_client.get_bucket(bucket_name)
+            blobs=bucket.list_blobs(prefix=table_id, delimiter=delimiter) #List all objects that satisfy the filter.
+            
+            # Download the file to a destination 
+            def download_to_local():
+               logging.info('File download Started…. Wait for the job to complete.')
+             
+            #  Create this folder locally if not exists
+               if not os.path.exists(folder):
+                 os.makedirs(folder)
+             
+            # Iterating through for loop one by one using API call
+               for blob in blobs:
+                 logging.info('Blobs: {}'.format(blob.name))
+                 destination_uri = '{}/{}'.format(folder, blob.name) 
+                 blob.download_to_filename(destination_uri)
+                 logging.info('Exported {} to {}'.format(
+                 blob.name, destination_uri))
 
-            storage_client = Client()
-            bucket = storage_client.bucket(target_bucket)
-            max_results=1000
-            workers=8
-            blob_names = [blob.name for blob in bucket.list_blobs(max_results=max_results)]
-            destination_directory=r"C:/Users/afsiny/Desktop/PLAY/"
-            results = transfer_manager.download_many_to_path(
-                bucket, blob_names, destination_directory=destination_directory, max_workers=workers
-            )
-        
-            for name, result in zip(blob_names, results):
-                # The results list is either `None` or an exception for each blob in
-                # the input list, in order.
-        
-                if isinstance(result, Exception):
-                    print("Failed to download {} due to exception: {}".format(name, result))
-                else:
-                    print("Downloaded {} to {}.".format(name, destination_directory + name))
                 
         if select=="FINANCE":
             hadi=False

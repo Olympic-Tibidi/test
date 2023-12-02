@@ -1926,7 +1926,7 @@ if authentication_status:
                         
                         completed_release_orders=[]
                         
-                        for key in release_order_database:
+                        for key in release_order_database[vessel]:
                             not_yet=0
                             #st.write(key)
                             for sales in release_order_database[key]:
@@ -1947,7 +1947,7 @@ if authentication_status:
                         release_order_dest_map={}
                         try:
                             
-                            for i in release_order_dictionary:
+                            for i in release_order_dictionary[vessel]:
                                 for sales in release_order_dictionary[i]:
                                     release_order_dest_map[i]=release_order_dictionary[i][sales]["destination"]
                             

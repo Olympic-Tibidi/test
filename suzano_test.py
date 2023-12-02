@@ -2210,12 +2210,12 @@ if authentication_status:
                         data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                         completed_release_orders=[]
                         
-                        for key in release_order_database:
+                        for key in release_order_database[vessel]:
                             not_yet=0
                             #st.write(key)
-                            for sales in release_order_database[key]:
+                            for sales in release_order_database[vessel][key]:
                                 #st.write(sales)
-                                if release_order_database[key][sales]["remaining"]>0:
+                                if release_order_database[vessel][key][sales]["remaining"]>0:
                                     not_yet=1
                                 else:
                                     pass#st.write(f"{key}{sales} seems to be finished")

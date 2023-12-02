@@ -459,11 +459,17 @@ if authentication_status:
             prefix = st.text_input("Enter File Prefix (optional):")
 
             if st.button("Download Files"):
+               
                 st.info("Downloading files. Please wait...")
-                file_paths = download_files(target_bucket, prefix)
-                st.success(f"Files downloaded successfully! Downloaded files: {file_paths}")
-
-                
+                blobs = download_files(bucket_name, prefix)
+        
+                for blob in blobs:
+                    st.info(f"Downloading {blob.name}")
+                    file_contents = blob.download_as_text()
+                    st.text(file_contents)
+        
+                st.success("Files downloaded successfully!")
+            
                 
         if select=="FINANCE":
             hadi=False

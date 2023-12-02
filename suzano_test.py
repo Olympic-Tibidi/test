@@ -433,43 +433,15 @@ if authentication_status:
                             
 
 
-            # Function to download files from GCS
-            def download_files(bucket_name, prefix):
-                # Set up GCS client
-                
-                storage_client = storage.Client()
-                bucket = storage_client.bucket(bucket_name)
-                
-                blobs = bucket.list_blobs(prefix=prefix)
-            
-                file_paths = []
-            
-                for blob in blobs:
-                    file_path = f"./downloads/{blob.name}"
-                    blob.download_to_filename(file_path)
-                    file_paths.append(file_path)
-            
-                return file_paths
-
-            # Streamlit app
-            st.title("GCS Batch File Downloader")
-
-# Input for GCS bucket name and prefix
-
-            prefix = st.text_input("Enter File Prefix (optional):")
-
-            if st.button("Download Files"):
-               
-                st.info("Downloading files. Please wait...")
-                blobs = download_files(target_bucket, prefix)
-        
-                for blob in blobs:
-                    st.info(f"Downloading {blob.name}")
-                    file_contents = blob.download_as_text()
-                    st.text(file_contents)
-        
-                st.success("Files downloaded successfully!")
-            
+            storage_client = storage.Client("[Your project name here]")
+            destination_file_name=temp.json
+            # Create a bucket object for our bucket
+            bucket = storage_client.get_bucket(target_bucket)
+            # Create a blob object from the filepath
+            blob = bucket.blob("terminal_bill_of_ladings.json")
+            # Download the file to a destination
+            blob.download_to_filename(destination_file_name)
+            st.write(json.loads(temp.json))
                 
         if select=="FINANCE":
             hadi=False

@@ -3147,6 +3147,9 @@ if authentication_status:
                         st.write(f'**Unaccounted Units Registered : {no_of_unaccounted} Units/{no_of_unaccounted*2} Tons**')
                         temp1=combined.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
                         temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
+                        st.dataframe(temp)
+                        st.dataframe(temp1)
+                        
                         temp1.insert(0,"Total",temp.Bales.values)
                         temp["Remaining"]=temp.Total-temp.quantity
                         temp.columns=["Total","Shipped","Remaining"]

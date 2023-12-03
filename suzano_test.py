@@ -3145,15 +3145,16 @@ if authentication_status:
                             upload_cs_file(target_bucket, 'temp.csv',rf"combined.csv") 
                         no_of_unaccounted=Inventory[Inventory["Accounted"]==False]["Bales"].sum()/8
                         st.write(f'**Unaccounted Units Registered : {no_of_unaccounted} Units/{no_of_unaccounted*2} Tons**')
-                        temp1=combined.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
                         temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
+                        temp1=combined.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
                         st.dataframe(temp)
                         st.dataframe(temp1)
                         temp=pd.merge(temp, temp1, left_index=True, right_index=True, how='outer', suffixes=('_df1', '_df2'))
                         st.dataframe(temp)
-                        temp.insert(0,"Total",temp1.Bales.values)
-                        temp["Remaining"]=temp.Total-temp.quantity
+                        temp=temp[["Bales","quantity","Remaining"]]
                         temp.columns=["Total","Shipped","Remaining"]
+                        temp.insert(0,"Total",temp1.Bales.values)
+                        temp["Remaining"]=temp.Total-temp.Shipped
                         temp.loc["TOTAL"]=temp.sum(axis=0)
                         tempo=temp*2
                         inv_col1,inv_col2=st.columns([2,2])

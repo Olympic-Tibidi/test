@@ -2245,7 +2245,7 @@ if authentication_status:
                         mf_numbers=json.loads(mf_numbers_)
                         vessel_mf=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"],key="lalalda")
                         gp_release_orders=[i for i in release_order_database[vessel_mf] if release_order_database[vessel_mf][i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and release_order_database[vessel_mf][i]["001"]["remaining"]>2]
-                        destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database[vessel] if release_order_database[vessel][i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and release_order_database[vessel][i]["001"]["remaining"]>2]
+                        destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database[vessel_mf] if release_order_database[vessel_mf][i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and release_order_database[vessel_mf][i]["001"]["remaining"]>2]
                         release_order_number_mf=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders,key="tatata")
                         input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
                         if input_mf_numbers is not None:

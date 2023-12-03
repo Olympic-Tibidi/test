@@ -2504,7 +2504,7 @@ if authentication_status:
                     def audit_unit(x):
                             if len(x)>=10:
                               
-                                if bill_mapping[x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[x[:-2]]["Batch"]!=batch:
+                                if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-2]]["Batch"]!=batch:
                                     
                                     return False
                                                                                 
@@ -2514,7 +2514,7 @@ if authentication_status:
                             if len(x)>=10:
                                 #st.write(bill_mapping[x[:-2]]["Batch"])
                                 
-                                if bill_mapping[x[:-2]]["Ocean_bl"]!=info[vessel][release][sales]["ocean_bill_of_lading"] and bill_mapping[x[:-2]]["Batch"]!=info[vessel][release][sales]["batch"]:
+                                if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=info[vessel][release][sales]["ocean_bill_of_lading"] and bill_mapping[vessel][x[:-2]]["Batch"]!=info[vessel][release][sales]["batch"]:
                                     st.write("**:red[WRONG B/L, DO NOT LOAD BELOW!]**")
                                     return False
                                 else:

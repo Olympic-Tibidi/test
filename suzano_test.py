@@ -3145,7 +3145,7 @@ if authentication_status:
                             upload_cs_file(target_bucket, 'temp.csv',rf"combined.csv") 
                         no_of_unaccounted=Inventory[Inventory["Accounted"]==False]["Bales"].sum()/8
                         st.write(f'**Unaccounted Units Registered : {no_of_unaccounted} Units/{no_of_unaccounted*2} Tons**')
-                        temp1=kirkenes_updated.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
+                        temp1=combined.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
                         temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
                         temp.insert(0,"Total",temp1.Bales.values)
                         temp["Remaining"]=temp.Total-temp.quantity

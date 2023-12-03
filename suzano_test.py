@@ -2867,7 +2867,7 @@ if authentication_status:
                             except:
                                 release_order_database={}
                            
-                            release_order_database[current_release_order][current_sales_order]["remaining"]=release_order_database[current_release_order][current_sales_order]["remaining"]-quantity
+                            release_order_database[vessel][current_release_order][current_sales_order]["remaining"]=release_order_database[vessel][current_release_order][current_sales_order]["remaining"]-quantity
                             release_order_database=json.dumps(release_order_database)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)

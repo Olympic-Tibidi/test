@@ -2902,7 +2902,7 @@ if authentication_status:
                             file_path = 'temp_file.txt'  # Use the path of the temporary file
                     
                             
-                            upload_cs_file("olym_suzano", 'temp_file.txt',rf"EDIS/{vessel}/{file_name}")
+                            upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}")
                             if load_mf_number_issued:
                                 mf_numbers_for_load[vessel][release_order_number].remove(load_mf_number)
                                 mf_numbers_for_load=json.dumps(mf_numbers_for_load)

@@ -3013,7 +3013,7 @@ if authentication_status:
                         st.table(arrived_vehicles.drop(columns=['ARRIVAL']))
             
             with inv2:
-                @st.cache
+                
                 def convert_df(df):
                     # IMPORTANT: Cache the conversion to prevent computation on every rerun
                     return df.to_csv().encode('utf-8')
@@ -3130,19 +3130,19 @@ if authentication_status:
                             file_name=f'INVENTORY REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
                             mime='text/csv')            
                     with inv4tab2:
-                        kirkenes_updated=gcp_csv_to_df(target_bucket,rf"kirkenes_updated.csv")
-                        kirkenes_updated["Batch"]=kirkenes_updated["Batch"].astype(str)
-                        st.write(kirkenes_updated)
+                        combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
+                        combined["Batch"]=combined["Batch"].astype(str)
+                        st.write(combined)
                         if st.button("CLICK TO RE-RUN INVENTORY",key="tyuris"):
-                            kirkenes_updated=gcp_csv_to_df(target_bucket,rf"kirkenes_with_ghosts_found.csv")
+                            combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
                             for line in inv_bill_of_ladings.loads[1:]:
                                 for unit in line.keys():
-                                    kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Shipped"]=kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Shipped"]+line[unit]*8
-                                    kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Remaining"]=kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Remaining"]-line[unit]*8
+                                    combined.loc[combined["Lot"]==unit[:-2],"Shipped"]=combined.loc[combined["Lot"]==unit[:-2],"Shipped"]+line[unit]*8
+                                    combined.loc[combined["Lot"]==unit[:-2],"Remaining"]=combined.loc[combined["Lot"]==unit[:-2],"Remaining"]-line[unit]*8
                             
                             
-                            temp=kirkenes_updated.to_csv("temp.csv",index=False)
-                            upload_cs_file(target_bucket, 'temp.csv',rf"kirkenes_updated.csv") 
+                            temp=combined.to_csv("temp.csv",index=False)
+                            upload_cs_file(target_bucket, 'temp.csv',rf"combined.csv") 
                         no_of_unaccounted=Inventory[Inventory["Accounted"]==False]["Bales"].sum()/8
                         st.write(f'**Unaccounted Units Registered : {no_of_unaccounted} Units/{no_of_unaccounted*2} Tons**')
                         temp1=kirkenes_updated.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8

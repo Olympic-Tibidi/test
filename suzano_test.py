@@ -2502,7 +2502,7 @@ if authentication_status:
                     if updated_quantity not in st.session_state:
                         st.session_state.updated_quantity=updated_quantity
                     def audit_unit(x):
-                            if len(x)==10:
+                            if len(x)>=10:
                               
                                 if bill_mapping[x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[x[:-2]]["Batch"]!=batch:
                                     
@@ -2511,7 +2511,7 @@ if authentication_status:
                                 else:
                                     return True
                     def audit_split(release,sales):
-                            if len(x)==10:
+                            if len(x)>=10:
                                 #st.write(bill_mapping[x[:-2]]["Batch"])
                                 
                                 if bill_mapping[x[:-2]]["Ocean_bl"]!=info[vessel][release][sales]["ocean_bill_of_lading"] and bill_mapping[x[:-2]]["Batch"]!=info[vessel][release][sales]["batch"]:

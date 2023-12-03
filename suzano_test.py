@@ -3149,7 +3149,7 @@ if authentication_status:
                         temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
                         st.dataframe(temp)
                         st.dataframe(temp1)
-                        temp=pd.merge(temp, temp1, on=index, how='outer', suffixes=('_df1', '_df2'))
+                        temp=pd.merge(temp, temp1, left_index=True, right_index=True, how='outer', suffixes=('_df1', '_df2'))
                         st.dataframe(temp)
                         temp.insert(0,"Total",temp1.Bales.values)
                         temp["Remaining"]=temp.Total-temp.quantity

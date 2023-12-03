@@ -2794,7 +2794,7 @@ if authentication_status:
                                                 
                             bill_of_ladings=json.dumps(bill_of_ladings)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket("olym_suzano")
+                            bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"terminal_bill_of_ladings.json")
                             blob.upload_from_string(bill_of_ladings)
                             
@@ -2823,7 +2823,7 @@ if authentication_status:
                                                      "Metric Ton": quantity*2, "ADMT":admt,"Mode of Transportation":transport_type}})
                                 suzano_report=json.dumps(suzano_report)
                                 storage_client = storage.Client()
-                                bucket = storage_client.bucket("olym_suzano")
+                                bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"suzano_report.json")
                                 blob.upload_from_string(suzano_report)
     
@@ -2889,8 +2889,8 @@ if authentication_status:
                             body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                             st.write(body)           
                             sender = "warehouseoly@gmail.com"
-                            recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                            #recipients = ["afsiny@portolympia.com"]
+                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                            recipients = ["afsiny@portolympia.com"]
                             password = "xjvxkmzbpotzeuuv"
                     
                   

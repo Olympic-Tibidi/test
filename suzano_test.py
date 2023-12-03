@@ -2232,7 +2232,7 @@ if authentication_status:
                         for i in release_order_dictionary[vessel]:
                             if i in completed_release_orders:
                                 completed_release_order_dest_map[i]=release_order_dictionary[vessel][i][sales]#["destination"]
-                        if len(pd.DataFrame(completed_release_order_dest_map).T)!>1:
+                        if len(pd.DataFrame(completed_release_order_dest_map).T)>=1:
                             st.write(pd.DataFrame(completed_release_order_dest_map).T)
                             destinations_of_completed_release_orders=[f"{i} to {completed_release_order_dest_map[i]}" for i in completed_release_orders]
                     

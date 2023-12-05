@@ -2504,21 +2504,7 @@ if authentication_status:
                         #grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
                         grade=info[vessel][current_release_order][current_sales_order]["grade"]
                         
-                    
-                with col3: 
-                    
-                    placeholder = st.empty()
-                    with placeholder.container():
-                        
-                        #carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=40)
-                        #transport_sequential_number=st.selectbox("Transport Sequential",["TRUCK","RAIL"],disabled=True,key=51)
-                        transport_sequential_number="TRUCK"
-                        #transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=6)
-                        transport_type="TRUCK"
-                       
-                
-                
-                with col4:
+               
                     updated_quantity=0
                     live_quantity=0
                     if updated_quantity not in st.session_state:

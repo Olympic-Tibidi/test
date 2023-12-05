@@ -2440,29 +2440,54 @@ if authentication_status:
                     delivery_date=datetime.datetime.today()-datetime.timedelta(hours=utc_difference)
                    #eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
                     eta_date=delivery_date
+                    carrier_code=info[vessel][current_release_order][current_sales_order]["carrier_code"]
+                    vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
+                    mf=True
+                    load_mf_number_issued=False
+                    if carrier_code=="123456-KBX":
+                       if release_order_number in mf_numbers_for_load[vessel].keys():
+                           mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
+                           load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
+                           mf=True
+                           load_mf_number_issued=True
+                       else:
+                           st.write("MF NUMBERS NOT IN!")
+                           mf=False
+                           load_mf_number_issued=False  
+                    foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
+                    foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
+
                     
                 with col2:
                     ocean_bol_to_batch = {"GSSWKIR6013D": 45302855,"GSSWKIR6013E": 45305548}
                     if double_load:
-                        release_order_number=st.text_input("Release Order Number",current_release_order,disabled=True,help="Release Order Number without the Item no")
-                        sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
-                        ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
+                        #release_order_number=st.text_input("Release Order Number",current_release_order,disabled=True,help="Release Order Number without the Item no")
+                        release_order_number=current_release_order
+                        #sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
+                        sales_order_item=current_sales_order
+                        #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
+                        ocean_bill_of_lading=info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"]
                         current_ocean_bill_of_lading=ocean_bill_of_lading
                         next_ocean_bill_of_lading=info[vessel][next_release_order][next_sales_order]["ocean_bill_of_lading"]
-                        batch=st.text_input("Batch",info[vessel][current_release_order][current_sales_order]["batch"],disabled=True)
-                        grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
+                        #batch=st.text_input("Batch",info[vessel][current_release_order][current_sales_order]["batch"],disabled=True)
+                        batch=info[vessel][current_release_order][current_sales_order]["batch"]
+                        #grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
+                        grade=info[vessel][current_release_order][current_sales_order]["grade"]
                         
                         #terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",disabled=False)
                         pass
                     else:
-                        release_order_number=st.text_input("Release Order Number",current_release_order,disabled=True,help="Release Order Number without the Item no")
-                        sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
-                        ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
+                        #release_order_number=st.text_input("Release Order Number",current_release_order,disabled=True,help="Release Order Number without the Item no")
+                        release_order_number=current_release_order
+                        #sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
+                        sales_order_item=current_sales_order
+                        #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
+                        ocean_bill_of_lading=info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"]
                         
-                        batch=st.text_input("Batch",info[vessel][current_release_order][current_sales_order]["batch"],disabled=True)
-                        grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
-                        #terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",disabled=False)
-                   
+                         #batch=st.text_input("Batch",info[vessel][current_release_order][current_sales_order]["batch"],disabled=True)
+                        batch=info[vessel][current_release_order][current_sales_order]["batch"]
+                        #grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
+                        grade=info[vessel][current_release_order][current_sales_order]["grade"]
                         
                     
                 with col3: 
@@ -2470,25 +2495,12 @@ if authentication_status:
                     placeholder = st.empty()
                     with placeholder.container():
                         
-                        carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=40)
-                        transport_sequential_number=st.selectbox("Transport Sequential",["TRUCK","RAIL"],disabled=True,key=51)
-                        transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=6)
-                        vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
-                        mf=True
-                        load_mf_number_issued=False
-                        if carrier_code=="123456-KBX":
-                           if release_order_number in mf_numbers_for_load[vessel].keys():
-                               mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
-                               load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
-                               mf=True
-                               load_mf_number_issued=True
-                           else:
-                               st.write("MF NUMBERS NOT IN!")
-                               mf=False
-                               load_mf_number_issued=False  
-                        foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
-                        foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
-
+                        #carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=40)
+                        #transport_sequential_number=st.selectbox("Transport Sequential",["TRUCK","RAIL"],disabled=True,key=51)
+                        transport_sequential_number="TRUCK"
+                        #transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=6)
+                        transport_type="TRUCK"
+                       
                         click_clear1 = st.button('CLEAR VEHICLE-QUANTITY INPUTS', key=34)
                     if click_clear1:
                          with placeholder.container():

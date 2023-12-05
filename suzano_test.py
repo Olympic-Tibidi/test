@@ -2817,6 +2817,7 @@ if authentication_status:
                             
                             
                             terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",bill_of_lading_number,disabled=True)
+                            st.write("Uploaded Bill of Lading...")
                             process()
                            
                             try:
@@ -2842,6 +2843,7 @@ if authentication_status:
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"suzano_report.json")
                                 blob.upload_from_string(suzano_report)
+                                st.write("Updated Suzano Report...")
     
                               
                                 
@@ -2876,6 +2878,7 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/{vessel}/{current_release_order}.json")
                             blob.upload_from_string(json_data)
+                            st.write("Updated Release Order...")
     
                             try:
                                 release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
@@ -2889,6 +2892,7 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                             blob.upload_from_string(release_order_database)
+                            st.write("Updated Release Order Database File...")
                             with open('placeholder.txt', 'r') as f:
                                 output_text = f.read()
                             st.markdown("**SUCCESS! EDI FOR THIS LOAD HAS BEEN SUBMITTED,THANK YOU**")
@@ -2903,7 +2907,7 @@ if authentication_status:
                             st.write(current_release_order,current_sales_order,destination,ocean_bill_of_lading,terminal_bill_of_lading,wrap)
                             subject = f'Suzano_EDI_{a}_ R.O:{release_order_number}-Terminal BOL :{bill_of_lading_number}-Destination : {destination}'
                             body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
-                            st.write(body)           
+                            #st.write(body)           
                             sender = "warehouseoly@gmail.com"
                             #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
                             recipients = ["afsiny@portolympia.com"]

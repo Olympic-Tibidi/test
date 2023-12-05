@@ -2663,7 +2663,13 @@ if authentication_status:
                        
                             seen=set()
                             for i,x in enumerate(textsplit):
-                                
+                                try:
+                                    if bill_mapping[vessel][x[:-2]]:
+                                        pass
+                                except:
+                                    st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                    faults.append(1)
+                                    st.markdown("**:red[This LOT NOT IN INVENTORY!]**")
                                 if audit_unit(x):
                                     if x in seen:
                                         st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
@@ -2689,6 +2695,13 @@ if authentication_status:
                             bale_textsplit=[i for i in bale_textsplit if len(i)>8]                           
                             seen=set()
                             for i,x in enumerate(bale_textsplit):
+                                try:
+                                    if bill_mapping[vessel][x[:-2]]:
+                                        pass
+                                except:
+                                    st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                    faults.append(1)
+                                    st.markdown("**:red[This LOT NOT IN INVENTORY!]**")
                                 if audit_unit(x):
                                     if x in textsplit:
                                         st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)

@@ -2418,7 +2418,7 @@ if authentication_status:
 
                 ###############    LOADOUT DATA ENTRY    #########
                 
-                col1, col2,col3,col4,col5= st.columns([2,2,2,2,2])
+                col1, col2,col3,col4= st.columns([2,2,2,2])
                 
               
                 release_order_number=current_release_order

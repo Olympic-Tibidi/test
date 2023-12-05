@@ -2441,6 +2441,8 @@ if authentication_status:
                    #eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
                     eta_date=delivery_date
                     carrier_code=info[vessel][current_release_order][current_sales_order]["carrier_code"]
+                    transport_sequential_number="TRUCK"
+                    transport_type="TRUCK"
                     placeholder = st.empty()
                     with placeholder.container():
                         vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
@@ -2468,8 +2470,7 @@ if authentication_status:
                          with placeholder.container():
                              
                            carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
-                           transport_sequential_number=st.selectbox("Transport Sequential",["TRUCK","RAIL"],disabled=True,key=10)
-                           transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=11)
+                           
                            vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=12)
                            
                            foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=193)

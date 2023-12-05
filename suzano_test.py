@@ -2441,21 +2441,36 @@ if authentication_status:
                    #eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
                     eta_date=delivery_date
                     carrier_code=info[vessel][current_release_order][current_sales_order]["carrier_code"]
-                    vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
-                    mf=True
-                    load_mf_number_issued=False
-                    if carrier_code=="123456-KBX":
-                       if release_order_number in mf_numbers_for_load[vessel].keys():
-                           mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
-                           load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
-                           mf=True
-                           load_mf_number_issued=True
-                       else:
-                           st.write("MF NUMBERS NOT IN!")
-                           mf=False
-                           load_mf_number_issued=False  
-                    foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
-                    foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
+                    placeholder = st.empty()
+                    with placeholder.container():
+                        vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
+                    
+                        mf=True
+                        load_mf_number_issued=False
+                        if carrier_code=="123456-KBX":
+                           if release_order_number in mf_numbers_for_load[vessel].keys():
+                               mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
+                               load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
+                               mf=True
+                               load_mf_number_issued=True
+                           else:
+                               st.write("MF NUMBERS NOT IN!")
+                               mf=False
+                               load_mf_number_issued=False  
+                        foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
+                        foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
+                    click_clear1 = st.button('CLEAR VEHICLE-QUANTITY INPUTS', key=34)
+                    if click_clear1:
+                         with placeholder.container():
+                             
+                           carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
+                           transport_sequential_number=st.selectbox("Transport Sequential",["TRUCK","RAIL"],disabled=True,key=10)
+                           transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=11)
+                           vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=12)
+                           
+                           foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=193)
+                           foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=13)
+
 
                     
                 with col2:
@@ -2501,19 +2516,7 @@ if authentication_status:
                         #transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=6)
                         transport_type="TRUCK"
                        
-                        click_clear1 = st.button('CLEAR VEHICLE-QUANTITY INPUTS', key=34)
-                    if click_clear1:
-                         with placeholder.container():
-                             
-                           carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
-                           transport_sequential_number=st.selectbox("Transport Sequential",["TRUCK","RAIL"],disabled=True,key=10)
-                           transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=11)
-                           vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=12)
-                           
-                           foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=193)
-                           foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=13)
-
-
+                
                 
                 with col4:
                     updated_quantity=0

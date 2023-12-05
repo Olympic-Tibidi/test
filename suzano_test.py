@@ -2460,7 +2460,7 @@ if authentication_status:
                                    mf=False
                                    load_mf_number_issued=False  
                            else:
-                               st.write("MF NUMBERS NOT IN!")
+                               st.write("NO MF FOR THIS VESSEL!")
                         foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
                         foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
                     click_clear1 = st.button('CLEAR VEHICLE-QUANTITY INPUTS', key=34)

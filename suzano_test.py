@@ -2817,7 +2817,8 @@ if authentication_status:
                             
                             
                             terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",bill_of_lading_number,disabled=True)
-                            st.success("Uploaded Bill of Lading...",icon="✅")
+                            success_container=st.empty()
+                            success_container.success("Uploaded Bill of Lading...",icon="✅")
                             process()
                             st.toast("Creating EDI...")
                             try:
@@ -2843,7 +2844,9 @@ if authentication_status:
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"suzano_report.json")
                                 blob.upload_from_string(suzano_report)
-                                st.toast("Updated Suzano Report...")
+                                success_container.empty()
+                                time.sleep(0.1)                            
+                                success_container.success(f"Updated Suzano Report",icon="✅")
     
                               
                                 
@@ -2878,7 +2881,9 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/{vessel}/{current_release_order}.json")
                             blob.upload_from_string(json_data)
-                            st.write("Updated Release Order...")
+                            success_container.empty()
+                            time.sleep(0.1)                            
+                            success_container.success(f"Updated Release Order {current_release_order}",icon="✅")
     
                             try:
                                 release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
@@ -2892,7 +2897,9 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                             blob.upload_from_string(release_order_database)
-                            st.write("Updated Release Order Database File...")
+                            success_container.empty()
+                            time.sleep(0.1)                            
+                            success_container.success(f"Updated Release Order Database",icon="✅")
                             with open('placeholder.txt', 'r') as f:
                                 output_text = f.read()
                             
@@ -2923,7 +2930,9 @@ if authentication_status:
                     
                             
                             upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}")
-                            st.write("Uploaded EDI File...")
+                            success_container.empty()
+                            time.sleep(0.1)                            
+                            success_container.success(f"Uploaded EDI File",icon="✅")
                             if load_mf_number_issued:
                                 mf_numbers_for_load[vessel][release_order_number].remove(load_mf_number)
                                 mf_numbers_for_load=json.dumps(mf_numbers_for_load)
@@ -2933,7 +2942,9 @@ if authentication_status:
                                 blob.upload_from_string(mf_numbers_for_load)
                                 st.write("Updated MF numbers...")
                             send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
-                            st.write("Sent EDI Email...")
+                            success_container.empty()
+                            time.sleep(0.1)                            
+                            success_container.success(f"Sent EDI Email",icon="✅")
                             st.markdown("**SUCCESS! EDI FOR THIS LOAD HAS BEEN SUBMITTED,THANK YOU**")
                             st.write(filename,current_release_order,current_sales_order,destination,ocean_bill_of_lading,terminal_bill_of_lading,wrap)
                             st.toast('Hooray!', icon='🎉')

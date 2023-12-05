@@ -2819,7 +2819,7 @@ if authentication_status:
                             terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",bill_of_lading_number,disabled=True)
                             st.write("Uploaded Bill of Lading...")
                             process()
-                           
+                            st.write("Creating EDI...")
                             try:
                                 suzano_report_keys=[int(i) for i in suzano_report.keys()]
                                 next_report_no=max(suzano_report_keys)+1
@@ -2896,8 +2896,8 @@ if authentication_status:
                             with open('placeholder.txt', 'r') as f:
                                 output_text = f.read()
                             st.markdown("**SUCCESS! EDI FOR THIS LOAD HAS BEEN SUBMITTED,THANK YOU**")
-                            st.markdown("**EDI TEXT**")
-                            st.text_area('', value=output_text, height=600)
+                            #st.markdown("**EDI TEXT**")
+                            #st.text_area('', value=output_text, height=600)
                             with open('placeholder.txt', 'r') as f:
                                 file_content = f.read()
                             newline="\n"
@@ -2923,6 +2923,7 @@ if authentication_status:
                     
                             
                             upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}")
+                            st.write("Uploaded EDI File...")
                             if load_mf_number_issued:
                                 mf_numbers_for_load[vessel][release_order_number].remove(load_mf_number)
                                 mf_numbers_for_load=json.dumps(mf_numbers_for_load)
@@ -2930,7 +2931,9 @@ if authentication_status:
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"release_orders/mf_numbers.json")
                                 blob.upload_from_string(mf_numbers_for_load)
+                                st.write("Updated MF numbers...")
                             send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
+                            st.write("Sent EDI Email...")
                             
                         else:   ###cancel bill of lading
                             pass

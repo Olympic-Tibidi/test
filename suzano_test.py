@@ -2421,7 +2421,7 @@ if authentication_status:
                 col1, col2,col3,col4,col5= st.columns([2,2,2,2,2])
                 
               
-               
+                release_order_number=current_release_order
                 if info[vessel][current_release_order][current_sales_order]["transport_type"]=="TRUCK":
                     medium="TRUCK"
                 else:

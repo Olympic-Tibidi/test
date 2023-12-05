@@ -1904,7 +1904,10 @@ if authentication_status:
                             except:
                                 
                                 release_order_database[vessel]={}
+                                release_order_database[vessel][release_order_number]={}
+                                release_order_database[vessel][release_order_number][sales_order_item]={}
                                 release_order_database[vessel][release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}
+                                
                             st.write(f"Recorded Release Order - {release_order_number} for Item No: {sales_order_item}")
                         release_orders_json=json.dumps(release_order_database)
                         storage_client = storage.Client()

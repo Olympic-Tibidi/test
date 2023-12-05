@@ -2428,14 +2428,18 @@ if authentication_status:
                     medium="RAIL"
                 
                 with col1:
-                
-                    terminal_code=st.text_input("Terminal Code","OLYM",disabled=True)
-                    file_date=st.date_input("File Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="file_dates",disabled=True)
+                ######################  LETS GET RID OF INOUT BOXES TO SIMPLIFY LONGSHORE SCREEN
+                    #terminal_code=st.text_input("Terminal Code","OLYM",disabled=True)
+                    terminal_code="OLYM"
+                    #file_date=st.date_input("File Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="file_dates",disabled=True)
+                    file_date=datetime.datetime.today()-datetime.timedelta(hours=utc_difference)
                     if file_date not in st.session_state:
                         st.session_state.file_date=file_date
                     file_time = st.time_input('FileTime', datetime.datetime.now()-datetime.timedelta(hours=utc_difference),step=60,disabled=False)
-                    delivery_date=st.date_input("Delivery Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="delivery_date",disabled=True,visible=False)
-                    eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
+                   #delivery_date=st.date_input("Delivery Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="delivery_date",disabled=True,visible=False)
+                    delivery_date=datetime.datetime.today()-datetime.timedelta(hours=utc_difference)
+                   #eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
+                    eta_date=delivery_date
                     
                 with col2:
                     ocean_bol_to_batch = {"GSSWKIR6013D": 45302855,"GSSWKIR6013E": 45305548}

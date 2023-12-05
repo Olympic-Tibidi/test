@@ -2567,10 +2567,6 @@ if authentication_status:
                         
                         
                         load_input=placeholder1.text_area("**UNITS**",value="",height=300,key=1)#[:-2]
-                        
-                with col3:
-                    placeholder2 = st.empty()
-                    bale_load_input=placeholder2.text_area("**INDIVIDUAL BALES**",value="",height=300,key=1111)#[:-2]
                     click_clear = st.button('CLEAR SCANNED INPUTS', key=3)
                     if click_clear:
                         load_input = placeholder1.text_area("**UNITS**",value="",height=300,key=2)#[:-2]
@@ -2585,6 +2581,11 @@ if authentication_status:
                         bale_textsplit=[i for i in bale_textsplit if len(i)>8]
                         bale_updated_quantity=len(bale_textsplit)
                         st.session_state.updated_quantity=updated_quantity+bale_updated_quantity*0.125
+                        
+                with col3:
+                    placeholder2 = st.empty()
+                    bale_load_input=placeholder2.text_area("**INDIVIDUAL BALES**",value="",height=300,key=1111)#[:-2]
+                    
                         
                     quantity=st.number_input("**Scanned Quantity of Units**",st.session_state.updated_quantity, key=None, help=None, on_change=None, disabled=True, label_visibility="visible")
                     st.markdown(f"**{quantity*2} TONS - {round(quantity*2*2204.62,1)} Pounds**")

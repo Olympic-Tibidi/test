@@ -2355,7 +2355,7 @@ if authentication_status:
                     
                 
                 st.markdown(rf'**:blue[CURRENTLY WORKING] :**')
-                load_col1,load_col2,load_col3=st.columns([8,1,1])
+                load_col1,load_col2,load_col3=st.columns([10,0,0])
                 
                 with load_col1:
                     wrap_dict={"ISU":"UNWRAPPED","ISP":"WRAPPED"}

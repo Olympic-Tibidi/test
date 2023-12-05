@@ -2817,9 +2817,9 @@ if authentication_status:
                             
                             
                             terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",bill_of_lading_number,disabled=True)
-                            st.write("Uploaded Bill of Lading...")
+                            st.toast("Uploaded Bill of Lading...")
                             process()
-                            st.write("Creating EDI...")
+                            st.toast("Creating EDI...")
                             try:
                                 suzano_report_keys=[int(i) for i in suzano_report.keys()]
                                 next_report_no=max(suzano_report_keys)+1
@@ -2843,7 +2843,7 @@ if authentication_status:
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"suzano_report.json")
                                 blob.upload_from_string(suzano_report)
-                                st.write("Updated Suzano Report...")
+                                st.toast("Updated Suzano Report...")
     
                               
                                 
@@ -2895,7 +2895,7 @@ if authentication_status:
                             st.write("Updated Release Order Database File...")
                             with open('placeholder.txt', 'r') as f:
                                 output_text = f.read()
-                            st.markdown("**SUCCESS! EDI FOR THIS LOAD HAS BEEN SUBMITTED,THANK YOU**")
+                            
                             #st.markdown("**EDI TEXT**")
                             #st.text_area('', value=output_text, height=600)
                             with open('placeholder.txt', 'r') as f:
@@ -2903,8 +2903,8 @@ if authentication_status:
                             newline="\n"
                             filename = f'{bill_of_lading_number}'
                             file_name= f'{bill_of_lading_number}.txt'
-                            st.write(filename)
-                            st.write(current_release_order,current_sales_order,destination,ocean_bill_of_lading,terminal_bill_of_lading,wrap)
+                            
+                            
                             subject = f'Suzano_EDI_{a}_ R.O:{release_order_number}-Terminal BOL :{bill_of_lading_number}-Destination : {destination}'
                             body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                             #st.write(body)           
@@ -2934,7 +2934,9 @@ if authentication_status:
                                 st.write("Updated MF numbers...")
                             send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
                             st.write("Sent EDI Email...")
-                            
+                            st.markdown("**SUCCESS! EDI FOR THIS LOAD HAS BEEN SUBMITTED,THANK YOU**")
+                            st.write(filename,current_release_order,current_sales_order,destination,ocean_bill_of_lading,terminal_bill_of_lading,wrap)
+                            st.toast('Hooray!', icon='🎉')
                         else:   ###cancel bill of lading
                             pass
                 

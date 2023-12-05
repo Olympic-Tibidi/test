@@ -2377,7 +2377,7 @@ if authentication_status:
 
 
                     
-                    sub_load_col1,sub_load_col2,sub_load_col3,sub_load_col4=st.columns([3,3,2,2])
+                    sub_load_col1,sub_load_col2,sub_load_col3,sub_load_col4=st.columns([3,3,3,3])
                     
                     with sub_load_col1:   
                         #st.markdown(rf'**Release Order-{current_release_order}**')

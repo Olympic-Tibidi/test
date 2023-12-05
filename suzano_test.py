@@ -2817,7 +2817,7 @@ if authentication_status:
                             
                             
                             terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",bill_of_lading_number,disabled=True)
-                            st.toast("Uploaded Bill of Lading...")
+                            st.success("Uploaded Bill of Lading...",icon="✅")
                             process()
                             st.toast("Creating EDI...")
                             try:

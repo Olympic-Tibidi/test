@@ -1915,7 +1915,7 @@ if authentication_status:
                         blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                         blob.upload_from_string(release_orders_json)
                         
-                with release_order_tab2:  ##   ACTIVE RELEASE ORDERS ##
+                with release_order_tab2:  ##   RELEASE ORDER DATABASE ##
                     
                     vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"],key="other")
                     rls_tab1,rls_tab2,rls_tab3=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS","ENTER MF NUMBERS"])
@@ -1928,18 +1928,20 @@ if authentication_status:
                     with rls_tab1:
                         
                         completed_release_orders=[]
-                        
-                        for key in release_order_database[vessel]:
-                            not_yet=0
-                            #st.write(key)
-                            for sales in release_order_database[vessel][key]:
-                                #st.write(sales)
-                                if release_order_database[vessel][key][sales]["remaining"]>0:
-                                    not_yet=1
-                                else:
-                                    pass#st.write(f"{key}{sales} seems to be finished")
-                            if not_yet==0:
-                                completed_release_orders.append(key)
+                        if not release_order_database[vessel]:
+                            st.write("NO RELEASE ORDERS FOR THIS VESSEL")
+                        else:
+                            for key in release_order_database[vessel]:
+                                not_yet=0
+                                #st.write(key)
+                                for sales in release_order_database[vessel][key]:
+                                    #st.write(sales)
+                                    if release_order_database[vessel][key][sales]["remaining"]>0:
+                                        not_yet=1
+                                    else:
+                                        pass#st.write(f"{key}{sales} seems to be finished")
+                                if not_yet==0:
+                                    completed_release_orders.append(key)
                         
                         files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/{vessel}/")]   ### REMOVE json extension from name
                         

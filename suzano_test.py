@@ -2214,18 +2214,20 @@ if authentication_status:
                     with rls_tab2:
                         data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                         completed_release_orders=[]
-                        
-                        for key in release_order_database[vessel]:
-                            not_yet=0
-                            #st.write(key)
-                            for sales in release_order_database[vessel][key]:
-                                #st.write(sales)
-                                if release_order_database[vessel][key][sales]["remaining"]>0:
-                                    not_yet=1
-                                else:
-                                    pass#st.write(f"{key}{sales} seems to be finished")
-                            if not_yet==0:
-                                completed_release_orders.append(key)
+                        if vessel not in release_order_database:
+                            pass
+                        else:
+                            for key in release_order_database[vessel]:
+                                not_yet=0
+                                #st.write(key)
+                                for sales in release_order_database[vessel][key]:
+                                    #st.write(sales)
+                                    if release_order_database[vessel][key][sales]["remaining"]>0:
+                                        not_yet=1
+                                    else:
+                                        pass#st.write(f"{key}{sales} seems to be finished")
+                                if not_yet==0:
+                                    completed_release_orders.append(key)
                         
                         for completed in completed_release_orders:
                             #st.write(completed)

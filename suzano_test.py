@@ -2419,7 +2419,7 @@ if authentication_status:
                 ###############    LOADOUT DATA ENTRY    #########
                 
                 col1, col2,col3,col4= st.columns([2,2,2,2])
-                
+                yes=False
               
                 release_order_number=current_release_order
                 if info[vessel][current_release_order][current_sales_order]["transport_type"]=="TRUCK":
@@ -2457,12 +2457,16 @@ if authentication_status:
                                    load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
                                    mf=True
                                    load_mf_number_issued=True
+                                   yes=True
                                else:
                                    st.write("MF NUMBERS NOT IN!")
                                    mf=False
+                                   yes=False
                                    load_mf_number_issued=False  
                            else:
                                st.write("NO MF FOR THIS VESSEL!")
+                               mf=False
+                               yes=False
                         foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
                         foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
                     click_clear1 = st.button('CLEAR VEHICLE-QUANTITY INPUTS', key=34)

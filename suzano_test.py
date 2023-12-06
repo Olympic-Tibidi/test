@@ -1928,7 +1928,7 @@ if authentication_status:
                     with rls_tab1:
                         
                         completed_release_orders=[]
-                        if not release_order_database[vessel]:
+                        if vessel not in  release_order_database:
                             st.write("NO RELEASE ORDERS FOR THIS VESSEL")
                         else:
                             for key in release_order_database[vessel]:

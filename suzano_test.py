@@ -2252,37 +2252,41 @@ if authentication_status:
                         mf_numbers_=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                         mf_numbers=json.loads(mf_numbers_)
                         vessel_mf=vessel
-                        gp_release_orders=[i for i in release_order_database[vessel_mf] if release_order_database[vessel_mf][i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and release_order_database[vessel_mf][i]["001"]["remaining"]>2]
-                        destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database[vessel_mf] if release_order_database[vessel_mf][i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and release_order_database[vessel_mf][i]["001"]["remaining"]>2]
-                        release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",destinations_of_release_orders,key="tatata")
-                        release_order_number_mf=release_order_number_mf.split(" ")[0]
-                        input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
-                        if input_mf_numbers is not None:
-                            input_mf_numbers = input_mf_numbers.splitlines()
-                            input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]
-                        #st.write(input_mf_numbers)
-                        if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
-                            if vessel_mf not in mf_numbers:
-                                mf_numbers[vessel_mf]={}
-                            if release_order_number_mf not in mf_numbers[vessel_mf].keys():   ####### CAREFUL THIS ASSUMES SAME DIGIT RELEASE ORDER EACH TIME
-                                mf_numbers[vessel_mf][release_order_number_mf]=[]
-                            mf_numbers[vessel_mf][release_order_number_mf]+=input_mf_numbers
-                            mf_numbers[vessel_mf][release_order_number_mf]=list(set(mf_numbers[vessel_mf][release_order_number_mf]))
-                            mf_data=json.dumps(mf_numbers)
-                            storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"release_orders/mf_numbers.json")
-                            blob.upload_from_string(mf_data)
-                        if st.button("REMOVE MF NUMBERS",key="ioerssu" ):
-                            for i in input_mf_numbers:
-                                if i in mf_numbers[vessel_mf][release_order_number_mf]:
-                                    mf_numbers[vessel_mf][release_order_number_mf].remove(i)
-                            mf_data=json.dumps(mf_numbers)
-                            storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"release_orders/mf_numbers.json")
-                            blob.upload_from_string(mf_data)
-                        st.table(pd.DataFrame(mf_numbers))
+                        if vessel_mf in release_order_database:
+                            
+                            gp_release_orders=[i for i in release_order_database[vessel_mf] if release_order_database[vessel_mf][i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and release_order_database[vessel_mf][i]["001"]["remaining"]>2]
+                            destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database[vessel_mf] if release_order_database[vessel_mf][i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and release_order_database[vessel_mf][i]["001"]["remaining"]>2]
+                            release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",destinations_of_release_orders,key="tatata")
+                            release_order_number_mf=release_order_number_mf.split(" ")[0]
+                            input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
+                            if input_mf_numbers is not None:
+                                input_mf_numbers = input_mf_numbers.splitlines()
+                                input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]
+                            #st.write(input_mf_numbers)
+                            if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
+                                if vessel_mf not in mf_numbers:
+                                    mf_numbers[vessel_mf]={}
+                                if release_order_number_mf not in mf_numbers[vessel_mf].keys():   ####### CAREFUL THIS ASSUMES SAME DIGIT RELEASE ORDER EACH TIME
+                                    mf_numbers[vessel_mf][release_order_number_mf]=[]
+                                mf_numbers[vessel_mf][release_order_number_mf]+=input_mf_numbers
+                                mf_numbers[vessel_mf][release_order_number_mf]=list(set(mf_numbers[vessel_mf][release_order_number_mf]))
+                                mf_data=json.dumps(mf_numbers)
+                                storage_client = storage.Client()
+                                bucket = storage_client.bucket(target_bucket)
+                                blob = bucket.blob(rf"release_orders/mf_numbers.json")
+                                blob.upload_from_string(mf_data)
+                            if st.button("REMOVE MF NUMBERS",key="ioerssu" ):
+                                for i in input_mf_numbers:
+                                    if i in mf_numbers[vessel_mf][release_order_number_mf]:
+                                        mf_numbers[vessel_mf][release_order_number_mf].remove(i)
+                                mf_data=json.dumps(mf_numbers)
+                                storage_client = storage.Client()
+                                bucket = storage_client.bucket(target_bucket)
+                                blob = bucket.blob(rf"release_orders/mf_numbers.json")
+                                blob.upload_from_string(mf_data)
+                            st.table(pd.DataFrame(mf_numbers))
+                        else:
+                            st.write("NO RELEASE ORDER FOR THIS VESSEL IN DATABASE")
                         
                                 
         

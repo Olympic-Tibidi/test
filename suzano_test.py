@@ -2491,7 +2491,7 @@ if authentication_status:
                     if click_clear1:
                          with placeholder.container():
                              
-                           carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
+                           carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=25)
                            
                            vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=12)
                            

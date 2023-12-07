@@ -2752,7 +2752,7 @@ if authentication_status:
                                                 storage_client = storage.Client()
                                                 bucket = storage_client.bucket(target_bucket)
                                                 blob = bucket.blob(rf"bill_mapping.json")
-                                                blob.upload_from_string()
+                                                blob.upload_from_string(updated_bill)
                                                 st.success(f"Added Unit {x} to Inventory!",icon="✅")
                                         seen.add(x)
                                 

@@ -2490,39 +2490,41 @@ if authentication_status:
                     click_clear1 = st.button('CLEAR VEHICLE-QUANTITY INPUTS', key=34)
                     if click_clear1:
                          with placeholder.container():
-                             
-                           vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
+                             vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
                     
-                            mf=True
-                            load_mf_number_issued=False
-                            carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
-                            if carrier_code=="123456-KBX":
-                               if vessel in mf_numbers_for_load:
+                             mf=True
+                             load_mf_number_issued=False
+                             carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
+                             if carrier_code=="123456-KBX":
+                                if vessel in mf_numbers_for_load:
                                    
-                                   if release_order_number in mf_numbers_for_load[vessel].keys():
-                                       mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
-                                       if len(mf_liste)>0:
-                                           load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
-                                           mf=True
-                                           load_mf_number_issued=True
-                                           yes=True
-                                       else:
-                                           st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
-                                           mf=False
-                                           yes=False
-                                           load_mf_number_issued=False  
-                                   else:
-                                       st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
-                                       mf=False
-                                       yes=False
-                                       load_mf_number_issued=False  
-                               else:
-                                   st.write(f"**:red[NO MF IN DATABASE FOR THIS VESSEL]**")
-                                   mf=False
-                                   yes=False
-                            foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
-                            foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
-
+                                    if release_order_number in mf_numbers_for_load[vessel].keys():
+                                        mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
+                                        if len(mf_liste)>0:
+                                            load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
+                                            mf=True
+                                            load_mf_number_issued=True
+                                            yes=True
+                                        else:
+                                            st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                                            mf=False
+                                            yes=False
+                                            load_mf_number_issued=False  
+                                    else:
+                                        st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                                        mf=False
+                                        yes=False
+                                        load_mf_number_issued=False  
+                                else:
+                                    st.write(f"**:red[NO MF IN DATABASE FOR THIS VESSEL]**")
+                                    mf=False
+                                    yes=False
+                             foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
+                             foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
+                             
+                           
+                    
+                            
                     
                 with col2:
                     ocean_bol_to_batch = {"GSSWKIR6013D": 45302855,"GSSWKIR6013E": 45305548}

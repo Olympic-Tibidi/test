@@ -2742,7 +2742,7 @@ if authentication_status:
                                         st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                         faults.append(1)
                                         st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
-                                        st.info("?UNIT")
+                                        st.info(f"VERIFY THIS UNIT CAME FROM {vessel} {grade} piles")
                                                                         
                                     seen.add(x)
                                 

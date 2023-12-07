@@ -2262,7 +2262,7 @@ if authentication_status:
                             if input_mf_numbers is not None:
                                 input_mf_numbers = input_mf_numbers.splitlines()
                                 input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]
-                            #st.write(input_mf_numbers)
+                           
                             if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
                                 if vessel_mf not in mf_numbers:
                                     mf_numbers[vessel_mf]={}
@@ -2469,12 +2469,12 @@ if authentication_status:
                                    load_mf_number_issued=True
                                    yes=True
                                else:
-                                   st.write("MF NUMBERS NOT IN!")
+                                   st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
                                    mf=False
                                    yes=False
                                    load_mf_number_issued=False  
                            else:
-                               st.write("NO MF FOR THIS VESSEL!")
+                               st.write(f"**:red[NO MF IN DATABASE FOR THIS VESSEL]**")
                                mf=False
                                yes=False
                         foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)

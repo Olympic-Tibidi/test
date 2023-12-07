@@ -2713,13 +2713,13 @@ if authentication_status:
                             seen=set()
                             for i,x in enumerate(textsplit):
                                 alternate_vessel=[ship for ship in bill_mapping if ship!=vessel][0]
-                                if bill_mapping[alternate_vessel][x[:-2]]:
+                                if x[:-2] in bill_mapping[alternate_vessel]:
                                     st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                     faults.append(1)
                                     st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")
                                 else:
                                     
-                                    if bill_mapping[vessel][x[:-2]]:
+                                    if x[:-2] in bill_mapping[vessel]:
                                         if audit_unit(x):
                                             if x in seen:
                                                 st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)

@@ -45,7 +45,7 @@ import re
 import tempfile
 import plotly.graph_objects as go
 #import streamlit_option_menu
-from streamlit_modal import Modal
+#from streamlit_modal import Modal
 
 st.set_page_config(layout="wide")
 

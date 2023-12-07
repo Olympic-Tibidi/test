@@ -2261,12 +2261,12 @@ if authentication_status:
                             input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
                             if input_mf_numbers is not None:
                                 input_mf_numbers = input_mf_numbers.splitlines()
-                                input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]
+                                input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]####### CAREFUL THIS ASSUMES SAME DIGIT MF EACH TIME
                            
                             if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
                                 if vessel_mf not in mf_numbers:
                                     mf_numbers[vessel_mf]={}
-                                if release_order_number_mf not in mf_numbers[vessel_mf].keys():   ####### CAREFUL THIS ASSUMES SAME DIGIT RELEASE ORDER EACH TIME
+                                if release_order_number_mf not in mf_numbers[vessel_mf].keys():   
                                     mf_numbers[vessel_mf][release_order_number_mf]=[]
                                 mf_numbers[vessel_mf][release_order_number_mf]+=input_mf_numbers
                                 mf_numbers[vessel_mf][release_order_number_mf]=list(set(mf_numbers[vessel_mf][release_order_number_mf]))
@@ -2848,7 +2848,7 @@ if authentication_status:
                             success_container=st.empty()
                             success_container.success("Uploaded Bill of Lading...",icon="✅")
                             process()
-                            st.toast("Creating EDI...")
+                            #st.toast("Creating EDI...")
                             try:
                                 suzano_report_keys=[int(i) for i in suzano_report.keys()]
                                 next_report_no=max(suzano_report_keys)+1

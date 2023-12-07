@@ -2745,7 +2745,7 @@ if authentication_status:
                                         st.info(f"VERIFY THIS UNIT CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles")
                                         with st.expander(f"VERIFY THIS UNIT CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles"):
                                             st.write("The chart above shows some numbers I picked for you.I rolled actual dice for these, so they're *guaranteed* tobe random.")
-                                            with st.button("ADD UNIT TO INVENTORY"):
+                                            if st.button("ADD UNIT TO INVENTORY"):
                                                 st.write("Do something")
                                         seen.add(x)
                                 

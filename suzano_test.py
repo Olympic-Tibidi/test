@@ -2466,10 +2466,16 @@ if authentication_status:
                                
                                if release_order_number in mf_numbers_for_load[vessel].keys():
                                    mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
-                                   load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
-                                   mf=True
-                                   load_mf_number_issued=True
-                                   yes=True
+                                   if len(mf_liste)>0:
+                                       load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
+                                       mf=True
+                                       load_mf_number_issued=True
+                                       yes=True
+                                   else:
+                                       st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                                       mf=False
+                                       yes=False
+                                       load_mf_number_issued=False  
                                else:
                                    st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
                                    mf=False

@@ -44,6 +44,8 @@ import plotly.graph_objects as go
 import re
 import tempfile
 import plotly.graph_objects as go
+import streamlit-option-menu
+from streamlit_modal import Modal
 
 st.set_page_config(layout="wide")
 
@@ -2439,7 +2441,7 @@ if authentication_status:
                     medium="RAIL"
                 
                 with col1:
-                ######################  LETS GET RID OF INOUT BOXES TO SIMPLIFY LONGSHORE SCREEN
+                ######################  LETS GET RID OF INPUT BOXES TO SIMPLIFY LONGSHORE SCREEN
                     #terminal_code=st.text_input("Terminal Code","OLYM",disabled=True)
                     terminal_code="OLYM"
                     #file_date=st.date_input("File Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="file_dates",disabled=True)
@@ -2740,7 +2742,9 @@ if authentication_status:
                                         st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                         faults.append(1)
                                         st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
-                                    
+                                        modal = Modal(key="Demo Key",title="test")
+                                        with modal.container():
+                                            st.markdown('testtesttesttesttesttesttesttest')
                                                                         
                                     seen.add(x)
                                 

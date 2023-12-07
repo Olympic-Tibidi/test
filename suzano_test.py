@@ -2976,7 +2976,7 @@ if authentication_status:
                             success_container.success(f"Sent EDI Email",icon="✅")
                             st.markdown("**SUCCESS! EDI FOR THIS LOAD HAS BEEN SUBMITTED,THANK YOU**")
                             st.write(filename,current_release_order,current_sales_order,destination,ocean_bill_of_lading,terminal_bill_of_lading,wrap)
-                            st.toast('Hooray!', icon='🎉')
+                            
                         else:   ###cancel bill of lading
                             pass
                 

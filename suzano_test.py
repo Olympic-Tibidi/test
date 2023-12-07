@@ -2742,9 +2742,7 @@ if authentication_status:
                                         st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                         faults.append(1)
                                         st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
-                                        modal = Modal(key="Demo Key",title="test")
-                                        with modal.container():
-                                            st.markdown('testtesttesttesttesttesttesttest')
+                                        st.info("?UNIT")
                                                                         
                                     seen.add(x)
                                 

@@ -2739,11 +2739,11 @@ if authentication_status:
                                             st.write(f"**:red[WRONG B/L, DO NOT LOAD UNIT {x}]**")
                                             faults.append(1)
                                     else:
-                                        st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                        #st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                         faults.append(1)
-                                        st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
+                                        #st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
                                         #st.info(f"VERIFY THIS UNIT CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles")
-                                        with st.expander(f"**:red[This LOT# NOT IN INVENTORY!]**VERIFY UNIT {x} CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles"):
+                                        with st.expander(f"**:red[Unit No : {i+1}-{x} This LOT# NOT IN INVENTORY!]**VERIFY UNIT {x} CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles"):
                                             st.write("The chart above shows some numbers I picked for you.I rolled actual dice for these, so they're *guaranteed* tobe random.")
                                             if st.button("ADD UNIT TO INVENTORY"):
                                                 updated_bill=bill_mapping.copy()

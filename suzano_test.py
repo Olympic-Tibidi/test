@@ -2747,7 +2747,7 @@ if authentication_status:
                                             st.write("The chart above shows some numbers I picked for you.I rolled actual dice for these, so they're *guaranteed* tobe random.")
                                             if st.button("ADD UNIT TO INVENTORY"):
                                                 {"KIRKENES-2304": {"I1132857": {"Batch": "45302855", "Ocean_bl": "GSSWKIR6013D"}, 
-                                                updated_bill=bill_mapping
+                                                updated_bill=bill_mapping.copy()
                                                 updated_bill[vessel][x[:-2]]={"Batch":batch,"Ocean_bl":ocean_bill_of_lading}
                                                 updated_bill=json.dumps(updated_bill)
                                                 storage_client = storage.Client()

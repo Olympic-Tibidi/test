@@ -2744,11 +2744,11 @@ if authentication_status:
                                         st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
                                         st.info(f"VERIFY THIS UNIT CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles")
                                         with st.expander("See explanation"):
-                                            st.write(\"\"\"
+                                            st.write("
                                                 The chart above shows some numbers I picked for you.
                                                 I rolled actual dice for these, so they're *guaranteed* to
                                                 be random.
-                                            \"\"\")
+                                            ")
                                             st.image("https://static.streamlit.io/examples/dice.jpg")                              
                                         seen.add(x)
                                 

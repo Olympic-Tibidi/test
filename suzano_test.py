@@ -2712,59 +2712,72 @@ if authentication_status:
                        
                             seen=set()
                             for i,x in enumerate(textsplit):
-                                try:
-                                    if bill_mapping[vessel][x[:-2]]:
-                                        pass
-                                
-                                    if audit_unit(x):
-                                        if x in seen:
-                                            st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                            faults.append(1)
-                                            st.markdown("**:red[This unit has been scanned TWICE!]**")
-                                        if x in load_dict.keys():
-                                            st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                            faults.append(1)
-                                            st.markdown("**:red[This unit has been SHIPPED!]**")   
-                                        else:
-                                            st.write(f"**Unit No : {i+1}-{x}**")
-                                            faults.append(0)
-                                    else:
-                                        st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                        st.write(f"**:red[WRONG B/L, DO NOT LOAD UNIT {x}]**")
-                                        faults.append(1)
-                                except:
+                                alternate_vessel=[ship for ship in bill_mapping if ship!=vessel][0]
+                                if bill_mapping[alternate_vessel][x[:-2]]:
                                     st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                     faults.append(1)
-                                    st.markdown("**:red[This LOT NOT IN INVENTORY!]**")
+                                    st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")
+                                else:
                                     
-                                seen.add(x)
+                                    if bill_mapping[vessel][x[:-2]]:
+                                        if audit_unit(x):
+                                            if x in seen:
+                                                st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                                faults.append(1)
+                                                st.markdown("**:red[This unit has been scanned TWICE!]**")
+                                            if x in load_dict.keys():
+                                                st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                                faults.append(1)
+                                                st.markdown("**:red[This unit has been SHIPPED!]**")   
+                                            else:
+                                                st.write(f"**Unit No : {i+1}-{x}**")
+                                                faults.append(0)
+                                        else:
+                                            st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                            st.write(f"**:red[WRONG B/L, DO NOT LOAD UNIT {x}]**")
+                                            faults.append(1)
+                                    else:
+                                        st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                        faults.append(1)
+                                        st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
+                                    
+                                                                        
+                                    seen.add(x)
+                                
                         if bale_load_input is not None:
                         
                             bale_textsplit = bale_load_input.splitlines()                       
                             bale_textsplit=[i for i in bale_textsplit if len(i)>8]                           
                             seen=set()
                             for i,x in enumerate(bale_textsplit):
-                                try:
+                                alternate_vessel=[ship for ship in bill_mapping if ship!=vessel][0]
+                                if bill_mapping[alternate_vessel][x[:-2]]:
+                                    st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                    faults.append(1)
+                                    st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")
+                                else:
+                                    
                                     if bill_mapping[vessel][x[:-2]]:
-                                        pass
-                                
-                                    if audit_unit(x):
-                                        if x in textsplit:
-                                            st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                            st.write(f"**:red[This number is scanned as a whole UNIT!]**")
-                                            bale_faults.append(1)
+                                        if audit_unit(x):
+                                            if x in seen:
+                                                st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                                faults.append(1)
+                                                st.markdown("**:red[This bale has been scanned TWICE!]**")
+                                            if x in load_dict.keys():
+                                                st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                                faults.append(1)
+                                                st.markdown("**:red[This bale has been SHIPPED!]**")   
+                                            else:
+                                                st.write(f"**Bale No : {i+1}-{x}**")
+                                                faults.append(0)
                                         else:
-                                            st.markdown(f"**Bale No : {i+1}-{x}**",unsafe_allow_html=True)
-                                            bale_faults.append(0)
+                                            st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                            st.write(f"**:red[WRONG B/L, DO NOT LOAD UNIT {x}]**")
+                                            faults.append(1)
                                     else:
                                         st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                        st.write(f"**:red[WRONG B/L, DO NOT LOAD UNIT {x}]**")
-                                        bale_faults.append(1)
-                                except:
-                                    st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                    faults.append(1)
-                                    st.markdown("**:red[This LOT NOT IN INVENTORY!]**")
-                                seen.add(x)
+                                        faults.append(1)
+                                        st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
                        
                            
                         loads={}

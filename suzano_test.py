@@ -2759,7 +2759,7 @@ if authentication_status:
                                         #st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
                                         #st.info(f"VERIFY THIS UNIT CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles")
                                         with st.expander(f"**:red[Unit No : {i+1}-{x} This LOT# NOT IN INVENTORY!]VERIFY UNIT {x} CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles**"):
-                                            st.write("The chart above shows some numbers I picked for you.I rolled actual dice for these, so they're *guaranteed* tobe random.")
+                                            st.write("Verify that the unit came from the pile that has the units for this release order and click to inventory")
                                             if st.button("ADD UNIT TO INVENTORY"):
                                                 updated_bill=bill_mapping.copy()
                                                 updated_bill[vessel][x[:-2]]={"Batch":batch,"Ocean_bl":ocean_bill_of_lading}
@@ -2779,7 +2779,7 @@ if authentication_status:
                                                 blob = bucket.blob(rf"alien_units.json")
                                                 blob.upload_from_string(alien_units)
                                                 
-                                                st.success(f"Added Unit {x} to Inventory!",icon="✅")
+                                                
                                                 subject=f"FOUND UNIT {x} NOT IN INVENTORY"
                                                 body=f"Clerk identified an uninventoried {'Unwrapped' if grade=='ISU' else 'wrapped'} unit {x}, and after verifying the physical pile, inventoried it into Ocean Bill Of Lading : {ocean_bill_of_lading} for vessel {vessel}. Unit has been put into alien unit list."
                                                 sender = "warehouseoly@gmail.com"
@@ -2787,6 +2787,8 @@ if authentication_status:
                                                 recipients = ["afsiny@portolympia.com"]
                                                 password = "xjvxkmzbpotzeuuv"
                                                 send_email(subject, body, sender, recipients, password)
+                                                time.sleep(0.1)
+                                                st.success(f"Added Unit {x} to Inventory!",icon="✅")
                                         seen.add(x)
                                 
                         if bale_load_input is not None:
@@ -3070,6 +3072,7 @@ if authentication_status:
                             success_container.success(f"Sent EDI Email",icon="✅")
                             st.markdown("**SUCCESS! EDI FOR THIS LOAD HAS BEEN SUBMITTED,THANK YOU**")
                             st.write(filename,current_release_order,current_sales_order,destination,ocean_bill_of_lading,terminal_bill_of_lading,wrap)
+                            
                             
                         else:   ###cancel bill of lading
                             pass

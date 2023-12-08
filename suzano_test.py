@@ -2758,7 +2758,7 @@ if authentication_status:
                                         faults.append(1)
                                         #st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
                                         #st.info(f"VERIFY THIS UNIT CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles")
-                                        with st.expander(f"**:red[Unit No : {i+1}-{x} This LOT# NOT IN INVENTORY!]VERIFY UNIT {x} CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles**"):
+                                        with st.expander(f"**:red[Unit No : {i+1}-{x} This LOT# NOT IN INVENTORY!---VERIFY UNIT {x} CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles]**"):
                                             st.write("Verify that the unit came from the pile that has the units for this release order and click to inventory")
                                             if st.button("ADD UNIT TO INVENTORY",key=f"{x}"):
                                                 updated_bill=bill_mapping.copy()

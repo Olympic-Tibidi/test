@@ -2719,6 +2719,7 @@ if authentication_status:
                             textsplit=[i for i in textsplit if len(i)>8]
                        
                             seen=set()
+                            alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                             for i,x in enumerate(textsplit):
                                 alternate_vessel=[ship for ship in bill_mapping if ship!=vessel][0]
                                 if x[:-2] in bill_mapping[alternate_vessel]:
@@ -3070,7 +3071,21 @@ if authentication_status:
                             success_container6.success(f"Sent EDI Email",icon="✅")
                             st.markdown("**SUCCESS! EDI FOR THIS LOAD HAS BEEN SUBMITTED,THANK YOU**")
                             st.write(filename,current_release_order,current_sales_order,destination,ocean_bill_of_lading,terminal_bill_of_lading,wrap)
-                            
+                            for i in pure_loads:
+                                if i not in pure_loads:
+                                    if i[:-2] in [u[:-2] for u in alien_units]:
+                                        alien_units[vessel][i]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
+                                            "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S"),
+                                            "Destination":destination,"Release_Order":release_order,"Terminal_Bill_of Lading":terminal_bill_of_lading,"Truck":vehicle}
+                                if i in pure_loads:       
+                                    alien_units[vessel][i]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
+                                            "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S"),
+                                            "Destination":destination,"Release_Order":release_order,"Terminal_Bill_of Lading":terminal_bill_of_lading,"Truck":vehicle}
+                            alien_units=json.dumps(alien_units)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"alien_units.json")
+                            blob.upload_from_string(alien_units)   
                             
                         else:   ###cancel bill of lading
                             pass

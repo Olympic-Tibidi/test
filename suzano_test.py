@@ -3339,7 +3339,10 @@ if authentication_status:
                                                     'Date_Found': alien_date
                                                 })
                             
-                        st.dataframe(alien_temp)
+                        try:
+                            st.dataframe(alien_temp)
+                        except:
+                            st.write("No unregistered units found on this vessel")
             with inv5:
                 inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T

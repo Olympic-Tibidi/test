@@ -2744,6 +2744,7 @@ if authentication_status:
                                             st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                             st.write(f"**:red[WRONG B/L, DO NOT LOAD UNIT {x}]**")
                                             faults.append(1)
+                                        seen.add(x)
                                     else:
                                         #st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                         faults.append(1)
@@ -2780,7 +2781,7 @@ if authentication_status:
                                                 send_email(subject, body, sender, recipients, password)
                                                 time.sleep(0.1)
                                                 st.success(f"Added Unit {x} to Inventory!",icon="✅")
-                                        seen.add(x)
+                                        
                                 
                         if bale_load_input is not None:
                         

@@ -2842,6 +2842,12 @@ if authentication_status:
                             for k in bale_textsplit:
                                 loads[k[:-2]]+=0.125
                                 pure_loads[k]+=0.125
+                with col3:
+                    quantity=st.number_input("**Scanned Quantity of Units**",st.session_state.updated_quantity, key=None, help=None, on_change=None, disabled=True, label_visibility="visible")
+                    st.markdown(f"**{quantity*2} TONS - {round(quantity*2*2204.62,1)} Pounds**")
+                    #ADMT=st.text_input("ADMT",round(info[vessel][current_release_order][current_sales_order]["dryness"]/90,4)*st.session_state.updated_quantity,disabled=True)
+                    admt=round(float(info[vessel][current_release_order][current_sales_order]["dryness"])/90*st.session_state.updated_quantity*2,4)
+                    st.markdown(f"**ADMT= {admt} TONS**")
                 manual_time=False   
                 #st.write(faults)                  
                 if st.checkbox("Check for Manual Entry for Date/Time"):

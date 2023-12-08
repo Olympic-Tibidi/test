@@ -2443,7 +2443,7 @@ if authentication_status:
                         except:
                             pass
 
-
+                st.divider()
                 ###############    LOADOUT DATA ENTRY    #########
                 
                 col1, col2,col3,col4= st.columns([2,2,2,2])

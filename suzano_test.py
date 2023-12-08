@@ -3254,7 +3254,7 @@ if authentication_status:
 
                                
                 else:
-                    inv4tab1,inv4tab2=st.tabs(["DAILY SHIPMENT REPORT","INVENTORY"])
+                    inv4tab1,inv4tab2,inv4tab3=st.tabs(["DAILY SHIPMENT REPORT","INVENTORY","UNREGISTERED LOTS FOUND"])
                     with inv4tab1:
                         
                         kf=inv_bill_of_ladings.iloc[1:].copy()
@@ -3319,7 +3319,9 @@ if authentication_status:
                         with inv_col2:
                             st.subheader("By Ocean BOL,TONS")
                             st.dataframe(tempo)
-                   
+                   with inv4tab3:
+                       alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
+                       st.dataframe(pd.DataFrame(alien_units)
             with inv5:
                 inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T

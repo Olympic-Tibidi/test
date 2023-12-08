@@ -3091,7 +3091,7 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"alien_units.json")
                             blob.upload_from_string(alien_units)   
-                            subject=f"FOUND UNIT {x} NOT IN INVENTORY"
+                            subject=f"UNREGISTERED UNITS SHIPPED ON THIS TRUCK TO {destination}"
                             body=f"These unregistered units were shipped with this truck.{[i for i in this_shipment_aliens]}"
                             sender = "warehouseoly@gmail.com"
                             #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
@@ -3350,7 +3350,10 @@ if authentication_status:
                     with inv4tab3:
                         alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                         alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])
-                        st.write(pd.DataFrame(alien_units[alien_vessel]).T)                        
+                        alien_list=pd.DataFrame(alien_units[alien_vessel]).T
+                        alien_list.reset_index(inplace=True)
+                        alien_list.index=alien_list.index+1
+                        st.dataframe(alien_list)
                         
                         
             with inv5:

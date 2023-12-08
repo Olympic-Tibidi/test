@@ -2786,7 +2786,7 @@ if authentication_status:
                                                 #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
                                                 recipients = ["afsiny@portolympia.com"]
                                                 password = "xjvxkmzbpotzeuuv"
-                                                send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
+                                                send_email(subject, body, sender, recipients, password)
                                         seen.add(x)
                                 
                         if bale_load_input is not None:

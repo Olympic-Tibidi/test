@@ -96,7 +96,22 @@ def output():
     with open('placeholder.txt', 'r') as f:
         output_text = f.read()
     return output_text
-        
+
+def send_email(subject, body, sender, recipients, password):
+    msg = MIMEMultipart()
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = ', '.join(recipients)
+
+    # Attach the body of the email as text
+    msg.attach(MIMEText(body, 'plain'))
+
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+        smtp_server.login(sender, password)
+        smtp_server.sendmail(sender, recipients, msg.as_string())
+    #print("Message sent!")
+
+
 def send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name):
     msg = MIMEMultipart()
     msg['Subject'] = subject
@@ -2753,7 +2768,25 @@ if authentication_status:
                                                 bucket = storage_client.bucket(target_bucket)
                                                 blob = bucket.blob(rf"bill_mapping.json")
                                                 blob.upload_from_string(updated_bill)
+
+                                                alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
+                                                alien_units[vessel][x]={}
+                                                alien_units[vessel][x]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
+                                                                        "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S")}
+                                                alien_units=json.dumps(alien_units)
+                                                storage_client = storage.Client()
+                                                bucket = storage_client.bucket(target_bucket)
+                                                blob = bucket.blob(rf"alien_units.json")
+                                                blob.upload_from_string(alien_units)
+                                                
                                                 st.success(f"Added Unit {x} to Inventory!",icon="✅")
+                                                subject=f"FOUND UNIT {x} NOT IN INVENTORY"
+                                                body=f"Clerk identified an uninventoried {'Unwrapped' if grade=='ISU' else 'wrapped'} unit {x}, and after verifying the physical pile, inventoried it into Ocean Bill Of Lading : {ocean_bill_of_lading} for vessel {vessel}. Unit has been put into alien unit list."
+                                                sender = "warehouseoly@gmail.com"
+                                                #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                                recipients = ["afsiny@portolympia.com"]
+                                                password = "xjvxkmzbpotzeuuv"
+                                                send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
                                         seen.add(x)
                                 
                         if bale_load_input is not None:

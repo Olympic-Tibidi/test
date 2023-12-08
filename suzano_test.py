@@ -3338,8 +3338,7 @@ if authentication_status:
                     with inv4tab3:
                         alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                         alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])
-                        st.write(pd.DataFrame(alien_units))
-                        
+                        st.write(pd.DataFrame(alien_units[alien_vessel]))                        
                         
                         ind=[]
                         alien_ocean=[]

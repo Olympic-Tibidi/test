@@ -3338,6 +3338,8 @@ if authentication_status:
                     with inv4tab3:
                         alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                         alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])
+                        st.write(alien_units)
+                        
                         ind=[]
                         alien_ocean=[]
                         alien_grade=[]

@@ -3340,27 +3340,7 @@ if authentication_status:
                         alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])
                         st.write(pd.DataFrame(alien_units[alien_vessel]).T)                        
                         
-                        ind=[]
-                        alien_ocean=[]
-                        alien_grade=[]
-                        alien_date=[]
                         
-                        for i in alien_units[alien_vessel]:
-                            ind.append(i)
-                            alien_ocean.append(alien_units[alien_vessel][i]["Ocean_Bill_Of_Lading"])
-                            alien_grade.append("Wrapped" if alien_units[alien_vessel][i]["Grade"]=="ISP" else "Unwrapped")
-                            alien_date.append(alien_units[alien_vessel][i]["Date_Found"])
-                            alien_temp = pd.DataFrame({
-                                                    'Index': ind,
-                                                    'Ocean_Bill_of_Lading': alien_ocean,
-                                                    'Grade': alien_grade,
-                                                    'Date_Found': alien_date
-                                                })
-                            
-                        try:
-                            st.dataframe(alien_temp)
-                        except:
-                            st.write("No unregistered units found on this vessel")
             with inv5:
                 inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T

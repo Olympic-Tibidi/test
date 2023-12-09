@@ -378,7 +378,7 @@ if authentication_status:
         if select=='WEATHER':
             st.caption("Live Data for Olympia From Weather.gov API")
             weather_tab1,weather_tab2=st.tabs(["TABULAR","GRAPH"])
-            with weather tab_1:
+            with weather_tab1:
             
                 def vectorize(direction,speed):
                     Wind_Direction=direction

@@ -44,7 +44,7 @@ import plotly.graph_objects as go
 import re
 import tempfile
 import plotly.graph_objects as go
-import metpy.calc as mpcalc
+
 #import streamlit_option_menu
 #from streamlit_modal import Modal
 
@@ -420,7 +420,7 @@ if authentication_status:
             
                 forecast=pd.DataFrame.from_dict(weather,orient='index')
                 forecast.Wind_Speed=[int(re.findall(f'\d+',i)[0]) for i in forecast.Wind_Speed.values]
-                forecast['Vector']=[vectorize(parse_angle(i),j) for i,j in zip(forecast.Wind_Direction.values,forecast.Wind_Speed.values)]
+                #forecast['Vector']=[vectorize(parse_angle(i),j) for i,j in zip(forecast.Wind_Direction.values,forecast.Wind_Speed.values)]
                 return forecast
             forecast=get_weather()
             st.dataframe(forecast)

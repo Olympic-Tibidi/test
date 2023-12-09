@@ -490,10 +490,10 @@ if authentication_status:
                 fig = go.Figure()
 
                 # Add traces for each weather parameter
-                fig.add_trace(go.Scatter(x=index, y=temperatures, mode='lines', name='Temperature'))
-                fig.add_trace(go.Scatter(x=index, y=wind, mode='lines', name='Wind Speed'))
+                fig.add_trace(go.Bar(x=index, y=temperatures, name='Temperature'))
+                fig.add_trace(go.Scatter(x=index, y=wind, mode='markers', name='Wind Speed'))
                 fig.add_trace(go.Scatter(x=index, y=pressure, mode='lines', name='Pressure'))
-                fig.add_trace(go.Scatter(x=index, y=rain, mode='lines', name='Rain Amount'))
+                fig.add_trace(go.Bar(x=index, y=rain, name='Rain Amount'))
                 fig.add_trace(go.Scatter(x=index, y=chance_rain, mode='lines', name='Chance of Rain'))
                 fig.add_trace(go.Scatter(x=index, y=cloud, mode='lines', name='Cloud Cover'))
                 # Add traces for other weather parameters...

@@ -526,8 +526,8 @@ if authentication_status:
                                   xaxis_title='Hour',
                                   yaxis_title='Value',
                                   template='plotly_dark',
-                                  width=800, 
-                                  height=400)
+                                  width=900, 
+                                  height=600)
                 st.plotly_chart(fig)
                
         

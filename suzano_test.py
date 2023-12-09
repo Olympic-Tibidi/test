@@ -491,8 +491,12 @@ if authentication_status:
                 gif_content = gcp_download_x(target_bucket,object_name)
                 image = Image.open(BytesIO(gif_content))
                 st.image(image, caption='Downloaded GIF from GCS', use_column_width=True)
-            display_gif_from_gcs(target_bucket, "fourier.gif")
+                contents = gif_content.read()
+                data_url = base64.b64encode(contents).decode('utf-8-sig')
                 
+                st.markdown(f'<img src="data:image/gif;base64,{data_url}>',unsafe_allow_html = True)
+            display_gif_from_gcs(target_bucket, "fourier.gif")
+            
         if select=="FINANCE":
             hadi=False
             fin_password=st.sidebar.text_input("Enter Password",key="sas")

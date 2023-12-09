@@ -377,51 +377,157 @@ if authentication_status:
 
         if select=='WEATHER':
             st.caption("Live Data for Olympia From Weather.gov API")
-            def vectorize(direction,speed):
-                Wind_Direction=direction
-                Wind_Speed=speed
-                wgu = 0.1*Wind_Speed * np.cos((270-Wind_Direction)*np.pi/180)
-                wgv= 0.1*Wind_Speed*np.sin((270-Wind_Direction)*np.pi/180)
-                return(wgu,wgv)
+            weather_tab1,weather_tab2=st.tabs(["TABULAR","GRAPH"])
+            with weather tab_1:
             
-            def parse_angle(angle_str):
-                angle= mpcalc.parse_angle(angle_str)
-                angle=re.findall(f'\d*\.?\d?',angle.__str__())[0]
-                return float(angle)
-            def get_weather():
-                weather=defaultdict(int)
-                headers = { 
-                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36', 
-                        'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 
-                        'Accept-Language' : 'en-US,en;q=0.5', 
-                        'Accept-Encoding' : 'gzip', 
-                        'DNT' : '1', # Do Not Track Request Header 
-                        'Connection' : 'close' }
-                url ='https://api.weather.gov/gridpoints/SEW/117,51/forecast/hourly'
-                #url='https://api.weather.gov/points/47.0379,-122.9007'   #### check for station info with lat/long
-                durl='https://api.weather.gov/alerts?zone=WAC033'
-                response = get(url,headers=headers)
-                desponse=get(durl)
-                data = json.loads(response.text)
-                datan=json.loads(desponse.text)
-                #print(data)
-            
-                for period in data['properties']['periods']:
-                    #print(period)
-                    date=datetime.datetime.strptime(period['startTime'],'%Y-%m-%dT%H:%M:%S-08:00')
-                    date_f=datetime.datetime.strftime(datetime.datetime.strptime(period['startTime'],'%Y-%m-%dT%H:%M:%S-08:00'),"%b-%d,%a %H:%M")
-                    weather[date_f]={'Wind_Direction':f'{period["windDirection"]}','Wind_Speed':f'{period["windSpeed"]}',
-                                  'Temperature':f'{period["temperature"]}','Sky':f'{period["shortForecast"]}',
-                                   'Rain_Chance':f'{period["probabilityOfPrecipitation"]["value"]}'
-                                  }
-                    
-            
-                forecast=pd.DataFrame.from_dict(weather,orient='index')
-                forecast.Wind_Speed=[int(re.findall(f'\d+',i)[0]) for i in forecast.Wind_Speed.values]
-                #forecast['Vector']=[vectorize(parse_angle(i),j) for i,j in zip(forecast.Wind_Direction.values,forecast.Wind_Speed.values)]
-                return forecast
-            forecast=get_weather()
-            st.table(forecast)
+                def vectorize(direction,speed):
+                    Wind_Direction=direction
+                    Wind_Speed=speed
+                    wgu = 0.1*Wind_Speed * np.cos((270-Wind_Direction)*np.pi/180)
+                    wgv= 0.1*Wind_Speed*np.sin((270-Wind_Direction)*np.pi/180)
+                    return(wgu,wgv)
+                
+                def parse_angle(angle_str):
+                    angle= mpcalc.parse_angle(angle_str)
+                    angle=re.findall(f'\d*\.?\d?',angle.__str__())[0]
+                    return float(angle)
+                def get_weather():
+                    weather=defaultdict(int)
+                    headers = { 
+                                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36', 
+                            'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 
+                            'Accept-Language' : 'en-US,en;q=0.5', 
+                            'Accept-Encoding' : 'gzip', 
+                            'DNT' : '1', # Do Not Track Request Header 
+                            'Connection' : 'close' }
+                    url ='https://api.weather.gov/gridpoints/SEW/117,51/forecast/hourly'
+                    #url='https://api.weather.gov/points/47.0379,-122.9007'   #### check for station info with lat/long
+                    durl='https://api.weather.gov/alerts?zone=WAC033'
+                    response = get(url,headers=headers)
+                    desponse=get(durl)
+                    data = json.loads(response.text)
+                    datan=json.loads(desponse.text)
+                    #print(data)
+                
+                    for period in data['properties']['periods']:
+                        #print(period)
+                        date=datetime.datetime.strptime(period['startTime'],'%Y-%m-%dT%H:%M:%S-08:00')
+                        date_f=datetime.datetime.strftime(datetime.datetime.strptime(period['startTime'],'%Y-%m-%dT%H:%M:%S-08:00'),"%b-%d,%a %H:%M")
+                        weather[date_f]={'Wind_Direction':f'{period["windDirection"]}','Wind_Speed':f'{period["windSpeed"]}',
+                                      'Temperature':f'{period["temperature"]}','Sky':f'{period["shortForecast"]}',
+                                       'Rain_Chance':f'{period["probabilityOfPrecipitation"]["value"]}'
+                                      }
+                        
+                
+                    forecast=pd.DataFrame.from_dict(weather,orient='index')
+                    forecast.Wind_Speed=[int(re.findall(f'\d+',i)[0]) for i in forecast.Wind_Speed.values]
+                    #forecast['Vector']=[vectorize(parse_angle(i),j) for i,j in zip(forecast.Wind_Direction.values,forecast.Wind_Speed.values)]
+                    return forecast
+                forecast=get_weather()
+                st.table(forecast)
+            with weather_tab2:
+                def get_weather():
+                    weather=defaultdict(int)
+                    headers = { 
+                                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36', 
+                            'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 
+                            'Accept-Language' : 'en-US,en;q=0.5', 
+                            'Accept-Encoding' : 'gzip', 
+                            'DNT' : '1', # Do Not Track Request Header 
+                            'Connection' : 'close' }
+                    #url ='https://api.weather.gov/gridpoints/SEW/117,51/forecast/hourly'
+                    url='http://api.weatherapi.com/v1/forecast.json?key=5fa3f1f7859a415b9e6145743230912&q=98502&days=7'
+                    #response = get(url,headers=headers)
+                    response=get(url,headers=headers)
+                    #data = json.loads(response.text)
+                    data=json.loads(response.text)
+                    print(data)
+                    return data
+                forecast=get_weather()
+                data=dict()
+                for day in forecast['forecast']['forecastday']:
+                    data[day['date']]={}
+                    data[day['date']]['DAY']={}
+                    data[day['date']]['ASTRO']={}
+                    for item in day['day']:
+                        data[day['date']]['DAY'][item]=day['day'][item]
+                    for astro in day['astro']:
+                        data[day['date']]['ASTRO'][astro]=day['astro'][astro]
+                    for dic in day['hour']:
+                        data[day['date']][dic['time']]={}
+                        for measure in dic:
+                            if measure=='condition':
+                                data[day['date']][dic['time']][measure]=dic[measure]['text']
+                                data[day['date']][dic['time']]['condition_png']=dic[measure]['icon']
+                            else:
+                                data[day['date']][dic['time']][measure]=dic[measure]
+                index=[]
+                temperatures=[]
+                condition=[]
+                wind=[]
+                wind_dir=[]
+                pressure=[]
+                cloud=[]
+                rain=[]
+                dew_point=[]
+                will_rain=[]
+                chance_rain=[]
+                for day in data:
+                    for hour in data[day]:
+                        if hour not in ['DAY','ASTRO']:
+                            #print(hour)
+                            index.append(hour)
+                            temperatures.append(data[day][hour]['temp_f'])
+                            condition.append(data[day][hour]['condition'])
+                            wind.append(data[day][hour]['wind_mph'])
+                            wind_dir.append(data[day][hour]['wind_dir'])
+                            pressure.append(data[day][hour]['pressure_mb'])
+                            cloud.append(data[day][hour]['cloud'])
+                            rain.append(data[day][hour]['precip_in'])
+                            will_rain.append(True if data[day][hour]['will_it_rain']==1 else False)
+                            chance_rain.append(data[day][hour]['chance_of_rain'])
+                            dew_point.append(data[day][hour]['dewpoint_f'])    
+                fig = go.Figure()
+
+                # Add traces for each weather parameter
+                fig.add_trace(go.Scatter(x=index, y=temperatures, mode='lines', name='Temperature'))
+                fig.add_trace(go.Scatter(x=index, y=wind, mode='lines', name='Wind Speed'))
+                fig.add_trace(go.Scatter(x=index, y=pressure, mode='lines', name='Pressure'))
+                fig.add_trace(go.Scatter(x=index, y=rain, mode='lines', name='Rain Amount'))
+                fig.add_trace(go.Scatter(x=index, y=chance_rain, mode='lines', name='Chance of Rain'))
+                fig.add_trace(go.Scatter(x=index, y=cloud, mode='lines', name='Cloud Cover'))
+                # Add traces for other weather parameters...
+                
+                # Create a dropdown menu for selecting weather parameters
+                button_list = []
+                for parameter in ['Temperature', 'Wind Speed','Rain Amount','Chance of Rain','Cloud Cover', 'Pressure']:
+                    button_list.append(dict(label=parameter, method='update', args=[{'visible': [trace.name == parameter for trace in fig.data]}]))
+                
+                # Add a "Show All" button
+                button_list.append(dict(label='Show All', method='update', args=[{'visible': [True] * len(fig.data)}]))
+                
+                # Update layout to include the dropdown menu
+                fig.update_layout(
+                    updatemenus=[
+                        dict(
+                            type='dropdown',
+                            showactive=True,
+                            buttons=button_list,
+                            x=0.5,
+                            xanchor='left',
+                            y=1.15,
+                            yanchor='top',
+                        ),
+                    ]
+                )
+                
+                # Update layout for better readability
+                fig.update_layout(title='PORT OF OLYMPIA Weather Forecast',
+                                  xaxis_title='Hour',
+                                  yaxis_title='Value',
+                                  template='plotly_dark')
+                st.plotly_chart(fig)
+               
         
         if select=="TIDES":
             dada=True

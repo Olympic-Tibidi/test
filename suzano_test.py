@@ -488,7 +488,7 @@ if authentication_status:
             
             
             def display_gif_from_gcs(bucket_name, object_name):
-                gif_content = gcp_download_x(target_bucket,object_name)
+                gif_content = gcp_download(target_bucket,object_name)
                 image = Image.open(BytesIO(gif_content))
                 st.image(image, caption='Downloaded GIF from GCS', use_column_width=True)
                 contents = gif_content.read()

@@ -495,7 +495,7 @@ if authentication_status:
                 gif_content = download_gcs_file(bucket_name, object_name)
                 image = Image.open(BytesIO(gif_content))
                 st.image(image, caption='Downloaded GIF from GCS', use_column_width=True, format='GIF')
-            display_gif_from_gcs(gcs_bucket, "fourier.gif")
+            display_gif_from_gcs(target_bucket, "fourier.gif")
                 
         if select=="FINANCE":
             hadi=False

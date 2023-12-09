@@ -376,7 +376,7 @@ if authentication_status:
             ('ADMIN', 'LOADOUT', 'INVENTORY','DATA BACKUP','WEATHER','TIDES','FINANCE'))
 
         if select=='WEATHER':
-            st.caption("Live Data From Weather.gov API")
+            st.caption("Live Data for Olympia From Weather.gov API")
             def vectorize(direction,speed):
                 Wind_Direction=direction
                 Wind_Speed=speed

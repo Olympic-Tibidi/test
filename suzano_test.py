@@ -527,7 +527,7 @@ if authentication_status:
                                   yaxis_title='Value',
                                   template='plotly_dark',
                                   width=800,  # Adjust the width as needed
-                                  height=400,  # Adjust the height as needed)
+                                  height=400,  # Adjust the height as needed))
                 st.plotly_chart(fig)
                
         

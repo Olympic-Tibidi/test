@@ -485,14 +485,10 @@ if authentication_status:
                 
         if select=="DATA BACKUP" :
             st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
-            def download_gcs_file(bucket_name, object_name):
-                bucket = storage_client.get_bucket(bucket_name)
-                blob = bucket.blob(object_name)
-                content = blob.download_as_text()
-                return content
+            
             
             def display_gif_from_gcs(bucket_name, object_name):
-                gif_content = download_gcs_file(bucket_name, object_name)
+                gif_content = gcp_download(target_bucket,object_name)
                 image = Image.open(BytesIO(gif_content))
                 st.image(image, caption='Downloaded GIF from GCS', use_column_width=True, format='GIF')
             display_gif_from_gcs(target_bucket, "fourier.gif")

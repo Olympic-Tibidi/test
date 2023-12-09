@@ -44,6 +44,7 @@ import plotly.graph_objects as go
 import re
 import tempfile
 import plotly.graph_objects as go
+import metpy.calc as mpcalc
 #import streamlit_option_menu
 #from streamlit_modal import Modal
 

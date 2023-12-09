@@ -1996,7 +1996,7 @@ if authentication_status:
                         
                         completed_release_orders=[]
                         if vessel not in  release_order_database:
-                            st.write("Vessel Not in Database yet. Create the first release order to put vessel into the database.")
+                            st.warning("Vessel Not in Database yet. Create the first release order to put vessel into the database.")
                         else:
                             for key in release_order_database[vessel]:
                                 not_yet=0

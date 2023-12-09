@@ -420,7 +420,7 @@ if authentication_status:
                 #forecast['Vector']=[vectorize(parse_angle(i),j) for i,j in zip(forecast.Wind_Direction.values,forecast.Wind_Speed.values)]
                 return forecast
             forecast=get_weather()
-            st.dataframe(forecast)
+            st.table(forecast)
         
         if select=="TIDES":
             dada=True

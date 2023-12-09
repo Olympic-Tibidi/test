@@ -14,4 +14,5 @@ google-cloud-storage
 xlsxwriter
 beautifulsoup4==4.9.3
 html5lib==1.1
+metpy==0.12.1
 

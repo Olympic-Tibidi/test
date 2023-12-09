@@ -489,13 +489,7 @@ if authentication_status:
             
             def display_gif_from_gcs(bucket_name, object_name):
                 gif_content = gcp_download_x(target_bucket,object_name)
-                image = Image.open(BytesIO(gif_content))
-                st.image(image, caption='Downloaded GIF from GCS', use_column_width=True)
-                #file_ = open("/home/rzwitch/Desktop/giphy.gif", "rb")
-                #contents = file_.read()
                 data_url = base64.b64encode(gif_content).decode("utf-8")
-               
-                
                 st.markdown(
                     f'<img src="data:image/gif;base64,{data_url}" alt="cat gif">',
                     unsafe_allow_html=True,

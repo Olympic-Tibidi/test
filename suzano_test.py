@@ -408,11 +408,8 @@ if authentication_status:
                 for period in data['properties']['periods']:
                     #print(period)
                     date=datetime.datetime.strptime(period['startTime'],'%Y-%m-%dT%H:%M:%S-08:00')
-                    #date_f=dt.datetime.strftime(dt.datetime.strptime(period['startTime'],'%Y-%m-%dT%H:%M:%S-08:00'),"%b-%d %H:%M")
-                    #date=f'{date_f} {period["name"]}' 
-                    #print(date)
-                    #print(period)
-                    weather[date]={'Wind_Direction':f'{period["windDirection"]}','Wind_Speed':f'{period["windSpeed"]}',
+                    date_f=datetime.datetime.strftime(datetime.datetime.strptime(period['startTime'],'%Y-%m-%dT%H:%M:%S-08:00'),"%b-%d,%a %H:%M")
+                    weather[date_f]={'Wind_Direction':f'{period["windDirection"]}','Wind_Speed':f'{period["windSpeed"]}',
                                   'Temperature':f'{period["temperature"]}','Sky':f'{period["shortForecast"]}',
                                    'Rain_Chance':f'{period["probabilityOfPrecipitation"]["value"]}'
                                   }

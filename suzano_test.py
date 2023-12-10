@@ -2515,7 +2515,8 @@ if authentication_status:
                         except:
                             pass
                 liste=[f"{i} to {menu_destinations[i]}" for i in dispatched.keys()]
-                work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste)
+                work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=liste.index(st.session_state.work_order_) if st.session_state.work_order_ else 0)
+                st.session_state.work_order_=work_order_
                 work_order=work_order_.split(" ")[0]
                 order=["001","002","003","004","005","006"]
                 

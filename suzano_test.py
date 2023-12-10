@@ -4494,8 +4494,9 @@ if authentication_status:
             
             daily1,daily2,daily3=st.tabs(["TODAY'SHIPMENTS","TRUCKS ENROUTE","TRUCKS AT DESTINATION"])
             with daily1:
-                now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
-                st.markdown(f"**SHIPPED TODAY ON {datetime.datetime.strftime(now.date(),'%b %d, %Y')} - Indexed By Terminal Bill Of Lading**")     
+                now=datetime.datetime.now()-datetime.timedelta(hours=7)
+                text=f"SHIPPED TODAY ON {datetime.datetime.strftime(now.date(),'%b %d, %Y')} - Indexed By Terminal Bill Of Lading"
+                st.markdown(f"<p style='font-family:arial,monospace; color: #0099ff;text-shadow: 2px 2px 4px #99ccff;'>{text}</p>",unsafe_allow_html=True)     
                 df_bill=pd.DataFrame(bill_of_ladings).T
                 df_bill=df_bill[["vessel","release_order","destination","sales_order","ocean_bill_of_lading","grade","carrier_id","vehicle","quantity","issued"]]
                 df_bill.columns=["VESSEL","RELEASE ORDER","DESTINATION","SALES ORDER","OCEAN BILL OF LADING","GRADE","CARRIER ID","VEHICLE NO","QUANTITY (UNITS)","ISSUED"]
@@ -4510,7 +4511,6 @@ if authentication_status:
 
         
             with daily2:
-                
                 enroute_vehicles={}
                 arrived_vehicles={}
                 today_arrived_vehicles={}
@@ -4568,12 +4568,12 @@ if authentication_status:
                     st.table(arrived_vehicles.drop(columns=['ARRIVAL']))
         
         with inv2:
-            @st.cache
+            
             def convert_df(df):
                 # IMPORTANT: Cache the conversion to prevent computation on every rerun
                 return df.to_csv().encode('utf-8')
             try:
-                now=datetime.datetime.now()-datetime.timedelta(hours=7)
+                now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
                 suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
                 suzano_report=json.loads(suzano_report_)
                 suzano_report=pd.DataFrame(suzano_report).T
@@ -4583,6 +4583,7 @@ if authentication_status:
                 daily_suzano=suzano_report.copy()
                 daily_suzano["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suzano_report["Date Shipped"]]
                 daily_suzano_=daily_suzano[daily_suzano["Date"]==now.date()]
+                
                 choose = st.radio(
                                 "Select Daily or Accumulative Report",
                                 ["DAILY", "ACCUMULATIVE", "FIND BY DATE"])
@@ -4639,7 +4640,6 @@ if authentication_status:
 
             
         with inv4:
-        
             inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
             inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
             
@@ -4650,7 +4650,7 @@ if authentication_status:
 
                            
             else:
-                inv4tab1,inv4tab2=st.tabs(["DAILY SHIPMENT REPORT","INVENTORY"])
+                inv4tab1,inv4tab2,inv4tab3=st.tabs(["DAILY SHIPMENT REPORT","INVENTORY","UNREGISTERED LOTS FOUND"])
                 with inv4tab1:
                     
                     kf=inv_bill_of_ladings.iloc[1:].copy()
@@ -4675,7 +4675,8 @@ if authentication_status:
                                                       'Accumulated_Tonnage':"Shipped Tonnage To_Date"},inplace=True)
                     merged_df_grouped=merged_df_grouped.reset_index()
                     merged_df_grouped["Date"]=merged_df_grouped['Date'].dt.strftime('%m-%d-%Y, %A')
-                    merged_df_grouped=merged_df_grouped.set_index("Date",drop=True)
+                    #merged_df_grouped=merged_df_grouped.set_index("Date",drop=True)
+                  
                     st.dataframe(merged_df_grouped)
                     csv_inventory=convert_df(merged_df_grouped)
                     st.download_button(
@@ -4684,26 +4685,27 @@ if authentication_status:
                         file_name=f'INVENTORY REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
                         mime='text/csv')            
                 with inv4tab2:
-                    kirkenes_updated=gcp_csv_to_df(target_bucket,rf"kirkenes_updated.csv")
-                    kirkenes_updated["Batch"]=kirkenes_updated["Batch"].astype(str)
-                    st.write(kirkenes_updated)
-                   #if st.button("CLICK TO RE-RUN INVENTORY",key="tyuris"):
-                   #     kirkenes_updated=gcp_csv_to_df(target_bucket,rf"kirkenes_with_ghosts_found.csv")
-                    #    for line in inv_bill_of_ladings.loads[1:]:
-                    #        for unit in line.keys():
-                    #            kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Shipped"]=kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Shipped"]+line[unit]*8
-                     #           kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Remaining"]=kirkenes_updated.loc[kirkenes_updated["Lot"]==unit[:-2],"Remaining"]-line[unit]*8
+                    combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
+                    combined["Batch"]=combined["Batch"].astype(str)
+                    st.write(combined)
+                    if st.button("CLICK TO RE-RUN INVENTORY",key="tyuris"):
+                        combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
+                        for line in inv_bill_of_ladings.loads[1:]:
+                            for unit in line.keys():
+                                combined.loc[combined["Lot"]==unit[:-2],"Shipped"]=combined.loc[combined["Lot"]==unit[:-2],"Shipped"]+line[unit]*8
+                                combined.loc[combined["Lot"]==unit[:-2],"Remaining"]=combined.loc[combined["Lot"]==unit[:-2],"Remaining"]-line[unit]*8
                         
                         
-                     #   temp=kirkenes_updated.to_csv("temp.csv",index=False)
-                     #   upload_cs_file(target_bucket, 'temp.csv',rf"kirkenes_updated.csv") 
+                        temp=combined.to_csv("temp.csv",index=False)
+                        upload_cs_file(target_bucket, 'temp.csv',rf"combined.csv") 
                     no_of_unaccounted=Inventory[Inventory["Accounted"]==False]["Bales"].sum()/8
                     st.write(f'**Unaccounted Units Registered : {no_of_unaccounted} Units/{no_of_unaccounted*2} Tons**')
-                    temp1=kirkenes_updated.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
                     temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
-                    temp.insert(0,"Total",temp1.Bales.values)
-                    temp["Remaining"]=temp.Total-temp.quantity
+                    temp1=combined.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
+                    temp=pd.merge(temp, temp1, left_index=True, right_index=True, how='outer', suffixes=('_df1', '_df2'))
+                    temp=temp[["Bales","quantity","Remaining"]]
                     temp.columns=["Total","Shipped","Remaining"]
+                    temp["Remaining"]=temp.Total-temp.Shipped
                     temp.loc["TOTAL"]=temp.sum(axis=0)
                     tempo=temp*2
                     inv_col1,inv_col2=st.columns([2,2])
@@ -4712,11 +4714,16 @@ if authentication_status:
                         st.dataframe(temp)
                     with inv_col2:
                         st.subheader("By Ocean BOL,TONS")
-                        st.dataframe(tempo)     
-                       
+                        st.dataframe(tempo)
+                with inv4tab3:
+                    alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
+                    alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])
+                    alien_list=pd.DataFrame(alien_units[alien_vessel]).T
+                    alien_list.reset_index(inplace=True)
+                    alien_list.index=alien_list.index+1
+                    st.dataframe(alien_list)
                     
                     
-               
         with inv5:
             inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
             inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
@@ -4728,6 +4735,7 @@ if authentication_status:
                 zf=inv_bill_of_ladings.copy()
                 zf['WEEK'] = pd.to_datetime(zf['issued'])
                 zf.set_index('WEEK', inplace=True)
+                
                 def sum_quantity(x):
                     return x.resample('W')['quantity'].sum()*2
                 resampled_quantity = zf.groupby('destination').apply(sum_quantity).unstack(level=0)
@@ -4740,12 +4748,15 @@ if authentication_status:
                 st.dataframe(resampled_quantity)
                 csv_weekly=convert_df(resampled_quantity)
                 st.download_button(
-                    label="DOWNLOAD WEEKLY REPORT AS CSV",
-                    data=csv_weekly,
-                    file_name=f'OLYMPIA WEEKLY SHIPMENT REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
-                    mime='text/csv')
+                label="DOWNLOAD WEEKLY REPORT AS CSV",
+                data=csv_weekly,
+                file_name=f'WEEKLY SHIPMENT REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
+                mime='text/csv')
+
+
+               
                 zf['issued'] = pd.to_datetime(zf['issued'])                   
-                   
+               
                 weekly_tonnage = zf.groupby(['destination', pd.Grouper(key='issued', freq='W')])['quantity'].sum() * 2  # Assuming 2 tons per quantity
                 weekly_tonnage = weekly_tonnage.reset_index()                   
               
@@ -4758,6 +4769,7 @@ if authentication_status:
                 fig.update_layout(width=1000, height=700)  # You can adjust the width and height values as needed
                 
                 st.plotly_chart(fig)
+
 
 
 

@@ -3716,8 +3716,11 @@ if authentication_status:
                         break
                     except:
                         pass
+            if 'work_order_' not in st.session_state:
+                st.session_state.work_order_ = None
             liste=[f"{i} to {menu_destinations[i]}" for i in dispatched.keys()]
-            work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste)
+            work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=liste.index(st.session_state.work_order_) if st.session_state.work_order_ else 0)
+            st.session_state.work_order_=work_order_
             work_order=work_order_.split(" ")[0]
             order=["001","002","003","004","005","006"]
             
@@ -3737,7 +3740,7 @@ if authentication_status:
             except:
                 
                 pass
-            info=gcp_download("olym_suzano",rf"release_orders/{vessel}/{work_order}.json")
+            info=gcp_download(target_bucket,rf"release_orders/{vessel}/{work_order}.json")
             info=json.loads(info)
             
             
@@ -3748,9 +3751,9 @@ if authentication_status:
              #   except:
                #     st.markdown("**:red[ONLY ONE ITEM IN QUEUE ! ASK NEXT ITEM TO BE DISPATCHED!]**")
                 
-           
+            
             st.markdown(rf'**:blue[CURRENTLY WORKING] :**')
-            load_col1,load_col2,load_col3=st.columns([8,1,1])
+            load_col1,load_col2=st.columns([9,1])
             
             with load_col1:
                 wrap_dict={"ISU":"UNWRAPPED","ISP":"WRAPPED"}
@@ -3764,7 +3767,7 @@ if authentication_status:
                 ship_=info[vessel][current_release_order][current_sales_order]["shipped"]
                 ship_bale=(ship_-math.floor(ship_))*8
                 remaining=info[vessel][current_release_order][current_sales_order]["remaining"]                #######      DEFINED "REMAINING" HERE FOR CHECKS
-                temp={f"<b>Release Order #":current_release_order,"<b>Destination":destination,"<b>Sales Order Item":current_sales_order}
+                temp={f"<b>Release Order #":current_release_order,"<b>Destination":destination,"<b>VESSEL":vessel}
                 temp2={"<b>Ocean B/L":ocean_bill_of_,"<b>Type":wrap_dict[wrap],"<b>Prep":unitized}
                 temp3={"<b>Total Units":quant_,"<b>Shipped Units":ship_,"<b>Remaining Units":remaining}
                 #temp4={"<b>Total Bales":0,"<b>Shipped Bales":int(8*(ship_-math.floor(ship_))),"<b>Remaining Bales":int(8*(remaining-math.floor(remaining)))}
@@ -3772,12 +3775,12 @@ if authentication_status:
 
 
                 
-                sub_load_col1,sub_load_col2,sub_load_col3,sub_load_col4=st.columns([3,3,2,2])
+                sub_load_col1,sub_load_col2,sub_load_col3,sub_load_col4=st.columns([3,3,3,3])
                 
                 with sub_load_col1:   
                     #st.markdown(rf'**Release Order-{current_release_order}**')
                     #st.markdown(rf'**Destination : {destination}**')
-                    #st.markdown(rf'**Sales Order Item-{current_sales_order}**')
+                    #st.markdown(rf'**VESSEL-{vessel}**')
                     st.write (pd.DataFrame(temp.items(),columns=["Inquiry","Data"]).to_html (escape=False, index=False), unsafe_allow_html=True)
                 with sub_load_col2:
                     st.write (pd.DataFrame(temp2.items(),columns=["Inquiry","Data"]).to_html (escape=False, index=False), unsafe_allow_html=True)
@@ -3810,109 +3813,156 @@ if authentication_status:
                     except:
                         pass
 
-
+            st.divider()
             ###############    LOADOUT DATA ENTRY    #########
             
-            col1, col2,col3,col4,col5= st.columns([2,2,2,2,2])
-            
+            col1, col2,col3,col4= st.columns([2,2,2,2])
+            yes=False
           
-           
+            release_order_number=current_release_order
             if info[vessel][current_release_order][current_sales_order]["transport_type"]=="TRUCK":
                 medium="TRUCK"
             else:
                 medium="RAIL"
             
             with col1:
-            
-                terminal_code=st.text_input("Terminal Code","OLYM",disabled=True)
-                file_date=st.date_input("File Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="file_dates",disabled=True)
+            ######################  LETS GET RID OF INPUT BOXES TO SIMPLIFY LONGSHORE SCREEN
+                #terminal_code=st.text_input("Terminal Code","OLYM",disabled=True)
+                terminal_code="OLYM"
+                #file_date=st.date_input("File Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="file_dates",disabled=True)
+                file_date=datetime.datetime.today()-datetime.timedelta(hours=utc_difference)
                 if file_date not in st.session_state:
                     st.session_state.file_date=file_date
                 file_time = st.time_input('FileTime', datetime.datetime.now()-datetime.timedelta(hours=utc_difference),step=60,disabled=False)
-                delivery_date=st.date_input("Delivery Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="delivery_date",disabled=True)
-                eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
+               #delivery_date=st.date_input("Delivery Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="delivery_date",disabled=True,visible=False)
+                delivery_date=datetime.datetime.today()-datetime.timedelta(hours=utc_difference)
+               #eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
+                eta_date=delivery_date
+                carrier_code=info[vessel][current_release_order][current_sales_order]["carrier_code"]
+                transport_sequential_number="TRUCK"
+                transport_type="TRUCK"
+                placeholder = st.empty()
+                with placeholder.container():
+                    vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
+                
+                    mf=True
+                    load_mf_number_issued=False
+                    carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
+                    if carrier_code=="123456-KBX":
+                       if vessel in mf_numbers_for_load:
+                           
+                           if release_order_number in mf_numbers_for_load[vessel].keys():
+                               mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
+                               if len(mf_liste)>0:
+                                   load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
+                                   mf=True
+                                   load_mf_number_issued=True
+                                   yes=True
+                               else:
+                                   st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                                   mf=False
+                                   yes=False
+                                   load_mf_number_issued=False  
+                           else:
+                               st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                               mf=False
+                               yes=False
+                               load_mf_number_issued=False  
+                       else:
+                           st.write(f"**:red[NO MF IN DATABASE FOR THIS VESSEL]**")
+                           mf=False
+                           yes=False
+                    foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
+                    foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
+                click_clear1 = st.button('CLEAR VEHICLE-QUANTITY INPUTS', key=34)
+                if click_clear1:
+                     with placeholder.container():
+                         vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=17)
+                
+                         mf=True
+                         load_mf_number_issued=False
+                         carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=19)
+                         if carrier_code=="123456-KBX":
+                            if vessel in mf_numbers_for_load:
+                               
+                                if release_order_number in mf_numbers_for_load[vessel].keys():
+                                    mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
+                                    if len(mf_liste)>0:
+                                        load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=114551)
+                                        mf=True
+                                        load_mf_number_issued=True
+                                        yes=True
+                                    else:
+                                        st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                                        mf=False
+                                        yes=False
+                                        load_mf_number_issued=False  
+                                else:
+                                    st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                                    mf=False
+                                    yes=False
+                                    load_mf_number_issued=False  
+                            else:
+                                st.write(f"**:red[NO MF IN DATABASE FOR THIS VESSEL]**")
+                                mf=False
+                                yes=False
+                         foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=18)
+                         foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=1123)
+                         
+                       
+                
+                        
                 
             with col2:
                 ocean_bol_to_batch = {"GSSWKIR6013D": 45302855,"GSSWKIR6013E": 45305548}
                 if double_load:
-                    release_order_number=st.text_input("Release Order Number",current_release_order,disabled=True,help="Release Order Number without the Item no")
-                    sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
-                    ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
+                    #release_order_number=st.text_input("Release Order Number",current_release_order,disabled=True,help="Release Order Number without the Item no")
+                    release_order_number=current_release_order
+                    #sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
+                    sales_order_item=current_sales_order
+                    #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
+                    ocean_bill_of_lading=info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"]
                     current_ocean_bill_of_lading=ocean_bill_of_lading
                     next_ocean_bill_of_lading=info[vessel][next_release_order][next_sales_order]["ocean_bill_of_lading"]
-                    batch=st.text_input("Batch",info[vessel][current_release_order][current_sales_order]["batch"],disabled=True)
-                    grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
+                    #batch=st.text_input("Batch",info[vessel][current_release_order][current_sales_order]["batch"],disabled=True)
+                    batch=info[vessel][current_release_order][current_sales_order]["batch"]
+                    #grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
+                    grade=info[vessel][current_release_order][current_sales_order]["grade"]
                     
                     #terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",disabled=False)
                     pass
                 else:
-                    release_order_number=st.text_input("Release Order Number",current_release_order,disabled=True,help="Release Order Number without the Item no")
-                    sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
-                    ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
+                    #release_order_number=st.text_input("Release Order Number",current_release_order,disabled=True,help="Release Order Number without the Item no")
+                    release_order_number=current_release_order
+                    #sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
+                    sales_order_item=current_sales_order
+                    #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
+                    ocean_bill_of_lading=info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"]
                     
-                    batch=st.text_input("Batch",info[vessel][current_release_order][current_sales_order]["batch"],disabled=True)
-                    grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
-                    #terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",disabled=False)
-               
+                     #batch=st.text_input("Batch",info[vessel][current_release_order][current_sales_order]["batch"],disabled=True)
+                    batch=info[vessel][current_release_order][current_sales_order]["batch"]
+                    #grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
+                    grade=info[vessel][current_release_order][current_sales_order]["grade"]
                     
-                
-            with col3: 
-                
-                placeholder = st.empty()
-                with placeholder.container():
-                    
-                    carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=40)
-                    transport_sequential_number=st.selectbox("Transport Sequential",["TRUCK","RAIL"],disabled=True,key=51)
-                    transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=6)
-                    vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
-                    mf=True
-                    load_mf_number_issued=False
-                    if carrier_code=="123456-KBX":
-                       if release_order_number in mf_numbers_for_load[vessel].keys():
-                           mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
-                           load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
-                           mf=True
-                           load_mf_number_issued=True
-                       else:
-                           st.write("MF NUMBERS NOT IN!")
-                           mf=False
-                           load_mf_number_issued=False  
-                    foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
-                    foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
-
-                    click_clear1 = st.button('CLEAR VEHICLE-QUANTITY INPUTS', key=34)
-                if click_clear1:
-                     with placeholder.container():
-                         
-                       carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
-                       transport_sequential_number=st.selectbox("Transport Sequential",["TRUCK","RAIL"],disabled=True,key=10)
-                       transport_type=st.selectbox("Transport Type",["TRUCK","RAIL"],disabled=True,key=11)
-                       vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=12)
-                       
-                       foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=193)
-                       foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=13)
-
-
-            
-            with col4:
+           
                 updated_quantity=0
                 live_quantity=0
                 if updated_quantity not in st.session_state:
                     st.session_state.updated_quantity=updated_quantity
                 def audit_unit(x):
-                        if len(x)==10:
+                        if len(x)>=10:
                           
-                            if bill_mapping[x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[x[:-2]]["Batch"]!=batch:
+                            if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-2]]["Batch"]!=batch:
                                 
                                 return False
                                                                             
                             else:
                                 return True
                 def audit_split(release,sales):
-                        if len(x)==10:
+                        if len(x)>=10:
                             #st.write(bill_mapping[x[:-2]]["Batch"])
                             
-                            if bill_mapping[x[:-2]]["Ocean_bl"]!=info[vessel][release][sales]["ocean_bill_of_lading"] and bill_mapping[x[:-2]]["Batch"]!=info[vessel][release][sales]["batch"]:
+                            if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=info[vessel][release][sales]["ocean_bill_of_lading"] and bill_mapping[vessel][x[:-2]]["Batch"]!=info[vessel][release][sales]["batch"]:
                                 st.write("**:red[WRONG B/L, DO NOT LOAD BELOW!]**")
                                 return False
                             else:
@@ -3926,7 +3976,7 @@ if authentication_status:
                 if double_load:
                     
                     try:
-                        next_item=gcp_download(target_bucket,rf"release_orders/{dispatched['2']['vessel']}/{dispatched['2']['release_order']}.json")
+                        next_item=gcp_download("olym_suzano",rf"release_orders/{dispatched['2']['vessel']}/{dispatched['2']['release_order']}.json")
                         
                         first_load_input=st.text_area("**FIRST SKU LOADS**",height=300)
                         first_quantity=0
@@ -3953,39 +4003,34 @@ if authentication_status:
     
     
                     placeholder1 = st.empty()
-                    placeholder2 = st.empty()
+                    
                     
                     
                     load_input=placeholder1.text_area("**UNITS**",value="",height=300,key=1)#[:-2]
-                    bale_load_input=placeholder2.text_area("**INDIVIDUAL BALES**",value="",height=300,key=1111)#[:-2]
-                    
-                    click_clear = st.button('CLEAR SCANNED INPUTS', key=3)
-                    if click_clear:
-                        load_input = placeholder1.text_area("**UNITS**",value="",height=300,key=2)#[:-2]
-                        bale_load_input=placeholder2.text_area("**INDIVIDUAL BALES**",value="",height=300,key=1121)#[:-2]
-                    if load_input is not None :
-                        textsplit = load_input.splitlines()
-                        textsplit=[i for i in textsplit if len(i)>8]
-                        updated_quantity=len(textsplit)
-                        st.session_state.updated_quantity=updated_quantity
-                    if bale_load_input is not None:
-                        bale_textsplit = bale_load_input.splitlines()
-                        bale_textsplit=[i for i in bale_textsplit if len(i)>8]
-                        bale_updated_quantity=len(bale_textsplit)
-                        st.session_state.updated_quantity=updated_quantity+bale_updated_quantity*0.125
-                    
-                quantity=st.number_input("**Scanned Quantity of Units**",st.session_state.updated_quantity, key=None, help=None, on_change=None, disabled=True, label_visibility="visible")
-                st.markdown(f"**{quantity*2} TONS - {round(quantity*2*2204.62,1)} Pounds**")
-                #ADMT=st.text_input("ADMT",round(info[vessel][current_release_order][current_sales_order]["dryness"]/90,4)*st.session_state.updated_quantity,disabled=True)
-                admt=round(float(info[vessel][current_release_order][current_sales_order]["dryness"])/90*st.session_state.updated_quantity*2,4)
-                st.markdown(f"**ADMT= {admt} TONS**")
                 
-   
+                    
+            with col3:
+                placeholder2 = st.empty()
+                bale_load_input=placeholder2.text_area("**INDIVIDUAL BALES**",value="",height=300,key=1111)#[:-2]
                 
-
-             
+                    
+            with col2:
+                click_clear = st.button('CLEAR SCANNED INPUTS', key=3)
+                if click_clear:
+                    load_input = placeholder1.text_area("**UNITS**",value="",height=300,key=2)#[:-2]
+                    bale_load_input=placeholder2.text_area("**INDIVIDUAL BALES**",value="",height=300,key=1121)#[:-2]
+                if load_input is not None :
+                    textsplit = load_input.splitlines()
+                    textsplit=[i for i in textsplit if len(i)>8]
+                    updated_quantity=len(textsplit)
+                    st.session_state.updated_quantity=updated_quantity
+                if bale_load_input is not None:
+                    bale_textsplit = bale_load_input.splitlines()
+                    bale_textsplit=[i for i in bale_textsplit if len(i)>8]
+                    bale_updated_quantity=len(bale_textsplit)
+                    st.session_state.updated_quantity=updated_quantity+bale_updated_quantity*0.125
                
-            with col5:
+            with col4:
                 
                 if double_load:
                     first_faults=[]
@@ -4044,46 +4089,105 @@ if authentication_status:
                         textsplit=[i for i in textsplit if len(i)>8]
                    
                         seen=set()
+                        alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                         for i,x in enumerate(textsplit):
-                            
-                            if audit_unit(x):
-                                if x in seen:
-                                    st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                    faults.append(1)
-                                    st.markdown("**:red[This unit has been scanned TWICE!]**")
-                                if x in load_dict.keys():
-                                    st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                    faults.append(1)
-                                    st.markdown("**:red[This unit has been SHIPPED!]**")   
-                                else:
-                                    st.write(f"**Unit No : {i+1}-{x}**")
-                                    faults.append(0)
-                            else:
+                            alternate_vessel=[ship for ship in bill_mapping if ship!=vessel][0]
+                            if x[:-2] in bill_mapping[alternate_vessel]:
                                 st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                st.write(f"**:red[WRONG B/L, DO NOT LOAD UNIT {x}]**")
                                 faults.append(1)
-                       
+                                st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")
+                            else:
                                 
-                            seen.add(x)
+                                if x[:-2] in bill_mapping[vessel]:
+                                    if audit_unit(x):
+                                        if x in seen:
+                                            st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                            faults.append(1)
+                                            st.markdown("**:red[This unit has been scanned TWICE!]**")
+                                        if x in load_dict.keys():
+                                            st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                            faults.append(1)
+                                            st.markdown("**:red[This unit has been SHIPPED!]**")   
+                                        else:
+                                            st.write(f"**Unit No : {i+1}-{x}**")
+                                            faults.append(0)
+                                    else:
+                                        st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                        st.write(f"**:red[WRONG B/L, DO NOT LOAD UNIT {x}]**")
+                                        faults.append(1)
+                                    seen.add(x)
+                                else:
+                                    #st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                    faults.append(1)
+                                    #st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
+                                    #st.info(f"VERIFY THIS UNIT CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles")
+                                    with st.expander(f"**:red[Unit No : {i+1}-{x} This LOT# NOT IN INVENTORY!---VERIFY UNIT {x} CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles]**"):
+                                        st.write("Verify that the unit came from the pile that has the units for this release order and click to inventory")
+                                        if st.button("ADD UNIT TO INVENTORY",key=f"{x}"):
+                                            updated_bill=bill_mapping.copy()
+                                            updated_bill[vessel][x[:-2]]={"Batch":batch,"Ocean_bl":ocean_bill_of_lading}
+                                            updated_bill=json.dumps(updated_bill)
+                                            storage_client = storage.Client()
+                                            bucket = storage_client.bucket(target_bucket)
+                                            blob = bucket.blob(rf"bill_mapping.json")
+                                            blob.upload_from_string(updated_bill)
+
+                                            alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
+                                            alien_units[vessel][x]={}
+                                            alien_units[vessel][x]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
+                                                                    "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S")}
+                                            alien_units=json.dumps(alien_units)
+                                            storage_client = storage.Client()
+                                            bucket = storage_client.bucket(target_bucket)
+                                            blob = bucket.blob(rf"alien_units.json")
+                                            blob.upload_from_string(alien_units)
+                                            
+                                            
+                                            subject=f"FOUND UNIT {x} NOT IN INVENTORY"
+                                            body=f"Clerk identified an uninventoried {'Unwrapped' if grade=='ISU' else 'wrapped'} unit {x}, and after verifying the physical pile, inventoried it into Ocean Bill Of Lading : {ocean_bill_of_lading} for vessel {vessel}. Unit has been put into alien unit list."
+                                            sender = "warehouseoly@gmail.com"
+                                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                            recipients = ["afsiny@portolympia.com"]
+                                            password = "xjvxkmzbpotzeuuv"
+                                            send_email(subject, body, sender, recipients, password)
+                                            time.sleep(0.1)
+                                            st.success(f"Added Unit {x} to Inventory!",icon="✅")
+                                            st.rerun()
+                            
                     if bale_load_input is not None:
                     
                         bale_textsplit = bale_load_input.splitlines()                       
                         bale_textsplit=[i for i in bale_textsplit if len(i)>8]                           
                         seen=set()
                         for i,x in enumerate(bale_textsplit):
-                            if audit_unit(x):
-                                if x in textsplit:
-                                    st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                    st.write(f"**:red[This number is scanned as a whole UNIT!]**")
-                                    bale_faults.append(1)
-                                else:
-                                    st.markdown(f"**Bale No : {i+1}-{x}**",unsafe_allow_html=True)
-                                    bale_faults.append(0)
-                            else:
+                            alternate_vessel=[ship for ship in bill_mapping if ship!=vessel][0]
+                            if bill_mapping[alternate_vessel][x[:-2]]:
                                 st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                st.write(f"**:red[WRONG B/L, DO NOT LOAD UNIT {x}]**")
-                                bale_faults.append(1)
-                            seen.add(x)
+                                faults.append(1)
+                                st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")
+                            else:
+                                
+                                if bill_mapping[vessel][x[:-2]]:
+                                    if audit_unit(x):
+                                        if x in seen:
+                                            st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                            faults.append(1)
+                                            st.markdown("**:red[This bale has been scanned TWICE!]**")
+                                        if x in load_dict.keys():
+                                            st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                            faults.append(1)
+                                            st.markdown("**:red[This bale has been SHIPPED!]**")   
+                                        else:
+                                            st.write(f"**Bale No : {i+1}-{x}**")
+                                            faults.append(0)
+                                    else:
+                                        st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                        st.write(f"**:red[WRONG B/L, DO NOT LOAD UNIT {x}]**")
+                                        faults.append(1)
+                                else:
+                                    st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                    faults.append(1)
+                                    st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
                    
                        
                     loads={}
@@ -4101,6 +4205,12 @@ if authentication_status:
                         for k in bale_textsplit:
                             loads[k[:-2]]+=0.125
                             pure_loads[k]+=0.125
+            with col3:
+                quantity=st.number_input("**Scanned Quantity of Units**",st.session_state.updated_quantity, key=None, help=None, on_change=None, disabled=True, label_visibility="visible")
+                st.markdown(f"**{quantity*2} TONS - {round(quantity*2*2204.62,1)} Pounds**")
+                #ADMT=st.text_input("ADMT",round(info[vessel][current_release_order][current_sales_order]["dryness"]/90,4)*st.session_state.updated_quantity,disabled=True)
+                admt=round(float(info[vessel][current_release_order][current_sales_order]["dryness"])/90*st.session_state.updated_quantity*2,4)
+                st.markdown(f"**ADMT= {admt} TONS**")
             manual_time=False   
             #st.write(faults)                  
             if st.checkbox("Check for Manual Entry for Date/Time"):
@@ -4122,6 +4232,7 @@ if authentication_status:
                 c=datetime.datetime.strftime(eta_date,"%Y%m%d")
                 
                 
+            
             load_bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
             load_admin_bill_of_ladings=json.loads(load_bill_data)
             load_admin_bill_of_ladings=pd.DataFrame.from_dict(load_admin_bill_of_ladings).T[1:]
@@ -4129,8 +4240,7 @@ if authentication_status:
             last_submitted=load_admin_bill_of_ladings.index[-3:].to_list()
             last_submitted.reverse()
             st.markdown(f"**Last Submitted Bill Of Ladings (From most recent) : {last_submitted}**")
-            
-            if yes:
+            if yes and mf:
                 
                 if st.button('**:blue[SUBMIT EDI]**'):
                  
@@ -4192,15 +4302,19 @@ if authentication_status:
                                             
                         bill_of_ladings=json.dumps(bill_of_ladings)
                         storage_client = storage.Client()
-                        bucket = storage_client.bucket("olym_suzano")
+                        bucket = storage_client.bucket(target_bucket)
                         blob = bucket.blob(rf"terminal_bill_of_ladings.json")
                         blob.upload_from_string(bill_of_ladings)
                         
                         
                         
                         terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",bill_of_lading_number,disabled=True)
+                        success_container=st.empty()
+                        success_container.info("Uploading Bill of Lading")
+                        time.sleep(0.1) 
+                        success_container.success("Uploaded Bill of Lading...",icon="✅")
                         process()
-                       
+                        #st.toast("Creating EDI...")
                         try:
                             suzano_report_keys=[int(i) for i in suzano_report.keys()]
                             next_report_no=max(suzano_report_keys)+1
@@ -4224,6 +4338,9 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"suzano_report.json")
                             blob.upload_from_string(suzano_report)
+                            success_container1=st.empty()
+                            time.sleep(0.1)                            
+                            success_container1.success(f"Updated Suzano Report",icon="✅")
 
                           
                             
@@ -4249,7 +4366,7 @@ if authentication_status:
                             
                             json_data = json.dumps(dispatched)
                             storage_client = storage.Client()
-                            bucket = storage_client.bucket("olym_suzano")
+                            bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"dispatched.json")
                             blob.upload_from_string(json_data)       
                         
@@ -4258,6 +4375,9 @@ if authentication_status:
                         bucket = storage_client.bucket(target_bucket)
                         blob = bucket.blob(rf"release_orders/{vessel}/{current_release_order}.json")
                         blob.upload_from_string(json_data)
+                        success_container2=st.empty()
+                        time.sleep(0.1)                            
+                        success_container2.success(f"Updated Release Order {current_release_order}",icon="✅")
 
                         try:
                             release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
@@ -4265,30 +4385,33 @@ if authentication_status:
                         except:
                             release_order_database={}
                        
-                        release_order_database[current_release_order][current_sales_order]["remaining"]=release_order_database[current_release_order][current_sales_order]["remaining"]-quantity
+                        release_order_database[vessel][current_release_order][current_sales_order]["remaining"]=release_order_database[vessel][current_release_order][current_sales_order]["remaining"]-quantity
                         release_order_database=json.dumps(release_order_database)
                         storage_client = storage.Client()
                         bucket = storage_client.bucket(target_bucket)
                         blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                         blob.upload_from_string(release_order_database)
+                        success_container3=st.empty()
+                        time.sleep(0.1)                            
+                        success_container3.success(f"Updated Release Order Database",icon="✅")
                         with open('placeholder.txt', 'r') as f:
                             output_text = f.read()
-                        st.markdown("**SUCCESS! EDI FOR THIS LOAD HAS BEEN SUBMITTED,THANK YOU**")
-                        st.markdown("**EDI TEXT**")
-                        st.text_area('', value=output_text, height=600)
+                        
+                        #st.markdown("**EDI TEXT**")
+                        #st.text_area('', value=output_text, height=600)
                         with open('placeholder.txt', 'r') as f:
                             file_content = f.read()
                         newline="\n"
                         filename = f'{bill_of_lading_number}'
                         file_name= f'{bill_of_lading_number}.txt'
-                        st.write(filename)
-                        st.write(current_release_order,current_sales_order,destination,ocean_bill_of_lading,terminal_bill_of_lading,wrap)
+                        
+                        
                         subject = f'Suzano_EDI_{a}_ R.O:{release_order_number}-Terminal BOL :{bill_of_lading_number}-Destination : {destination}'
                         body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
-                        st.write(body)           
+                        #st.write(body)           
                         sender = "warehouseoly@gmail.com"
-                        recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                        #recipients = ["afsiny@portolympia.com"]
+                        #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                        recipients = ["afsiny@portolympia.com"]
                         password = "xjvxkmzbpotzeuuv"
                 
               
@@ -4300,7 +4423,10 @@ if authentication_status:
                         file_path = 'temp_file.txt'  # Use the path of the temporary file
                 
                         
-                        upload_cs_file("olym_suzano", 'temp_file.txt',rf"EDIS/{vessel}/{file_name}")
+                        upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}")
+                        success_container5=st.empty()
+                        time.sleep(0.1)                            
+                        success_container5.success(f"Uploaded EDI File",icon="✅")
                         if load_mf_number_issued:
                             mf_numbers_for_load[vessel][release_order_number].remove(load_mf_number)
                             mf_numbers_for_load=json.dumps(mf_numbers_for_load)
@@ -4308,7 +4434,40 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/mf_numbers.json")
                             blob.upload_from_string(mf_numbers_for_load)
+                            st.write("Updated MF numbers...")
                         send_email_with_attachment(subject, body, sender, recipients, password, file_path,file_name)
+                        success_container6=st.empty()
+                        time.sleep(0.1)                            
+                        success_container6.success(f"Sent EDI Email",icon="✅")
+                        st.markdown("**SUCCESS! EDI FOR THIS LOAD HAS BEEN SUBMITTED,THANK YOU**")
+                        st.write(filename,current_release_order,current_sales_order,destination,ocean_bill_of_lading,terminal_bill_of_lading,wrap)
+                        this_shipment_aliens=[]
+                        for i in pure_loads:
+                            
+                            if i in alien_units[vessel]:       
+                                alien_units[vessel][i]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
+                                        "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S"),
+                                        "Destination":destination,"Release_Order":current_release_order,"Terminal_Bill_of Lading":terminal_bill_of_lading,"Truck":vehicle_id}
+                                this_shipment_aliens.append(i)
+                            if i not in alien_units[vessel]:
+                                if i[:-2] in [u[:-2] for u in alien_units[vessel]]:
+                                    alien_units[vessel][i]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
+                                        "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S"),
+                                        "Destination":destination,"Release_Order":current_release_order,"Terminal_Bill_of Lading":terminal_bill_of_lading,"Truck":vehicle_id}
+                                    this_shipment_aliens.append(i)
+                                    
+                        alien_units=json.dumps(alien_units)
+                        storage_client = storage.Client()
+                        bucket = storage_client.bucket(target_bucket)
+                        blob = bucket.blob(rf"alien_units.json")
+                        blob.upload_from_string(alien_units)   
+                        subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
+                        body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
+                        sender = "warehouseoly@gmail.com"
+                        #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                        recipients = ["afsiny@portolympia.com"]
+                        password = "xjvxkmzbpotzeuuv"
+                        send_email(subject, body, sender, recipients, password)
                         
                     else:   ###cancel bill of lading
                         pass

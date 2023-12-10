@@ -435,7 +435,7 @@ if authentication_status:
                     chance_rain.append(data[day][hour]['chance_of_rain'])
                     dew_point.append(data[day][hour]['dewpoint_f'])    
         select=st.sidebar.radio("SELECT FUNCTION",
-            ('ADMIN', 'LOADOUT', 'INVENTORY','DATA BACKUP','WEATHER','TIDES','FINANCE'))
+            ('ADMIN', 'LOADOUT', 'INVENTORY','WEATHER','TIDES','FINANCE'))
         custom_style = """
                     <style>
                         .custom-container {
@@ -695,20 +695,6 @@ if authentication_status:
                                     mime="text/html"
                                 )
 
-              
-                
-        if select=="DATA BACKUP" :
-            st.write(datetime.datetime.now()-datetime.timedelta(hours=utc_difference))
-            
-            
-            def display_gif_from_gcs(bucket_name, object_name):
-                gif_content = gcp_download_x(target_bucket,object_name)
-                data_url = base64.b64encode(gif_content).decode("utf-8")
-                st.markdown(
-                    f'<img src="data:image/gif;base64,{data_url}" alt="cat gif">',
-                    unsafe_allow_html=True,
-                )
-            display_gif_from_gcs(target_bucket, "fourier.gif")
             
         if select=="FINANCE":
             hadi=False

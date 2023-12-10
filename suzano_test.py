@@ -631,7 +631,7 @@ if authentication_status:
                 fig.update_layout(title='PORT OF OLYMPIA Weather Forecast',
                                   xaxis_title='Hour',
                                   yaxis_title='Value',
-                                  template='plotly_dark',
+                                  template='plotly_white',
                                   width=900, 
                                   height=600)
                 st.plotly_chart(fig)

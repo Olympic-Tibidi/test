@@ -436,7 +436,8 @@ if authentication_status:
                     dew_point.append(data[day][hour]['dewpoint_f'])    
         select=st.sidebar.radio("SELECT FUNCTION",
             ('ADMIN', 'LOADOUT', 'INVENTORY','DATA BACKUP','WEATHER','TIDES','FINANCE'))
-        st.sidebar.write(data)
+        with st.sidebar.container(border=True):
+            st.write(data)
 
         if select=='WEATHER':
             st.caption("Live Data for Olympia From Weather.gov API")

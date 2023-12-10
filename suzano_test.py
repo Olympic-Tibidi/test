@@ -441,7 +441,9 @@ if authentication_status:
             st.markdown(f"Conditions: {forecast['current']['condition']['text']}")
             st.markdown(f"Wind: {forecast['current']['wind_dir']}-{forecast['current']['wind_mph']}")
             st.markdown(f"Cloud Cover: %{forecast['current']['cloud']}")
-            st.markdown(f"Precipitation: {forecast['current']['precip_in']} Inches")
+            st.markdown(f"Chance of Rain Today: %{forecast['forecast']['forecastday'][0]['date']} ")
+            st.markdown(f"Current Precipitation: {forecast['current']['precip_in']} Inches")
+            st.markdown(f"Day's Total Expected Rain: {forecast['forecast']['forecastday'][0]['totalprecip_in']} Inches")
             
 
         if select=='WEATHER':

@@ -459,11 +459,7 @@ if authentication_status:
 
         if select=='WEATHER':
             st.caption("Live Data for Olympia From Weather.gov API")
-            [data-testid="tab"] {
-                box-shadow: rgb(0 0 0 / 20%) 0px 2px 1px -1px, rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px;
-                border-radius: 15px;
-                padding: 5% 5% 5% 10%;
-                } 
+            
             weather_tab1,weather_tab2=st.tabs(["TABULAR","GRAPH"])
             with weather_tab1:
             

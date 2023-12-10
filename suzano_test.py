@@ -436,6 +436,17 @@ if authentication_status:
                     dew_point.append(data[day][hour]['dewpoint_f'])    
         select=st.sidebar.radio("SELECT FUNCTION",
             ('ADMIN', 'LOADOUT', 'INVENTORY','DATA BACKUP','WEATHER','TIDES','FINANCE'))
+        custom_style = """
+                    <style>
+                        .custom-container {
+                            background-color: #f0f0f0;  /* Set your desired background color */
+                            padding: 20px;
+                            border-radius: 10px;
+                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                        }
+                    </style>
+                """
+        st.markdown(custom_style, unsafe_allow_html=True)
         with st.sidebar.container(border=True):
             st.markdown(f"Temperature: {forecast['current']['temp_f']}")
             st.markdown(f"Conditions: {forecast['current']['condition']['text']}")

@@ -581,7 +581,18 @@ if authentication_status:
                 fig.add_trace(go.Scatter(x=index, y=chance_rain, mode='lines', name='Chance of Rain'))
                 fig.add_trace(go.Scatter(x=index, y=cloud, mode='lines', name='Cloud Cover'))
                 # Add traces for other weather parameters...
-                
+                rain_threshold = 0.04
+                fig.add_shape(
+                    dict(
+                        type='line',
+                        x0=min(index),
+                        x1=max(index),
+                        y0=rain_threshold,
+                        y1=rain_threshold,
+                        line=dict(color='red', width=2),
+                        visible='Rain Amount' in [trace.name for trace in fig.data],  # Show only when Rain graph is selected
+                    )
+                )
                 # Create a dropdown menu for selecting weather parameters
                 button_list = []
                 for parameter in ['Temperature', 'Wind Speed','Rain Amount','Chance of Rain','Cloud Cover', 'Pressure']:

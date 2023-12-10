@@ -578,7 +578,7 @@ if authentication_status:
                 fig.add_trace(go.Scatter(x=index, y=wind, mode='markers', name='Wind Speed'))
                 fig.add_trace(go.Scatter(x=index, y=pressure, mode='lines', name='Pressure'))
                 fig.add_trace(go.Bar(x=index, y=rain, name='Rain Amount'))
-                fig.add_trace(go.Scatter(x=index, y=chance_rain, mode='lines', name='Chance of Rain'))
+                fig.add_trace(go.Bar(x=index, y=chance_rain,name='Chance of Rain'))
                 fig.add_trace(go.Scatter(x=index, y=cloud, mode='lines', name='Cloud Cover'))
                 # Add traces for other weather parameters...
                 rain_threshold = 0.04

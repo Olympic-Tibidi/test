@@ -2946,7 +2946,7 @@ if authentication_status:
                                                 send_email(subject, body, sender, recipients, password)
                                                 time.sleep(0.1)
                                                 st.success(f"Added Unit {x} to Inventory!",icon="✅")
-                                        
+                                                st.rerun()
                                 
                         if bale_load_input is not None:
                         

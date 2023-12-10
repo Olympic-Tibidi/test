@@ -437,11 +437,11 @@ if authentication_status:
         select=st.sidebar.radio("SELECT FUNCTION",
             ('ADMIN', 'LOADOUT', 'INVENTORY','DATA BACKUP','WEATHER','TIDES','FINANCE'))
         with st.sidebar.container(border=True):
-            st.markdown(f"Current Temperature: {forecast['current']['temp_f']}")
-            st.markdown(f"Current Conditions: {forecast['current']['condition']['text']}")
-            st.markdown(f"Current Wind: {forecast['current']['wind_dir']}-{forecast['current']['wind_mph']}")
-            st.markdown(f"Current Cloud Cover: %{forecast['current']['cloud']}")
-            st.markdown(f"Current Precipitation: {forecast['current']['precip_in']} Inches")
+            st.markdown(f"Temperature: {forecast['current']['temp_f']}")
+            st.markdown(f"Conditions: {forecast['current']['condition']['text']}")
+            st.markdown(f"Wind: {forecast['current']['wind_dir']}-{forecast['current']['wind_mph']}")
+            st.markdown(f"Cloud Cover: %{forecast['current']['cloud']}")
+            st.markdown(f"Precipitation: {forecast['current']['precip_in']} Inches")
             
 
         if select=='WEATHER':

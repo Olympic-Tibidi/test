@@ -593,6 +593,17 @@ if authentication_status:
                         visible='Rain Amount' in [trace.name for trace in fig.data],  # Show only when Rain graph is selected
                     )
                 )
+                fig.add_annotation(
+                        go.layout.Annotation(
+                            x=0.5,  # Set x to the middle of the x-axis (adjust as needed)
+                            y=rain_threshold,
+                            xref='paper',
+                            yref='y',
+                            text='0.04 inches/h',
+                            showarrow=False,
+                            font=dict(color='red', size=10),
+                        )
+                    )
                 # Create a dropdown menu for selecting weather parameters
                 button_list = []
                 for parameter in ['Temperature', 'Wind Speed','Rain Amount','Chance of Rain','Cloud Cover', 'Pressure']:

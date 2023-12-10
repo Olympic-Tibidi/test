@@ -426,6 +426,7 @@ if authentication_status:
                 forecast=get_weather()
                 st.table(forecast)
             with weather_tab2:
+                st.markdown('Powered by <a href="https://www.weatherapi.com/" title="Free Weather API">WeatherAPI.com</a>',unsafe_allow_html=True)
                 def get_weather():
                     weather=defaultdict(int)
                     headers = { 

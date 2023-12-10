@@ -2134,11 +2134,9 @@ if authentication_status:
                             files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
                             files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
                             release_order_dest_map={}
-                            st.write(files_in_folder)
                             try:
                                 
                                 for i in release_order_dictionary[vessel]:
-                                    st.write(i)
                                     for sales in release_order_dictionary[vessel][i]:
                                         release_order_dest_map[i]=release_order_dictionary[vessel][i][sales]["destination"]
                                 

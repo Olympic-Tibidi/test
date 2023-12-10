@@ -3259,8 +3259,8 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"alien_units.json")
                             blob.upload_from_string(alien_units)   
-                            subject=f"UNREGISTERED UNITS SHIPPED ON THIS TRUCK TO {destination}"
-                            body=f"These unregistered units were shipped with this truck.{[i for i in this_shipment_aliens]}"
+                            subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
+                            body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
                             sender = "warehouseoly@gmail.com"
                             #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
                             recipients = ["afsiny@portolympia.com"]

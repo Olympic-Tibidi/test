@@ -2441,7 +2441,9 @@ if authentication_status:
                             gp_release_orders=[i for i in release_order_database[vessel_mf] if release_order_database[vessel_mf][i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and release_order_database[vessel_mf][i]["001"]["remaining"]>0]
                             
                             destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database[vessel_mf] if release_order_database[vessel_mf][i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and release_order_database[vessel_mf][i]["001"]["remaining"]>2]
-                            if len(destinations_of_release_orders)>0:
+                            if len(destinations_of_release_orders)==0:
+                                st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
+                            else:
                                 
                                 release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",destinations_of_release_orders,key="tatata")
                                 release_order_number_mf=release_order_number_mf.split(" ")[0]

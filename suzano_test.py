@@ -2081,15 +2081,11 @@ if authentication_status:
                         if edit:
                             release_order_database[vessel][release_order_number][sales_order_item_edit]={"destination":destination_edit,"total":quantity_edit,"remaining":remaining_edit}
                         else:
+                            release_order_database[vessel][release_order_number]={}
+                            release_order_database[vessel][release_order_number][sales_order_item]={}
                             release_order_database[vessel][release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}
-                                
-                                                         
-                                #release_order_database[vessel]={}
-                                #release_order_database[vessel][release_order_number]={}
-                                #release_order_database[vessel][release_order_number][sales_order_item]={}
-                                #release_order_database[vessel][release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}
-                                
                             st.write(f"Recorded Release Order - {release_order_number} for Item No: {sales_order_item}")
+                        
                         release_orders_json=json.dumps(release_order_database)
                         storage_client = storage.Client()
                         bucket = storage_client.bucket(target_bucket)

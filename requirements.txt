@@ -5,7 +5,7 @@ Requests==2.31.0
 seaborn==0.12.2
 #streamlit_extras==0.3.0
 #streamlit-extras
-streamlit==1.24.1
+streamlit==1.29.0
 openpyxl
 gcsfs
 git+https://github.com/streamlit/files-connection

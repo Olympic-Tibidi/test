@@ -2175,9 +2175,10 @@ if authentication_status:
                         else:
                             if vessel not in release_order_database:
                                 release_order_database[vessel]={}
+                                release_order_database[vessel][release_order_number]={}
                             else:
                                 release_order_database[vessel][release_order_number]={}
-                                
+                            release_order_database[vessel][release_order_number][sales_order_item]={}
                             
                             release_order_database[vessel][release_order_number][sales_order_item]={}
                             release_order_database[vessel][release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}

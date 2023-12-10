@@ -437,9 +437,9 @@ if authentication_status:
         select=st.sidebar.radio("SELECT FUNCTION",
             ('ADMIN', 'LOADOUT', 'INVENTORY','DATA BACKUP','WEATHER','TIDES','FINANCE'))
         with st.sidebar.container(border=True):
-            st.markdown(f"Sunrise: {data["ASTRO"]["sunrise"]}")
-            st.markdown(f"Sunset: {data["ASTRO"]["sunset"]}")
-            st.markdown(f"Daily Condition: {data["DAY"]["condition"]["text"]}")
+            st.markdown(f"Sunrise: {data['ASTRO']['sunrise']}")
+            st.markdown(f"Sunset: {data['ASTRO']['sunset']}")
+            st.markdown(f"Daily Condition: {data['DAY']['condition']['text']}")
             
 
         if select=='WEATHER':

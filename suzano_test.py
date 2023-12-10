@@ -2111,7 +2111,7 @@ if authentication_status:
                         wrap_edit=st.text_input("Grade",to_edit[vessel][release_order_number][sales_order_item_edit]["grade"],disabled=False)
                         batch_edit=st.text_input("Batch No",to_edit[vessel][release_order_number][sales_order_item_edit]["batch"],disabled=False)
                         dryness_edit=st.text_input("Dryness",to_edit[vessel][release_order_number][sales_order_item_edit]["dryness"],disabled=False)
-                        st.write(int(batch_mapping[vessel][ocean_bill_of_lading]["dryness"]))
+                        st.write(batch_mapping[vessel][ocean_bill_of_lading]["dryness"])
                         admt_edit=st.text_input("ADMT PER UNIT",round(int(batch_mapping[vessel][ocean_bill_of_lading]["dryness"])/90,6),disabled=False)
                         unitized_edit=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
                         quantity_edit=st.number_input("Quantity of Units", 0, disabled=False, label_visibility="visible")

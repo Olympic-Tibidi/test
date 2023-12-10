@@ -373,8 +373,70 @@ if authentication_status:
     if username == 'ayilmaz' or username=='gatehouse':
         st.subheader("PORT OF OLYMPIA TOS")
         st.write(f'Welcome *{name}*')
+        def get_weather():
+            weather=defaultdict(int)
+            headers = { 
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36', 
+                    'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 
+                    'Accept-Language' : 'en-US,en;q=0.5', 
+                    'Accept-Encoding' : 'gzip', 
+                    'DNT' : '1', # Do Not Track Request Header 
+                    'Connection' : 'close' }
+            #url ='https://api.weather.gov/gridpoints/SEW/117,51/forecast/hourly'
+            url='http://api.weatherapi.com/v1/forecast.json?key=5fa3f1f7859a415b9e6145743230912&q=98502&days=7'
+            #response = get(url,headers=headers)
+            response=get(url,headers=headers)
+            #data = json.loads(response.text)
+            data=json.loads(response.text)
+            print(data)
+            return data
+        forecast=get_weather()
+        data=dict()
+        for day in forecast['forecast']['forecastday']:
+            data[day['date']]={}
+            data[day['date']]['DAY']={}
+            data[day['date']]['ASTRO']={}
+            for item in day['day']:
+                data[day['date']]['DAY'][item]=day['day'][item]
+            for astro in day['astro']:
+                data[day['date']]['ASTRO'][astro]=day['astro'][astro]
+            for dic in day['hour']:
+                data[day['date']][dic['time']]={}
+                for measure in dic:
+                    if measure=='condition':
+                        data[day['date']][dic['time']][measure]=dic[measure]['text']
+                        data[day['date']][dic['time']]['condition_png']=dic[measure]['icon']
+                    else:
+                        data[day['date']][dic['time']][measure]=dic[measure]
+        index=[]
+        temperatures=[]
+        condition=[]
+        wind=[]
+        wind_dir=[]
+        pressure=[]
+        cloud=[]
+        rain=[]
+        dew_point=[]
+        will_rain=[]
+        chance_rain=[]
+        for day in data:
+            for hour in data[day]:
+                if hour not in ['DAY','ASTRO']:
+                    #print(hour)
+                    index.append(hour)
+                    temperatures.append(data[day][hour]['temp_f'])
+                    condition.append(data[day][hour]['condition'])
+                    wind.append(data[day][hour]['wind_mph'])
+                    wind_dir.append(data[day][hour]['wind_dir'])
+                    pressure.append(data[day][hour]['pressure_mb'])
+                    cloud.append(data[day][hour]['cloud'])
+                    rain.append(data[day][hour]['precip_in'])
+                    will_rain.append(True if data[day][hour]['will_it_rain']==1 else False)
+                    chance_rain.append(data[day][hour]['chance_of_rain'])
+                    dew_point.append(data[day][hour]['dewpoint_f'])    
         select=st.sidebar.radio("SELECT FUNCTION",
             ('ADMIN', 'LOADOUT', 'INVENTORY','DATA BACKUP','WEATHER','TIDES','FINANCE'))
+        st.sidebar.write(data)
 
         if select=='WEATHER':
             st.caption("Live Data for Olympia From Weather.gov API")

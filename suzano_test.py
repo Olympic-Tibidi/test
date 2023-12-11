@@ -1683,7 +1683,7 @@ if authentication_status:
                                 alongside_date=datetime.datetime.strftime(alongside_date,"%Y-%m-%d")
                                 alongside_time=st.time_input("ALONGSIDE TIME",disabled=False,key="arrt")
                                 #st.write(type(alongside_time))
-                                #alongside_time=datetime.datetime.strftime(alongside_time,"%H-%M")
+                                #alongside_time=datetime.datetime.strftime(alongside_time,"%H:%M")
                                 departure_date=st.date_input("DEPARTURE DATE",disabled=False,key="dep")
                                 departure_date=datetime.datetime.strftime(departure_date,"%Y-%m-%d")
                                 st.write(departure_date)

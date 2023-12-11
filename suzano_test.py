@@ -1686,8 +1686,11 @@ if authentication_status:
                                 #alongside_time=datetime.datetime.strftime(alongside_time,"%H-%M")
                                 departure_date=st.date_input("DEPARTURE DATE",disabled=False,key="dep")
                                 departure_date=datetime.datetime.strftime(departure_date,"%Y-%m-%D")
+                                st.write(departure_date)
                                 departure_time=st.time_input("DEPARTURE TIME",disabled=False,key="dept")
-                                #departure_time=datetime.datetime.strftime(departure_time,"%H-%M")
+                                st.write(departure_time)
+                                departure_time=datetime.datetime.strftime(departure_time,"%H-%M")
+                                st.write(departure_time)
                             if st.button("RECORD JOB"):
                                 year="2023"
                                 mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")

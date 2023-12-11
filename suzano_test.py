@@ -1711,7 +1711,7 @@ if authentication_status:
                     with lab_tab1:
                         
                         foreman=False
-                        with st.container(boreder=True):
+                        with st.container(border=True):
                             
                             tinker,tailor=st.columns([5,5])
                             with tinker:

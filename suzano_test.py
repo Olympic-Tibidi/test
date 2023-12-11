@@ -1689,9 +1689,9 @@ if authentication_status:
                                 mt_jobs=json.loads(mt_jobs_)
                                 if year not in mt_jobs:
                                     mt_jobs[year]={}
-                                mt_jobs[year].update("Job Number":job_vessel,"Vessel":job_vessel,"Vessel Length":vessel_length,
+                                mt_jobs[year].update({"Job Number":job_vessel,"Vessel":job_vessel,"Vessel Length":vessel_length,
                                                     "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
-                                                    "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time)
+                                                    "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time})
                     
                     with lab_tab1:
                         

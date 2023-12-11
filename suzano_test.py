@@ -1681,8 +1681,8 @@ if authentication_status:
                                 stevedore=st.selectbox("STEVEDORE",["SSA","JONES"],disabled=False)
                                 alongside_date=st.date_input("ALONGSIDE DATE",disabled=False,key="arr")
                                 alongside_time=st.time_input("ALONGSIDE TIME",disabled=False,key="arrt")
-                                departure_date=st.date_input("ALONGSIDE DATE",disabled=False,key="dep")
-                                departure_time=st.time_input("ALONGSIDE TIME",disabled=False,key="dept")
+                                departure_date=st.date_input("DEPARTURE DATE",disabled=False,key="dep")
+                                departure_time=st.time_input("DEPARTURE TIME",disabled=False,key="dept")
                             if st.button("RECORD JOB"):
                                 year=alongside_date.year
                                 mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")

@@ -1878,7 +1878,7 @@ if authentication_status:
                                 st.dataframe(display)
                         csv=convert_df(display)
                         file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
-                        down_col1,down_col2,down_col3=st.columns([2,2,6])
+                        down_col1,down_col2,down_col3=st.columns([2,2,2,4])
                         with down_col1:
                             st.write(" ")
                             st.download_button(
@@ -1886,9 +1886,9 @@ if authentication_status:
                                 data=csv,
                                 file_name=file_name,
                                 mime='text/csv')
-                        with down_col2:
-                            filename=st.text_input("Name the Template",key="7dr3")
                         with down_col3:
+                            filename=st.text_input("Name the Template",key="7dr3")
+                        with down_col2:
                             st.write(" ")
                             template=st.button("SAVE AS TEMPLATE",key="srfqw")
                             if template:
@@ -3347,13 +3347,15 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"alien_units.json")
                             blob.upload_from_string(alien_units)   
-                            subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
-                            body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
-                            sender = "warehouseoly@gmail.com"
-                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                            recipients = ["afsiny@portolympia.com"]
-                            password = "xjvxkmzbpotzeuuv"
-                            send_email(subject, body, sender, recipients, password)
+                            
+                            if len(this_shipment_aliens)>0:
+                                subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
+                                body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
+                                sender = "warehouseoly@gmail.com"
+                                recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                #recipients = ["afsiny@portolympia.com"]
+                                password = "xjvxkmzbpotzeuuv"
+                                send_email(subject, body, sender, recipients, password)
                             
                         else:   ###cancel bill of lading
                             pass
@@ -4444,13 +4446,14 @@ if authentication_status:
                         bucket = storage_client.bucket(target_bucket)
                         blob = bucket.blob(rf"alien_units.json")
                         blob.upload_from_string(alien_units)   
-                        subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
-                        body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
-                        sender = "warehouseoly@gmail.com"
-                        #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                        recipients = ["afsiny@portolympia.com"]
-                        password = "xjvxkmzbpotzeuuv"
-                        send_email(subject, body, sender, recipients, password)
+                        if len(this_shipment_aliens)>0:
+                            subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
+                            body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
+                            sender = "warehouseoly@gmail.com"
+                            recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                            #recipients = ["afsiny@portolympia.com"]
+                            password = "xjvxkmzbpotzeuuv"
+                            send_email(subject, body, sender, recipients, password)
                         
                     else:   ###cancel bill of lading
                         pass

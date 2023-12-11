@@ -1867,14 +1867,14 @@ if authentication_status:
                                     
                            
                        
-                        display=pd.DataFrame(st.session_state.scores)
-                        display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]].sum()
-                        display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]]
-                        
-                        if template_check and template_choice_valid:
-                            st.dataframe(loaded_template)
-                        else:
-                            st.dataframe(display)
+                            display=pd.DataFrame(st.session_state.scores)
+                            display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]].sum()
+                            display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]]
+                            
+                            if template_check and template_choice_valid:
+                                st.dataframe(loaded_template)
+                            else:
+                                st.dataframe(display)
                         csv=convert_df(display)
                         file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
                         down_col1,down_col2,down_col3=st.columns([2,2,6])

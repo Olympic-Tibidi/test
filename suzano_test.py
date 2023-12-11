@@ -1846,21 +1846,23 @@ if authentication_status:
                             st.success("Rank added successfully!")
                         
                             
-                        sub_col1,sub_col2,sub_col3=st.columns([3,3,4])
-                        with sub_col1:
-                            # Display the updated DataFrame
-                            st.write("### Updated Cost Table")
-                        with sub_col2:
-                            template_check=st.checkbox("LOAD FROM TEMPLATE")
-                            if template_check:
-                                with sub_col3:
-                                    template_choice_valid=False
-                                    template_choice=st.selectbox("Select Recorded Template",["Pick From List"]+[i for i in list_files_in_subfolder(target_bucket, rf"labor_templates/")],
-                                                                  label_visibility="collapsed")
-                                    if template_choice!="Pick From List":
-                                        template_choice_valid=True 
-                                    if template_choice_valid:
-                                        loaded_template=gcp_csv_to_df(target_bucket,rf"labor_templates/{template_choice}")
+                        with st.container(border=True):
+                            
+                            sub_col1,sub_col2,sub_col3=st.columns([3,3,4])
+                            with sub_col1:
+                                # Display the updated DataFrame
+                                st.write("### Updated Cost Table")
+                            with sub_col2:
+                                template_check=st.checkbox("LOAD FROM TEMPLATE")
+                                if template_check:
+                                    with sub_col3:
+                                        template_choice_valid=False
+                                        template_choice=st.selectbox("Select Recorded Template",["Pick From List"]+[i for i in list_files_in_subfolder(target_bucket, rf"labor_templates/")],
+                                                                      label_visibility="collapsed")
+                                        if template_choice!="Pick From List":
+                                            template_choice_valid=True 
+                                        if template_choice_valid:
+                                            loaded_template=gcp_csv_to_df(target_bucket,rf"labor_templates/{template_choice}")
                                     
                                     
                            

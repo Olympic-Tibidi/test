@@ -1689,7 +1689,7 @@ if authentication_status:
                                 st.write(departure_date)
                                 departure_time=st.time_input("DEPARTURE TIME",disabled=False,key="dept")
                                 st.write(departure_time)
-                                departure_time=datetime.datetime.strftime(departure_time,"%H-%M")
+                                departure_time=datetime.datetime.strftime(departure_time,"%H:%M")
                                 st.write(departure_time)
                             if st.button("RECORD JOB"):
                                 year="2023"

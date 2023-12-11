@@ -1688,10 +1688,12 @@ if authentication_status:
                                 mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
                                 mt_jobs=json.loads(mt_jobs_)
                                 if year not in mt_jobs:
+                                    st.write("this")
                                     mt_jobs[year]={}
                                 mt_jobs[year].update({"Job Number":job_vessel,"Vessel":job_vessel,"Vessel Length":vessel_length,
                                                     "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
                                                     "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time})
+                                st.write("done")
                                 mt_jobs_=json.dumps(mt_jobs)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)

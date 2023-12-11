@@ -1692,7 +1692,11 @@ if authentication_status:
                                 mt_jobs[year].update({"Job Number":job_vessel,"Vessel":job_vessel,"Vessel Length":vessel_length,
                                                     "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
                                                     "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time})
-                    
+                                mt_jobs_=json.dumps(mt_jobs)
+                                storage_client = storage.Client()
+                                bucket = storage_client.bucket(target_bucket)
+                                blob = bucket.blob(rf"mt_jobs.json")
+                                blob.upload_from_string(mt_jobs_)
                     with lab_tab1:
                         
                         foreman=False

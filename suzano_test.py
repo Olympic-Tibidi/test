@@ -1711,11 +1711,13 @@ if authentication_status:
                     with lab_tab1:
                         
                         foreman=False
-                        tinker,tailor=st.columns([5,5])
-                        with tinker:
-                            select_year=st.selectbox("SELECT ILWU PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
-                        with tailor:
-                            select_pmayear=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
+                        with st.container(boreder=True):
+                            
+                            tinker,tailor=st.columns([5,5])
+                            with tinker:
+                                select_year=st.selectbox("SELECT ILWU PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
+                            with tailor:
+                                select_pmayear=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
                         
                         year=select_year.split(' ')[1]
                         month=select_year.split(' ')[0]

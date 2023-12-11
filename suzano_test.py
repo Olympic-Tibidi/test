@@ -457,9 +457,12 @@ if authentication_status:
             st.markdown(f"Chance of Rain Today: %{forecast['forecast']['forecastday'][0]['day']['daily_chance_of_rain']} ")
             st.markdown(f"Current Precipitation: {forecast['current']['precip_in']} Inches")
             st.markdown(f"Day's Total Expected Rain: {forecast['forecast']['forecastday'][0]['day']['totalprecip_in']} Inches")
+            events=[]
             for i,j in enumerate(forecast['forecast']['forecastday'][:3]):
                 if forecast['forecast']['forecastday'][i]['astro']['moon_phase'] in ['New Moon','Full Moon']:
-                    st.markdown(f"{forecast['forecast']['forecastday'][i]['astro']['moon_phase']} Coming up in {i} days. Check for King Tides.")
+                    events.append(f"{forecast['forecast']['forecastday'][i]['astro']['moon_phase']} Coming up in {i} days. Check for King Tides.")
+            if len(events)>0:
+                st.markdown(events[0])
 
         if select=='WEATHER':
             st.caption("Live Data for Olympia From Weather.gov API")

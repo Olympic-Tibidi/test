@@ -1669,7 +1669,7 @@ if authentication_status:
                 if secondary:
                     lab_tab1,lab_tab2=st.tabs(["LABOR TEMPLATE", "JOBS"])
                     with lab_tab2:
-                        lab_col1,lab_col2=st.columns([2,2])
+                        lab_col1,lab_col2,lab_col3=st.columns([2,2,2])
                         with lab_col1:
                             with st.container(border=True):
                                 
@@ -1679,9 +1679,19 @@ if authentication_status:
                                 shipper=st.text_input("SHIPPER",disabled=False)
                                 agent=st.selectbox("AGENT",["TALON","ACGI","NORTON LILLY"],disabled=False)
                                 stevedore=st.selectbox("STEVEDORE",["SSA","JONES"],disabled=False)
-                                alongside_date=st.date_input("ALONGSIDE DATE",disabled=False)
-                                alongside_time=st.time_input("ALONGSIDE TIME",disabled=False)
-                
+                                alongside_date=st.date_input("ALONGSIDE DATE",disabled=False,key="arr")
+                                alongside_time=st.time_input("ALONGSIDE TIME",disabled=False,key="arrt")
+                                departure_date=st.date_input("ALONGSIDE DATE",disabled=False,key="dep")
+                                departure_time=st.time_input("ALONGSIDE TIME",disabled=False,key="dept")
+                            if st.button("RECORD JOB"):
+                                year=alongside_date.year
+                                mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
+                                mt_jobs=json.loads(mt_jobs_)
+                                if year not in mt_jobs:
+                                    mt_jobs[year]={}
+                                mt_jobs[year].update("Job Number":job_vessel,"Vessel":job_vessel,"Vessel Length":vessel_length,
+                                                    "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
+                                                    "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time)
                     
                     with lab_tab1:
                         

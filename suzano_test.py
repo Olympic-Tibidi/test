@@ -1688,9 +1688,9 @@ if authentication_status:
                                 departure_date=datetime.datetime.strftime(departure_date,"%Y-%m-%d")
                                 
                                 departure_time=st.time_input("DEPARTURE TIME",disabled=False,key="dept")
-                                st.write(departure_time)
+                                #st.write(departure_time)
                                 departure_time=departure_time.strftime("%H:%M")
-                                st.write(departure_time)
+                                #st.write(departure_time)
                                 
                             if st.button("RECORD JOB"):
                                 year="2023"

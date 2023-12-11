@@ -1686,11 +1686,11 @@ if authentication_status:
                                 #alongside_time=datetime.datetime.strftime(alongside_time,"%H:%M")
                                 departure_date=st.date_input("DEPARTURE DATE",disabled=False,key="dep")
                                 departure_date=datetime.datetime.strftime(departure_date,"%Y-%m-%d")
-                                
+                                st.write(type(departure_date))
                                 departure_time=st.time_input("DEPARTURE TIME",disabled=False,key="dept")
-                                #st.write(departure_time)
+                                
                                 departure_time=departure_time.strftime("%H:%M")
-                                #st.write(departure_time)
+                                st.write(type(departure_time))
                                 
                             if st.button("RECORD JOB"):
                                 year="2023"
@@ -1699,7 +1699,7 @@ if authentication_status:
                                 if year not in mt_jobs:
                                     st.write("this")
                                     mt_jobs[year]={}
-                                mt_jobs[year].update({"Job Number":job_vessel,"Vessel":job_vessel,"Vessel Length":vessel_length,
+                                mt_jobs[year].update({"Job Number":job_number,"Vessel":job_vessel,"Vessel Length":vessel_length,
                                                     "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
                                                     "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time})
                                 st.write("done")

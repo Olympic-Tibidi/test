@@ -1673,15 +1673,15 @@ if authentication_status:
                         with lab_col1:
                             with st.container(border=True):
                                 
-                            job_vessel=st.text_input("VESSEL",disabled=False)
-                            vessel_length=st.number_input("VESSEL LENGTH",disabled=False)
-                            job_number=st.text_input("MT JOB NO",disabled=False)
-                            shipper=st.text_input("SHIPPER",disabled=False)
-                            agent=st.selectbox("AGENT",["TALON","ACGI","NORTON LILLY"],disabled=False)
-                            stevedore=st.text_input("STEVEDORE",disabled=False)
-                            alongside_date=st.date_input("ALONGSIDE DATE",disabled=False)
-                            alongside_time=st.time_input("ALONGSIDE TIME",disabled=False)
-            
+                                job_vessel=st.text_input("VESSEL",disabled=False)
+                                vessel_length=st.number_input("VESSEL LENGTH",disabled=False)
+                                job_number=st.text_input("MT JOB NO",disabled=False)
+                                shipper=st.text_input("SHIPPER",disabled=False)
+                                agent=st.selectbox("AGENT",["TALON","ACGI","NORTON LILLY"],disabled=False)
+                                stevedore=st.text_input("STEVEDORE",disabled=False)
+                                alongside_date=st.date_input("ALONGSIDE DATE",disabled=False)
+                                alongside_time=st.time_input("ALONGSIDE TIME",disabled=False)
+                
                     
                     with lab_tab1:
                         

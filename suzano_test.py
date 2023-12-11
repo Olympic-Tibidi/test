@@ -1667,7 +1667,7 @@ if authentication_status:
                 labor_issue=False
                 secondary=True
                 if secondary:
-                    lab_tab1,lab_tab2=st.tabs("LABOR TEMPLATE", "JOBS")
+                    lab_tab1,lab_tab2=st.tabs(["LABOR TEMPLATE", "JOBS"])
                     with lab_tab2:
                         job_vessel=st.text_input("VESSEL",disabled=False)
                         alongside_date=st.date_input("ALONGSIDE DATE",disabled=False)

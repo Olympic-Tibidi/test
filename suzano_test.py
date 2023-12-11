@@ -1802,8 +1802,9 @@ if authentication_status:
                         
                             
                         # Form for adding a new score
-                        st.write("### Add a New Rank")
+                        
                         with st.form("new_score_form"):
+                            st.write("### Add a New Rank")
                             form_col1,form_col2,form_col3=st.columns([3,3,4])
                             with form_col1:
                                 

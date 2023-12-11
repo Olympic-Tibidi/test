@@ -1679,12 +1679,12 @@ if authentication_status:
                                 shipper=st.text_input("SHIPPER",disabled=False)
                                 agent=st.selectbox("AGENT",["TALON","ACGI","NORTON LILLY"],disabled=False)
                                 stevedore=st.selectbox("STEVEDORE",["SSA","JONES"],disabled=False)
-                                alongside_date=st.date_input("ALONGSIDE DATE",disabled=False,key="arr")
-                                alongside_time=st.time_input("ALONGSIDE TIME",disabled=False,key="arrt")
-                                departure_date=st.date_input("DEPARTURE DATE",disabled=False,key="dep")
-                                departure_time=st.time_input("DEPARTURE TIME",disabled=False,key="dept")
+                                alongside_date=datetime.datetime.strftime(st.date_input("ALONGSIDE DATE",disabled=False,key="arr"),"%Y-%m-%D")
+                                alongside_time=datetime.datetime.strftime(st.time_input("ALONGSIDE TIME",disabled=False,key="arrt"),"%H-%M")
+                                departure_date=datetime.datetime.strftime(st.date_input("DEPARTURE DATE",disabled=False,key="dep"),"%Y-%m-%D")
+                                departure_time=datetime.datetime.strftime(st.time_input("DEPARTURE TIME",disabled=False,key="dept"),"%H-%M")
                             if st.button("RECORD JOB"):
-                                year=alongside_date.year
+                                year="2023"
                                 mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
                                 mt_jobs=json.loads(mt_jobs_)
                                 if year not in mt_jobs:

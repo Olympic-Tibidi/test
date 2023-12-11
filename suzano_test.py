@@ -1697,7 +1697,7 @@ if authentication_status:
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"mt_jobs.json")
                                 blob.upload_from_string(mt_jobs_)
-                                st.success(f"RECORDED JOB NO {job_number}1")
+                                st.success(f"RECORDED JOB NO {job_number} ! ")
                     with lab_tab1:
                         
                         foreman=False

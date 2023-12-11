@@ -460,7 +460,7 @@ if authentication_status:
             events=[]
             for i,j in enumerate(forecast['forecast']['forecastday'][:3]):
                 if forecast['forecast']['forecastday'][i]['astro']['moon_phase'] in ['New Moon','Full Moon']:
-                    events.append(f"{forecast['forecast']['forecastday'][i]['astro']['moon_phase']} Coming up in {i} {"days" if i>1 else "day"}. Check for King Tides.")
+                    events.append(f"{forecast['forecast']['forecastday'][i]['astro']['moon_phase']} Coming up in {i} {'days' if i>1 else 'day'}. Check for King Tides.")
             if len(events)>0:
                 st.warning(events[0])
 

@@ -460,7 +460,7 @@ if authentication_status:
             events=[]
             for i,j in enumerate(forecast['forecast']['forecastday'][:3]):
                 if forecast['forecast']['forecastday'][i]['astro']['moon_phase'] in ['New Moon','Full Moon']:
-                    events.append(f"{forecast['forecast']['forecastday'][i]['astro']['moon_phase']} Coming up in {i} {'days' if i>1 else 'day'}. Check for King Tides.")
+                    events.append(f"{forecast['forecast']['forecastday'][i]['astro']['moon_phase']} Coming up in {i} {'days' if i>1 else 'day'}. Check for King Tides for the following days.")
             if len(events)>0:
                 st.warning(events[0])
 
@@ -3582,19 +3582,10 @@ if authentication_status:
                     with inv4tab2:
                         combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
                         combined["Batch"]=combined["Batch"].astype(str)
-                        st.write(combined)
-                        if st.button("CLICK TO RE-RUN INVENTORY",key="tyuris"):
-                            combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
-                            for line in inv_bill_of_ladings.loads[1:]:
-                                for unit in line.keys():
-                                    combined.loc[combined["Lot"]==unit[:-2],"Shipped"]=combined.loc[combined["Lot"]==unit[:-2],"Shipped"]+line[unit]*8
-                                    combined.loc[combined["Lot"]==unit[:-2],"Remaining"]=combined.loc[combined["Lot"]==unit[:-2],"Remaining"]-line[unit]*8
-                            
-                            
-                            temp=combined.to_csv("temp.csv",index=False)
-                            upload_cs_file(target_bucket, 'temp.csv',rf"combined.csv") 
-                        no_of_unaccounted=Inventory[Inventory["Accounted"]==False]["Bales"].sum()/8
-                        st.write(f'**Unaccounted Units Registered : {no_of_unaccounted} Units/{no_of_unaccounted*2} Tons**')
+                        
+                        #no_of_unaccounted=Inventory[Inventory["Accounted"]==False]["Bales"].sum()/8
+                        #st.write(f'**Unaccounted Units Registered : {no_of_unaccounted} Units/{no_of_unaccounted*2} Tons**')
+                        
                         temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
                         temp1=combined.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
                         temp=pd.merge(temp, temp1, left_index=True, right_index=True, how='outer', suffixes=('_df1', '_df2'))
@@ -4678,19 +4669,10 @@ if authentication_status:
                 with inv4tab2:
                     combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
                     combined["Batch"]=combined["Batch"].astype(str)
-                    st.write(combined)
-                    if st.button("CLICK TO RE-RUN INVENTORY",key="tyuris"):
-                        combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
-                        for line in inv_bill_of_ladings.loads[1:]:
-                            for unit in line.keys():
-                                combined.loc[combined["Lot"]==unit[:-2],"Shipped"]=combined.loc[combined["Lot"]==unit[:-2],"Shipped"]+line[unit]*8
-                                combined.loc[combined["Lot"]==unit[:-2],"Remaining"]=combined.loc[combined["Lot"]==unit[:-2],"Remaining"]-line[unit]*8
-                        
-                        
-                        temp=combined.to_csv("temp.csv",index=False)
-                        upload_cs_file(target_bucket, 'temp.csv',rf"combined.csv") 
-                    no_of_unaccounted=Inventory[Inventory["Accounted"]==False]["Bales"].sum()/8
-                    st.write(f'**Unaccounted Units Registered : {no_of_unaccounted} Units/{no_of_unaccounted*2} Tons**')
+                    
+                    #no_of_unaccounted=Inventory[Inventory["Accounted"]==False]["Bales"].sum()/8
+                    #st.write(f'**Unaccounted Units Registered : {no_of_unaccounted} Units/{no_of_unaccounted*2} Tons**')
+                    
                     temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
                     temp1=combined.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
                     temp=pd.merge(temp, temp1, left_index=True, right_index=True, how='outer', suffixes=('_df1', '_df2'))

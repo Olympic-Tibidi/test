@@ -1669,12 +1669,18 @@ if authentication_status:
                 if secondary:
                     lab_tab1,lab_tab2=st.tabs(["LABOR TEMPLATE", "JOBS"])
                     with lab_tab2:
-                        job_vessel=st.text_input("VESSEL",disabled=False)
-                        alongside_date=st.date_input("ALONGSIDE DATE",disabled=False)
-                        alongside_time=st.time_input("ALONGSIDE TIME",disabled=False)
-                        #sales_order_item_edit=st.text_input("Sales Order Item",list(to_edit[vessel][release_order_number].keys())[2],disabled=False)
-                        #ocean_bill_of_lading_edit=st.text_input("Ocean Bill Of Lading",to_edit[vessel][release_order_number][sales_order_item_edit]["ocean_bill_of_lading"],disabled=False)
-                        #wrap_edit=st.text_input("Grade",to_edit[vessel][release_order_number][sales_order_item_edit]["grade"],disabled=False)
+                        lab_col1,lab_col2=st.columns([2,2])
+                        with lab_col1:
+                            with st.container(border=True):
+                                
+                            job_vessel=st.text_input("VESSEL",disabled=False)
+                            vessel_length=st.number_input("VESSEL LENGTH",disabled=False)
+                            job_number=st.text_input("MT JOB NO",disabled=False)
+                            shipper=st.text_input("SHIPPER",disabled=False)
+                            agent=st.selectbox("AGENT",["TALON","ACGI","NORTON LILLY"],disabled=False)
+                            stevedore=st.text_input("STEVEDORE",disabled=False)
+                            alongside_date=st.date_input("ALONGSIDE DATE",disabled=False)
+                            alongside_time=st.time_input("ALONGSIDE TIME",disabled=False)
             
                     
                     with lab_tab1:

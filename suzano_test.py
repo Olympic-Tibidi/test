@@ -2093,11 +2093,8 @@ if authentication_status:
                     new=new.reset_index()
                     new.columns=["Release Order","Ocean_BOL","Destination","Total Order", "Shipped", "Remaining"]
                     row_totals = new.select_dtypes(include='number').sum()
-                   
                     new = new.append(pd.Series(row_totals, name='TOTAL'))
 
-                    #new.groupby('level_1')['remaining'].sum()
-                    
                     release_orders = [str(key[0]) for key in info.keys()]
                     release_orders=[str(i) for i in release_orders]
                     release_orders = pd.Categorical(release_orders)
@@ -2113,8 +2110,10 @@ if authentication_status:
                     fig = go.Figure()
                     
                     # Add bars for total quantities
-                    fig.add_trace(go.Bar(x=release_orders, y=total_quantities, name='Total', marker_color='lightgray'))
-                    
+                    fig.add_trace(go.Bar(x=release_orders, y=total_quantities, name='Total', mode="markers+text", marker_color='lightgray',text=["Text D", "Text E", "Text F"]))
+                   
+    name="Markers and Text",
+    text=["Text D", "Text E", "Text F"],
                     # Add filled bars for shipped quantities
                     fig.add_trace(go.Bar(x=release_orders, y=shipped_quantities, name='Shipped', marker_color='blue', opacity=0.7))
                     

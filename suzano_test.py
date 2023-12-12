@@ -214,14 +214,16 @@ def list_files_in_subfolder(bucket_name, folder_name):
     filenames = [blob.name.split('/')[-1] for blob in blobs]
 
     return filenames
-def store_release_order_data(vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code):
+def store_release_order_data(release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code):
        
     # Create a dictionary to store the release order data
-    release_order_data = { vessel: {
+    release_order_data = { release_order_number:{
         
-        release_order_number:{
-        'destination':destination,"po_number":po_number,
+        
+        'destination':destination,
+        "po_number":po_number,
         sales_order_item: {
+        "vessel":vessel,
         "batch": batch,
         "ocean_bill_of_lading": ocean_bill_of_lading,
         "grade": wrap,
@@ -242,24 +244,25 @@ def store_release_order_data(vessel,release_order_number,destination,po_number,s
     json_data = json.dumps(release_order_data)
     return json_data
 
-def add_release_order_data(file,vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code):
+def add_release_order_data(file,release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code):
        
     # Edit the loaded current dictionary.
-    file[vessel][release_order_number]["destination"]= destination
-    file[vessel][release_order_number]["po_number"]= po_number
-    if sales_order_item not in file[vessel][release_order_number]:
-        file[vessel][release_order_number][sales_order_item]={}
-    file[vessel][release_order_number][sales_order_item]["batch"]= batch
-    file[vessel][release_order_number][sales_order_item]["ocean_bill_of_lading"]= ocean_bill_of_lading
-    file[vessel][release_order_number][sales_order_item]["grade"]= wrap
-    file[vessel][release_order_number][sales_order_item]["dryness"]= dryness
-    file[vessel][release_order_number][sales_order_item]["transport_type"]= transport_type
-    file[vessel][release_order_number][sales_order_item]["carrier_code"]= carrier_code
-    file[vessel][release_order_number][sales_order_item]["unitized"]= unitized
-    file[vessel][release_order_number][sales_order_item]["quantity"]= quantity
-    file[vessel][release_order_number][sales_order_item]["tonnage"]= tonnage
-    file[vessel][release_order_number][sales_order_item]["shipped"]= 0
-    file[vessel][release_order_number][sales_order_item]["remaining"]= quantity
+    file[release_order_number]["destination"]= destination
+    file[release_order_number]["po_number"]= po_number
+    if sales_order_item not in file[release_order_number]:
+        file[release_order_number][sales_order_item]={}
+    file[release_order_number][sales_order_item]["vessel"]= vessel
+    file[release_order_number][sales_order_item]["batch"]= batch
+    file[release_order_number][sales_order_item]["ocean_bill_of_lading"]= ocean_bill_of_lading
+    file[release_order_number][sales_order_item]["grade"]= wrap
+    file[release_order_number][sales_order_item]["dryness"]= dryness
+    file[release_order_number][sales_order_item]["transport_type"]= transport_type
+    file[release_order_number][sales_order_item]["carrier_code"]= carrier_code
+    file[release_order_number][sales_order_item]["unitized"]= unitized
+    file[release_order_number][sales_order_item]["quantity"]= quantity
+    file[release_order_number][sales_order_item]["tonnage"]= tonnage
+    file[release_order_number][sales_order_item]["shipped"]= 0
+    file[release_order_number][sales_order_item]["remaining"]= quantity
     
     
        
@@ -272,10 +275,10 @@ def edit_release_order_data(file,sales_order_item,quantity,tonnage,shipped,remai
        
     # Edit the loaded current dictionary.
     
-    file[vessel][release_order_number][sales_order_item]["quantity"]= quantity
-    file[vessel][release_order_number][sales_order_item]["tonnage"]= tonnage
-    file[vessel][release_order_number][sales_order_item]["shipped"]= shipped
-    file[vessel][release_order_number][sales_order_item]["remaining"]= remaining
+    file[release_order_number][sales_order_item]["quantity"]= quantity
+    file[release_order_number][sales_order_item]["tonnage"]= tonnage
+    file[release_order_number][sales_order_item]["shipped"]= shipped
+    file[release_order_number][sales_order_item]["remaining"]= remaining
     
     
        
@@ -2149,36 +2152,53 @@ if authentication_status:
                     batch_mapping=json.loads(batch_mapping)
                     if edit:
                         
-                        release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/{vessel}/")[0:]] if i not in junk]))
-                        to_edit=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
+                        release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/ORDERS/")[0:]] if i not in junk]))
+                        to_edit=gcp_download(target_bucket,rf"release_orders/ORDERS/{release_order_number}.json")
                         to_edit=json.loads(to_edit)
-                        po_number_edit=st.text_input("PO No",to_edit[vessel][release_order_number]["po_number"],disabled=False)
-                        destination_edit=st.text_input("Destination",to_edit[vessel][release_order_number]["destination"],disabled=False)
-                        sales_order_item_edit=st.text_input("Sales Order Item",list(to_edit[vessel][release_order_number].keys())[2],disabled=False)
-                        ocean_bill_of_lading_edit=st.text_input("Ocean Bill Of Lading",to_edit[vessel][release_order_number][sales_order_item_edit]["ocean_bill_of_lading"],disabled=False)
-                        wrap_edit=st.text_input("Grade",to_edit[vessel][release_order_number][sales_order_item_edit]["grade"],disabled=False)
-                        batch_edit=st.text_input("Batch No",to_edit[vessel][release_order_number][sales_order_item_edit]["batch"],disabled=False)
-                        dryness_edit=st.text_input("Dryness",to_edit[vessel][release_order_number][sales_order_item_edit]["dryness"],disabled=False)
+                        po_number_edit=st.text_input("PO No",to_edit[release_order_number]["po_number"],disabled=False)
+                        destination_edit=st.text_input("Destination",to_edit[release_order_number]["destination"],disabled=False)
+                        sales_order_item_edit=st.text_input("Sales Order Item",list(to_edit[release_order_number].keys())[2],disabled=False)
+                        vessel_edit=st.text_input("Vessel",to_edit[release_order_number][sales_order_item_edit]['vessel'],disabled=False)
+                        ocean_bill_of_lading_edit=st.text_input("Ocean Bill Of Lading",to_edit[release_order_number][sales_order_item_edit]["ocean_bill_of_lading"],disabled=False)
+                        wrap_edit=st.text_input("Grade",to_edit[release_order_number][sales_order_item_edit]["grade"],disabled=False)
+                        batch_edit=st.text_input("Batch No",to_edit[release_order_number][sales_order_item_edit]["batch"],disabled=False)
+                        dryness_edit=st.text_input("Dryness",to_edit[release_order_number][sales_order_item_edit]["dryness"],disabled=False)
                         admt_edit=st.text_input("ADMT PER UNIT",round(int(batch_mapping[vessel][ocean_bill_of_lading_edit]["dryness"])/90,6),disabled=False)
                         unitized_edit=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
                         quantity_edit=st.number_input("Quantity of Units", 0, disabled=False, label_visibility="visible")
                         tonnage_edit=2*quantity_edit
-                        shipped_edit=st.number_input("Shipped # of Units",to_edit[vessel][release_order_number][sales_order_item_edit]["shipped"],disabled=True)
+                        shipped_edit=st.number_input("Shipped # of Units",to_edit[release_order_number][sales_order_item_edit]["shipped"],disabled=True)
                         remaining_edit=st.number_input("Remaining # of Units",
-                                                       quantity_edit-to_edit[vessel][release_order_number][sales_order_item_edit]["shipped"],disabled=True)
+                                                       quantity_edit-to_edit[release_order_number][sales_order_item_edit]["shipped"],disabled=True)
                     elif add:
-                        release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/KIRKENES-2304/")] if i not in junk]))
-                        
-                        
+                        release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/ORDERS/")] if i not in junk]))
+                        to_add=gcp_download(target_bucket,rf"release_orders/ORDERS/{release_order_number}.json")
+                        to_add=json.loads(to_edit)
+                        po_number_add=st.text_input("PO No",to_add[release_order_number]["po_number"],disabled=False)
+                        destination_add=st.text_input("Destination",to_edit[release_order_number]["destination"],disabled=False)
+                        sales_order_item_add=st.text_input("Sales Order Item",disabled=False)
+                        vessel_add=vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"],key="popoa")
+                        ocean_bill_of_lading_add=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel_add].keys(),key="treerw")  
+                        wrap_add=st.text_input("Grade",batch_mapping[vessel_add][ocean_bill_of_lading_add]["grade"],disabled=True) 
+                        batch_add=st.text_input("Batch No",batch_mapping[vessel_add][ocean_bill_of_lading_add]["batch"],disabled=False)
+                        dryness_add=st.text_input("Dryness",batch_mapping[vessel_add][ocean_bill_of_lading_add]["dryness"],disabled=False)
+                        admt_add=st.text_input("ADMT PER UNIT",round(int(batch_mapping[vessel_add][ocean_bill_of_lading_add]["dryness"])/90,6),disabled=False)
+                        unitized_add=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
+                        quantity_add=st.number_input("Quantity of Units", 0, disabled=False, label_visibility="visible")
+                        tonnage_add=2*quantity_edit
+                        shipped_add=0
+                        remaining_add=st.number_input("Remaining # of Units", quantity_add,disabled=True)
+                        transport_type_add=st.radio("Select Transport Type",("TRUCK","RAIL"))
+                        carrier_code_add=st.selectbox("Carrier Code",[f"{key}-{item}" for key,item in carrier_list.items()])            
                     else:  ### If creating new release order
                         
                         release_order_number=st.text_input("Release Order Number")
                         po_number=st.text_input("PO No")
-                        
                         destination_list=list(set([f"{i}-{j}" for i,j in zip(mill_df["Group"].tolist(),mill_df["Final Destination"].tolist())]))
                         #st.write(destination_list)
                         destination=st.selectbox("SELECT DESTINATION",destination_list)
                         sales_order_item=st.text_input("Sales Order Item")  
+                        vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])
                         ocean_bill_of_lading=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel].keys())   #######
                         wrap=st.text_input("Grade",batch_mapping[vessel][ocean_bill_of_lading]["grade"],disabled=True)   ##### batch mapping injection
                         batch=st.text_input("Batch No",batch_mapping[vessel][ocean_bill_of_lading]["batch"],disabled=True)   #####
@@ -2196,20 +2216,32 @@ if authentication_status:
                     if create_release_order:
                         
                         if add: 
-                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
+                            data=gcp_download(target_bucket,rf"release_orders/ORDER/{release_order_number}.json")
                             to_edit=json.loads(data)
-                            temp=add_release_order_data(to_edit,vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
-                            st.write(f"ADDED sales order item {sales_order_item} to release order {release_order_number}!")
+                            temp=add_release_order_data(to_add,release_order_number,destination_add,po_number_add,sales_order_item_add,vessel_add,batch_add,ocean_bill_of_lading_add,wrap_add,dryness_add,unitized_add,quantity_add,tonnage_add,transport_type_add,carrier_code_add)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"release_orders/ORDERS/{release_order_number}.json")
+                            blob.upload_from_string(temp)
+                            st.success(f"ADDED sales order item {sales_order_item} to release order {release_order_number}!")
                         elif edit:
-                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{release_order_number}.json")
+                            data=gcp_download(target_bucket,rf"release_orders/ORDERS/{release_order_number}.json")
                             to_edit=json.loads(data)
                             temp=edit_release_order_data(to_edit,sales_order_item_edit,quantity_edit,tonnage_edit,shipped_edit,remaining_edit)
-                            st.write(f"Edited release order {release_order_number} successfully!")
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"release_orders/ORDERS/{release_order_number}.json")
+                            blob.upload_from_string(temp)
+                            st.success(f"Edited release order {release_order_number} successfully!")
                             
                         else:
                             
-                            temp=store_release_order_data(vessel,release_order_number,destination,po_number,sales_order_item,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
-                     
+                            temp=store_release_order_data(release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"release_orders/ORDERS/{release_order_number}.json")
+                            blob.upload_from_string(temp)
+                            st.success(f"Edited release order {release_order_number} successfully!")
                         
                         try:
                             junk=gcp_download(target_bucket,rf"release_orders/{vessel}/junk_release.json")
@@ -2227,23 +2259,19 @@ if authentication_status:
                             pass
                         
 
-                        storage_client = storage.Client()
-                        bucket = storage_client.bucket(target_bucket)
-                        blob = bucket.blob(rf"release_orders/{vessel}/{release_order_number}.json")
-                        blob.upload_from_string(temp)
+                        
 
                         if edit:
-                            release_order_database[vessel][release_order_number][sales_order_item_edit]={"destination":destination_edit,"total":quantity_edit,"remaining":remaining_edit}
+                            release_order_database[release_order_number][sales_order_item_edit]={"destination":destination_edit,"vessel":vessel_edit,"total":quantity_edit,"remaining":remaining_edit}
+                        elif add:
+                            if sales_order_item not in release_order_database[release_order_number]:
+                                release_order_database[release_order_number][sales_order_item]={}
+                                release_order_database[release_order_number][sales_order_item]={"destination":destination_add,"vessel":vessel_add,"total":quantity_add,"remaining":quantity_add}
                         else:
-                            if vessel not in release_order_database:
-                                release_order_database[vessel]={}
-                                release_order_database[vessel][release_order_number]={}
-                            else:
-                                release_order_database[vessel][release_order_number]={}
-                            release_order_database[vessel][release_order_number][sales_order_item]={}
+                            release_order_database[release_order_number]={}
+                            release_order_database[release_order_number][sales_order_item]={}
                             
-                            release_order_database[vessel][release_order_number][sales_order_item]={}
-                            release_order_database[vessel][release_order_number][sales_order_item]={"destination":destination,"total":quantity,"remaining":quantity}
+                            release_order_database[release_order_number][sales_order_item]={"destination":destination,"vessel":vessel,"total":quantity,"remaining":quantity}
                             st.write(f"Recorded Release Order - {release_order_number} for Item No: {sales_order_item}")
                         
                         release_orders_json=json.dumps(release_order_database)
@@ -2258,29 +2286,26 @@ if authentication_status:
                     rls_tab1,rls_tab2,rls_tab3=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS","ENTER MF NUMBERS"])
                     data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")  #################
                     try:
-                        release_order_dictionary=json.loads(data)
+                        release_order_database=json.loads(data)
                     except: 
                         release_order_dictionary={}
                     
                     with rls_tab1:
                         
-                        completed_release_orders=[]
-                        if vessel not in  release_order_database:
-                            st.warning("Vessel Not in Database yet. Create the first release order to put vessel into the database.")
+                        completed_release_orders=[]   #### Check if any of them are completed.
+                     
                         else:
-                            for key in release_order_database[vessel]:
+                            for key in release_order_database:
                                 not_yet=0
-                                #st.write(key)
-                                for sales in release_order_database[vessel][key]:
-                                    #st.write(sales)
-                                    if release_order_database[vessel][key][sales]["remaining"]>0:
+                                for sales in release_order_database[key]:
+                                    if release_order_database[key][sales]["remaining"]>0:
                                         not_yet=1
                                     else:
-                                        pass#st.write(f"{key}{sales} seems to be finished")
+                                        pass
                                 if not_yet==0:
                                     completed_release_orders.append(key)
                         
-                            files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/{vessel}/")]   ### REMOVE json extension from name
+                            files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/ORDERS/")]   ### REMOVE json extension from name
                             
                             junk=gcp_download(target_bucket,rf"junk_release.json")
                             junk=json.loads(junk)
@@ -2289,9 +2314,9 @@ if authentication_status:
                             release_order_dest_map={}
                             try:
                                 
-                                for i in release_order_dictionary[vessel]:
-                                    for sales in release_order_dictionary[vessel][i]:
-                                        release_order_dest_map[i]=release_order_dictionary[vessel][i][sales]["destination"]
+                                for i in release_order_database:
+                                    for sales in release_order_database[i]:
+                                        release_order_dest_map[i]=release_order_database[i][sales]["destination"]
                                 
                                 destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder if i!=""]
                             

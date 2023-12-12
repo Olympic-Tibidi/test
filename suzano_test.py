@@ -2110,7 +2110,7 @@ if authentication_status:
                     fig = go.Figure()
                     
                     # Add bars for total quantities
-                    fig.add_trace(go.Bar(x=release_orders, y=total_quantities, name='Total', mode="markers+text", marker_color='lightgray',text=["Text D", "Text E", "Text F"]))
+                    fig.add_trace(go.Bar(x=release_orders, y=total_quantities, name='Total', marker_color='lightgray'))
                    
  
                     # Add filled bars for shipped quantities

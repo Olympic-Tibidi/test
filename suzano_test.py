@@ -2128,7 +2128,7 @@ if authentication_status:
                                       xaxis_title='Release Orders',
                                       yaxis_title='Quantities',
                                       barmode='overlay',
-                                      xaxis=dict(tickangle=-90))
+                                      xaxis=dict(tickangle=-90, type='category'))
                     #fig.update_layout(annotations=annotations)
                     # Show the plot
                     st.plotly_chart(fig)

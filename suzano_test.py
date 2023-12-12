@@ -2201,7 +2201,7 @@ if authentication_status:
                         #st.write(destination_list)
                         destination=st.selectbox("SELECT DESTINATION",destination_list)
                         sales_order_item=st.text_input("Sales Order Item")  
-                        vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])
+                        vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"],key="tre")
                         ocean_bill_of_lading=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel].keys())   #######
                         wrap=st.text_input("Grade",batch_mapping[vessel][ocean_bill_of_lading]["grade"],disabled=True)   ##### batch mapping injection
                         batch=st.text_input("Batch No",batch_mapping[vessel][ocean_bill_of_lading]["batch"],disabled=True)   #####

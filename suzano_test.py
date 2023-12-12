@@ -4614,7 +4614,7 @@ if authentication_status:
         data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
         bill_of_ladings=json.loads(data)
         mill_info=json.loads(gcp_download(target_bucket,rf"mill_info.json"))
-        inv1,inv2,inv3,inv4,inv5=st.tabs(["DAILY ACTION","SUZANO DAILY REPORTS","EDI BANK","MAIN INVENTORY","SUZANO MILL SHIPMENT SCHEDULE/PROGRESS"])
+        inv1,inv2,inv3,inv4,inv5,inv6=st.tabs(["DAILY ACTION","SUZANO DAILY REPORTS","EDI BANK","MAIN INVENTORY","SUZANO MILL SHIPMENT SCHEDULE/PROGRESS","RELEASE ORDER STATUS"])
         with inv1:
             
             daily1,daily2,daily3=st.tabs(["TODAY'SHIPMENTS","TRUCKS ENROUTE","TRUCKS AT DESTINATION"])

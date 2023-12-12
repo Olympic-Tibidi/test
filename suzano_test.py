@@ -237,7 +237,7 @@ def store_release_order_data(release_order_number,destination,po_number,sales_or
         "remaining":quantity       
         }}              
     }
-    }
+    
                          
 
     # Convert the dictionary to JSON format

@@ -3447,7 +3447,7 @@ if authentication_status:
             data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
             bill_of_ladings=json.loads(data)
             mill_info=json.loads(gcp_download(target_bucket,rf"mill_info.json"))
-            inv1,inv2,inv3,inv4,inv5=st.tabs(["DAILY ACTION","SUZANO DAILY REPORTS","EDI BANK","MAIN INVENTORY","SUZANO MILL SHIPMENT SCHEDULE/PROGRESS"])
+            inv1,inv2,inv3,inv4,inv5,inv6=st.tabs(["DAILY ACTION","SUZANO DAILY REPORTS","EDI BANK","MAIN INVENTORY","SUZANO MILL SHIPMENT SCHEDULE/PROGRESS","RELEASE ORDER STATUS"])
             with inv1:
                 
                 daily1,daily2,daily3=st.tabs(["TODAY'SHIPMENTS","TRUCKS ENROUTE","TRUCKS AT DESTINATION"])
@@ -3690,7 +3690,7 @@ if authentication_status:
                         st.markdown(f"**{len(alien_list)} units that are not on the shipping file found on {alien_vessel}**")
                         st.dataframe(alien_list)
                         
-                        
+                      
             with inv5:
                 inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
@@ -3738,7 +3738,69 @@ if authentication_status:
                     st.plotly_chart(fig)
 
 
-                    
+            with inv6:
+                
+                inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
+                ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                ro = pd.read_json(ro)
+                grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
+                bols=grouped_df.T.to_dict()
+                grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
+                info=grouped_df.T.to_dict()
+                for i in bols:
+                    for val in bols[i]:
+                        found_key = next((key for key in info.keys() if val in key), None)
+                        qt=info[found_key]['quantity']
+                        info.update({found_key:{'total':ro.loc[int(val),"KIRKENES-2304"]['001']['total'],
+                                              'shipped':qt,'remaining':ro.loc[int(val),"KIRKENES-2304"]['001']['remaining']}})
+                new=pd.DataFrame(info).T
+                new=new.reset_index()
+                new.groupby('level_1')['remaining'].sum()
+                
+                release_orders = [str(key[0]) for key in info.keys()]
+                release_orders=[str(i) for i in release_orders]
+                release_orders = pd.Categorical(release_orders)
+
+                total_quantities = [item['total'] for item in info.values()]
+                shipped_quantities = [item['shipped'] for item in info.values()]
+                remaining_quantities = [item['remaining'] for item in info.values()]
+                destinations = [key[2] for key in info.keys()]
+                # Calculate the percentage of shipped quantities
+                #percentage_shipped = [shipped / total * 100 for shipped, total in zip(shipped_quantities, total_quantities)]
+                
+                # Create a Plotly bar chart
+                fig = go.Figure()
+                
+                # Add bars for total quantities
+                fig.add_trace(go.Bar(x=release_orders, y=total_quantities, name='Total', marker_color='lightgray'))
+                
+                # Add filled bars for shipped quantities
+                fig.add_trace(go.Bar(x=release_orders, y=shipped_quantities, name='Shipped', marker_color='blue', opacity=0.7))
+                
+                # Add remaining quantities as separate scatter points
+                #fig.add_trace(go.Scatter(x=release_orders, y=remaining_quantities, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
+                
+                remaining_data = [remaining if remaining > 0 else None for remaining in remaining_quantities]
+                fig.add_trace(go.Scatter(x=release_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
+                
+                # Add destinations as annotations
+                annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(release_orders, total_quantities, destinations)]
+                #fig.update_layout(annotations=annotations)
+                
+                # Update layout
+                fig.update_layout(title='Shipment Status',
+                                  xaxis_title='Release Orders',
+                                  yaxis_title='Quantities',
+                                  barmode='overlay',
+                                  xaxis=dict(tickangle=-90, type='category'))
+                #fig.update_layout(annotations=annotations)
+                # Show the plot
+                relcol1,relcol2=st.columns([5,5])
+                with relcol1:
+                    st.dataframe(new)
+                with relcol2:
+                    st.plotly_chart(fig)
                    
                 
 
@@ -4824,7 +4886,70 @@ if authentication_status:
                 
                 st.plotly_chart(fig)
 
+        with inv6:
+            
+            
+            inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+            inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
+            ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+            ro = pd.read_json(ro)
+            grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
+            bols=grouped_df.T.to_dict()
+            grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
+            info=grouped_df.T.to_dict()
+            for i in bols:
+                for val in bols[i]:
+                    found_key = next((key for key in info.keys() if val in key), None)
+                    qt=info[found_key]['quantity']
+                    info.update({found_key:{'total':ro.loc[int(val),"KIRKENES-2304"]['001']['total'],
+                                          'shipped':qt,'remaining':ro.loc[int(val),"KIRKENES-2304"]['001']['remaining']}})
+            new=pd.DataFrame(info).T
+            new=new.reset_index()
+            new.groupby('level_1')['remaining'].sum()
+            
+            release_orders = [str(key[0]) for key in info.keys()]
+            release_orders=[str(i) for i in release_orders]
+            release_orders = pd.Categorical(release_orders)
 
+            total_quantities = [item['total'] for item in info.values()]
+            shipped_quantities = [item['shipped'] for item in info.values()]
+            remaining_quantities = [item['remaining'] for item in info.values()]
+            destinations = [key[2] for key in info.keys()]
+            # Calculate the percentage of shipped quantities
+            #percentage_shipped = [shipped / total * 100 for shipped, total in zip(shipped_quantities, total_quantities)]
+            
+            # Create a Plotly bar chart
+            fig = go.Figure()
+            
+            # Add bars for total quantities
+            fig.add_trace(go.Bar(x=release_orders, y=total_quantities, name='Total', marker_color='lightgray'))
+            
+            # Add filled bars for shipped quantities
+            fig.add_trace(go.Bar(x=release_orders, y=shipped_quantities, name='Shipped', marker_color='blue', opacity=0.7))
+            
+            # Add remaining quantities as separate scatter points
+            #fig.add_trace(go.Scatter(x=release_orders, y=remaining_quantities, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
+            
+            remaining_data = [remaining if remaining > 0 else None for remaining in remaining_quantities]
+            fig.add_trace(go.Scatter(x=release_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
+            
+            # Add destinations as annotations
+            annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(release_orders, total_quantities, destinations)]
+            #fig.update_layout(annotations=annotations)
+            
+            # Update layout
+            fig.update_layout(title='Shipment Status',
+                              xaxis_title='Release Orders',
+                              yaxis_title='Quantities',
+                              barmode='overlay',
+                              xaxis=dict(tickangle=-90, type='category'))
+            #fig.update_layout(annotations=annotations)
+            # Show the plot
+            relcol1,relcol2=st.columns([5,5])
+            with relcol1:
+                st.dataframe(new)
+            with relcol2:
+                st.plotly_chart(fig)
 
 
 

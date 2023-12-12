@@ -2092,7 +2092,7 @@ if authentication_status:
                     new=pd.DataFrame(info).T
                     new=new.reset_index()
                     new.groupby('level_1')['remaining'].sum()
-                    st.dataframe(new)
+                    
                     release_orders = [str(key[0]) for key in info.keys()]
                     release_orders=[str(i) for i in release_orders]
                     release_orders = pd.Categorical(release_orders)
@@ -2131,7 +2131,11 @@ if authentication_status:
                                       xaxis=dict(tickangle=-90, type='category'))
                     #fig.update_layout(annotations=annotations)
                     # Show the plot
-                    st.plotly_chart(fig)
+                    relcol1,relcol2=st.columns([5,5])
+                    with relcol1:
+                        st.dataframe(new)
+                    with relcol2:
+                        st.plotly_chart(fig)
                 
                 with release_order_tab1:
                     vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])  ###-###

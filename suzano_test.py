@@ -2092,11 +2092,11 @@ if authentication_status:
                     new=pd.DataFrame(info).T
                     new=new.reset_index()
                     new.groupby('level_1')['remaining'].sum()
-                    release_orders = [key[0] for key in data.keys()]
-                    total_quantities = [item['total'] for item in data.values()]
-                    shipped_quantities = [item['shipped'] for item in data.values()]
-                    remaining_quantities = [item['remaining'] for item in data.values()]
-                    destinations = [key[2] for key in data.keys()]
+                    release_orders = [key[0] for key in info.keys()]
+                    total_quantities = [item['total'] for item in info.values()]
+                    shipped_quantities = [item['shipped'] for item in info.values()]
+                    remaining_quantities = [item['remaining'] for item in info.values()]
+                    destinations = [key[2] for key in info.keys()]
                     # Calculate the percentage of shipped quantities
                     #percentage_shipped = [shipped / total * 100 for shipped, total in zip(shipped_quantities, total_quantities)]
                     

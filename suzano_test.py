@@ -2294,285 +2294,285 @@ if authentication_status:
                         
                         completed_release_orders=[]   #### Check if any of them are completed.
                      
-                        else:
-                            for key in release_order_database:
-                                not_yet=0
-                                for sales in release_order_database[key]:
-                                    if release_order_database[key][sales]["remaining"]>0:
-                                        not_yet=1
-                                    else:
-                                        pass
-                                if not_yet==0:
-                                    completed_release_orders.append(key)
                         
-                            files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/ORDERS/")]   ### REMOVE json extension from name
-                            
-                            junk=gcp_download(target_bucket,rf"junk_release.json")
-                            junk=json.loads(junk)
-                            files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
-                            files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
-                            release_order_dest_map={}
-                            try:
-                                
-                                for i in release_order_database:
-                                    for sales in release_order_database[i]:
-                                        release_order_dest_map[i]=release_order_database[i][sales]["destination"]
-                                
-                                destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder if i!=""]
-                            
-                                                                            
-                                requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
-                                requested_file=requested_file_.split(" ")[0]
-                                nofile=0
-                            except:
-                                st.write("NO RELEASE ORDERS FOR THIS VESSEL YET")
-                            try:
-                                data=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
-                                release_order_json = json.loads(data)
-                                
-                                
-                                target=release_order_json[vessel][requested_file]
-                                destination=target['destination']
-                                po_number=target["po_number"]
-                                if len(target.keys())==0:
-                                    nofile=1
-                               
-                                number_of_sales_orders=len(target)    ##### WRONG CAUSE THERE IS NOW DESTINATION KEYS
-                        
-                            
-                            except:
-                                nofile=1
-                            
-                            rel_col1,rel_col2,rel_col3,rel_col4=st.columns([2,2,2,2])
-                            #### DISPATCHED CLEANUP  #######
-                            
-                            try:
-                                dispatched=gcp_download(target_bucket,rf"dispatched.json")
-                                dispatched=json.loads(dispatched)
-                                #st.write(dispatched)
-                            except:
-                                pass
-                            to_delete=[]            
-                            try:
-                                for i in dispatched.keys():
-                                    if not dispatched[i].keys():
-                                        del dispatched[i]
-                                    
-                                for k in to_delete:
-                                    dispatched.pop(k)
-                                    #st.write("deleted k")
-                               
-                                json_data = json.dumps(dispatched)
-                                storage_client = storage.Client()
-                                bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"dispatched.json")
-                                blob.upload_from_string(json_data)
-                            except:
-                                pass
-                            
-                                
-                            
-                            
-                            
-                            ### END CLEAN DISPATCH
-            
-                            
-                                                  
-                            if nofile!=1 :         
-                                            
-                                targets=[i for i in target if i not in ["destination","po_number"]] ####doing this cause we set jason path {downloadedfile[vessel][releaseorder] as target. i have to use one of the keys (release order number) that is in target list
-                                sales_orders_completed=[k for k in targets if target[k]['remaining']<=0]
-                                
-                                with rel_col1:
-                                    
-                                    st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
-                                    st.markdown(f"**:blue[PO Number] : {target['po_number']}**")
-                                    if targets[0] in sales_orders_completed:
-                                        st.markdown(f"**:orange[Sales Order Item : {targets[0]} - COMPLETED]**")
-                                        target0_done=True
-                                        
-                                    else:
-                                        st.markdown(f"**:blue[Sales Order Item] : {targets[0]}**")
-                                    st.markdown(f"**:blue[Destination] : {target['destination']}**")
-                                    st.write(f"        Total Quantity-Tonnage : {target[targets[0]]['quantity']} Units - {target[targets[0]]['tonnage']} Metric Tons")
-                                    st.write(f"        Ocean Bill Of Lading : {target[targets[0]]['ocean_bill_of_lading']}")
-                                    st.write(f"        Batch : {target[targets[0]]['batch']} WIRES : {target[targets[0]]['unitized']}")
-                                    st.write(f"        Units Shipped : {target[targets[0]]['shipped']} Units - {2*target[targets[0]]['shipped']} Metric Tons")
-                                    if 0<target[targets[0]]['remaining']<=10:
-                                        st.markdown(f"**:red[Units Remaining : {target[targets[0]]['remaining']} Units - {2*target[targets[0]]['remaining']} Metric Tons]**")
-                                    elif target[targets[0]]['remaining']<=0:
-                                        st.markdown(f":orange[Units Remaining : {target[targets[0]]['remaining']} Units - {2*target[targets[0]]['remaining']} Metric Tons]")                                                                        
-                                    else:
-                                        st.write(f"       Units Remaining : {target[targets[0]]['remaining']} Units - {2*target[targets[0]]['remaining']} Metric Tons")
-                                with rel_col2:
-                                    try:
-                                    
-                                        st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
-                                        if targets[1] in sales_orders_completed:
-                                            st.markdown(f"**:orange[Sales Order Item : {targets[1]} - COMPLETED]**")                                    
-                                        else:
-                                            st.markdown(f"**:blue[Sales Order Item] : {targets[1]}**")
-                                        st.markdown(f"**:blue[Destination : {target['destination']}]**")
-                                        st.write(f"        Total Quantity-Tonnage : {target[targets[1]]['quantity']} Units - {target[targets[1]]['tonnage']} Metric Tons")                        
-                                        st.write(f"        Ocean Bill Of Lading : {target[targets[1]]['ocean_bill_of_lading']}")
-                                        st.write(f"        Batch : {target[targets[1]]['batch']} WIRES : {target[targets[1]]['unitized']}")
-                                        st.write(f"        Units Shipped : {target[targets[1]]['shipped']} Units - {2*target[targets[1]]['shipped']} Metric Tons")
-                                        if 0<target[targets[1]]['remaining']<=10:
-                                            st.markdown(f"**:red[Units Remaining : {target[targets[1]]['remaining']} Units - {2*target[targets[1]]['remaining']} Metric Tons]**")
-                                        elif target[targets[1]]['remaining']<=0:
-                                            st.markdown(f":orange[Units Remaining : {target[targets[1]]['remaining']} Units - {2*target[targets[1]]['remaining']} Metric Tons]")
-                                        else:
-                                            st.write(f"       Units Remaining : {target[targets[1]]['remaining']} Units - {2*target[targets[1]]['remaining']} Metric Tons")
-                                            
-                                    except:
-                                        pass
+                        for key in release_order_database:
+                            not_yet=0
+                            for sales in release_order_database[key]:
+                                if release_order_database[key][sales]["remaining"]>0:
+                                    not_yet=1
+                                else:
+                                    pass
+                            if not_yet==0:
+                                completed_release_orders.append(key)
                     
-                                with rel_col3:
-                                    try:
-                                    
-                                        st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
-                                        if targets[2] in sales_orders_completed:
-                                            st.markdown(f"**:orange[Sales Order Item : {targets[2]} - COMPLETED]**")
-                                        else:
-                                            st.markdown(f"**:blue[Sales Order Item] : {targets[2]}**")
-                                        st.markdown(f"**:blue[Destination : {target['destination']}]**")
-                                        st.write(f"        Total Quantity-Tonnage : {target[targets[2]]['quantity']} Units - {target[targets[2]]['tonnage']} Metric Tons")
-                                        st.write(f"        Ocean Bill Of Lading : {target[targets[2]]['ocean_bill_of_lading']}")
-                                        st.write(f"        Batch : {target[targets[2]]['batch']} WIRES : {target[targets[2]]['unitized']}")
-                                        st.write(f"        Units Shipped : {target[targets[2]]['shipped']} Units - {2*target[targets[2]]['shipped']} Metric Tons")
-                                        if 0<target[targets[2]]['remaining']<=10:
-                                            st.markdown(f"**:red[Units Remaining : {target[targets[2]]['remaining']} Units - {2*target[targets[2]]['remaining']} Metric Tons]**")
-                                        elif target[targets[2]]['remaining']<=0:
-                                            st.markdown(f":orange[Units Remaining : {target[targets[2]]['remaining']} Units - {2*target[targets[2]]['remaining']} Metric Tons]")
-                                        else:
-                                            st.write(f"       Units Remaining : {target[targets[2]]['remaining']} Units - {2*target[targets[2]]['remaining']} Metric Tons")
-                                        
-                                        
-                                    except:
-                                        pass
-                
-                                with rel_col4:
-                                    try:
-                                    
-                                        st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
-                                        if targets[3] in sales_orders_completed:
-                                            st.markdown(f"**:orange[Sales Order Item : {targets[3]} - COMPLETED]**")
-                                        else:
-                                            st.markdown(f"**:blue[Sales Order Item] : {targets[3]}**")
-                                        st.markdown(f"**:blue[Destination : {target['destination']}]**")
-                                        st.write(f"        Total Quantity-Tonnage : {target[targets[3]]['quantity']} Units - {target[targets[3]]['tonnage']} Metric Tons")
-                                        st.write(f"        Ocean Bill Of Lading : {target[targets[3]]['ocean_bill_of_lading']}")
-                                        st.write(f"        Batch : {target[targets[3]]['batch']} WIRES : {target[targets[3]]['unitized']}")
-                                        st.write(f"        Units Shipped : {target[targets[3]]['shipped']} Units - {2*target[targets[3]]['shipped']} Metric Tons")
-                                        if 0<target[targets[3]]['remaining']<=10:
-                                            st.markdown(f"**:red[Units Remaining : {target[targets[3]]['remaining']} Units - {2*target[targets[3]]['remaining']} Metric Tons]**")
-                                        elif target[targets[3]]['remaining']<=0:
-                                            st.markdown(f":orange[Units Remaining : {target[targets[3]]['remaining']} Units - {2*target[targets[3]]['remaining']} Metric Tons]")
-                                        else:
-                                            st.write(f"       Units Remaining : {target[targets[3]]['remaining']} Units - {2*target[targets[3]]['remaining']} Metric Tons")
-                                        
-                                        
-                                    except:
-                                        pass
-                                
-                                # dispatched={"vessel":vessel,"date":datetime.datetime.strftime(datetime.datetime.today()-datetime.timedelta(hours=7),"%b-%d-%Y"),
-                                         #               "time":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%H:%M:%S"),
-                                           #                 "release_order":requested_file,"sales_order":hangisi,"ocean_bill_of_lading":ocean_bill_of_lading,"batch":batch}
-                                
-                                hangisi=st.selectbox("**:green[SELECT SALES ORDER ITEM TO DISPATCH]**",([i for i in target if i not in sales_orders_completed and i not in ["destination","po_number"]]))
-                                dol1,dol2,dol3,dol4=st.columns([2,2,2,2])
-                                with dol1:
-                                   
-                                    if st.button("DISPATCH TO WAREHOUSE",key="lala"):
-                                       
-                                        
-                                        
-                                        dispatch=dispatched.copy()
-                                        try:
-                                            last=list(dispatch[requested_file].keys())[-1]
-                                            #dispatch[requested_file]={}
-                                            dispatch[requested_file][hangisi]={"vessel":vessel,"date":datetime.datetime.strftime(datetime.datetime.today()-datetime.timedelta(hours=7),"%b-%d-%Y"),
-                                                        "time":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%H:%M:%S"),
-                                                         "release_order":requested_file,"sales_order":hangisi,"destination":destination,"ocean_bill_of_lading":target[hangisi]["ocean_bill_of_lading"],"batch":target[hangisi]["batch"]}
-                                        except:
-                                            dispatch[requested_file]={}
-                                            dispatch[requested_file][hangisi]={"vessel":vessel,"date":datetime.datetime.strftime(datetime.datetime.today()-datetime.timedelta(hours=7),"%b-%d-%Y"),
-                                                        "time":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%H:%M:%S"),
-                                                         "release_order":requested_file,"sales_order":hangisi,"destination":destination,"ocean_bill_of_lading":target[hangisi]["ocean_bill_of_lading"],"batch":target[hangisi]["batch"]}
-                
-                                        
-                                        json_data = json.dumps(dispatch)
-                                        storage_client = storage.Client()
-                                        bucket = storage_client.bucket(target_bucket)
-                                        blob = bucket.blob(rf"dispatched.json")
-                                        blob.upload_from_string(json_data)
-                                        st.markdown(f"**DISPATCHED Release Order Number {requested_file} Item No : {hangisi} to Warehouse**")
-                                with dol4:
-                                    
-                                    if st.button("DELETE SALES ORDER ITEM",key="lalag"):
-                                        
-                                        data_d=gcp_download("olym_suzano",rf"release_orders/{vessel}/{requested_file}.json")
-                                        to_edit_d=json.loads(data_d)
-                                        to_edit_d[vessel][requested_file].pop(hangisi)
-                                        #st.write(to_edit_d)
-                                        
-                                        json_data = json.dumps(to_edit_d)
-                                        storage_client = storage.Client()
-                                        bucket = storage_client.bucket(target_bucket)
-                                        blob = bucket.blob(rf"release_orders/{vessel}/{requested_file}.json")
-                                        blob.upload_from_string(json_data)
-                                    if st.button("DELETE RELEASE ORDER ITEM!",key="laladg"):
-                                        junk=gcp_download(target_bucket,rf"junk_release.json")
-                                        junk=json.loads(junk)
-                                       
-                                        junk[requested_file]=1
-                                        json_data = json.dumps(junk)
-                                        storage_client = storage.Client()
-                                        bucket = storage_client.bucket(target_bucket)
-                                        blob = bucket.blob(rf"junk_release.json")
-                                        blob.upload_from_string(json_data)
-                                               
-                                with dol2:  
-                                    if st.button("CLEAR DISPATCH QUEUE!"):
-                                        dispatch={}
-                                        json_data = json.dumps(dispatch)
-                                        storage_client = storage.Client()
-                                        bucket = storage_client.bucket(target_bucket)
-                                        blob = bucket.blob(rf"dispatched.json")
-                                        blob.upload_from_string(json_data)
-                                        st.markdown(f"**CLEARED ALL DISPATCHES**")   
-                                with dol3:
-                                    dispatch=gcp_download(target_bucket,rf"dispatched.json")
-                                    dispatch=json.loads(dispatch)
-                                    try:
-                                        item=st.selectbox("CHOOSE ITEM",dispatch.keys())
-                                        if st.button("CLEAR DISPATCH ITEM"):                                       
-                                            del dispatch[item]
-                                            json_data = json.dumps(dispatch)
-                                            storage_client = storage.Client()
-                                            bucket = storage_client.bucket("olym_suzano")
-                                            blob = bucket.blob(rf"dispatched.json")
-                                            blob.upload_from_string(json_data)
-                                            st.markdown(f"**CLEARED DISPATCH ITEM {item}**")   
-                                    except:
-                                        pass
-                                st.markdown("**CURRENT DISPATCH QUEUE**")
-                                try:
-                                    dispatch=gcp_download(target_bucket,rf"dispatched.json")
-                                    dispatch=json.loads(dispatch)
-                                    try:
-                                        for dispatched_release in dispatch.keys():
-                                            #st.write(dispatched_release)
-                                            for sales in dispatch[dispatched_release].keys():
-                                                #st.write(sales)
-                                                st.markdown(f'**Release Order = {dispatched_release}, Sales Item : {sales}, Destination : {dispatch[dispatched_release][sales]["destination"]} .**')
-                                    except:
-                                        pass
-                                except:
-                                    st.write("NO DISPATCH ITEMS")
+                        files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/ORDERS/")]   ### REMOVE json extension from name
+                        
+                        junk=gcp_download(target_bucket,rf"junk_release.json")
+                        junk=json.loads(junk)
+                        files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
+                        files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
+                        release_order_dest_map={}
+                        try:
                             
-                            else:
-                                st.write("NO RELEASE ORDERS IN DATABASE")
+                            for i in release_order_database:
+                                for sales in release_order_database[i]:
+                                    release_order_dest_map[i]=release_order_database[i][sales]["destination"]
+                            
+                            destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder if i!=""]
+                        
+                                                                        
+                            requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
+                            requested_file=requested_file_.split(" ")[0]
+                            nofile=0
+                        except:
+                            st.write("NO RELEASE ORDERS FOR THIS VESSEL YET")
+                        try:
+                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
+                            release_order_json = json.loads(data)
+                            
+                            
+                            target=release_order_json[vessel][requested_file]
+                            destination=target['destination']
+                            po_number=target["po_number"]
+                            if len(target.keys())==0:
+                                nofile=1
+                           
+                            number_of_sales_orders=len(target)    ##### WRONG CAUSE THERE IS NOW DESTINATION KEYS
+                    
+                        
+                        except:
+                            nofile=1
+                        
+                        rel_col1,rel_col2,rel_col3,rel_col4=st.columns([2,2,2,2])
+                        #### DISPATCHED CLEANUP  #######
+                        
+                        try:
+                            dispatched=gcp_download(target_bucket,rf"dispatched.json")
+                            dispatched=json.loads(dispatched)
+                            #st.write(dispatched)
+                        except:
+                            pass
+                        to_delete=[]            
+                        try:
+                            for i in dispatched.keys():
+                                if not dispatched[i].keys():
+                                    del dispatched[i]
+                                
+                            for k in to_delete:
+                                dispatched.pop(k)
+                                #st.write("deleted k")
+                           
+                            json_data = json.dumps(dispatched)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"dispatched.json")
+                            blob.upload_from_string(json_data)
+                        except:
+                            pass
+                        
+                            
+                        
+                        
+                        
+                        ### END CLEAN DISPATCH
+        
+                        
+                                              
+                        if nofile!=1 :         
+                                        
+                            targets=[i for i in target if i not in ["destination","po_number"]] ####doing this cause we set jason path {downloadedfile[vessel][releaseorder] as target. i have to use one of the keys (release order number) that is in target list
+                            sales_orders_completed=[k for k in targets if target[k]['remaining']<=0]
+                            
+                            with rel_col1:
+                                
+                                st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
+                                st.markdown(f"**:blue[PO Number] : {target['po_number']}**")
+                                if targets[0] in sales_orders_completed:
+                                    st.markdown(f"**:orange[Sales Order Item : {targets[0]} - COMPLETED]**")
+                                    target0_done=True
+                                    
+                                else:
+                                    st.markdown(f"**:blue[Sales Order Item] : {targets[0]}**")
+                                st.markdown(f"**:blue[Destination] : {target['destination']}**")
+                                st.write(f"        Total Quantity-Tonnage : {target[targets[0]]['quantity']} Units - {target[targets[0]]['tonnage']} Metric Tons")
+                                st.write(f"        Ocean Bill Of Lading : {target[targets[0]]['ocean_bill_of_lading']}")
+                                st.write(f"        Batch : {target[targets[0]]['batch']} WIRES : {target[targets[0]]['unitized']}")
+                                st.write(f"        Units Shipped : {target[targets[0]]['shipped']} Units - {2*target[targets[0]]['shipped']} Metric Tons")
+                                if 0<target[targets[0]]['remaining']<=10:
+                                    st.markdown(f"**:red[Units Remaining : {target[targets[0]]['remaining']} Units - {2*target[targets[0]]['remaining']} Metric Tons]**")
+                                elif target[targets[0]]['remaining']<=0:
+                                    st.markdown(f":orange[Units Remaining : {target[targets[0]]['remaining']} Units - {2*target[targets[0]]['remaining']} Metric Tons]")                                                                        
+                                else:
+                                    st.write(f"       Units Remaining : {target[targets[0]]['remaining']} Units - {2*target[targets[0]]['remaining']} Metric Tons")
+                            with rel_col2:
+                                try:
+                                
+                                    st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
+                                    if targets[1] in sales_orders_completed:
+                                        st.markdown(f"**:orange[Sales Order Item : {targets[1]} - COMPLETED]**")                                    
+                                    else:
+                                        st.markdown(f"**:blue[Sales Order Item] : {targets[1]}**")
+                                    st.markdown(f"**:blue[Destination : {target['destination']}]**")
+                                    st.write(f"        Total Quantity-Tonnage : {target[targets[1]]['quantity']} Units - {target[targets[1]]['tonnage']} Metric Tons")                        
+                                    st.write(f"        Ocean Bill Of Lading : {target[targets[1]]['ocean_bill_of_lading']}")
+                                    st.write(f"        Batch : {target[targets[1]]['batch']} WIRES : {target[targets[1]]['unitized']}")
+                                    st.write(f"        Units Shipped : {target[targets[1]]['shipped']} Units - {2*target[targets[1]]['shipped']} Metric Tons")
+                                    if 0<target[targets[1]]['remaining']<=10:
+                                        st.markdown(f"**:red[Units Remaining : {target[targets[1]]['remaining']} Units - {2*target[targets[1]]['remaining']} Metric Tons]**")
+                                    elif target[targets[1]]['remaining']<=0:
+                                        st.markdown(f":orange[Units Remaining : {target[targets[1]]['remaining']} Units - {2*target[targets[1]]['remaining']} Metric Tons]")
+                                    else:
+                                        st.write(f"       Units Remaining : {target[targets[1]]['remaining']} Units - {2*target[targets[1]]['remaining']} Metric Tons")
+                                        
+                                except:
+                                    pass
+                
+                            with rel_col3:
+                                try:
+                                
+                                    st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
+                                    if targets[2] in sales_orders_completed:
+                                        st.markdown(f"**:orange[Sales Order Item : {targets[2]} - COMPLETED]**")
+                                    else:
+                                        st.markdown(f"**:blue[Sales Order Item] : {targets[2]}**")
+                                    st.markdown(f"**:blue[Destination : {target['destination']}]**")
+                                    st.write(f"        Total Quantity-Tonnage : {target[targets[2]]['quantity']} Units - {target[targets[2]]['tonnage']} Metric Tons")
+                                    st.write(f"        Ocean Bill Of Lading : {target[targets[2]]['ocean_bill_of_lading']}")
+                                    st.write(f"        Batch : {target[targets[2]]['batch']} WIRES : {target[targets[2]]['unitized']}")
+                                    st.write(f"        Units Shipped : {target[targets[2]]['shipped']} Units - {2*target[targets[2]]['shipped']} Metric Tons")
+                                    if 0<target[targets[2]]['remaining']<=10:
+                                        st.markdown(f"**:red[Units Remaining : {target[targets[2]]['remaining']} Units - {2*target[targets[2]]['remaining']} Metric Tons]**")
+                                    elif target[targets[2]]['remaining']<=0:
+                                        st.markdown(f":orange[Units Remaining : {target[targets[2]]['remaining']} Units - {2*target[targets[2]]['remaining']} Metric Tons]")
+                                    else:
+                                        st.write(f"       Units Remaining : {target[targets[2]]['remaining']} Units - {2*target[targets[2]]['remaining']} Metric Tons")
+                                    
+                                    
+                                except:
+                                    pass
+            
+                            with rel_col4:
+                                try:
+                                
+                                    st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
+                                    if targets[3] in sales_orders_completed:
+                                        st.markdown(f"**:orange[Sales Order Item : {targets[3]} - COMPLETED]**")
+                                    else:
+                                        st.markdown(f"**:blue[Sales Order Item] : {targets[3]}**")
+                                    st.markdown(f"**:blue[Destination : {target['destination']}]**")
+                                    st.write(f"        Total Quantity-Tonnage : {target[targets[3]]['quantity']} Units - {target[targets[3]]['tonnage']} Metric Tons")
+                                    st.write(f"        Ocean Bill Of Lading : {target[targets[3]]['ocean_bill_of_lading']}")
+                                    st.write(f"        Batch : {target[targets[3]]['batch']} WIRES : {target[targets[3]]['unitized']}")
+                                    st.write(f"        Units Shipped : {target[targets[3]]['shipped']} Units - {2*target[targets[3]]['shipped']} Metric Tons")
+                                    if 0<target[targets[3]]['remaining']<=10:
+                                        st.markdown(f"**:red[Units Remaining : {target[targets[3]]['remaining']} Units - {2*target[targets[3]]['remaining']} Metric Tons]**")
+                                    elif target[targets[3]]['remaining']<=0:
+                                        st.markdown(f":orange[Units Remaining : {target[targets[3]]['remaining']} Units - {2*target[targets[3]]['remaining']} Metric Tons]")
+                                    else:
+                                        st.write(f"       Units Remaining : {target[targets[3]]['remaining']} Units - {2*target[targets[3]]['remaining']} Metric Tons")
+                                    
+                                    
+                                except:
+                                    pass
+                            
+                            # dispatched={"vessel":vessel,"date":datetime.datetime.strftime(datetime.datetime.today()-datetime.timedelta(hours=7),"%b-%d-%Y"),
+                                     #               "time":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%H:%M:%S"),
+                                       #                 "release_order":requested_file,"sales_order":hangisi,"ocean_bill_of_lading":ocean_bill_of_lading,"batch":batch}
+                            
+                            hangisi=st.selectbox("**:green[SELECT SALES ORDER ITEM TO DISPATCH]**",([i for i in target if i not in sales_orders_completed and i not in ["destination","po_number"]]))
+                            dol1,dol2,dol3,dol4=st.columns([2,2,2,2])
+                            with dol1:
+                               
+                                if st.button("DISPATCH TO WAREHOUSE",key="lala"):
+                                   
+                                    
+                                    
+                                    dispatch=dispatched.copy()
+                                    try:
+                                        last=list(dispatch[requested_file].keys())[-1]
+                                        #dispatch[requested_file]={}
+                                        dispatch[requested_file][hangisi]={"vessel":vessel,"date":datetime.datetime.strftime(datetime.datetime.today()-datetime.timedelta(hours=7),"%b-%d-%Y"),
+                                                    "time":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%H:%M:%S"),
+                                                     "release_order":requested_file,"sales_order":hangisi,"destination":destination,"ocean_bill_of_lading":target[hangisi]["ocean_bill_of_lading"],"batch":target[hangisi]["batch"]}
+                                    except:
+                                        dispatch[requested_file]={}
+                                        dispatch[requested_file][hangisi]={"vessel":vessel,"date":datetime.datetime.strftime(datetime.datetime.today()-datetime.timedelta(hours=7),"%b-%d-%Y"),
+                                                    "time":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%H:%M:%S"),
+                                                     "release_order":requested_file,"sales_order":hangisi,"destination":destination,"ocean_bill_of_lading":target[hangisi]["ocean_bill_of_lading"],"batch":target[hangisi]["batch"]}
+            
+                                    
+                                    json_data = json.dumps(dispatch)
+                                    storage_client = storage.Client()
+                                    bucket = storage_client.bucket(target_bucket)
+                                    blob = bucket.blob(rf"dispatched.json")
+                                    blob.upload_from_string(json_data)
+                                    st.markdown(f"**DISPATCHED Release Order Number {requested_file} Item No : {hangisi} to Warehouse**")
+                            with dol4:
+                                
+                                if st.button("DELETE SALES ORDER ITEM",key="lalag"):
+                                    
+                                    data_d=gcp_download("olym_suzano",rf"release_orders/{vessel}/{requested_file}.json")
+                                    to_edit_d=json.loads(data_d)
+                                    to_edit_d[vessel][requested_file].pop(hangisi)
+                                    #st.write(to_edit_d)
+                                    
+                                    json_data = json.dumps(to_edit_d)
+                                    storage_client = storage.Client()
+                                    bucket = storage_client.bucket(target_bucket)
+                                    blob = bucket.blob(rf"release_orders/{vessel}/{requested_file}.json")
+                                    blob.upload_from_string(json_data)
+                                if st.button("DELETE RELEASE ORDER ITEM!",key="laladg"):
+                                    junk=gcp_download(target_bucket,rf"junk_release.json")
+                                    junk=json.loads(junk)
+                                   
+                                    junk[requested_file]=1
+                                    json_data = json.dumps(junk)
+                                    storage_client = storage.Client()
+                                    bucket = storage_client.bucket(target_bucket)
+                                    blob = bucket.blob(rf"junk_release.json")
+                                    blob.upload_from_string(json_data)
+                                           
+                            with dol2:  
+                                if st.button("CLEAR DISPATCH QUEUE!"):
+                                    dispatch={}
+                                    json_data = json.dumps(dispatch)
+                                    storage_client = storage.Client()
+                                    bucket = storage_client.bucket(target_bucket)
+                                    blob = bucket.blob(rf"dispatched.json")
+                                    blob.upload_from_string(json_data)
+                                    st.markdown(f"**CLEARED ALL DISPATCHES**")   
+                            with dol3:
+                                dispatch=gcp_download(target_bucket,rf"dispatched.json")
+                                dispatch=json.loads(dispatch)
+                                try:
+                                    item=st.selectbox("CHOOSE ITEM",dispatch.keys())
+                                    if st.button("CLEAR DISPATCH ITEM"):                                       
+                                        del dispatch[item]
+                                        json_data = json.dumps(dispatch)
+                                        storage_client = storage.Client()
+                                        bucket = storage_client.bucket("olym_suzano")
+                                        blob = bucket.blob(rf"dispatched.json")
+                                        blob.upload_from_string(json_data)
+                                        st.markdown(f"**CLEARED DISPATCH ITEM {item}**")   
+                                except:
+                                    pass
+                            st.markdown("**CURRENT DISPATCH QUEUE**")
+                            try:
+                                dispatch=gcp_download(target_bucket,rf"dispatched.json")
+                                dispatch=json.loads(dispatch)
+                                try:
+                                    for dispatched_release in dispatch.keys():
+                                        #st.write(dispatched_release)
+                                        for sales in dispatch[dispatched_release].keys():
+                                            #st.write(sales)
+                                            st.markdown(f'**Release Order = {dispatched_release}, Sales Item : {sales}, Destination : {dispatch[dispatched_release][sales]["destination"]} .**')
+                                except:
+                                    pass
+                            except:
+                                st.write("NO DISPATCH ITEMS")
+                        
+                        else:
+                            st.write("NO RELEASE ORDERS IN DATABASE")
                     with rls_tab2:
                         data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                         completed_release_orders=[]

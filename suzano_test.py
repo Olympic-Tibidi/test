@@ -3621,7 +3621,7 @@ if authentication_status:
                         alien_list=pd.DataFrame(alien_units[alien_vessel]).T
                         alien_list.reset_index(inplace=True)
                         alien_list.index=alien_list.index+1
-                        st.markdown(f"**{len(alien_list) units that are not on the shipping file found on {alien_vessel}**")
+                        st.markdown(f"**{len(alien_list)} units that are not on the shipping file found on {alien_vessel}**")
                         st.dataframe(alien_list)
                         
                         

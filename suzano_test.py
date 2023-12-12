@@ -3537,6 +3537,8 @@ if authentication_status:
             with inv4:
                 inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
+                ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                
                 
                 maintenance=False
                                 
@@ -3583,8 +3585,20 @@ if authentication_status:
                         combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
                         combined["Batch"]=combined["Batch"].astype(str)
                         
-                        #no_of_unaccounted=Inventory[Inventory["Accounted"]==False]["Bales"].sum()/8
-                        #st.write(f'**Unaccounted Units Registered : {no_of_unaccounted} Units/{no_of_unaccounted*2} Tons**')
+                        ro = pd.read_json(ro)
+                        grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
+                        bols=grouped_df.T.to_dict()
+                        grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
+                        info=grouped_df.T.to_dict()
+                        for i in bols:
+                            for val in bols[i]:
+                                found_key = next((key for key in info.keys() if val in key), None)
+                                qt=info[found_key]['quantity']
+                                info.update({found_key:{'total':ro.loc[int(val),"KIRKENES-2304"]['001']['total'],
+                                                      'shipped':qt,'remaining':ro.loc[int(val),"KIRKENES-2304"]['001']['remaining']}})
+                        new=pd.DataFrame(info).T
+                        new=new.reset_index()
+                        new.groupby('level_1')['remaining'].sum()
                         
                         temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
                         temp1=combined.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
@@ -3607,6 +3621,7 @@ if authentication_status:
                         alien_list=pd.DataFrame(alien_units[alien_vessel]).T
                         alien_list.reset_index(inplace=True)
                         alien_list.index=alien_list.index+1
+                        st.markdown(f"**{len(alien_list) units that are not on the shipping file found on {alien_vessel}**")
                         st.dataframe(alien_list)
                         
                         

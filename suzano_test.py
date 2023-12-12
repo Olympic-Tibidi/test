@@ -2092,7 +2092,9 @@ if authentication_status:
                     new=pd.DataFrame(info).T
                     new=new.reset_index()
                     new.groupby('level_1')['remaining'].sum()
+                    st.dataframe(new)
                     release_orders = [str(key[0]) for key in info.keys()]
+                    release_orders=[str(i) for i in release_orders]
                     total_quantities = [item['total'] for item in info.values()]
                     shipped_quantities = [item['shipped'] for item in info.values()]
                     remaining_quantities = [item['remaining'] for item in info.values()]

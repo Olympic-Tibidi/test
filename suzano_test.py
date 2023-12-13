@@ -2940,8 +2940,8 @@ if authentication_status:
                         else:
                             if bill_mapping[vessel][x[:-3]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-3]]["Batch"]!=batch:
                                     return False
-                                else:
-                                    return True
+                            else:
+                                return True
                     
                     flip=False 
                     first_load_input=None

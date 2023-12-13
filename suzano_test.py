@@ -2716,7 +2716,7 @@ if authentication_status:
                 except:
                     
                     pass
-                info=gcp_download(target_bucket,rf"release_orders/{vessel}/{work_order}.json")
+                info=gcp_download(target_bucket,rf"release_orders/ORDERS/{work_order}.json")
                 info=json.loads(info)
                 
                 

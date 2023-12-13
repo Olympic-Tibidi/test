@@ -2147,7 +2147,7 @@ if authentication_status:
                             st.plotly_chart(fig)
                 
                 with release_order_tab1:
-                    vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])  ###-###
+                    #vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])  ###-###
                    
                     add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER",disabled=True)
                     edit=st.checkbox("CHECK TO EDIT EXISTING RELEASE ORDER")

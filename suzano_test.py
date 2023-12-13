@@ -3845,6 +3845,7 @@ if authentication_status:
                     
                     try:
                         menu_destinations[rel_ord]=dispatched[rel_ord][sales]["destination"]
+                        
                         break
                     except:
                         pass
@@ -3872,7 +3873,7 @@ if authentication_status:
             except:
                 
                 pass
-            info=gcp_download(target_bucket,rf"release_orders/{vessel}/{work_order}.json")
+            info=gcp_download(target_bucket,rf"release_orders/ORDERS/{work_order}.json")
             info=json.loads(info)
             
             
@@ -3889,16 +3890,14 @@ if authentication_status:
             
             with load_col1:
                 wrap_dict={"ISU":"UNWRAPPED","ISP":"WRAPPED"}
-                wrap=info[vessel][current_release_order][current_sales_order]["grade"]
-                ocean_bill_of_=info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"]
-                #st.markdown(f'**Ocean Bill Of Lading : {ocean_bill_of_} - {wrap_dict[wrap]}**')
-                unitized=info[vessel][current_release_order][current_sales_order]["unitized"]
-                #st.markdown(rf'**{info[vessel][current_release_order][current_sales_order]["unitized"]}**')
-                quant_=info[vessel][current_release_order][current_sales_order]["quantity"]
+                wrap=info[current_release_order][current_sales_order]["grade"]
+                ocean_bill_of_=info[current_release_order][current_sales_order]["ocean_bill_of_lading"]
+                unitized=info[current_release_order][current_sales_order]["unitized"]
+                quant_=info[current_release_order][current_sales_order]["quantity"]
                 real_quant=int(math.floor(quant_))
-                ship_=info[vessel][current_release_order][current_sales_order]["shipped"]
+                ship_=info[current_release_order][current_sales_order]["shipped"]
                 ship_bale=(ship_-math.floor(ship_))*8
-                remaining=info[vessel][current_release_order][current_sales_order]["remaining"]                #######      DEFINED "REMAINING" HERE FOR CHECKS
+                remaining=info[current_release_order][current_sales_order]["remaining"]                #######      DEFINED "REMAINING" HERE FOR CHECKS
                 temp={f"<b>Release Order #":current_release_order,"<b>Destination":destination,"<b>VESSEL":vessel}
                 temp2={"<b>Ocean B/L":ocean_bill_of_,"<b>Type":wrap_dict[wrap],"<b>Prep":unitized}
                 temp3={"<b>Total Units":quant_,"<b>Shipped Units":ship_,"<b>Remaining Units":remaining}
@@ -3952,7 +3951,7 @@ if authentication_status:
             yes=False
           
             release_order_number=current_release_order
-            if info[vessel][current_release_order][current_sales_order]["transport_type"]=="TRUCK":
+            if info[current_release_order][current_sales_order]["transport_type"]=="TRUCK":
                 medium="TRUCK"
             else:
                 medium="RAIL"
@@ -3970,7 +3969,7 @@ if authentication_status:
                 delivery_date=datetime.datetime.today()-datetime.timedelta(hours=utc_difference)
                #eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
                 eta_date=delivery_date
-                carrier_code=info[vessel][current_release_order][current_sales_order]["carrier_code"]
+                carrier_code=info[current_release_order][current_sales_order]["carrier_code"]
                 transport_sequential_number="TRUCK"
                 transport_type="TRUCK"
                 placeholder = st.empty()
@@ -3979,12 +3978,39 @@ if authentication_status:
                 
                     mf=True
                     load_mf_number_issued=False
-                    carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
+                    carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
                     if carrier_code=="123456-KBX":
-                       if vessel in mf_numbers_for_load:
-                           
-                           if release_order_number in mf_numbers_for_load[vessel].keys():
-                               mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
+                       if release_order_number in mf_numbers_for_load.keys():
+                           mf_liste=[i for i in mf_numbers_for_load[release_order_number]]
+                           if len(mf_liste)>0:
+                               load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
+                               mf=True
+                               load_mf_number_issued=True
+                               yes=True
+                           else:
+                               st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                               mf=False
+                               yes=False
+                               load_mf_number_issued=False  
+                       else:
+                           st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                           mf=False
+                           yes=False
+                           load_mf_number_issued=False  
+                       
+                    foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
+                    foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
+                click_clear1 = st.button('CLEAR VEHICLE-QUANTITY INPUTS', key=34)
+                if click_clear1:
+                     with placeholder.container():
+                         vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=17)
+                
+                         mf=True
+                         load_mf_number_issued=False
+                         carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=19)
+                         if carrier_code=="123456-KBX":
+                           if release_order_number in mf_numbers_for_load.keys():
+                               mf_liste=[i for i in mf_numbers_for_load[release_order_number]]
                                if len(mf_liste)>0:
                                    load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
                                    mf=True
@@ -4000,44 +4026,6 @@ if authentication_status:
                                mf=False
                                yes=False
                                load_mf_number_issued=False  
-                       else:
-                           st.write(f"**:red[NO MF IN DATABASE FOR THIS VESSEL]**")
-                           mf=False
-                           yes=False
-                    foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
-                    foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
-                click_clear1 = st.button('CLEAR VEHICLE-QUANTITY INPUTS', key=34)
-                if click_clear1:
-                     with placeholder.container():
-                         vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=17)
-                
-                         mf=True
-                         load_mf_number_issued=False
-                         carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=19)
-                         if carrier_code=="123456-KBX":
-                            if vessel in mf_numbers_for_load:
-                               
-                                if release_order_number in mf_numbers_for_load[vessel].keys():
-                                    mf_liste=[i for i in mf_numbers_for_load[vessel][release_order_number]]
-                                    if len(mf_liste)>0:
-                                        load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=114551)
-                                        mf=True
-                                        load_mf_number_issued=True
-                                        yes=True
-                                    else:
-                                        st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
-                                        mf=False
-                                        yes=False
-                                        load_mf_number_issued=False  
-                                else:
-                                    st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
-                                    mf=False
-                                    yes=False
-                                    load_mf_number_issued=False  
-                            else:
-                                st.write(f"**:red[NO MF IN DATABASE FOR THIS VESSEL]**")
-                                mf=False
-                                yes=False
                          foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=18)
                          foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=1123)
                          
@@ -4052,14 +4040,14 @@ if authentication_status:
                     release_order_number=current_release_order
                     #sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
                     sales_order_item=current_sales_order
-                    #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
-                    ocean_bill_of_lading=info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"]
+                    #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
+                    ocean_bill_of_lading=info[current_release_order][current_sales_order]["ocean_bill_of_lading"]
                     current_ocean_bill_of_lading=ocean_bill_of_lading
-                    next_ocean_bill_of_lading=info[vessel][next_release_order][next_sales_order]["ocean_bill_of_lading"]
-                    #batch=st.text_input("Batch",info[vessel][current_release_order][current_sales_order]["batch"],disabled=True)
-                    batch=info[vessel][current_release_order][current_sales_order]["batch"]
-                    #grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
-                    grade=info[vessel][current_release_order][current_sales_order]["grade"]
+                    next_ocean_bill_of_lading=info[next_release_order][next_sales_order]["ocean_bill_of_lading"]
+                    #batch=st.text_input("Batch",info[current_release_order][current_sales_order]["batch"],disabled=True)
+                    batch=info[current_release_order][current_sales_order]["batch"]
+                    #grade=st.text_input("Grade",info[current_release_order][current_sales_order]["grade"],disabled=True)
+                    grade=info[current_release_order][current_sales_order]["grade"]
                     
                     #terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",disabled=False)
                     pass
@@ -4068,13 +4056,13 @@ if authentication_status:
                     release_order_number=current_release_order
                     #sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
                     sales_order_item=current_sales_order
-                    #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
-                    ocean_bill_of_lading=info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"]
+                    #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
+                    ocean_bill_of_lading=info[current_release_order][current_sales_order]["ocean_bill_of_lading"]
                     
-                     #batch=st.text_input("Batch",info[vessel][current_release_order][current_sales_order]["batch"],disabled=True)
-                    batch=info[vessel][current_release_order][current_sales_order]["batch"]
-                    #grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
-                    grade=info[vessel][current_release_order][current_sales_order]["grade"]
+                     #batch=st.text_input("Batch",info[current_release_order][current_sales_order]["batch"],disabled=True)
+                    batch=info[current_release_order][current_sales_order]["batch"]
+                    #grade=st.text_input("Grade",info[current_release_order][current_sales_order]["grade"],disabled=True)
+                    grade=info[current_release_order][current_sales_order]["grade"]
                     
            
                 updated_quantity=0
@@ -4340,8 +4328,8 @@ if authentication_status:
             with col3:
                 quantity=st.number_input("**Scanned Quantity of Units**",st.session_state.updated_quantity, key=None, help=None, on_change=None, disabled=True, label_visibility="visible")
                 st.markdown(f"**{quantity*2} TONS - {round(quantity*2*2204.62,1)} Pounds**")
-                #ADMT=st.text_input("ADMT",round(info[vessel][current_release_order][current_sales_order]["dryness"]/90,4)*st.session_state.updated_quantity,disabled=True)
-                admt=round(float(info[vessel][current_release_order][current_sales_order]["dryness"])/90*st.session_state.updated_quantity*2,4)
+                
+                admt=round(float(info[current_release_order][current_sales_order]["dryness"])/90*st.session_state.updated_quantity*2,4)
                 st.markdown(f"**ADMT= {admt} TONS**")
             manual_time=False   
             #st.write(faults)                  
@@ -4477,14 +4465,14 @@ if authentication_status:
                           
                             
                         if double_load:
-                            info[vessel][current_release_order][current_sales_order]["shipped"]=info[vessel][current_release_order][current_sales_order]["shipped"]+len(first_textsplit)
-                            info[vessel][current_release_order][current_sales_order]["remaining"]=info[vessel][current_release_order][current_sales_order]["remaining"]-len(first_textsplit)
-                            info[vessel][next_release_order][next_sales_order]["shipped"]=info[vessel][next_release_order][next_sales_order]["shipped"]+len(second_textsplit)
-                            info[vessel][next_release_order][next_sales_order]["remaining"]=info[vessel][next_release_order][next_sales_order]["remaining"]-len(second_textsplit)
+                            info[current_release_order][current_sales_order]["shipped"]=info[current_release_order][current_sales_order]["shipped"]+len(first_textsplit)
+                            info[current_release_order][current_sales_order]["remaining"]=info[current_release_order][current_sales_order]["remaining"]-len(first_textsplit)
+                            info[next_release_order][next_sales_order]["shipped"]=info[next_release_order][next_sales_order]["shipped"]+len(second_textsplit)
+                            info[next_release_order][next_sales_order]["remaining"]=info[next_release_order][next_sales_order]["remaining"]-len(second_textsplit)
                         else:
-                            info[vessel][current_release_order][current_sales_order]["shipped"]=info[vessel][current_release_order][current_sales_order]["shipped"]+quantity
-                            info[vessel][current_release_order][current_sales_order]["remaining"]=info[vessel][current_release_order][current_sales_order]["remaining"]-quantity
-                        if info[vessel][current_release_order][current_sales_order]["remaining"]<=0:
+                            info[current_release_order][current_sales_order]["shipped"]=info[current_release_order][current_sales_order]["shipped"]+quantity
+                            info[current_release_order][current_sales_order]["remaining"]=info[current_release_order][current_sales_order]["remaining"]-quantity
+                        if info[current_release_order][current_sales_order]["remaining"]<=0:
                             to_delete=[]
                             for release in dispatched.keys():
                                 if release==current_release_order:
@@ -4505,7 +4493,7 @@ if authentication_status:
                         json_data = json.dumps(info)
                         storage_client = storage.Client()
                         bucket = storage_client.bucket(target_bucket)
-                        blob = bucket.blob(rf"release_orders/{vessel}/{current_release_order}.json")
+                        blob = bucket.blob(rf"release_orders/ORDERS/{current_release_order}.json")
                         blob.upload_from_string(json_data)
                         success_container2=st.empty()
                         time.sleep(0.1)                            
@@ -4517,7 +4505,7 @@ if authentication_status:
                         except:
                             release_order_database={}
                        
-                        release_order_database[vessel][current_release_order][current_sales_order]["remaining"]=release_order_database[vessel][current_release_order][current_sales_order]["remaining"]-quantity
+                        release_order_database[current_release_order][current_sales_order]["remaining"]=release_order_database[current_release_order][current_sales_order]["remaining"]-quantity
                         release_order_database=json.dumps(release_order_database)
                         storage_client = storage.Client()
                         bucket = storage_client.bucket(target_bucket)
@@ -4560,7 +4548,7 @@ if authentication_status:
                         time.sleep(0.1)                            
                         success_container5.success(f"Uploaded EDI File",icon="✅")
                         if load_mf_number_issued:
-                            mf_numbers_for_load[vessel][release_order_number].remove(load_mf_number)
+                            mf_numbers_for_load[release_order_number].remove(load_mf_number)
                             mf_numbers_for_load=json.dumps(mf_numbers_for_load)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)
@@ -4593,6 +4581,7 @@ if authentication_status:
                         bucket = storage_client.bucket(target_bucket)
                         blob = bucket.blob(rf"alien_units.json")
                         blob.upload_from_string(alien_units)   
+                        
                         if len(this_shipment_aliens)>0:
                             subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
                             body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"

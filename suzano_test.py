@@ -2176,7 +2176,7 @@ if authentication_status:
                     elif add:
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/ORDERS/")][1:] if i not in junk]))
                         to_add=gcp_download(target_bucket,rf"release_orders/ORDERS/{release_order_number}.json")
-                        to_add=json.loads(to_edit)
+                        to_add=json.loads(to_add)
                         po_number_add=st.text_input("PO No",to_add[release_order_number]["po_number"],disabled=False)
                         destination_add=st.text_input("Destination",to_edit[release_order_number]["destination"],disabled=False)
                         sales_order_item_add=st.text_input("Sales Order Item",disabled=False)

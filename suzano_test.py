@@ -2594,9 +2594,9 @@ if authentication_status:
                             #comp_rel_order=json.loads(data)
                         
                         completed_release_order_dest_map={}
-                        for i in release_order_dictionary:
+                        for i in release_order_database:
                             if i in completed_release_orders:
-                                completed_release_order_dest_map[i]=release_order_dictionary[i][sales]#["destination"]
+                                completed_release_order_dest_map[i]=release_order_database[i][sales]#["destination"]
                         if len(pd.DataFrame(completed_release_order_dest_map).T)>=1:
                             st.write(pd.DataFrame(completed_release_order_dest_map).T)
                             

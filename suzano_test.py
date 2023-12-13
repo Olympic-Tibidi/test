@@ -2643,7 +2643,7 @@ if authentication_status:
                                     bucket = storage_client.bucket(target_bucket)
                                     blob = bucket.blob(rf"release_orders/mf_numbers.json")
                                     blob.upload_from_string(mf_data)
-                                st.table(pd.DataFrame(mf_numbers))
+                                st.write(mf_numbers)
                         else:
                             #st.write("NO RELEASE ORDER FOR THIS VESSEL IN DATABASE")
                             pass

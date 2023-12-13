@@ -2314,20 +2314,20 @@ if authentication_status:
                         junk=json.loads(junk)
                         files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
                         files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
-                        release_order_dest_map={}
-                        try:
-                            for i in release_order_database:
-                                for sales in release_order_database[i]:
-                                    release_order_dest_map[i]=release_order_database[i][sales]["destination"]
-                            
-                            destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder if i!=""]
                         
-                                                                        
-                            requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
-                            requested_file=requested_file_.split(" ")[0]
-                            nofile=0
-                        except:
-                            st.write("NO RELEASE ORDERS FOR THIS VESSEL YET")
+                        ###       Make Release order destinaiton map for dropdown menu
+                        
+                        release_order_dest_map={} 
+                        for i in release_order_database:
+                            for sales in release_order_database[i]:
+                                release_order_dest_map[i]=release_order_database[i][sales]["destination"]
+                        destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder if i!=""]
+
+                        ###       Dropdown menu
+                        
+                        requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
+                        requested_file=requested_file_.split(" ")[0]
+                        
                         try:
                             data=gcp_download(target_bucket,rf"release_orders/ORDERS/{requested_file}.json")
                             release_order_json = json.loads(data)

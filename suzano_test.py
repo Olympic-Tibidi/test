@@ -303,9 +303,9 @@ def process():
     bale_loadls=[]
     if double_load:
         for i in first_textsplit:
-            loadls.append("2DEV:"+current_release_order+" "*(10-len(current_release_order))+"000"+current_sales_order+a+tsn+i[:-2]+" "*(10-len(i[:-2]))+"0"*16+str(2000))
+            loadls.append("2DEV:"+current_release_order+" "*(10-len(current_release_order))+"000"+current_sales_order+a+tsn+i[:load_digit]+" "*(10-len(i[:load_digit]))+"0"*16+str(2000))
         for k in second_textsplit:
-            loadls.append("2DEV:"+next_release_order+" "*(10-len(next_release_order))+"000"+next_sales_order+a+tsn+k[:-3]+" "*(10-len(k[:-2]))+"0"*16+str(2000))
+            loadls.append("2DEV:"+next_release_order+" "*(10-len(next_release_order))+"000"+next_sales_order+a+tsn+k[:load_digit]+" "*(10-len(k[:load_digit]))+"0"*16+str(2000))
     else:
         for k in loads:
             loadls.append("2DEV:"+release_order_number+" "*(10-len(release_order_number))+"000"+sales_order_item+a+tsn+k+" "*(10-len(k))+"0"*(20-len(str(int(loads[k]*2000))))+str(int(loads[k]*2000)))
@@ -2815,6 +2815,7 @@ if authentication_status:
                    #eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
                     eta_date=delivery_date
                     carrier_code=info[current_release_order][current_sales_order]["carrier_code"]
+                    vessel=info[current_release_order][current_sales_order]["vessel"]
                     transport_sequential_number="TRUCK"
                     transport_type="TRUCK"
                     placeholder = st.empty()
@@ -2914,24 +2915,33 @@ if authentication_status:
                     live_quantity=0
                     if updated_quantity not in st.session_state:
                         st.session_state.updated_quantity=updated_quantity
+                    load_digit=-2 if vessel=="KIRKENES-2304" else -3
                     def audit_unit(x):
+                        if vessel=="KIRKENES-2304":
                             if len(x)>=10:
-                              
                                 if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-2]]["Batch"]!=batch:
-                                    
-                                    return False
-                                                                                
-                                else:
-                                    return True
-                    def audit_split(release,sales):
-                            if len(x)>=10:
-                                #st.write(bill_mapping[x[:-2]]["Batch"])
-                                
-                                if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=info[vessel][release][sales]["ocean_bill_of_lading"] and bill_mapping[vessel][x[:-2]]["Batch"]!=info[vessel][release][sales]["batch"]:
                                     st.write("**:red[WRONG B/L, DO NOT LOAD BELOW!]**")
                                     return False
                                 else:
                                     return True
+                        else:
+                            if bill_mapping[vessel][x[:-3]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-3]]["Batch"]!=batch:
+                                    return False
+                                else:
+                                    return True
+                    def audit_split(release,sales):
+                            if vessel=="KIRKENES-2304":
+                                if len(x)>=10:
+                                    if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-2]]["Batch"]!=batch:
+                                        st.write("**:red[WRONG B/L, DO NOT LOAD BELOW!]**")
+                                        return False
+                                    else:
+                                        return True
+                            else:
+                                if bill_mapping[vessel][x[:-3]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-3]]["Batch"]!=batch:
+                                        return False
+                                    else:
+                                        return True
                     
                     flip=False 
                     first_load_input=None
@@ -2982,8 +2992,8 @@ if authentication_status:
                 with col2:
                     click_clear = st.button('CLEAR SCANNED INPUTS', key=3)
                     if click_clear:
-                        load_input = placeholder1.text_area("**UNITS**",value="",height=300,key=2)#[:-2]
-                        bale_load_input=placeholder2.text_area("**INDIVIDUAL BALES**",value="",height=300,key=1121)#[:-2]
+                        load_input = placeholder1.text_area("**UNITS**",value="",height=300,key=2)#
+                        bale_load_input=placeholder2.text_area("**INDIVIDUAL BALES**",value="",height=300,key=1121)#
                     if load_input is not None :
                         textsplit = load_input.splitlines()
                         textsplit=[i for i in textsplit if len(i)>8]
@@ -3057,13 +3067,13 @@ if authentication_status:
                             alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                             for i,x in enumerate(textsplit):
                                 alternate_vessel=[ship for ship in bill_mapping if ship!=vessel][0]
-                                if x[:-2] in bill_mapping[alternate_vessel]:
+                                if x[:load_digit] in bill_mapping[alternate_vessel]:
                                     st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                     faults.append(1)
                                     st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")
                                 else:
                                     
-                                    if x[:-2] in bill_mapping[vessel]:
+                                    if x[:load_digit] in bill_mapping[vessel]:
                                         if audit_unit(x):
                                             if x in seen:
                                                 st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
@@ -3090,7 +3100,7 @@ if authentication_status:
                                             st.write("Verify that the unit came from the pile that has the units for this release order and click to inventory")
                                             if st.button("ADD UNIT TO INVENTORY",key=f"{x}"):
                                                 updated_bill=bill_mapping.copy()
-                                                updated_bill[vessel][x[:-2]]={"Batch":batch,"Ocean_bl":ocean_bill_of_lading}
+                                                updated_bill[vessel][x[:load_digit]]={"Batch":batch,"Ocean_bl":ocean_bill_of_lading}
                                                 updated_bill=json.dumps(updated_bill)
                                                 storage_client = storage.Client()
                                                 bucket = storage_client.bucket(target_bucket)
@@ -3126,13 +3136,13 @@ if authentication_status:
                             seen=set()
                             for i,x in enumerate(bale_textsplit):
                                 alternate_vessel=[ship for ship in bill_mapping if ship!=vessel][0]
-                                if bill_mapping[alternate_vessel][x[:-2]]:
+                                if bill_mapping[alternate_vessel][x[:load_digit]]:
                                     st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
                                     faults.append(1)
                                     st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")
                                 else:
                                     
-                                    if bill_mapping[vessel][x[:-2]]:
+                                    if bill_mapping[vessel][x[:load_digit]]:
                                         if audit_unit(x):
                                             if x in seen:
                                                 st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
@@ -3163,12 +3173,12 @@ if authentication_status:
                         
                         if yes:
                             pure_loads={**{k:0 for k in textsplit},**{k:0 for k in bale_textsplit}}
-                            loads={**{k[:-2]:0 for k in textsplit},**{k[:-2]:0 for k in bale_textsplit}}
+                            loads={**{k[:load_digit]:0 for k in textsplit},**{k[:load_digit]:0 for k in bale_textsplit}}
                             for k in textsplit:
-                                loads[k[:-2]]+=1
+                                loads[k[:load_digit]]+=1
                                 pure_loads[k]+=1
                             for k in bale_textsplit:
-                                loads[k[:-2]]+=0.125
+                                loads[k[:load_digit]]+=0.125
                                 pure_loads[k]+=0.125
                 with col3:
                     quantity=st.number_input("**Scanned Quantity of Units**",st.session_state.updated_quantity, key=None, help=None, on_change=None, disabled=True, label_visibility="visible")

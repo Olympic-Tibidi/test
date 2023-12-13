@@ -2275,7 +2275,7 @@ if authentication_status:
                             release_order_database[release_order_number][sales_order_item]={}
                             
                             release_order_database[release_order_number][sales_order_item]={"destination":destination,"vessel":vessel,"total":quantity,"remaining":quantity}
-                            st.write(f"Recorded Release Order - {release_order_number} for Item No: {sales_order_item}")
+                            st.write(f"Updated Release Order Database")
                         
                         release_orders_json=json.dumps(release_order_database)
                         storage_client = storage.Client()

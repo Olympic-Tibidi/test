@@ -2578,40 +2578,32 @@ if authentication_status:
                     with rls_tab2:
                         data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                         completed_release_orders=[]
-                        if vessel not in release_order_database:
-                            pass
-                        else:
-                            for key in release_order_database[vessel]:
-                                not_yet=0
-                                #st.write(key)
-                                for sales in release_order_database[vessel][key]:
-                                    #st.write(sales)
-                                    if release_order_database[vessel][key][sales]["remaining"]>0:
-                                        not_yet=1
-                                    else:
-                                        pass#st.write(f"{key}{sales} seems to be finished")
-                                if not_yet==0:
-                                    completed_release_orders.append(key)
+                        for key in release_order_database:
+                            not_yet=0
+                            for sales in release_order_database[key]:
+                                if release_order_database[key][sales]["remaining"]>0:
+                                    not_yet=1
+                                else:
+                                    pass
+                            if not_yet==0:
+                                completed_release_orders.append(key)
                         
-                        for completed in completed_release_orders:
+                        #for completed in completed_release_orders:
                             #st.write(completed)
-                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{completed}.json")
-                            comp_rel_order=json.loads(data)
+                            #data=gcp_download(target_bucket,rf"release_orders/ORDERS/{completed}.json")
+                            #comp_rel_order=json.loads(data)
                         
                         completed_release_order_dest_map={}
-                        if vessel in release_order_dictionary:
+                        for i in release_order_dictionary:
+                            if i in completed_release_orders:
+                                completed_release_order_dest_map[i]=release_order_dictionary[i][sales]#["destination"]
+                        if len(pd.DataFrame(completed_release_order_dest_map).T)>=1:
+                            st.write(pd.DataFrame(completed_release_order_dest_map).T)
                             
-                            for i in release_order_dictionary[vessel]:
-                                if i in completed_release_orders:
-                                    completed_release_order_dest_map[i]=release_order_dictionary[vessel][i][sales]#["destination"]
-                            if len(pd.DataFrame(completed_release_order_dest_map).T)>=1:
-                                st.write(pd.DataFrame(completed_release_order_dest_map).T)
-                                destinations_of_completed_release_orders=[f"{i} to {completed_release_order_dest_map[i]}" for i in completed_release_orders]
-                    
-                                                                    
-                                requested_file_=st.selectbox("COMPLETED RELEASE ORDERS",destinations_of_completed_release_orders,key=16)
-                                requested_file=requested_file_.split(" ")[0]
-                                nofile=0
+                            #destinations_of_completed_release_orders=[f"{i} to {completed_release_order_dest_map[i]}" for i in completed_release_orders]
+                            #requested_file_=st.selectbox("COMPLETED RELEASE ORDERS",destinations_of_completed_release_orders,key=16)
+                            #requested_file=requested_file_.split(" ")[0]
+                            #nofile=0
                     with rls_tab3:
                         mf_numbers_=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                         mf_numbers=json.loads(mf_numbers_)

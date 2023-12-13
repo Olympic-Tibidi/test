@@ -271,7 +271,7 @@ def add_release_order_data(file,release_order_number,destination,po_number,sales
     json_data = json.dumps(file)
     return json_data
 
-def edit_release_order_data(file,sales_order_item,quantity,tonnage,shipped,remaining):
+def edit_release_order_data(file,sales_order_item,quantity,tonnage,shipped,remaining,carrier_code):
        
     # Edit the loaded current dictionary.
     
@@ -279,6 +279,7 @@ def edit_release_order_data(file,sales_order_item,quantity,tonnage,shipped,remai
     file[release_order_number][sales_order_item]["tonnage"]= tonnage
     file[release_order_number][sales_order_item]["shipped"]= shipped
     file[release_order_number][sales_order_item]["remaining"]= remaining
+    file[release_order_number][sales_order_item]["carrier_code"]= carrier_code
     
     
        
@@ -2173,6 +2174,8 @@ if authentication_status:
                         shipped_edit=st.number_input("Shipped # of Units",to_edit[release_order_number][sales_order_item_edit]["shipped"],disabled=True)
                         remaining_edit=st.number_input("Remaining # of Units",
                                                        quantity_edit-to_edit[release_order_number][sales_order_item_edit]["shipped"],disabled=True)
+                        carrier_code_edit=st.selectbox("Carrier Code",[f"{key}-{item}" for key,item in carrier_list.items()],key="dsfdssa")          
+                        
                     elif add:
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/ORDERS/")][1:] if i not in junk]))
                         to_add=gcp_download(target_bucket,rf"release_orders/ORDERS/{release_order_number}.json")
@@ -2230,7 +2233,7 @@ if authentication_status:
                         elif edit:
                             data=gcp_download(target_bucket,rf"release_orders/ORDERS/{release_order_number}.json")
                             to_edit=json.loads(data)
-                            temp=edit_release_order_data(to_edit,sales_order_item_edit,quantity_edit,tonnage_edit,shipped_edit,remaining_edit)
+                            temp=edit_release_order_data(to_edit,sales_order_item_edit,quantity_edit,tonnage_edit,shipped_edit,remaining_edit,carrier_code_edit)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/ORDERS/{release_order_number}.json")

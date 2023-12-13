@@ -2327,10 +2327,11 @@ if authentication_status:
                         
                         requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
                         requested_file=requested_file_.split(" ")[0]
+                        st.write(requested_file)
                         
-                        try:
-                            data=gcp_download(target_bucket,rf"release_orders/ORDERS/{requested_file}.json")
-                            release_order_json = json.loads(data)
+                       
+                        data=gcp_download(target_bucket,rf"release_orders/ORDERS/{requested_file}.json")
+                        release_order_json = json.loads(data)
                             
                             
                             target=release_order_json[requested_file]

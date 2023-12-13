@@ -2552,7 +2552,7 @@ if authentication_status:
                                         del dispatch[item]
                                         json_data = json.dumps(dispatch)
                                         storage_client = storage.Client()
-                                        bucket = storage_client.bucket("olym_suzano")
+                                        bucket = storage_client.bucket(target_bucket)
                                         blob = bucket.blob(rf"dispatched.json")
                                         blob.upload_from_string(json_data)
                                         st.markdown(f"**CLEARED DISPATCH ITEM {item}**")   

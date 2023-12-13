@@ -2324,7 +2324,7 @@ if authentication_status:
                         destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder if i!=""]
 
                         ###       Dropdown menu
-                        
+                        nofile=0
                         requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
                         st.write(requested_file_)
                         requested_file=requested_file_.split(" ")[0]

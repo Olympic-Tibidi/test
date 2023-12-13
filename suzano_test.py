@@ -2219,7 +2219,7 @@ if authentication_status:
                     if create_release_order:
                         
                         if add: 
-                            data=gcp_download(target_bucket,rf"release_orders/ORDER/{release_order_number}.json")
+                            data=gcp_download(target_bucket,rf"release_orders/ORDERS/{release_order_number}.json")
                             to_edit=json.loads(data)
                             temp=add_release_order_data(to_add,release_order_number,destination_add,po_number_add,sales_order_item_add,vessel_add,batch_add,ocean_bill_of_lading_add,wrap_add,dryness_add,unitized_add,quantity_add,tonnage_add,transport_type_add,carrier_code_add)
                             storage_client = storage.Client()

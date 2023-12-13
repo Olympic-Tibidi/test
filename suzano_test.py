@@ -3666,42 +3666,45 @@ if authentication_status:
                             file_name=f'INVENTORY REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
                             mime='text/csv')            
                     with inv4tab2:
-                        combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
-                        combined["Batch"]=combined["Batch"].astype(str)
-                        
-                        inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                        inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
-                        ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                        ro = pd.read_json(ro)
-                        grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
-                        bols=grouped_df.T.to_dict()
-                        grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
-                        info=grouped_df.T.to_dict()
-                        for i in bols:
-                            for val in bols[i]:
-                                found_key = next((key for key in info.keys() if val in key), None)
-                                qt=info[found_key]['quantity']
-                                info.update({found_key:{'total':ro.loc[int(val),"KIRKENES-2304"]['001']['total'],
-                                                      'shipped':qt,'remaining':ro.loc[int(val),"KIRKENES-2304"]['001']['remaining']}})
-                        new=pd.DataFrame(info).T
-                        new=new.reset_index()
-                        new.groupby('level_1')['remaining'].sum()
-                        
-                        temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
-                        temp1=combined.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
-                        temp=pd.merge(temp, temp1, left_index=True, right_index=True, how='outer', suffixes=('_df1', '_df2'))
-                        temp=temp[["Bales","quantity","Remaining"]]
-                        temp.columns=["Total","Shipped","Remaining"]
-                        temp["Remaining"]=temp.Total-temp.Shipped
-                        temp.loc["TOTAL"]=temp.sum(axis=0)
-                        tempo=temp*2
-                        inv_col1,inv_col2=st.columns([2,2])
-                        with inv_col1:
-                            st.subheader("By Ocean BOL,UNITS")
-                            st.dataframe(temp)
-                        with inv_col2:
-                            st.subheader("By Ocean BOL,TONS")
-                            st.dataframe(tempo)
+                        try:
+                            combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
+                            combined["Batch"]=combined["Batch"].astype(str)
+                            
+                            inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                            inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
+                            ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                            ro = pd.read_json(ro)
+                            grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
+                            bols=grouped_df.T.to_dict()
+                            grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
+                            info=grouped_df.T.to_dict()
+                            for i in bols:
+                                for val in bols[i]:
+                                    found_key = next((key for key in info.keys() if val in key), None)
+                                    qt=info[found_key]['quantity']
+                                    info.update({found_key:{'total':ro.loc[int(val),"KIRKENES-2304"]['001']['total'],
+                                                          'shipped':qt,'remaining':ro.loc[int(val),"KIRKENES-2304"]['001']['remaining']}})
+                            new=pd.DataFrame(info).T
+                            new=new.reset_index()
+                            new.groupby('level_1')['remaining'].sum()
+                            
+                            temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
+                            temp1=combined.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
+                            temp=pd.merge(temp, temp1, left_index=True, right_index=True, how='outer', suffixes=('_df1', '_df2'))
+                            temp=temp[["Bales","quantity","Remaining"]]
+                            temp.columns=["Total","Shipped","Remaining"]
+                            temp["Remaining"]=temp.Total-temp.Shipped
+                            temp.loc["TOTAL"]=temp.sum(axis=0)
+                            tempo=temp*2
+                            inv_col1,inv_col2=st.columns([2,2])
+                            with inv_col1:
+                                st.subheader("By Ocean BOL,UNITS")
+                                st.dataframe(temp)
+                            with inv_col2:
+                                st.subheader("By Ocean BOL,TONS")
+                                st.dataframe(tempo)
+                        except:
+                            pass
                     with inv4tab3:
                         alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                         alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])

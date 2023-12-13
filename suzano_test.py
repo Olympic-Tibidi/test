@@ -2174,7 +2174,7 @@ if authentication_status:
                         remaining_edit=st.number_input("Remaining # of Units",
                                                        quantity_edit-to_edit[release_order_number][sales_order_item_edit]["shipped"],disabled=True)
                     elif add:
-                        release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/ORDERS/")] if i not in junk]))
+                        release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/ORDERS/")][1:] if i not in junk]))
                         to_add=gcp_download(target_bucket,rf"release_orders/ORDERS/{release_order_number}.json")
                         to_add=json.loads(to_edit)
                         po_number_add=st.text_input("PO No",to_add[release_order_number]["po_number"],disabled=False)

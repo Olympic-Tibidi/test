@@ -2226,7 +2226,7 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/ORDERS/{release_order_number}.json")
                             blob.upload_from_string(temp)
-                            st.success(f"ADDED sales order item {sales_order_item} to release order {release_order_number}!")
+                            st.success(f"ADDED sales order item {sales_order_item_add} to release order {release_order_number}!")
                         elif edit:
                             data=gcp_download(target_bucket,rf"release_orders/ORDERS/{release_order_number}.json")
                             to_edit=json.loads(data)

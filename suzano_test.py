@@ -2162,7 +2162,7 @@ if authentication_status:
                         destination_edit=st.text_input("Destination",to_edit[release_order_number]["destination"],disabled=False)
                         sales_order_item_edit=st.selectbox("Sales Order Item",list(to_edit[release_order_number].keys())[2:],disabled=False)
                         vessel_edit=vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"],key="poFpoa")
-                        ocean_bill_of_lading_edit=st.text_input("Ocean Bill Of Lading",to_edit[release_order_number][sales_order_item_edit]["ocean_bill_of_lading"],disabled=False)
+                        ocean_bill_of_lading_edit=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel_edit].keys(),key="trdfeerw") 
                         wrap_edit=st.text_input("Grade",to_edit[release_order_number][sales_order_item_edit]["grade"],disabled=False)
                         batch_edit=st.text_input("Batch No",to_edit[release_order_number][sales_order_item_edit]["batch"],disabled=False)
                         dryness_edit=st.text_input("Dryness",to_edit[release_order_number][sales_order_item_edit]["dryness"],disabled=False)

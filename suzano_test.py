@@ -3398,7 +3398,7 @@ if authentication_status:
                             file_path = 'temp_file.txt'  # Use the path of the temporary file
                     
                             
-                            upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}")
+                            upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{file_name}")
                             success_container5=st.empty()
                             time.sleep(0.1)                            
                             success_container5.success(f"Uploaded EDI File",icon="✅")
@@ -3602,10 +3602,10 @@ if authentication_status:
                 
 
             with inv3:
-                edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/KIRKENES-2304/")
+                edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
                 requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
                 try:
-                    requested_edi=gcp_download(target_bucket, rf"EDIS/KIRKENES-2304/{requested_edi_file}")
+                    requested_edi=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}")
                     st.text_area("EDI",requested_edi,height=400)
                     st.download_button(
                         label="DOWNLOAD EDI",
@@ -4764,10 +4764,10 @@ if authentication_status:
             
 
         with inv3:
-            edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/KIRKENES-2304/")
+            edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
             requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
             try:
-                requested_edi=gcp_download(target_bucket, rf"EDIS/KIRKENES-2304/{requested_edi_file}")
+                requested_edi=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}")
                 st.text_area("EDI",requested_edi,height=400)
                 st.download_button(
                     label="DOWNLOAD EDI",

@@ -2926,22 +2926,22 @@ if authentication_status:
                                     return True
                         else:
                             if bill_mapping[vessel][x[:-3]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-3]]["Batch"]!=batch:
+                                return False
+                            else:
+                                return True
+                    def audit_split(release,sales):
+                        if vessel=="KIRKENES-2304":
+                            if len(x)>=10:
+                                if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-2]]["Batch"]!=batch:
+                                    st.write("**:red[WRONG B/L, DO NOT LOAD BELOW!]**")
                                     return False
                                 else:
                                     return True
-                    def audit_split(release,sales):
-                            if vessel=="KIRKENES-2304":
-                                if len(x)>=10:
-                                    if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-2]]["Batch"]!=batch:
-                                        st.write("**:red[WRONG B/L, DO NOT LOAD BELOW!]**")
-                                        return False
-                                    else:
-                                        return True
-                            else:
-                                if bill_mapping[vessel][x[:-3]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-3]]["Batch"]!=batch:
-                                        return False
-                                    else:
-                                        return True
+                        else:
+                            if bill_mapping[vessel][x[:-3]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-3]]["Batch"]!=batch:
+                                    return False
+                                else:
+                                    return True
                     
                     flip=False 
                     first_load_input=None

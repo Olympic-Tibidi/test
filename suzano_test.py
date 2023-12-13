@@ -2160,7 +2160,7 @@ if authentication_status:
                         to_edit=json.loads(to_edit)
                         po_number_edit=st.text_input("PO No",to_edit[release_order_number]["po_number"],disabled=False)
                         destination_edit=st.text_input("Destination",to_edit[release_order_number]["destination"],disabled=False)
-                        sales_order_item_edit=st.text_input("Sales Order Item",list(to_edit[release_order_number].keys())[2:],disabled=False)
+                        sales_order_item_edit=st.selectbox("Sales Order Item",list(to_edit[release_order_number].keys())[2:],disabled=False)
                         vessel_edit=st.text_input("Vessel",to_edit[release_order_number][sales_order_item_edit]['vessel'],disabled=False)
                         ocean_bill_of_lading_edit=st.text_input("Ocean Bill Of Lading",to_edit[release_order_number][sales_order_item_edit]["ocean_bill_of_lading"],disabled=False)
                         wrap_edit=st.text_input("Grade",to_edit[release_order_number][sales_order_item_edit]["grade"],disabled=False)

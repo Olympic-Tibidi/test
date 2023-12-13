@@ -2607,7 +2607,7 @@ if authentication_status:
                     with rls_tab3:
                         mf_numbers_=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                         mf_numbers=json.loads(mf_numbers_)
-                        goahead=1
+                        goahead=True
                         if goahead:
                             
                             gp_release_orders=[i for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] and (release_order_database[i]["001"]["remaining"]>0|release_order_database[i]["001"]["remaining"]>0)]

@@ -2285,7 +2285,7 @@ if authentication_status:
                         
                 with release_order_tab2:  ##   RELEASE ORDER DATABASE ##
                     
-                    vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"],key="other")
+                    #vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"],key="other")
                     rls_tab1,rls_tab2,rls_tab3=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS","ENTER MF NUMBERS"])
                     data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")  #################
                     try:
@@ -2316,7 +2316,6 @@ if authentication_status:
                         files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
                         release_order_dest_map={}
                         try:
-                            
                             for i in release_order_database:
                                 for sales in release_order_database[i]:
                                     release_order_dest_map[i]=release_order_database[i][sales]["destination"]
@@ -2330,11 +2329,11 @@ if authentication_status:
                         except:
                             st.write("NO RELEASE ORDERS FOR THIS VESSEL YET")
                         try:
-                            data=gcp_download(target_bucket,rf"release_orders/{vessel}/{requested_file}.json")
+                            data=gcp_download(target_bucket,rf"release_orders/ORDERS/{requested_file}.json")
                             release_order_json = json.loads(data)
                             
                             
-                            target=release_order_json[vessel][requested_file]
+                            target=release_order_json[requested_file]
                             destination=target['destination']
                             po_number=target["po_number"]
                             if len(target.keys())==0:
@@ -2383,7 +2382,7 @@ if authentication_status:
                                               
                         if nofile!=1 :         
                                         
-                            targets=[i for i in target if i not in ["destination","po_number"]] ####doing this cause we set jason path {downloadedfile[vessel][releaseorder] as target. i have to use one of the keys (release order number) that is in target list
+                            targets=[i for i in target if i not in ["destination","po_number"]] ####doing this cause we set jason path {downloadedfile[releaseorder] as target. i have to use one of the keys (release order number) that is in target list
                             sales_orders_completed=[k for k in targets if target[k]['remaining']<=0]
                             
                             with rel_col1:

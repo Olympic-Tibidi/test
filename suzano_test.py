@@ -3307,14 +3307,14 @@ if authentication_status:
                               
                                 
                             if double_load:
-                                info[vessel][current_release_order][current_sales_order]["shipped"]=info[vessel][current_release_order][current_sales_order]["shipped"]+len(first_textsplit)
-                                info[vessel][current_release_order][current_sales_order]["remaining"]=info[vessel][current_release_order][current_sales_order]["remaining"]-len(first_textsplit)
-                                info[vessel][next_release_order][next_sales_order]["shipped"]=info[vessel][next_release_order][next_sales_order]["shipped"]+len(second_textsplit)
-                                info[vessel][next_release_order][next_sales_order]["remaining"]=info[vessel][next_release_order][next_sales_order]["remaining"]-len(second_textsplit)
+                                info[current_release_order][current_sales_order]["shipped"]=info[current_release_order][current_sales_order]["shipped"]+len(first_textsplit)
+                                info[current_release_order][current_sales_order]["remaining"]=info[current_release_order][current_sales_order]["remaining"]-len(first_textsplit)
+                                info[next_release_order][next_sales_order]["shipped"]=info[next_release_order][next_sales_order]["shipped"]+len(second_textsplit)
+                                info[next_release_order][next_sales_order]["remaining"]=info[next_release_order][next_sales_order]["remaining"]-len(second_textsplit)
                             else:
-                                info[vessel][current_release_order][current_sales_order]["shipped"]=info[vessel][current_release_order][current_sales_order]["shipped"]+quantity
-                                info[vessel][current_release_order][current_sales_order]["remaining"]=info[vessel][current_release_order][current_sales_order]["remaining"]-quantity
-                            if info[vessel][current_release_order][current_sales_order]["remaining"]<=0:
+                                info[current_release_order][current_sales_order]["shipped"]=info[current_release_order][current_sales_order]["shipped"]+quantity
+                                info[current_release_order][current_sales_order]["remaining"]=info[current_release_order][current_sales_order]["remaining"]-quantity
+                            if info[current_release_order][current_sales_order]["remaining"]<=0:
                                 to_delete=[]
                                 for release in dispatched.keys():
                                     if release==current_release_order:
@@ -3335,7 +3335,7 @@ if authentication_status:
                             json_data = json.dumps(info)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"release_orders/{vessel}/{current_release_order}.json")
+                            blob = bucket.blob(rf"release_orders/ORDERS/{current_release_order}.json")
                             blob.upload_from_string(json_data)
                             success_container2=st.empty()
                             time.sleep(0.1)                            
@@ -3347,7 +3347,7 @@ if authentication_status:
                             except:
                                 release_order_database={}
                            
-                            release_order_database[vessel][current_release_order][current_sales_order]["remaining"]=release_order_database[vessel][current_release_order][current_sales_order]["remaining"]-quantity
+                            release_order_database[current_release_order][current_sales_order]["remaining"]=release_order_database[current_release_order][current_sales_order]["remaining"]-quantity
                             release_order_database=json.dumps(release_order_database)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)
@@ -3390,7 +3390,7 @@ if authentication_status:
                             time.sleep(0.1)                            
                             success_container5.success(f"Uploaded EDI File",icon="✅")
                             if load_mf_number_issued:
-                                mf_numbers_for_load[vessel][release_order_number].remove(load_mf_number)
+                                mf_numbers_for_load[release_order_number].remove(load_mf_number)
                                 mf_numbers_for_load=json.dumps(mf_numbers_for_load)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)

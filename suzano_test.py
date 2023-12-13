@@ -2188,7 +2188,7 @@ if authentication_status:
                         admt_add=st.text_input("ADMT PER UNIT",round(int(batch_mapping[vessel_add][ocean_bill_of_lading_add]["dryness"])/90,6),disabled=False)
                         unitized_add=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
                         quantity_add=st.number_input("Quantity of Units", 0, disabled=False, label_visibility="visible")
-                        tonnage_add=2*quantity_edit
+                        tonnage_add=2*quantity_add
                         shipped_add=0
                         remaining_add=st.number_input("Remaining # of Units", quantity_add,disabled=True)
                         transport_type_add=st.radio("Select Transport Type",("TRUCK","RAIL"))

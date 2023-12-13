@@ -1955,10 +1955,10 @@ if authentication_status:
                         csv=convert_df(admin_bill_of_ladings)
                         file_name=f'OLYMPIA_ALL_BILL_OF_LADINGS to {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
             with admin_tab3:
-                edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/KIRKENES-2304/")
+                edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
                 requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
                 try:
-                    requested_edi=gcp_download(target_bucket, rf"EDIS/KIRKENES-2304/{requested_edi_file}")
+                    requested_edi=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}")
                     st.text_area("EDI",requested_edi,height=400)                                
                    
                     st.download_button(

@@ -2079,7 +2079,7 @@ if authentication_status:
               
                 release_order_tab1,release_order_tab2,release_order_tab3=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE","RELEASE ORDER STATUS"])
                 with release_order_tab3:
-                    maintenance=True
+                    maintenance=False
                     if not maintenance:
                         
                         inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
@@ -2329,9 +2329,8 @@ if authentication_status:
                         ###       Dropdown menu
                         nofile=0
                         requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
-                        st.write(requested_file_)
                         requested_file=requested_file_.split(" ")[0]
-                        st.write(requested_file)
+                 
                         
                        
                         data=gcp_download(target_bucket,rf"release_orders/ORDERS/{requested_file}.json")
@@ -2721,7 +2720,7 @@ if authentication_status:
                 info=gcp_download(target_bucket,rf"release_orders/ORDERS/{work_order}.json")
                 info=json.loads(info)
                 
-                
+                vessel=info[current_release_order][current_sales_order]["vessel"]
                 #if st.checkbox("CLICK TO LOAD MIXED SKU"):
                 #    try:
                   #      next_item=gcp_download("olym_suzano",rf"release_orders/{dispatched['2']['vessel']}/{dispatched['2']['release_order']}.json")
@@ -3385,8 +3384,8 @@ if authentication_status:
                             body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                             #st.write(body)           
                             sender = "warehouseoly@gmail.com"
-                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                            recipients = ["afsiny@portolympia.com"]
+                            recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                            #recipients = ["afsiny@portolympia.com"]
                             password = "xjvxkmzbpotzeuuv"
                     
                   
@@ -3895,7 +3894,7 @@ if authentication_status:
             info=gcp_download(target_bucket,rf"release_orders/ORDERS/{work_order}.json")
             info=json.loads(info)
             
-            
+            vessel=info[current_release_order][current_sales_order]["vessel"]
             #if st.checkbox("CLICK TO LOAD MIXED SKU"):
             #    try:
               #      next_item=gcp_download("olym_suzano",rf"release_orders/{dispatched['2']['vessel']}/{dispatched['2']['release_order']}.json")
@@ -3989,6 +3988,7 @@ if authentication_status:
                #eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
                 eta_date=delivery_date
                 carrier_code=info[current_release_order][current_sales_order]["carrier_code"]
+                vessel=info[current_release_order][current_sales_order]["vessel"]
                 transport_sequential_number="TRUCK"
                 transport_type="TRUCK"
                 placeholder = st.empty()
@@ -4088,24 +4088,33 @@ if authentication_status:
                 live_quantity=0
                 if updated_quantity not in st.session_state:
                     st.session_state.updated_quantity=updated_quantity
+                load_digit=-2 if vessel=="KIRKENES-2304" else -3
                 def audit_unit(x):
+                    if vessel=="KIRKENES-2304":
                         if len(x)>=10:
-                          
                             if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-2]]["Batch"]!=batch:
-                                
-                                return False
-                                                                            
-                            else:
-                                return True
-                def audit_split(release,sales):
-                        if len(x)>=10:
-                            #st.write(bill_mapping[x[:-2]]["Batch"])
-                            
-                            if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=info[vessel][release][sales]["ocean_bill_of_lading"] and bill_mapping[vessel][x[:-2]]["Batch"]!=info[vessel][release][sales]["batch"]:
                                 st.write("**:red[WRONG B/L, DO NOT LOAD BELOW!]**")
                                 return False
                             else:
                                 return True
+                    else:
+                        if bill_mapping[vessel][x[:-3]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-3]]["Batch"]!=batch:
+                            return False
+                        else:
+                            return True
+                def audit_split(release,sales):
+                    if vessel=="KIRKENES-2304":
+                        if len(x)>=10:
+                            if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-2]]["Batch"]!=batch:
+                                st.write("**:red[WRONG B/L, DO NOT LOAD BELOW!]**")
+                                return False
+                            else:
+                                return True
+                    else:
+                        if bill_mapping[vessel][x[:-3]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-3]]["Batch"]!=batch:
+                                return False
+                        else:
+                            return True
                 
                 flip=False 
                 first_load_input=None
@@ -4156,8 +4165,8 @@ if authentication_status:
             with col2:
                 click_clear = st.button('CLEAR SCANNED INPUTS', key=3)
                 if click_clear:
-                    load_input = placeholder1.text_area("**UNITS**",value="",height=300,key=2)#[:-2]
-                    bale_load_input=placeholder2.text_area("**INDIVIDUAL BALES**",value="",height=300,key=1121)#[:-2]
+                    load_input = placeholder1.text_area("**UNITS**",value="",height=300,key=2)#
+                    bale_load_input=placeholder2.text_area("**INDIVIDUAL BALES**",value="",height=300,key=1121)#
                 if load_input is not None :
                     textsplit = load_input.splitlines()
                     textsplit=[i for i in textsplit if len(i)>8]
@@ -4231,13 +4240,13 @@ if authentication_status:
                         alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                         for i,x in enumerate(textsplit):
                             alternate_vessel=[ship for ship in bill_mapping if ship!=vessel][0]
-                            if x[:-2] in bill_mapping[alternate_vessel]:
+                            if x[:load_digit] in bill_mapping[alternate_vessel]:
                                 st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                 faults.append(1)
                                 st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")
                             else:
                                 
-                                if x[:-2] in bill_mapping[vessel]:
+                                if x[:load_digit] in bill_mapping[vessel]:
                                     if audit_unit(x):
                                         if x in seen:
                                             st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
@@ -4264,7 +4273,7 @@ if authentication_status:
                                         st.write("Verify that the unit came from the pile that has the units for this release order and click to inventory")
                                         if st.button("ADD UNIT TO INVENTORY",key=f"{x}"):
                                             updated_bill=bill_mapping.copy()
-                                            updated_bill[vessel][x[:-2]]={"Batch":batch,"Ocean_bl":ocean_bill_of_lading}
+                                            updated_bill[vessel][x[:load_digit]]={"Batch":batch,"Ocean_bl":ocean_bill_of_lading}
                                             updated_bill=json.dumps(updated_bill)
                                             storage_client = storage.Client()
                                             bucket = storage_client.bucket(target_bucket)
@@ -4300,13 +4309,13 @@ if authentication_status:
                         seen=set()
                         for i,x in enumerate(bale_textsplit):
                             alternate_vessel=[ship for ship in bill_mapping if ship!=vessel][0]
-                            if bill_mapping[alternate_vessel][x[:-2]]:
+                            if bill_mapping[alternate_vessel][x[:load_digit]]:
                                 st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
                                 faults.append(1)
                                 st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")
                             else:
                                 
-                                if bill_mapping[vessel][x[:-2]]:
+                                if bill_mapping[vessel][x[:load_digit]]:
                                     if audit_unit(x):
                                         if x in seen:
                                             st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
@@ -4337,12 +4346,12 @@ if authentication_status:
                     
                     if yes:
                         pure_loads={**{k:0 for k in textsplit},**{k:0 for k in bale_textsplit}}
-                        loads={**{k[:-2]:0 for k in textsplit},**{k[:-2]:0 for k in bale_textsplit}}
+                        loads={**{k[:load_digit]:0 for k in textsplit},**{k[:load_digit]:0 for k in bale_textsplit}}
                         for k in textsplit:
-                            loads[k[:-2]]+=1
+                            loads[k[:load_digit]]+=1
                             pure_loads[k]+=1
                         for k in bale_textsplit:
-                            loads[k[:-2]]+=0.125
+                            loads[k[:load_digit]]+=0.125
                             pure_loads[k]+=0.125
             with col3:
                 quantity=st.number_input("**Scanned Quantity of Units**",st.session_state.updated_quantity, key=None, help=None, on_change=None, disabled=True, label_visibility="visible")
@@ -4562,7 +4571,7 @@ if authentication_status:
                         file_path = 'temp_file.txt'  # Use the path of the temporary file
                 
                         
-                        upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{vessel}/{file_name}")
+                        upload_cs_file(target_bucket, 'temp_file.txt',rf"EDIS/{file_name}")
                         success_container5=st.empty()
                         time.sleep(0.1)                            
                         success_container5.success(f"Uploaded EDI File",icon="✅")

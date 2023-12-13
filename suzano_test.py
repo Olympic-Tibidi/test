@@ -2244,7 +2244,7 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/ORDERS/{release_order_number}.json")
                             blob.upload_from_string(temp)
-                            st.success(f"Edited release order {release_order_number} successfully!")
+                            st.success(f"Created release order {release_order_number} successfully!")
                         
                         try:
                             junk=gcp_download(target_bucket,rf"release_orders/{vessel}/junk_release.json")

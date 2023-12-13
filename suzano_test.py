@@ -2178,7 +2178,7 @@ if authentication_status:
                         to_add=gcp_download(target_bucket,rf"release_orders/ORDERS/{release_order_number}.json")
                         to_add=json.loads(to_add)
                         po_number_add=st.text_input("PO No",to_add[release_order_number]["po_number"],disabled=False)
-                        destination_add=st.text_input("Destination",to_edit[release_order_number]["destination"],disabled=False)
+                        destination_add=st.text_input("Destination",to_add[release_order_number]["destination"],disabled=False)
                         sales_order_item_add=st.text_input("Sales Order Item",disabled=False)
                         vessel_add=vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"],key="popoa")
                         ocean_bill_of_lading_add=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel_add].keys(),key="treerw")  

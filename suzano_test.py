@@ -2794,7 +2794,7 @@ if authentication_status:
                 yes=False
               
                 release_order_number=current_release_order
-                if info[vessel][current_release_order][current_sales_order]["transport_type"]=="TRUCK":
+                if info[current_release_order][current_sales_order]["transport_type"]=="TRUCK":
                     medium="TRUCK"
                 else:
                     medium="RAIL"
@@ -2812,7 +2812,7 @@ if authentication_status:
                     delivery_date=datetime.datetime.today()-datetime.timedelta(hours=utc_difference)
                    #eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
                     eta_date=delivery_date
-                    carrier_code=info[vessel][current_release_order][current_sales_order]["carrier_code"]
+                    carrier_code=info[current_release_order][current_sales_order]["carrier_code"]
                     transport_sequential_number="TRUCK"
                     transport_type="TRUCK"
                     placeholder = st.empty()
@@ -2821,7 +2821,7 @@ if authentication_status:
                     
                         mf=True
                         load_mf_number_issued=False
-                        carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
+                        carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
                         if carrier_code=="123456-KBX":
                            if vessel in mf_numbers_for_load:
                                
@@ -2855,7 +2855,7 @@ if authentication_status:
                     
                              mf=True
                              load_mf_number_issued=False
-                             carrier_code=st.text_input("Carrier Code",info[vessel][current_release_order][current_sales_order]["carrier_code"],disabled=True,key=19)
+                             carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=19)
                              if carrier_code=="123456-KBX":
                                 if vessel in mf_numbers_for_load:
                                    
@@ -2894,14 +2894,14 @@ if authentication_status:
                         release_order_number=current_release_order
                         #sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
                         sales_order_item=current_sales_order
-                        #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
-                        ocean_bill_of_lading=info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"]
+                        #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
+                        ocean_bill_of_lading=info[current_release_order][current_sales_order]["ocean_bill_of_lading"]
                         current_ocean_bill_of_lading=ocean_bill_of_lading
-                        next_ocean_bill_of_lading=info[vessel][next_release_order][next_sales_order]["ocean_bill_of_lading"]
-                        #batch=st.text_input("Batch",info[vessel][current_release_order][current_sales_order]["batch"],disabled=True)
-                        batch=info[vessel][current_release_order][current_sales_order]["batch"]
-                        #grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
-                        grade=info[vessel][current_release_order][current_sales_order]["grade"]
+                        next_ocean_bill_of_lading=info[next_release_order][next_sales_order]["ocean_bill_of_lading"]
+                        #batch=st.text_input("Batch",info[current_release_order][current_sales_order]["batch"],disabled=True)
+                        batch=info[current_release_order][current_sales_order]["batch"]
+                        #grade=st.text_input("Grade",info[current_release_order][current_sales_order]["grade"],disabled=True)
+                        grade=info[current_release_order][current_sales_order]["grade"]
                         
                         #terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",disabled=False)
                         pass
@@ -2910,13 +2910,13 @@ if authentication_status:
                         release_order_number=current_release_order
                         #sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
                         sales_order_item=current_sales_order
-                        #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
-                        ocean_bill_of_lading=info[vessel][current_release_order][current_sales_order]["ocean_bill_of_lading"]
+                        #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
+                        ocean_bill_of_lading=info[current_release_order][current_sales_order]["ocean_bill_of_lading"]
                         
-                         #batch=st.text_input("Batch",info[vessel][current_release_order][current_sales_order]["batch"],disabled=True)
-                        batch=info[vessel][current_release_order][current_sales_order]["batch"]
-                        #grade=st.text_input("Grade",info[vessel][current_release_order][current_sales_order]["grade"],disabled=True)
-                        grade=info[vessel][current_release_order][current_sales_order]["grade"]
+                         #batch=st.text_input("Batch",info[current_release_order][current_sales_order]["batch"],disabled=True)
+                        batch=info[current_release_order][current_sales_order]["batch"]
+                        #grade=st.text_input("Grade",info[current_release_order][current_sales_order]["grade"],disabled=True)
+                        grade=info[current_release_order][current_sales_order]["grade"]
                         
                
                     updated_quantity=0

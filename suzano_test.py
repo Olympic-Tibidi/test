@@ -2267,9 +2267,9 @@ if authentication_status:
                         if edit:
                             release_order_database[release_order_number][sales_order_item_edit]={"destination":destination_edit,"vessel":vessel_edit,"total":quantity_edit,"remaining":remaining_edit}
                         elif add:
-                            if sales_order_item not in release_order_database[release_order_number]:
-                                release_order_database[release_order_number][sales_order_item]={}
-                                release_order_database[release_order_number][sales_order_item]={"destination":destination_add,"vessel":vessel_add,"total":quantity_add,"remaining":quantity_add}
+                            if sales_order_item_add not in release_order_database[release_order_number]:
+                                release_order_database[release_order_number][sales_order_item_add]={}
+                                release_order_database[release_order_number][sales_order_item_add]={"destination":destination_add,"vessel":vessel_add,"total":quantity_add,"remaining":quantity_add}
                         else:
                             release_order_database[release_order_number]={}
                             release_order_database[release_order_number][sales_order_item]={}

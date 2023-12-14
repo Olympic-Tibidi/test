@@ -2091,6 +2091,7 @@ if authentication_status:
                         bols=grouped_df.T.to_dict()
                         grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
                         info=grouped_df.T.to_dict()
+                        st.write(info)
                         st.dataframe(grouped_df)
                         st.write(bols)
                         for i in bols:

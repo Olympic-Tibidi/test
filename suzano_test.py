@@ -2090,15 +2090,15 @@ if authentication_status:
                         grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
                         bols=grouped_df.T.to_dict()
                         grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
-                        info=grouped_df.reset_index().T.to_dict()
-                        st.write(grouped_df)
+                        info=grouped_df.T.to_dict()
+                        st.dataframe(grouped_df)
                         st.write(bols)
                         for i in bols:
                             for val in bols[i]:
                                 found_key = next((key for key in info.keys() if val in key), None)
                                 qt=info[found_key]['quantity']
-                                info.update({found_key:{'total':ro.loc[int(val),"KIRKENES-2304"]['001']['total'],
-                                                      'shipped':qt,'remaining':ro.loc[int(val),"KIRKENES-2304"]['001']['remaining']}})
+                                info.update({found_key:{'total':ro.loc[int(val),1]['total'],
+                                                      'shipped':qt,'remaining':ro.loc[int(val),1]['remaining']}})
                         new=pd.DataFrame(info).T
                         new=new.reset_index()
                         new.columns=["Release Order","Ocean_BOL","Destination","Total Order", "Shipped", "Remaining"]

@@ -2088,7 +2088,7 @@ if authentication_status:
                         raw_ro =json.loads(ro)
                         ro = pd.read_json(ro).T
                         st.write(ro)
-                        #df = inv_bill_of_ladings.copy()
+                        df = inv_bill_of_ladings.copy()
                         temp_dict={}
                         for rel_ord in raw_ro:
                             temp_dict[rel_ord]={}

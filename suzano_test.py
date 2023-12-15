@@ -2082,12 +2082,72 @@ if authentication_status:
                     maintenance=False
                     if not maintenance:
                         
-                        #inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                        #inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
+                        inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                        inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
                         ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                        raw_ro =json.load(ro)
                         ro = pd.read_json(ro).T
                         st.write(ro)
+                        #df = inv_bill_of_ladings.copy()
+                        with open(r"C:\Users\afsiny\Desktop\BACKUP\dec12\RELEASE_ORDERS.json", 'r') as file:
+                            raw_ro = json.load(file)
+                   
+                        temp_dict={}
+                        for rel_ord in raw_ro:
+                            temp_dict[rel_ord]={}
+                            dest=raw_ro[rel_ord]["001"]['destination']
+                            vessel=raw_ro[rel_ord]["001"]['vessel']
+                            total=0
+                            remaining=0
+                            for sales in raw_ro[rel_ord]:
+                                total+=raw_ro[rel_ord][sales]['total']
+                                remaining+=raw_ro[rel_ord][sales]['remaining']
+                            temp_dict[rel_ord]={'destination': dest,'vessel': vessel,'total':total,'remaining':remaining}
+                        temp_df=pd.DataFrame(temp_dict).T
                         
+                        #temp_df['First Shipment'] = temp_df.index.map(df.groupby('release_order')['issued'].first())
+                        temp_df['First Shipment'] = temp_df.index.map(df.groupby('release_order')['issued'].first())
+                        
+                        for i in temp_df.index:
+                            if temp_df.loc[i,'remaining']==0:
+                                temp_df.loc[i,"Last Shipment"]=df.groupby(['release_order']).issued.last().loc[i]
+                                temp_df.loc[i,"Duration"]=(pd.to_datetime(temp_df.loc[i,"Last Shipment"])-pd.to_datetime(temp_df.loc[i,"First Shipment"])).days
+                        
+                        temp_df['Last Shipment'] = temp_df['Last Shipment'].fillna(datetime.datetime.now())
+                        
+                        def business_days(start_date, end_date):
+                            return pd.date_range(start=start_date, end=end_date, freq=BDay())
+                        temp_df['# of Shipment Days'] = temp_df.apply(lambda row: len(business_days(row['First Shipment'], row['Last Shipment'])), axis=1)
+                        for i in temp_df.index:
+                            temp_df.loc[i,"Utilized Shipment Days"]=df_temp.groupby("release_order")[["issued"]].nunique().loc[i,'issued']
+                        temp_df['First Shipment'] = temp_df['First Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y'))
+                        temp_df['Last Shipment'] = temp_df['Last Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y') if type(x)==str else None)
+                        liste=['Duration','# of Shipment Days',"Utilized Shipment Days"]
+                        for col in liste:
+                            temp_df[col] = temp_df[col].apply(lambda x: f" {int(x)} days" if not pd.isna(x) else np.nan)
+                        temp_df['remaining'] = temp_df['remaining'].apply(lambda x: int(x))
+                        st.write(temp_df)
+                        df_temp=inv_bill_of_ladings.copy()
+                        df_temp["issued"]=[pd.to_datetime(i).date() for i in df_temp["issued"]]
+                        a=df_temp.groupby(["issued"])[['quantity']].sum()
+                        a.index=pd.to_datetime(a.index)
+                        labor = json.load(gcp_download(target_bucket,rf"trucks.json"))
+                        labor=pd.DataFrame(labor).T
+                        labor.index=pd.to_datetime(labor.index)
+                        for index in a.index:
+                            try:
+                                a.loc[index,'cost']=labor.loc[index,'cost']
+                            except:
+                                pass
+                        a['quantity']=2*a['quantity']
+                        a['Per_Ton']=a['cost']/a['quantity']
+                        trucks=df_temp.groupby(["issued"])[['vehicle']].count().vehicle.values
+                        a.insert(0,'trucks',trucks)
+                        a['Per_Ton']=round(a['Per_Ton'],1)
+                        st.write(a)
+
+
+
                 
                 with release_order_tab1:
                     #vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])  ###-###

@@ -2089,9 +2089,6 @@ if authentication_status:
                         ro = pd.read_json(ro).T
                         st.write(ro)
                         #df = inv_bill_of_ladings.copy()
-                        with open(r"C:\Users\afsiny\Desktop\BACKUP\dec12\RELEASE_ORDERS.json", 'r') as file:
-                            raw_ro = json.load(file)
-                   
                         temp_dict={}
                         for rel_ord in raw_ro:
                             temp_dict[rel_ord]={}

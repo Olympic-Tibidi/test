@@ -2085,7 +2085,7 @@ if authentication_status:
                         inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                         inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
                         ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                        raw_ro =json.load(ro)
+                        raw_ro =json.loads(ro)
                         ro = pd.read_json(ro).T
                         st.write(ro)
                         #df = inv_bill_of_ladings.copy()

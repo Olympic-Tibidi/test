@@ -2080,7 +2080,7 @@ if authentication_status:
               
                 release_order_tab1,release_order_tab2,release_order_tab3=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE","RELEASE ORDER STATUS"])
                 with release_order_tab3:
-                    maintenance=False
+                    maintenance=True
                     if not maintenance:
                         
                         inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")

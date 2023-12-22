@@ -721,7 +721,7 @@ if authentication_status:
                     trucks=df_temp.groupby(["issued"])[['vehicle']].count().vehicle.values
                     a.insert(0,'trucks',trucks)
                     a['Per_Ton']=round(a['Per_Ton'],1)
-                    st.dataframe(a)
+                    st.table(a)
                 
                 with ttab2:
                     

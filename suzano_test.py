@@ -722,7 +722,7 @@ if authentication_status:
                     a.insert(0,'trucks',trucks)
                     a['Per_Ton']=round(a['Per_Ton'],1)
                     a.columns=["# of Trucks","Shipped Tonnage","Total Cost","Cost Per Ton"]
-                    a.index=[i.date for i in a.index]
+                    a.index=[i.date() for i in a.index]
                     a["Shipped Tonnage"]=[int(i) for i in a["Shipped Tonnage"]]
                     a["Total Cost"]= a["Total Cost"].map('${:,.2f}'.format)
                     st.table(a)

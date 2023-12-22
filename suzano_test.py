@@ -661,6 +661,7 @@ if authentication_status:
                     df=pd.read_json(inv_bill_of_ladings).T
                     ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                     labor=gcp_download(target_bucket,rf"trucks.json")
+                    labor=json.load(labor)
                     raw_ro = json.loads(ro)
                     temp_dict={}
                     for rel_ord in raw_ro:

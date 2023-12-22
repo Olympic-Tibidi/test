@@ -2080,70 +2080,69 @@ if authentication_status:
               
                 release_order_tab1,release_order_tab2,release_order_tab3=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE","RELEASE ORDER STATUS"])
                 with release_order_tab3:
-                    maintenance=True
+                    maintenance=False
                     if not maintenance:
                         
                         inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                         inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
                         ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                        raw_ro =json.loads(ro)
-                        ro = pd.read_json(ro).T
-                        st.write(ro)
-                        df = inv_bill_of_ladings.copy()
-                        temp_dict={}
+                        raw_ro = json.loads(ro)
+                        grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
+                        info=grouped_df.T.to_dict()
                         for rel_ord in raw_ro:
-                            temp_dict[rel_ord]={}
-                            dest=raw_ro[rel_ord]["001"]['destination']
-                            vessel=raw_ro[rel_ord]["001"]['vessel']
-                            total=0
-                            remaining=0
+                            
                             for sales in raw_ro[rel_ord]:
-                                total+=raw_ro[rel_ord][sales]['total']
-                                remaining+=raw_ro[rel_ord][sales]['remaining']
-                            temp_dict[rel_ord]={'destination': dest,'vessel': vessel,'total':total,'remaining':remaining}
-                        temp_df=pd.DataFrame(temp_dict).T
+                                found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
+                                qt=info[found_key]['quantity']
+                                info[found_key]={'total':raw_ro[rel_ord][sales]['total'],
+                                                        'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}
+                                                    
+                        new=pd.DataFrame(info).T
+                        new=new.reset_index()
+                        new.groupby('level_1')['remaining'].sum()
+                        new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
+                        new.index=[i+1 for i in new.index]
+                        release_orders = [str(key[0]) for key in info.keys()]
+                        release_orders=[str(i) for i in release_orders]
+                        release_orders = pd.Categorical(release_orders)
                         
-                        #temp_df['First Shipment'] = temp_df.index.map(df.groupby('release_order')['issued'].first())
-                        temp_df['First Shipment'] = temp_df.index.map(df.groupby('release_order')['issued'].first())
+                        total_quantities = [item['total'] for item in info.values()]
+                        shipped_quantities = [item['shipped'] for item in info.values()]
+                        remaining_quantities = [item['remaining'] for item in info.values()]
+                        destinations = [key[2] for key in info.keys()]
+                        # Calculate the percentage of shipped quantities
+                        #percentage_shipped = [shipped / total * 100 for shipped, total in zip(shipped_quantities, total_quantities)]
                         
-                        for i in temp_df.index:
-                            if temp_df.loc[i,'remaining']==0:
-                                temp_df.loc[i,"Last Shipment"]=df.groupby(['release_order']).issued.last().loc[i]
-                                temp_df.loc[i,"Duration"]=(pd.to_datetime(temp_df.loc[i,"Last Shipment"])-pd.to_datetime(temp_df.loc[i,"First Shipment"])).days
+                        # Create a Plotly bar chart
+                        fig = go.Figure()
                         
-                        temp_df['Last Shipment'] = temp_df['Last Shipment'].fillna(datetime.datetime.now())
+                        # Add bars for total quantities
+                        fig.add_trace(go.Bar(x=release_orders, y=total_quantities, name='Total', marker_color='lightgray'))
                         
-                        def business_days(start_date, end_date):
-                            return pd.date_range(start=start_date, end=end_date, freq=BDay())
-                        temp_df['# of Shipment Days'] = temp_df.apply(lambda row: len(business_days(row['First Shipment'], row['Last Shipment'])), axis=1)
-                        for i in temp_df.index:
-                            temp_df.loc[i,"Utilized Shipment Days"]=df_temp.groupby("release_order")[["issued"]].nunique().loc[i,'issued']
-                        temp_df['First Shipment'] = temp_df['First Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y'))
-                        temp_df['Last Shipment'] = temp_df['Last Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y') if type(x)==str else None)
-                        liste=['Duration','# of Shipment Days',"Utilized Shipment Days"]
-                        for col in liste:
-                            temp_df[col] = temp_df[col].apply(lambda x: f" {int(x)} days" if not pd.isna(x) else np.nan)
-                        temp_df['remaining'] = temp_df['remaining'].apply(lambda x: int(x))
-                        st.write(temp_df)
-                        df_temp=inv_bill_of_ladings.copy()
-                        df_temp["issued"]=[pd.to_datetime(i).date() for i in df_temp["issued"]]
-                        a=df_temp.groupby(["issued"])[['quantity']].sum()
-                        a.index=pd.to_datetime(a.index)
-                        labor = json.load(gcp_download(target_bucket,rf"trucks.json"))
-                        labor=pd.DataFrame(labor).T
-                        labor.index=pd.to_datetime(labor.index)
-                        for index in a.index:
-                            try:
-                                a.loc[index,'cost']=labor.loc[index,'cost']
-                            except:
-                                pass
-                        a['quantity']=2*a['quantity']
-                        a['Per_Ton']=a['cost']/a['quantity']
-                        trucks=df_temp.groupby(["issued"])[['vehicle']].count().vehicle.values
-                        a.insert(0,'trucks',trucks)
-                        a['Per_Ton']=round(a['Per_Ton'],1)
-                        st.write(a)
-
+                        # Add filled bars for shipped quantities
+                        fig.add_trace(go.Bar(x=release_orders, y=shipped_quantities, name='Shipped', marker_color='blue', opacity=0.7))
+                        
+                        # Add remaining quantities as separate scatter points
+                        #fig.add_trace(go.Scatter(x=release_orders, y=remaining_quantities, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
+                        
+                        remaining_data = [remaining if remaining > 0 else None for remaining in remaining_quantities]
+                        fig.add_trace(go.Scatter(x=release_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
+                        
+                        # Add destinations as annotations
+                        annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(release_orders, total_quantities, destinations)]
+                        #fig.update_layout(annotations=annotations)
+                        
+                        # Update layout
+                        fig.update_layout(title='Shipment Status',
+                                          xaxis_title='Release Orders',
+                                          yaxis_title='Quantities',
+                                          barmode='overlay',
+                                          xaxis=dict(tickangle=-90, type='category'))
+                        relcol1,relcol2=st.columns([5,5])
+                        with relcol1:
+                            st.dataframe(new)
+                        with relcol2:
+                            st.plotly_chart(fig)
 
 
                 

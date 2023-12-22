@@ -3704,7 +3704,7 @@ if authentication_status:
                                 st.dataframe(tempo)
                         except:
                             pass
-                    with inv4tab3:
+                    with inv4tab3: ### UNREGISTERED UNITS TAB
                         alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                         alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])
                         alien_list=pd.DataFrame(alien_units[alien_vessel]).T
@@ -3714,7 +3714,7 @@ if authentication_status:
                         st.dataframe(alien_list)
                         
                       
-            with inv5:
+            with inv5:     
                 inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
                 maintenance=False
@@ -3768,16 +3768,16 @@ if authentication_status:
                     inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
                     ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                     ro = pd.read_json(ro)
-                    grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
-                    bols=grouped_df.T.to_dict()
-                    grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
+                    grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
                     info=grouped_df.T.to_dict()
-                    for i in bols:
-                        for val in bols[i]:
-                            found_key = next((key for key in info.keys() if val in key), None)
+                    for rel_ord in raw_ro:
+                        
+                        for sales in raw_ro[rel_ord]:
+                            found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
                             qt=info[found_key]['quantity']
-                            info.update({found_key:{'total':ro.loc[int(val),"KIRKENES-2304"]['001']['total'],
-                                                  'shipped':qt,'remaining':ro.loc[int(val),"KIRKENES-2304"]['001']['remaining']}})
+                            info[found_key]={'total':raw_ro[rel_ord][sales]['total'],
+                                                    'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}
+                                                
                     new=pd.DataFrame(info).T
                     new=new.reset_index()
                     new.groupby('level_1')['remaining'].sum()
@@ -3785,7 +3785,7 @@ if authentication_status:
                     release_orders = [str(key[0]) for key in info.keys()]
                     release_orders=[str(i) for i in release_orders]
                     release_orders = pd.Categorical(release_orders)
-    
+                    
                     total_quantities = [item['total'] for item in info.values()]
                     shipped_quantities = [item['shipped'] for item in info.values()]
                     remaining_quantities = [item['remaining'] for item in info.values()]
@@ -3818,8 +3818,6 @@ if authentication_status:
                                       yaxis_title='Quantities',
                                       barmode='overlay',
                                       xaxis=dict(tickangle=-90, type='category'))
-                    #fig.update_layout(annotations=annotations)
-                    # Show the plot
                     relcol1,relcol2=st.columns([5,5])
                     with relcol1:
                         st.dataframe(new)

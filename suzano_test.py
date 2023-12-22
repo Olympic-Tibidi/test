@@ -725,7 +725,7 @@ if authentication_status:
                     a.index=[i.date() for i in a.index]
                     a["Shipped Tonnage"]=[int(i) for i in a["Shipped Tonnage"]]
                     a["Total Cost"]= a["Total Cost"].map('${:,.2f}'.format)
-                    a"Cost Per Ton"]= a["Cost Per Ton"].map('${:,.2f}'.format)
+                    a["Cost Per Ton"]= a["Cost Per Ton"].map('${:,.2f}'.format)
                     st.table(a)
                 
                 with ttab2:

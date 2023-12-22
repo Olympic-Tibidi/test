@@ -657,8 +657,10 @@ if authentication_status:
                 ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","SUZANO TRUCK ANALYSIS"])
                 with ttab3:
                     inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                    
                     df=pd.read_json(inv_bill_of_ladings).T
                     ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                    labor=gcp_download(target_bucket,rf"trucks.json")
                     raw_ro = json.loads(ro)
                     temp_dict={}
                     for rel_ord in raw_ro:
@@ -702,6 +704,23 @@ if authentication_status:
                            'Last Shipment', 'Duration', '# of Calendar Shipment Days',
                            'Utilized Calendar Shipment Days']
                     st.write(temp_df)
+                    a=df_temp.groupby(["issued"])[['quantity']].sum()
+                    a.index=pd.to_datetime(a.index)
+                    
+                    
+                    labor=pd.DataFrame(labor).T
+                    labor.index=pd.to_datetime(labor.index)
+                    for index in a.index:
+                        try:
+                            a.loc[index,'cost']=labor.loc[index,'cost']
+                        except:
+                            pass
+                    a['quantity']=2*a['quantity']
+                    a['Per_Ton']=a['cost']/a['quantity']
+                    trucks=df_temp.groupby(["issued"])[['vehicle']].count().vehicle.values
+                    a.insert(0,'trucks',trucks)
+                    a['Per_Ton']=round(a['Per_Ton'],1)
+                    st.dataframe(a)
                 
                 with ttab2:
                     

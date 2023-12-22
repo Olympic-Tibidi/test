@@ -657,7 +657,7 @@ if authentication_status:
                 ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","SUZANO TRUCK ANALYSIS"])
                 with ttab3:
                     inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                    inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
+                    df=pd.read_json(inv_bill_of_ladings).T
                     ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                     raw_ro = json.loads(ro)
                     temp_dict={}

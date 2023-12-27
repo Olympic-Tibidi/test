@@ -2199,7 +2199,8 @@ if authentication_status:
                         trucks=df_temp.groupby(["issued"])[['vehicle']].count().vehicle.values
                         a.insert(0,'trucks',trucks)
                         a['Per_Ton']=round(a['Per_Ton'],1)
-                        b=a.copy()
+                        w=a.copy()
+                        m=a.copy()
                         cost_choice=st.radio("Select Daily/Weekly/Monthly Cost Analysis",["DAILY","WEEKLY","MONTHLY"])
                         if cost_choice=="DAILY":
                             a['Per_Ton']=["${:.2f}".format(number) for number in a['Per_Ton']]
@@ -2209,18 +2210,19 @@ if authentication_status:
                             a.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
                             st.dataframe(a)
                         if cost_choice=="WEEKLY":
-                            b= b.rename_axis('Week', axis=0)
-                            b.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
-                            weekly=b.dropna()
+                            w.index=[i.date() for i in w.index()]
+                            w= w.rename_axis('Week', axis=0)
+                            w.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
+                            weekly=w.dropna()
                             weekly=weekly.resample('W').sum()
                             weekly['Cost Per Ton']=round(weekly['Total Cost']/weekly['Tons Shipped'],1)
                             weekly['Cost Per Ton']=["${:.2f}".format(number) for number in weekly['Cost Per Ton']]
                             weekly['Total Cost']=["${:.2f}".format(number) for number in weekly['Total Cost']]
                             st.dataframe(weekly)
                         if cost_choice=="MONTHLY":
-                            c= b.rename_axis('Month', axis=0)
-                            c.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
-                            monthly=c.dropna()
+                            m= m.rename_axis('Month', axis=0)
+                            m.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
+                            monthly=m.dropna()
                             monthly=monthly.resample('M').sum()
                             monthly['Cost Per Ton']=round(monthly['Total Cost']/monthly['Tons Shipped'],1)
                             st.dataframe(monthly)

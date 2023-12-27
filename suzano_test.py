@@ -2091,7 +2091,7 @@ if authentication_status:
                         info=grouped_df.T.to_dict()
                         st.write(info)
                         for rel_ord in raw_ro:
-                            
+                            st.write(rel_ord)
                             for sales in raw_ro[rel_ord]:
                                 found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
                                 qt=info[found_key]['quantity']

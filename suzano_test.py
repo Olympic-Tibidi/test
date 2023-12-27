@@ -2104,7 +2104,6 @@ if authentication_status:
                         new=pd.DataFrame(info).T
                         new=new.reset_index()
                         st.dataframe(new)
-                        new.groupby('level_1')['remaining'].sum()
                         new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
                         new.index=[i+1 for i in new.index]
                         release_orders = [str(key[0]) for key in info.keys()]

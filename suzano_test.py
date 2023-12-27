@@ -2102,6 +2102,7 @@ if authentication_status:
                                                         'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}
                                                     
                         new=pd.DataFrame(info).T
+                        st.dataframe(new)
                         new=new.reset_index()
                         st.dataframe(new)
                         new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]

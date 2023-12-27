@@ -2088,6 +2088,7 @@ if authentication_status:
                         ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                         raw_ro = json.loads(ro)
                         grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
+                        grouped_df.reset_index(inplace=True)
                         info=grouped_df.T.to_dict()
                         st.write(info)
                         for rel_ord in raw_ro:

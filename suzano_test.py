@@ -2202,7 +2202,7 @@ if authentication_status:
                         b=a.copy()
                         cost_choice=st.radio("Select Daily/Weekly/Monthly Cost Analysis",["DAILY","WEEKLY","MONTHLY"])
                         if cost_choice=="DAILY":
-                            #a['Per_Ton']=["${:.2f}".format(number) for number in a['Per_Ton']]
+                            a['Per_Ton']=["${:.2f}".format(number) for number in a['Per_Ton']]
                             a['cost']=["${:.2f}".format(number) for number in a['cost']]
                             a.index=[i.date() for i in a.index]
                             a= a.rename_axis('Day', axis=0)
@@ -2214,6 +2214,8 @@ if authentication_status:
                             weekly=b.dropna()
                             weekly=weekly.resample('W').sum()
                             weekly['Cost Per Ton']=round(weekly['Total Cost']/weekly['Tons Shipped'],1)
+                            weekly['Per_Ton']=["${:.2f}".format(number) for number in weekly['Per_Ton']]
+                            weekly['cost']=["${:.2f}".format(number) for number in weekly['cost']]
                             st.dataframe(weekly)
                         if cost_choice=="MONTHLY":
                             c= b.rename_axis('Month', axis=0)

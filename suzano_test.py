@@ -2089,11 +2089,9 @@ if authentication_status:
                         raw_ro = json.loads(ro)
                         grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
                         info=grouped_df.T.to_dict()
-                        st.dataframe(info)
+                        
                         for rel_ord in raw_ro:
-                            st.write(rel_ord)
                             for sales in raw_ro[rel_ord]:
-                                st.write(sales)
                                 found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
                                 st.write(found_key)
                                 try:
@@ -2105,6 +2103,7 @@ if authentication_status:
                                                     
                         new=pd.DataFrame(info).T
                         new=new.reset_index()
+                        st.dataframe(new)
                         new.groupby('level_1')['remaining'].sum()
                         new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
                         new.index=[i+1 for i in new.index]

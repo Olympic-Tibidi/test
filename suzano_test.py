@@ -2154,13 +2154,11 @@ if authentication_status:
                                 remaining=raw_ro[rel_ord][sales]['remaining']
                                 temp_dict[rel_ord,sales]={'destination': dest,'vessel': vessel,'total':total,'remaining':remaining}
                         temp_df=pd.DataFrame(temp_dict).T
-                        #temp_df
-                        
-                        temp_df['First Shipment'] = temp_df.index.map(df.groupby(['release_order','sales_order'])['issued'].first())
+                        temp_df['First Shipment'] = temp_df.index.map(inv_bill_of_ladings.groupby(['release_order','sales_order'])['issued'].first())
                         
                         for i in temp_df.index:
                             if temp_df.loc[i,'remaining']<=2:
-                                temp_df.loc[i,"Last Shipment"]=df.groupby(['release_order','sales_order']).issued.last().loc[i]
+                                temp_df.loc[i,"Last Shipment"]=inv_bill_of_ladings.groupby(['release_order','sales_order']).issued.last().loc[i]
                                 temp_df.loc[i,"Duration"]=(pd.to_datetime(temp_df.loc[i,"Last Shipment"])-pd.to_datetime(temp_df.loc[i,"First Shipment"])).days+1
                         
                         temp_df['Last Shipment'] = temp_df['Last Shipment'].fillna(datetime.datetime.now())
@@ -2170,7 +2168,7 @@ if authentication_status:
                         def business_days(start_date, end_date):
                             return pd.date_range(start=start_date, end=end_date, freq=BDay())
                         temp_df['# of Shipment Days'] = temp_df.apply(lambda row: len(business_days(row['First Shipment'], row['Last Shipment'])), axis=1)
-                        df_temp=df.copy()
+                        df_temp=inv_bill_of_ladings.copy()
                         df_temp["issued"]=[pd.to_datetime(i).date() for i in df_temp["issued"]]
                         for i in temp_df.index:
                             temp_df.loc[i,"Utilized Shipment Days"]=df_temp.groupby(["release_order",'sales_order'])[["issued"]].nunique().loc[i,'issued']

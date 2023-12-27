@@ -2182,6 +2182,27 @@ if authentication_status:
                                'Last Shipment', 'Duration', '# of Calendar Shipment Days',
                                'Utilized Calendar Shipment Days']
                         st.dataframe(temp_df)
+                        a=df_temp.groupby(["issued"])[['quantity']].sum()
+                        a.index=pd.to_datetime(a.index)
+                        labor=gcp_download(target_bucket,rf"trucks.json")
+                        labor = json.loads(labor)
+                        
+                        labor=pd.DataFrame(labor).T
+                        labor.index=pd.to_datetime(labor.index)
+                        for index in a.index:
+                            try:
+                                a.loc[index,'cost']=labor.loc[index,'cost']
+                            except:
+                                pass
+                        a['quantity']=2*a['quantity']
+                        a['Per_Ton']=a['cost']/a['quantity']
+                        trucks=df_temp.groupby(["issued"])[['vehicle']].count().vehicle.values
+                        a.insert(0,'trucks',trucks)
+                        a['Per_Ton']=round(a['Per_Ton'],1)
+                        #a['Per_Ton']=["${:.2f}".format(number) for number in a['Per_Ton']]
+                        a['cost']=["${:.2f}".format(number) for number in a['cost']]
+                        a= a.rename_axis('Week', axis=0)
+                        a.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
                 with release_order_tab1:
                     #vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])  ###-###
                    

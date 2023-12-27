@@ -2089,7 +2089,7 @@ if authentication_status:
                         raw_ro = json.loads(ro)
                         grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
                         info=grouped_df.T.to_dict()
-                        
+                        st.write(info)
                         for rel_ord in raw_ro:
                             for sales in raw_ro[rel_ord]:
                                 found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)

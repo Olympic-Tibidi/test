@@ -2214,8 +2214,8 @@ if authentication_status:
                             weekly=b.dropna()
                             weekly=weekly.resample('W').sum()
                             weekly['Cost Per Ton']=round(weekly['Total Cost']/weekly['Tons Shipped'],1)
-                            weekly['Per_Ton']=["${:.2f}".format(number) for number in weekly['Per_Ton']]
-                            weekly['cost']=["${:.2f}".format(number) for number in weekly['cost']]
+                            weekly['Cost Per Ton']=["${:.2f}".format(number) for number in weekly['Cost Per Ton']]
+                            weekly['Total Cost']=["${:.2f}".format(number) for number in weekly['Total Cost']]
                             st.dataframe(weekly)
                         if cost_choice=="MONTHLY":
                             c= b.rename_axis('Month', axis=0)

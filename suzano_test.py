@@ -47,6 +47,7 @@ import plotly.graph_objects as go
 import pydeck as pdk
 from pandas.tseries.offsets import BDay
 
+
 #import streamlit_option_menu
 #from streamlit_modal import Modal
 
@@ -362,7 +363,7 @@ def get_weather():
             'Accept-Encoding' : 'gzip', 
             'DNT' : '1', # Do Not Track Request Header 
             'Connection' : 'close' }
-    #url ='https://api.weather.gov/gridpoints/SEW/117,51/forecast/hourly'
+
     url='http://api.weatherapi.com/v1/forecast.json?key=5fa3f1f7859a415b9e6145743230912&q=98502&days=7'
     #response = get(url,headers=headers)
     response=get(url,headers=headers)
@@ -471,58 +472,63 @@ if authentication_status:
 
         if select=='WEATHER':
             st.caption("Live Data for Olympia From Weather.gov API")
-            
+            gov_forecast=get_weather()
+            data=dict()
+            for day in forecast['forecast']['forecastday']:
+                data[day['date']]={}
+                data[day['date']]['DAY']={}
+                data[day['date']]['ASTRO']={}
+                for item in day['day']:
+                    data[day['date']]['DAY'][item]=day['day'][item]
+                for astro in day['astro']:
+                    data[day['date']]['ASTRO'][astro]=day['astro'][astro]
+                for dic in day['hour']:
+                    data[day['date']][dic['time']]={}
+                    for measure in dic:
+                        if measure=='condition':
+                            data[day['date']][dic['time']][measure]=dic[measure]['text']
+                            data[day['date']][dic['time']]['condition_png']=dic[measure]['icon']
+                        else:
+                            data[day['date']][dic['time']][measure]=dic[measure]
+            index=[]
+            temperatures=[]
+            condition=[]
+            wind=[]
+            wind_dir=[]
+            pressure=[]
+            cloud=[]
+            rain=[]
+            dew_point=[]
+            will_rain=[]
+            chance_rain=[]
+            for day in data:
+                for hour in data[day]:
+                    if hour not in ['DAY','ASTRO']:
+                        #print(hour)
+                        index.append(hour)
+                        temperatures.append(data[day][hour]['temp_f'])
+                        condition.append(data[day][hour]['condition'])
+                        wind.append(data[day][hour]['wind_mph'])
+                        wind_dir.append(data[day][hour]['wind_dir'])
+                        pressure.append(data[day][hour]['pressure_mb'])
+                        cloud.append(data[day][hour]['cloud'])
+                        rain.append(data[day][hour]['precip_in'])
+                        will_rain.append(True if data[day][hour]['will_it_rain']==1 else False)
+                        chance_rain.append(data[day][hour]['chance_of_rain'])
+                        dew_point.append(data[day][hour]['dewpoint_f'])    
             weather_tab1,weather_tab2=st.tabs(["TABULAR","GRAPH"])
             with weather_tab1:
-            
-                gov_forecast=get_gov_weather()
-                st.table(gov_forecast)
+                temperatures_=["{:.1f}".format(number)for number in temperatures]
+                rain_=["{:.2f}".format(number)for number in rain]
+                weather_df=pd.DataFrame({'Temperature':temperatures_,"Sky":condition,'Rain Amount':rain_,
+                'Chance of Rain':chance_rain,"Wind":[f"{i}-{j}" for i,j in zip(wind_dir,wind)]
+                },index=index)
+                
+                st.table(weather_df)
             with weather_tab2:
                 st.markdown('Powered by <a href="https://www.weatherapi.com/" title="Free Weather API">WeatherAPI.com</a>',unsafe_allow_html=True)
                 
-                data=dict()
-                for day in forecast['forecast']['forecastday']:
-                    data[day['date']]={}
-                    data[day['date']]['DAY']={}
-                    data[day['date']]['ASTRO']={}
-                    for item in day['day']:
-                        data[day['date']]['DAY'][item]=day['day'][item]
-                    for astro in day['astro']:
-                        data[day['date']]['ASTRO'][astro]=day['astro'][astro]
-                    for dic in day['hour']:
-                        data[day['date']][dic['time']]={}
-                        for measure in dic:
-                            if measure=='condition':
-                                data[day['date']][dic['time']][measure]=dic[measure]['text']
-                                data[day['date']][dic['time']]['condition_png']=dic[measure]['icon']
-                            else:
-                                data[day['date']][dic['time']][measure]=dic[measure]
-                index=[]
-                temperatures=[]
-                condition=[]
-                wind=[]
-                wind_dir=[]
-                pressure=[]
-                cloud=[]
-                rain=[]
-                dew_point=[]
-                will_rain=[]
-                chance_rain=[]
-                for day in data:
-                    for hour in data[day]:
-                        if hour not in ['DAY','ASTRO']:
-                            #print(hour)
-                            index.append(hour)
-                            temperatures.append(data[day][hour]['temp_f'])
-                            condition.append(data[day][hour]['condition'])
-                            wind.append(data[day][hour]['wind_mph'])
-                            wind_dir.append(data[day][hour]['wind_dir'])
-                            pressure.append(data[day][hour]['pressure_mb'])
-                            cloud.append(data[day][hour]['cloud'])
-                            rain.append(data[day][hour]['precip_in'])
-                            will_rain.append(True if data[day][hour]['will_it_rain']==1 else False)
-                            chance_rain.append(data[day][hour]['chance_of_rain'])
-                            dew_point.append(data[day][hour]['dewpoint_f'])    
+                
                 fig = go.Figure()
 
                 # Add traces for each weather parameter
@@ -727,7 +733,6 @@ if authentication_status:
                     a["Total Cost"]= a["Total Cost"].map('${:,.2f}'.format)
                     a["Cost Per Ton"]= a["Cost Per Ton"].map('${:,.2f}'.format)
                     st.table(a)
-                
                 with ttab2:
                     
                     if st.checkbox("UPLOAD LEDGER CSV",key="fsdsw"):
@@ -1745,8 +1750,8 @@ if authentication_status:
             
               
         if select=="ADMIN" :
-            admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","VESSEL SHIPMENT FILES","LABOR"])
-            with admin_tab5:
+            admin_tab1,admin_tab2,admin_tab3,admin_tab4=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","LABOR"])
+            with admin_tab4:
                 labor_issue=False
                 secondary=True
                 if secondary:
@@ -2028,6 +2033,12 @@ if authentication_status:
                         st.dataframe(admin_bill_of_ladings)
                         csv=convert_df(admin_bill_of_ladings)
                         file_name=f'OLYMPIA_ALL_BILL_OF_LADINGS to {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
+
+                    st.download_button(
+                        label="DOWNLOAD BILL OF LADINGS",
+                        data=csv,
+                        file_name=file_name,
+                        mime='text/csv')
             with admin_tab3:
                 edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
                 requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
@@ -2047,92 +2058,7 @@ if authentication_status:
             
                             
 
-            with admin_tab4:
-                st.markdown("SHIPMENT FILES")
-                shipment_tab1,shipment_tab2=st.tabs(["UPLOAD/PROCESS SHIPMENT FILE","SHIPMENT FILE DATABASE"])
-                with shipment_tab1:
-                    
-                    uploaded_file = st.file_uploader("Choose a file")
-                    if uploaded_file is not None:
-                        # To read file as bytes:
-                        bytes_data = uploaded_file.getvalue()
-                        #st.write(bytes_data)
-                    
-                        # To convert to a string based IO:
-                        stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
-                        #st.write(stringio)
-                    
-                        # To read file as string:
-                        string_data = stringio.read()
-                        #st.write(string_data)
-                    
-                        # Can be used wherever a "file-like" object is accepted:
-                        temp = pd.read_csv(uploaded_file,header=None)
-                        temp=temp[1:-1]
-                        gemi=temp[5].unique()[0]
-                        voyage=int(temp[6].unique()[0])
-                        df=pd.DataFrame(list(zip([i[5:] for i in temp[0]],[str(i)[13:15] for i in temp[7]],
-                                  [str(i)[20:28] for i in temp[7]])),columns=["Lot","Lot Qty","Batch"])
-                        df["Lot Qty"]=[int(int(i)/2) for i in df["Lot Qty"]]
-                        df["Grade"]=[i[:3] for i in temp[1]]
-                        df["Vessel"]=[i[-12:] for i in temp[7]]
-                        df["DryWeight"]=[int(i) for i in temp[8]]
-                        df["ADMT"]=[int(i)/0.9/100000 for i in temp[8]]
-                        new_list=[]
-                        lotq=[]
-                        batch=[]
-                        wrap=[]
-                        vessel=[]
-                        DryWeight=[]
-                        ADMT=[]
-                        for i in df.index:
-                            #print(df.loc[i,"Lot"])
-                            for j in range(1,df.loc[i,"Lot Qty"]+1):
-                                #print(f"00{i}")
-                                if j<10:
-                                    new_list.append(f"{df.loc[i,'Lot']}00{j}")
-                                else:
-                                    new_list.append(f"{df.loc[i,'Lot']}0{j}")
-                                lotq.append(df.loc[i,"Lot Qty"])
-                                batch.append(str(df.loc[i,"Batch"]))
-                                wrap.append(df.loc[i,"Grade"])
-                                vessel.append(df.loc[i,"Vessel"])
-                                DryWeight.append(df.loc[i,"DryWeight"])
-                                ADMT.append(df.loc[i,"ADMT"])
-                        new_df=pd.DataFrame(list(zip(new_list,lotq,batch,wrap,vessel,DryWeight,ADMT)),columns=df.columns.to_list())
-                        new_df["Location"]="OLYM"
-                        new_df["Warehouse_In"]="8/24/2023"
-                        new_df["Warehouse_Out"]=""
-                        new_df["Vehicle_Id"]=""
-                        new_df["Release_Order_Number"]=""
-                        new_df["Carrier_Code"]=""
-                        new_df["BL"]=""
-                        bls=new_df["Batch"].value_counts()
-                        wraps=[new_df[new_df["Batch"]==k]["Grade"].unique()[0] for k in bls.keys()]
-                        wrap_dict={"ISU":"Unwrapped","ISP":"Wrapped"}
-                        col1, col2= st.columns([2,2])
-                        with col1:
-                            st.markdown(f"**VESSEL = {gemi} - VOYAGE = {voyage}**")
-                            st.markdown(f"**TOTAL UNITS = {len(new_df)}**")
-                        
-                       
-                            for i in range(len(bls)):
-                                st.markdown(f"**{bls[i]} units of Bill of Lading {bls.keys()[i]} - -{wrap_dict[wraps[i]]}-{wraps[i]}**")
-                        with col2:
-                            if st.button("RECORD PARSED SHIPMENT TO DATABASE"):
-                                temp=new_df.to_csv("temp.csv")
-                                upload_cs_file(target_bucket, 'temp.csv',rf"shipping_files/{gemi}-{voyage}-shipping_file.csv") 
-                                st.write(f"Uploaded {gemi}-{voyage}-shipping_file.csv to database")
-                        st.dataframe(new_df)
-                    with shipment_tab2:
-                        folder_name = "olym_suzano/shipping_files"  # Replace this with the folder path you want to read
-                        files_in_folder = list_files_in_folder(target_bucket, "shipping_files")
-                        requested_file=st.selectbox("SHIPPING FILES IN DATABASE",files_in_folder[1:])
-                        if st.button("LOAD SHIPPING FILE"):
-                            requested_shipping_file=gcp_csv_to_df(target_bucket,requested_file)
-                            filtered_df=requested_shipping_file[["Lot","Lot Qty","Batch","Grade","Ocean B/L","DryWeight","ADMT"]]
-                            #st.data_editor(filtered_df, use_container_width=True)
-                            st.data_editor(filtered_df)
+            
                           
             with admin_tab1:
                 carrier_list_=gcp_download(target_bucket,rf"carrier.json")
@@ -2216,9 +2142,7 @@ if authentication_status:
                             st.dataframe(new)
                         with relcol2:
                             st.plotly_chart(fig)
-
-
-                
+                        
                 with release_order_tab1:
                     #vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])  ###-###
                    
@@ -2768,7 +2692,7 @@ if authentication_status:
                 if 'work_order_' not in st.session_state:
                     st.session_state.work_order_ = None
                 liste=[f"{i} to {menu_destinations[i]}" for i in dispatched.keys()]
-                work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=liste.index(st.session_state.work_order_) if st.session_state.work_order_ else 0)
+                work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=liste.index(st.session_state.work_order_) if st.session_state.work_order_ else 0) 
                 st.session_state.work_order_=work_order_
                 work_order=work_order_.split(" ")[0]
                 order=["001","002","003","004","005","006"]
@@ -2897,23 +2821,27 @@ if authentication_status:
                         load_mf_number_issued=False
                         carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
                         if carrier_code=="123456-KBX":
-                           if release_order_number in mf_numbers_for_load.keys():
-                               mf_liste=[i for i in mf_numbers_for_load[release_order_number]]
-                               if len(mf_liste)>0:
-                                   load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
-                                   mf=True
-                                   load_mf_number_issued=True
-                                   yes=True
-                               else:
-                                   st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
-                                   mf=False
-                                   yes=False
-                                   load_mf_number_issued=False  
-                           else:
-                               st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
-                               mf=False
-                               yes=False
-                               load_mf_number_issued=False  
+                            if 'load_mf_number' not in st.session_state:
+                                st.session_state.load_mf_number = None
+                            if release_order_number in mf_numbers_for_load.keys():
+                                mf_liste=[i for i in mf_numbers_for_load[release_order_number]]
+                                if len(mf_liste)>0:
+                                    load_mf_number = st.selectbox("MF NUMBER", mf_liste, disabled=False, key=14551, index=mf_liste.index(st.session_state.load_mf_number) if st.session_state.load_mf_number else 0)
+                                    mf=True
+                                    load_mf_number_issued=True
+                                    yes=True
+                                    st.session_state.load_mf_number = load_mf_number
+                                   
+                                else:
+                                    st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                                    mf=False
+                                    yes=False
+                                    load_mf_number_issued=False  
+                            else:
+                                st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                                mf=False
+                                yes=False
+                                load_mf_number_issued=False  
                            
                         foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
                         foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
@@ -3340,7 +3268,7 @@ if authentication_status:
                             else:
                                 bill_of_lading_number,bill_of_ladings=gen_bill_of_lading()
                                 if load_mf_number_issued:
-                                    bill_of_lading_number=load_mf_number
+                                    bill_of_lading_number=st.session_state.load_mf_number
                                 edi_name= f'{bill_of_lading_number}.txt'
                                 bill_of_ladings[str(bill_of_lading_number)]={"vessel":vessel,"release_order":release_order_number,"destination":destination,"sales_order":current_sales_order,
                                                                              "ocean_bill_of_lading":ocean_bill_of_lading,"grade":wrap,"carrier_id":carrier_code,"vehicle":vehicle_id,
@@ -3512,8 +3440,8 @@ if authentication_status:
                                 subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
                                 body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
                                 sender = "warehouseoly@gmail.com"
-                                #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                                recipients = ["afsiny@portolympia.com"]
+                                recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                #recipients = ["afsiny@portolympia.com"]
                                 password = "xjvxkmzbpotzeuuv"
                                 send_email(subject, body, sender, recipients, password)
                             
@@ -3776,7 +3704,7 @@ if authentication_status:
                                 st.dataframe(tempo)
                         except:
                             pass
-                    with inv4tab3: ### UNREGISTERED UNITS TAB
+                    with inv4tab3:
                         alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                         alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])
                         alien_list=pd.DataFrame(alien_units[alien_vessel]).T
@@ -3786,7 +3714,7 @@ if authentication_status:
                         st.dataframe(alien_list)
                         
                       
-            with inv5:     
+            with inv5:
                 inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
                 maintenance=False
@@ -3834,8 +3762,6 @@ if authentication_status:
 
 
             with inv6:
-                
-                
                 inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
                 ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
@@ -3896,8 +3822,6 @@ if authentication_status:
                     st.dataframe(new)
                 with relcol2:
                     st.plotly_chart(fig)
-                
-                   
                    
                 
 
@@ -3941,7 +3865,7 @@ if authentication_status:
             if 'work_order_' not in st.session_state:
                 st.session_state.work_order_ = None
             liste=[f"{i} to {menu_destinations[i]}" for i in dispatched.keys()]
-            work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=liste.index(st.session_state.work_order_) if st.session_state.work_order_ else 0)
+            work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=liste.index(st.session_state.work_order_) if st.session_state.work_order_ else 0) 
             st.session_state.work_order_=work_order_
             work_order=work_order_.split(" ")[0]
             order=["001","002","003","004","005","006"]
@@ -4070,23 +3994,27 @@ if authentication_status:
                     load_mf_number_issued=False
                     carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
                     if carrier_code=="123456-KBX":
-                       if release_order_number in mf_numbers_for_load.keys():
-                           mf_liste=[i for i in mf_numbers_for_load[release_order_number]]
-                           if len(mf_liste)>0:
-                               load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
-                               mf=True
-                               load_mf_number_issued=True
-                               yes=True
-                           else:
-                               st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
-                               mf=False
-                               yes=False
-                               load_mf_number_issued=False  
-                       else:
-                           st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
-                           mf=False
-                           yes=False
-                           load_mf_number_issued=False  
+                        if 'load_mf_number' not in st.session_state:
+                            st.session_state.load_mf_number = None
+                        if release_order_number in mf_numbers_for_load.keys():
+                            mf_liste=[i for i in mf_numbers_for_load[release_order_number]]
+                            if len(mf_liste)>0:
+                                load_mf_number = st.selectbox("MF NUMBER", mf_liste, disabled=False, key=14551, index=mf_liste.index(st.session_state.load_mf_number) if st.session_state.load_mf_number else 0)
+                                mf=True
+                                load_mf_number_issued=True
+                                yes=True
+                                st.session_state.load_mf_number = load_mf_number
+                               
+                            else:
+                                st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                                mf=False
+                                yes=False
+                                load_mf_number_issued=False  
+                        else:
+                            st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                            mf=False
+                            yes=False
+                            load_mf_number_issued=False  
                        
                     foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
                     foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)
@@ -4513,7 +4441,7 @@ if authentication_status:
                         else:
                             bill_of_lading_number,bill_of_ladings=gen_bill_of_lading()
                             if load_mf_number_issued:
-                                bill_of_lading_number=load_mf_number
+                                bill_of_lading_number=st.session_state.load_mf_number
                             edi_name= f'{bill_of_lading_number}.txt'
                             bill_of_ladings[str(bill_of_lading_number)]={"vessel":vessel,"release_order":release_order_number,"destination":destination,"sales_order":current_sales_order,
                                                                          "ocean_bill_of_lading":ocean_bill_of_lading,"grade":wrap,"carrier_id":carrier_code,"vehicle":vehicle_id,
@@ -4629,8 +4557,8 @@ if authentication_status:
                         body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                         #st.write(body)           
                         sender = "warehouseoly@gmail.com"
-                        #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                        recipients = ["afsiny@portolympia.com"]
+                        recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                        #recipients = ["afsiny@portolympia.com"]
                         password = "xjvxkmzbpotzeuuv"
                 
               
@@ -4685,8 +4613,8 @@ if authentication_status:
                             subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
                             body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
                             sender = "warehouseoly@gmail.com"
-                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                            recipients = ["afsiny@portolympia.com"]
+                            recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                            #recipients = ["afsiny@portolympia.com"]
                             password = "xjvxkmzbpotzeuuv"
                             send_email(subject, body, sender, recipients, password)
                         
@@ -4699,8 +4627,7 @@ if authentication_status:
                     
         else:
             st.subheader("**Nothing dispatched!**")
-                        
-    
+   
         
                     ###########################       SUZANO INVENTORY BOARD    ###########################
  
@@ -5043,7 +4970,6 @@ if authentication_status:
                 st.dataframe(new)
             with relcol2:
                 st.plotly_chart(fig)
-
 
 
 elif authentication_status == False:

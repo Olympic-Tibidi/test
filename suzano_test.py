@@ -2199,13 +2199,31 @@ if authentication_status:
                         trucks=df_temp.groupby(["issued"])[['vehicle']].count().vehicle.values
                         a.insert(0,'trucks',trucks)
                         a['Per_Ton']=round(a['Per_Ton'],1)
-                        #a['Per_Ton']=["${:.2f}".format(number) for number in a['Per_Ton']]
-                        a['cost']=["${:.2f}".format(number) for number in a['cost']]
-                        a.index=[i.date() for i in a.index]
-                        a= a.rename_axis('Week Ending On', axis=0)
-                        a.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
-                        st.dataframe(a)
-                with release_order_tab1:
+                        b=a.copy()
+                        cost_choice=st.radio("Select Daily/Weekly/Monthly Cost Analysis",["DAILY","WEEKLY","MONTHLY"])
+                        if cost_choice=="DAILY":
+                            #a['Per_Ton']=["${:.2f}".format(number) for number in a['Per_Ton']]
+                            a['cost']=["${:.2f}".format(number) for number in a['cost']]
+                            a.index=[i.date() for i in a.index]
+                            a= a.rename_axis('Day', axis=0)
+                            a.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
+                            st.dataframe(a)
+                        if cost_choice=="WEEKLY":
+                            b= b.rename_axis('Week', axis=0)
+                            b.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
+                            weekly=b.dropna()
+                            weekly=weekly.resample('W').sum()
+                            weekly['Cost Per Ton']=round(weekly['Total Cost']/weekly['Tons Shipped'],1)
+                            st.dataframe(weekly)
+                        if cost_choice=="MONTHLY":
+                            c= b.rename_axis('Month', axis=0)
+                            c.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
+                            monthly=c.dropna()
+                            monthly=monthly.resample('M').sum()
+                            monthly['Cost Per Ton']=round(monthly['Total Cost']/monthly['Tons Shipped'],1)
+                            st.dataframe(monthly)
+                
+                with release_order_tab1:  ####  CREATE RELEASE ORDER ###
                     #vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])  ###-###
                    
                     add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER",disabled=False)

@@ -2220,11 +2220,14 @@ if authentication_status:
                             weekly= weekly.rename_axis('Week', axis=0)
                             st.dataframe(weekly)
                         if cost_choice=="MONTHLY":
-                            m= m.rename_axis('Month', axis=0)
                             m.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
                             monthly=m.dropna()
                             monthly=monthly.resample('M').sum()
                             monthly['Cost Per Ton']=round(monthly['Total Cost']/monthly['Tons Shipped'],1)
+                            monthly['Cost Per Ton']=["${:.2f}".format(number) for number in monthly['Cost Per Ton']]
+                            monthly['Total Cost']=["${:.2f}".format(number) for number in monthly['Total Cost']]
+                            monthly.index=[i.date() for i in monthly.index]
+                            monthly= monthly.rename_axis('Week', axis=0)
                             st.dataframe(monthly)
                 
                 with release_order_tab1:  ####  CREATE RELEASE ORDER ###

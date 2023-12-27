@@ -46,6 +46,7 @@ import tempfile
 import plotly.graph_objects as go
 import pydeck as pdk
 from pandas.tseries.offsets import BDay
+import calendar
 
 
 #import streamlit_option_menu
@@ -2226,8 +2227,8 @@ if authentication_status:
                             monthly['Cost Per Ton']=round(monthly['Total Cost']/monthly['Tons Shipped'],1)
                             monthly['Cost Per Ton']=["${:.2f}".format(number) for number in monthly['Cost Per Ton']]
                             monthly['Total Cost']=["${:.2f}".format(number) for number in monthly['Total Cost']]
-                            monthly.index=[i.date() for i in monthly.index]
-                            monthly= monthly.rename_axis('Week', axis=0)
+                            monthly.index=[calendar.month_abbr[k] for k in [i.month for i in weekly.index]]
+                            monthly= monthly.rename_axis('Month', axis=0)
                             st.dataframe(monthly)
                 
                 with release_order_tab1:  ####  CREATE RELEASE ORDER ###

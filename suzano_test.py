@@ -2095,6 +2095,7 @@ if authentication_status:
                             for sales in raw_ro[rel_ord]:
                                 st.write(sales)
                                 found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
+                                st.write(found_key)
                                 qt=info[found_key]['quantity']
                                 info[found_key]={'total':raw_ro[rel_ord][sales]['total'],
                                                         'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}

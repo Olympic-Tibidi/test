@@ -2203,6 +2203,7 @@ if authentication_status:
                         a['cost']=["${:.2f}".format(number) for number in a['cost']]
                         a= a.rename_axis('Week', axis=0)
                         a.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
+                        st.dataframe(a)
                 with release_order_tab1:
                     #vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])  ###-###
                    

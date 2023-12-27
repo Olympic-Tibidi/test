@@ -2210,7 +2210,7 @@ if authentication_status:
                             a.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
                             st.dataframe(a)
                         if cost_choice=="WEEKLY":
-                            w.index=[i.date() for i in w.index]
+                            w.index=[i.date for i in w.index]
                             w= w.rename_axis('Week', axis=0)
                             w.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
                             weekly=w.dropna()

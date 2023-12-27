@@ -2201,8 +2201,8 @@ if authentication_status:
                         a['Per_Ton']=round(a['Per_Ton'],1)
                         #a['Per_Ton']=["${:.2f}".format(number) for number in a['Per_Ton']]
                         a['cost']=["${:.2f}".format(number) for number in a['cost']]
-                        a= a.rename_axis('Week Ending On', axis=0)
                         a.index=[i.date() for i in a.index]
+                        a= a.rename_axis('Week Ending On', axis=0)
                         a.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
                         st.dataframe(a)
                 with release_order_tab1:

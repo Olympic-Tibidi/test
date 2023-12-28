@@ -2090,14 +2090,13 @@ if authentication_status:
                         grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
                         info=grouped_df.T.to_dict()
                         for rel_ord in raw_ro:
-                            
                             for sales in raw_ro[rel_ord]:
+                                st.write(f"{rel_ord},{sales},{raw_ro[rel_ord][sales]['destination']},{raw_ro[rel_ord][sales]['remaining']}
                                 try:
                                     found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
                                     qt=info[found_key]['quantity']
                                 except:
                                     qt=0
-                                    
                                 info[rel_ord,sales,raw_ro[rel_ord][sales]['destination']]={'total':raw_ro[rel_ord][sales]['total'],
                                                         'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}
                                                     

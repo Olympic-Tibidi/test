@@ -1960,8 +1960,8 @@ if authentication_status:
                            
                        
                             display=pd.DataFrame(st.session_state.scores)
-                            display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","SIU","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]].sum()
-                            display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","SIU","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]]
+                            display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]].sum()
+                            display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]]
                             
                             if template_check and template_choice_valid:
                                 st.dataframe(loaded_template)
@@ -2084,7 +2084,6 @@ if authentication_status:
                 with release_order_tab3: #### RELEASE ORDER STATUS ####
                     maintenance=False
                     if not maintenance:
-                        
                         inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                         inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
                         ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")

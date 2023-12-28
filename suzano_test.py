@@ -2934,7 +2934,10 @@ if authentication_status:
                                 mf_liste=[i for i in mf_numbers_for_load[release_order_number]]
                                 st.write(mf_liste)
                                 if len(mf_liste)>0:
-                                    load_mf_number = st.selectbox("MF NUMBER", mf_liste, disabled=False, key=14551, index=mf_liste.index(st.session_state.load_mf_number) if st.session_state.load_mf_number else 0)
+                                    try:
+                                        load_mf_number = st.selectbox("MF NUMBER", mf_liste, disabled=False, key=14551, index=mf_liste.index(st.session_state.load_mf_number) if st.session_state.load_mf_number else 0)
+                                    except:
+                                        load_mf_number = st.selectbox("MF NUMBER", mf_liste, disabled=False, key=14551)
                                     mf=True
                                     load_mf_number_issued=True
                                     yes=True

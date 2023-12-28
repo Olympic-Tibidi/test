@@ -1855,10 +1855,10 @@ if authentication_status:
                             ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
                             wage_cost=hour_cost+ot_cost
                             benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792 #+wage_cost*st.session_state.siu/100
-                            siu_choice=wage_cost*st.session_state.siu/100
-                            assessments=total_hours*pma_rates[pma_year]["Cargo_Dues"]+total_hours*pma_rates[pma_year]["Electronic_Input"]+total_hours*pma_rates[pma_year]["Benefits"]+total_hours*pension
-                            total_cost=wage_cost+benefits+siu_choice+assessments
                             
+                            assessments=total_hours*pma_rates[pma_year]["Cargo_Dues"]+total_hours*pma_rates[pma_year]["Electronic_Input"]+total_hours*pma_rates[pma_year]["Benefits"]+total_hours*pension
+                            total_cost=wage_cost+benefits+assessments
+                            siu_choice=wage_cost*st.session_state.siu/100
                             markup=total_cost*st.session_state.markup/100   ##+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
                             if foreman:
                                 markup=total_cost*st.session_state.f_markup/100  ###+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100

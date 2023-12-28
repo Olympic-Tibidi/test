@@ -3248,10 +3248,10 @@ if authentication_status:
                                 else:
                                     if x[:load_digit] in bill_mapping[vessel]:
                                         if audit_unit(x):
-                                            st.write(f"**Unit No : {i+1}-{x}**")
+                                            st.write(f"**Bale No : {i+1}-{x}**")
                                             faults.append(0)
                                         else:
-                                            st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                            st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
                                             st.write(f"**:red[WRONG B/L, DO NOT LOAD BALE {x}]**")
                                             faults.append(1)
                                         seen.add(x)

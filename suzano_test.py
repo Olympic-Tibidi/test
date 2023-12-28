@@ -1854,13 +1854,14 @@ if authentication_status:
                             hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
                             ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
                             wage_cost=hour_cost+ot_cost
-                            benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792+wage_cost*st.session_state.siu/100
+                            benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792 #+wage_cost*st.session_state.siu/100
+                            siu_choice=wage_cost*st.session_state.siu/100
                             assessments=total_hours*pma_rates[pma_year]["Cargo_Dues"]+total_hours*pma_rates[pma_year]["Electronic_Input"]+total_hours*pma_rates[pma_year]["Benefits"]+total_hours*pension
-                            total_cost=wage_cost+benefits+assessments
+                            total_cost=wage_cost+benefits+siu_choice+assessments
                             
-                            markup=wage_cost*st.session_state.markup/100+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
+                            markup=total_cost*st.session_state.markup/100   ##+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
                             if foreman:
-                                markup=wage_cost*st.session_state.f_markup/100+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
+                                markup=total_cost*st.session_state.f_markup/100  ###+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
                                               
                            
                             invoice=total_cost+markup
@@ -1875,6 +1876,7 @@ if authentication_status:
                                     "OT Cost": [ot_cost*qty],
                                     "Total Wage": [round(wage_cost*qty,2)],
                                     "Benefits":[round(benefits*qty,2)],
+                                    "SIU":[round(siu_choice*qty,2)],
                                     "PMA Assessments":[round(assessments*qty,2)],
                                     "TOTAL COST":[round(total_cost*qty,2)],
                                     "Mark UP":[round(markup*qty,2)],

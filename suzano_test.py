@@ -3238,35 +3238,57 @@ if authentication_status:
                             bale_textsplit = bale_load_input.splitlines()                       
                             bale_textsplit=[i for i in bale_textsplit if len(i)>8]                           
                             seen=set()
+                            alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                             for i,x in enumerate(bale_textsplit):
                                 alternate_vessel=[ship for ship in bill_mapping if ship!=vessel][0]
-                                if bill_mapping[alternate_vessel][x[:load_digit]]:
+                                if x[:load_digit] in bill_mapping[alternate_vessel]:
                                     st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
                                     faults.append(1)
-                                    st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")
+                                    st.markdown("**:red[THIS BALE LOT# IS FROM THE OTHER VESSEL!]**")
                                 else:
-                                    
-                                    if bill_mapping[vessel][x[:load_digit]]:
+                                    if x[:load_digit] in bill_mapping[vessel]:
                                         if audit_unit(x):
-                                            if x in seen:
-                                                st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                                faults.append(1)
-                                                st.markdown("**:red[This bale has been scanned TWICE!]**")
-                                            if x in load_dict.keys():
-                                                st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                                faults.append(1)
-                                                st.markdown("**:red[This bale has been SHIPPED!]**")   
-                                            else:
-                                                st.write(f"**Bale No : {i+1}-{x}**")
-                                                faults.append(0)
+                                            st.write(f"**Unit No : {i+1}-{x}**")
+                                            faults.append(0)
                                         else:
-                                            st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
-                                            st.write(f"**:red[WRONG B/L, DO NOT LOAD UNIT {x}]**")
+                                            st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
+                                            st.write(f"**:red[WRONG B/L, DO NOT LOAD BALE {x}]**")
                                             faults.append(1)
+                                        seen.add(x)
                                     else:
-                                        st.markdown(f"**:red[Bale No : {i+1}-{x}]**",unsafe_allow_html=True)
                                         faults.append(1)
-                                        st.markdown("**:red[This LOT# NOT IN INVENTORY!]**")
+                                        with st.expander(f"**:red[Bale No : {i+1}-{x} This LOT# NOT IN INVENTORY!---VERIFY BALE {x} CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles]**"):
+                                            st.write("Verify that the bale came from the pile that has the units for this release order and click to inventory")
+                                            if st.button("ADD UNIT TO INVENTORY",key=f"{x}"):
+                                                updated_bill=bill_mapping.copy()
+                                                updated_bill[vessel][x[:load_digit]]={"Batch":batch,"Ocean_bl":ocean_bill_of_lading}
+                                                updated_bill=json.dumps(updated_bill)
+                                                storage_client = storage.Client()
+                                                bucket = storage_client.bucket(target_bucket)
+                                                blob = bucket.blob(rf"bill_mapping.json")
+                                                blob.upload_from_string(updated_bill)
+
+                                                alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
+                                                alien_units[vessel][x]={}
+                                                alien_units[vessel][x]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
+                                                                        "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S")}
+                                                alien_units=json.dumps(alien_units)
+                                                storage_client = storage.Client()
+                                                bucket = storage_client.bucket(target_bucket)
+                                                blob = bucket.blob(rf"alien_units.json")
+                                                blob.upload_from_string(alien_units)
+                                                
+                                                
+                                                subject=f"FOUND UNIT {x} NOT IN INVENTORY"
+                                                body=f"Clerk identified an uninventoried {'Unwrapped' if grade=='ISU' else 'wrapped'} unit {x}, and after verifying the physical pile, inventoried it into Ocean Bill Of Lading : {ocean_bill_of_lading} for vessel {vessel}. Unit has been put into alien unit list."
+                                                sender = "warehouseoly@gmail.com"
+                                                #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                                recipients = ["afsiny@portolympia.com"]
+                                                password = "xjvxkmzbpotzeuuv"
+                                                send_email(subject, body, sender, recipients, password)
+                                                time.sleep(0.1)
+                                                st.success(f"Added Unit {x} to Inventory!",icon="✅")
+                                                st.rerun()
                        
                            
                         loads={}

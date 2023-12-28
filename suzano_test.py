@@ -2106,7 +2106,7 @@ if authentication_status:
                         st.dataframe(new)
                         new=new.reset_index()
                         st.dataframe(new)
-                        new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
+                        #new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
                         new.index=[i+1 for i in new.index]
                         release_orders = [str(key[0]) for key in info.keys()]
                         st.write(release_orders)

@@ -1889,7 +1889,7 @@ if authentication_status:
                             )
                          
                        
-                        #sub_rate1,sub_rate2=st.columns([2,8])
+                     
                         
                             
                         # Form for adding a new score
@@ -1966,6 +1966,7 @@ if authentication_status:
                             if template_check and template_choice_valid:
                                 st.dataframe(loaded_template)
                             else:
+                                st.write(st.session_state.scores.to_dict())
                                 st.dataframe(display)
                         csv=convert_df(display)
                         file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'

@@ -2088,23 +2088,24 @@ if authentication_status:
                         ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                         raw_ro = json.loads(ro)
                         grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
-                        grouped_df.reset_index(inplace=True)
-                        st.write(grouped_df)
                         info=grouped_df.T.to_dict()
-                        st.write(info)
                         for rel_ord in raw_ro:
+                            
                             for sales in raw_ro[rel_ord]:
                                 try:
                                     found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
                                     qt=info[found_key]['quantity']
                                 except:
                                     qt=0
+                                    
                                 info[rel_ord,sales,raw_ro[rel_ord][sales]['destination']]={'total':raw_ro[rel_ord][sales]['total'],
                                                         'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}
                                                     
                         new=pd.DataFrame(info).T
-                        st.dataframe(new)
                         new=new.reset_index()
+                        #new.groupby('level_1')['remaining'].sum()
+                        new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
+                        new.index=[i+1 for i in new.index]
                         st.dataframe(new)
                         #new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
                         new.index=[i+1 for i in new.index]

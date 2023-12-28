@@ -3896,14 +3896,12 @@ if authentication_status:
                 grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
                 info=grouped_df.T.to_dict()
                 for rel_ord in raw_ro:
-                    
                     for sales in raw_ro[rel_ord]:
                         try:
                             found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
                             qt=info[found_key]['quantity']
                         except:
                             qt=0
-                            
                         info[rel_ord,sales,raw_ro[rel_ord][sales]['destination']]={'total':raw_ro[rel_ord][sales]['total'],
                                                 'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}
                                             
@@ -3911,6 +3909,8 @@ if authentication_status:
                 new=new.reset_index()
                 #new.groupby('level_1')['remaining'].sum()
                 new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
+                new.index=[i+1 for i in new.index]
+                #new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
                 new.index=[i+1 for i in new.index]
                 release_orders = [str(key[0]) for key in info.keys()]
                 release_orders=[str(i) for i in release_orders]
@@ -3953,6 +3953,58 @@ if authentication_status:
                     st.dataframe(new)
                 with relcol2:
                     st.plotly_chart(fig)
+                
+                temp_dict={}
+                for rel_ord in raw_ro:
+                    
+                    
+                    for sales in raw_ro[rel_ord]:
+                        temp_dict[rel_ord,sales]={}
+                        dest=raw_ro[rel_ord][sales]['destination']
+                        vessel=raw_ro[rel_ord][sales]['vessel']
+                        total=raw_ro[rel_ord][sales]['total']
+                        remaining=raw_ro[rel_ord][sales]['remaining']
+                        temp_dict[rel_ord,sales]={'destination': dest,'vessel': vessel,'total':total,'remaining':remaining}
+                temp_df=pd.DataFrame(temp_dict).T
+              
+                temp_df= temp_df.rename_axis(['release_order','sales_order'], axis=0)
+            
+                temp_df['First Shipment'] = temp_df.index.map(inv_bill_of_ladings.groupby(['release_order','sales_order'])['issued'].first())
+                
+                for i in temp_df.index:
+                    if temp_df.loc[i,'remaining']<=2:
+                        try:
+                            temp_df.loc[i,"Last Shipment"]=inv_bill_of_ladings.groupby(['release_order','sales_order']).issued.last().loc[i]
+                        except:
+                            temp_df.loc[i,"Last Shipment"]=datetime.datetime.now()
+                        temp_df.loc[i,"Duration"]=(pd.to_datetime(temp_df.loc[i,"Last Shipment"])-pd.to_datetime(temp_df.loc[i,"First Shipment"])).days+1
+                
+                temp_df['First Shipment'] = temp_df['First Shipment'].fillna(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S'))
+                temp_df['Last Shipment'] = temp_df['Last Shipment'].fillna(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S'))
+                
+                ####
+                
+                def business_days(start_date, end_date):
+                    return pd.date_range(start=start_date, end=end_date, freq=BDay())
+                temp_df['# of Shipment Days'] = temp_df.apply(lambda row: len(business_days(row['First Shipment'], row['Last Shipment'])), axis=1)
+                df_temp=inv_bill_of_ladings.copy()
+                df_temp["issued"]=[pd.to_datetime(i).date() for i in df_temp["issued"]]
+                for i in temp_df.index:
+                    try:
+                        temp_df.loc[i,"Utilized Shipment Days"]=df_temp.groupby(["release_order",'sales_order'])[["issued"]].nunique().loc[i,'issued']
+                    except:
+                        temp_df.loc[i,"Utilized Shipment Days"]=0
+                
+                temp_df['First Shipment'] = temp_df['First Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y'))
+                temp_df['Last Shipment'] = temp_df['Last Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y') if type(x)==str else None)
+                liste=['Duration','# of Shipment Days',"Utilized Shipment Days"]
+                for col in liste:
+                    temp_df[col] = temp_df[col].apply(lambda x: f" {int(x)} days" if not pd.isna(x) else np.nan)
+                temp_df['remaining'] = temp_df['remaining'].apply(lambda x: int(x))
+                temp_df.columns=['Destination', 'Vessel', 'Total Units', 'Remaining Units', 'First Shipment',
+                       'Last Shipment', 'Duration', '# of Calendar Shipment Days',
+                       'Utilized Calendar Shipment Days']
+                st.dataframe(temp_df)
                    
                 
 
@@ -5073,17 +5125,21 @@ if authentication_status:
             grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
             info=grouped_df.T.to_dict()
             for rel_ord in raw_ro:
-                
                 for sales in raw_ro[rel_ord]:
-                    found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
-                    qt=info[found_key]['quantity']
-                    info[found_key]={'total':raw_ro[rel_ord][sales]['total'],
+                    try:
+                        found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
+                        qt=info[found_key]['quantity']
+                    except:
+                        qt=0
+                    info[rel_ord,sales,raw_ro[rel_ord][sales]['destination']]={'total':raw_ro[rel_ord][sales]['total'],
                                             'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}
                                         
             new=pd.DataFrame(info).T
             new=new.reset_index()
-            new.groupby('level_1')['remaining'].sum()
+            #new.groupby('level_1')['remaining'].sum()
             new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
+            new.index=[i+1 for i in new.index]
+            #new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
             new.index=[i+1 for i in new.index]
             release_orders = [str(key[0]) for key in info.keys()]
             release_orders=[str(i) for i in release_orders]
@@ -5126,6 +5182,58 @@ if authentication_status:
                 st.dataframe(new)
             with relcol2:
                 st.plotly_chart(fig)
+            
+            temp_dict={}
+            for rel_ord in raw_ro:
+                
+                
+                for sales in raw_ro[rel_ord]:
+                    temp_dict[rel_ord,sales]={}
+                    dest=raw_ro[rel_ord][sales]['destination']
+                    vessel=raw_ro[rel_ord][sales]['vessel']
+                    total=raw_ro[rel_ord][sales]['total']
+                    remaining=raw_ro[rel_ord][sales]['remaining']
+                    temp_dict[rel_ord,sales]={'destination': dest,'vessel': vessel,'total':total,'remaining':remaining}
+            temp_df=pd.DataFrame(temp_dict).T
+          
+            temp_df= temp_df.rename_axis(['release_order','sales_order'], axis=0)
+        
+            temp_df['First Shipment'] = temp_df.index.map(inv_bill_of_ladings.groupby(['release_order','sales_order'])['issued'].first())
+            
+            for i in temp_df.index:
+                if temp_df.loc[i,'remaining']<=2:
+                    try:
+                        temp_df.loc[i,"Last Shipment"]=inv_bill_of_ladings.groupby(['release_order','sales_order']).issued.last().loc[i]
+                    except:
+                        temp_df.loc[i,"Last Shipment"]=datetime.datetime.now()
+                    temp_df.loc[i,"Duration"]=(pd.to_datetime(temp_df.loc[i,"Last Shipment"])-pd.to_datetime(temp_df.loc[i,"First Shipment"])).days+1
+            
+            temp_df['First Shipment'] = temp_df['First Shipment'].fillna(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S'))
+            temp_df['Last Shipment'] = temp_df['Last Shipment'].fillna(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S'))
+            
+            ####
+            
+            def business_days(start_date, end_date):
+                return pd.date_range(start=start_date, end=end_date, freq=BDay())
+            temp_df['# of Shipment Days'] = temp_df.apply(lambda row: len(business_days(row['First Shipment'], row['Last Shipment'])), axis=1)
+            df_temp=inv_bill_of_ladings.copy()
+            df_temp["issued"]=[pd.to_datetime(i).date() for i in df_temp["issued"]]
+            for i in temp_df.index:
+                try:
+                    temp_df.loc[i,"Utilized Shipment Days"]=df_temp.groupby(["release_order",'sales_order'])[["issued"]].nunique().loc[i,'issued']
+                except:
+                    temp_df.loc[i,"Utilized Shipment Days"]=0
+            
+            temp_df['First Shipment'] = temp_df['First Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y'))
+            temp_df['Last Shipment'] = temp_df['Last Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y') if type(x)==str else None)
+            liste=['Duration','# of Shipment Days',"Utilized Shipment Days"]
+            for col in liste:
+                temp_df[col] = temp_df[col].apply(lambda x: f" {int(x)} days" if not pd.isna(x) else np.nan)
+            temp_df['remaining'] = temp_df['remaining'].apply(lambda x: int(x))
+            temp_df.columns=['Destination', 'Vessel', 'Total Units', 'Remaining Units', 'First Shipment',
+                   'Last Shipment', 'Duration', '# of Calendar Shipment Days',
+                   'Utilized Calendar Shipment Days']
+            st.dataframe(temp_df)
 
 
 elif authentication_status == False:

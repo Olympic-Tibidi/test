@@ -2095,10 +2095,11 @@ if authentication_status:
                         for rel_ord in raw_ro:
                             for sales in raw_ro[rel_ord]:
                                 try:
-                                    qt=grouped_df[(grouped_df['release_order']==rel_ord)&(grouped_df['sales_order']==sales)]['quantity']
+                                    found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
+                                    qt=info[found_key]['quantity']
                                 except:
                                     qt=0
-                                info[found_key]={'total':raw_ro[rel_ord][sales]['total'],
+                                info[rel_ord,sales,raw_ro[rel_ord][sales]['destination']]={'total':raw_ro[rel_ord][sales]['total'],
                                                         'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}
                                                     
                         new=pd.DataFrame(info).T

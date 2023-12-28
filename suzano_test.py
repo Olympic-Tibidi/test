@@ -1960,8 +1960,8 @@ if authentication_status:
                            
                        
                             display=pd.DataFrame(st.session_state.scores)
-                            display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]].sum()
-                            display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]]
+                            display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","SIU","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]].sum()
+                            display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","SIU","PMA Assessments","TOTAL COST","Mark UP","INVOICE"]]
                             
                             if template_check and template_choice_valid:
                                 st.dataframe(loaded_template)

@@ -2097,7 +2097,7 @@ if authentication_status:
                                 found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
                                 st.write(found_key)
                                 try:
-                                    qt=info[found_key]['quantity']
+                                    qt=grouped_df[(grouped_df['release_order']==rel_ord)&(grouped_df['sales_order']==sales)]['quantity']
                                 except:
                                     qt=0
                                 info[found_key]={'total':raw_ro[rel_ord][sales]['total'],

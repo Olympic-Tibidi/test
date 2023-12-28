@@ -1966,7 +1966,7 @@ if authentication_status:
                             if template_check and template_choice_valid:
                                 st.dataframe(loaded_template)
                             else:
-                                st.write(st.session_state.scores.to_dict())
+                                st.write(st.session_state.scores.T.to_dict())
                                 st.dataframe(display)
                         csv=convert_df(display)
                         file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'

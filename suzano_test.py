@@ -1859,6 +1859,7 @@ if authentication_status:
                             assessments=total_hours*pma_rates[pma_year]["Cargo_Dues"]+total_hours*pma_rates[pma_year]["Electronic_Input"]+total_hours*pma_rates[pma_year]["Benefits"]+total_hours*pension
                             total_cost=wage_cost+benefits+assessments
                             siu_choice=wage_cost*st.session_state.siu/100
+                            
                             with_siu=total_cost+siu_choice
                             markup=with_siu*st.session_state.markup/100   ##+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
                             if foreman:
@@ -1963,7 +1964,7 @@ if authentication_status:
                             display=pd.DataFrame(st.session_state.scores)
                             display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]].sum()
                             display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]]
-                            display.rename(columns={"SIU":f"%{siu_choice} SIU"},inplace=True)
+                            display.rename(columns={"SIU":f"%{st.session_state.siu} SIU"},inplace=True)
                             if template_check and template_choice_valid:
                                 st.dataframe(loaded_template)
                             else:

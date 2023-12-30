@@ -2002,7 +2002,13 @@ if authentication_status:
                                 st.session_state.scores.reset_index(drop=True,inplace=True)
                             except:
                                 pass
-
+                        if st.button("CLEAR TABLE"):
+                            try:
+                                st.session_state.scores = pd.DataFrame(
+                                {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]}
+                            )
+                            except:
+                                pass
             
             
             with admin_tab2:

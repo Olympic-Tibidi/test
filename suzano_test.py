@@ -2007,6 +2007,7 @@ if authentication_status:
                                 st.session_state.scores = pd.DataFrame(
                                 {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]}
                             )
+                                st.rerun()
                             except:
                                 pass
             

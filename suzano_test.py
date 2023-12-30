@@ -444,7 +444,7 @@ if authentication_status:
         
         
         select=st.sidebar.radio("SELECT FUNCTION",
-            ('ADMIN', 'LOADOUT', 'INVENTORY','WEATHER','TIDES','FINANCE'))
+            ('ADMIN', 'LOADOUT', 'INVENTORY','LABOR','WEATHER','TIDES','FINANCE'))
         custom_style = """
                     <style>
                         .custom-container {
@@ -471,6 +471,264 @@ if authentication_status:
             if len(events)>0:
                 st.warning(events[0])
 
+        if select=='LABOR':
+            labor_issue=False
+            secondary=True
+            if secondary:
+                lab_tab1,lab_tab2=st.tabs(["LABOR TEMPLATE", "JOBS"])
+                with lab_tab2:
+                    lab_col1,lab_col2,lab_col3=st.columns([2,2,2])
+                    with lab_col1:
+                        with st.container(border=True):
+                            
+                            job_vessel=st.text_input("VESSEL",disabled=False)
+                            vessel_length=st.number_input("VESSEL LENGTH",step=1,disabled=False)
+                            job_number=st.text_input("MT JOB NO",disabled=False)
+                            shipper=st.text_input("SHIPPER",disabled=False)
+                            agent=st.selectbox("AGENT",["TALON","ACGI","NORTON LILLY"],disabled=False)
+                            stevedore=st.selectbox("STEVEDORE",["SSA","JONES"],disabled=False)
+                            
+                            alongside_date=st.date_input("ALONGSIDE DATE",disabled=False,key="arr")
+                            alongside_date=datetime.datetime.strftime(alongside_date,"%Y-%m-%d")
+                            
+                            alongside_time=st.time_input("ALONGSIDE TIME",disabled=False,key="arrt")
+                            alongside_time=alongside_time.strftime("%H:%M")
+                            
+                            departure_date=st.date_input("DEPARTURE DATE",disabled=False,key="dep")
+                            departure_date=datetime.datetime.strftime(departure_date,"%Y-%m-%d")
+                           
+                            departure_time=st.time_input("DEPARTURE TIME",disabled=False,key="dept")
+                            departure_time=departure_time.strftime("%H:%M")
+                            
+                            
+                        if st.button("RECORD JOB"):
+                            year="2023"
+                            mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
+                            mt_jobs=json.loads(mt_jobs_)
+                            if year not in mt_jobs:
+                                mt_jobs[year]={}
+                            mt_jobs[year].update({"Job Number":job_number,"Vessel":job_vessel,"Vessel Length":vessel_length,
+                                                "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
+                                                "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time})
+                            mt_jobs_=json.dumps(mt_jobs)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"mt_jobs.json")
+                            blob.upload_from_string(mt_jobs_)
+                            st.success(f"RECORDED JOB NO {job_number} ! ")
+                with lab_tab1:
+                    
+                    foreman=False
+                    with st.container(border=True):
+                        
+                        tinker,tailor=st.columns([5,5])
+                        with tinker:
+                            select_year=st.selectbox("SELECT ILWU PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
+                        with tailor:
+                            select_pmayear=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
+                    
+                    year=select_year.split(' ')[1]
+                    month=select_year.split(' ')[0]
+                    pma_year=select_pmayear.split(' ')[1]
+                    pma_rates=gcp_download(target_bucket,rf"pma_dues.json")
+                    pma_rates=json.loads(pma_rates)
+                    pma_rates_=pd.DataFrame(pma_rates).T
+                    assessment_rates=gcp_download(target_bucket,rf"occ_codes{year}.json")
+                    assessment_rates=json.loads(assessment_rates)
+                    occ_codes=pd.DataFrame(assessment_rates).T
+                    occ_codes=occ_codes.rename_axis('Occ_Code')
+                    shortened_occ_codes=occ_codes.loc[["0036","0037","0055","0092","0101","0103","0115","0129","0213","0215"]]
+                    shortened_occ_codes=shortened_occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
+                    occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
+                    rates=st.checkbox("SELECT TO DISPLAY RATE TABLE FOR THE YEAR",key="iueis")
+                    if rates:
+                        
+                        lan1,lan2=st.columns([2,2])
+                        with lan1:
+                            st.write(occ_codes)
+                        with lan2:
+                            st.write(pma_rates[pma_year])
+                    
+                    
+                    if "scores" not in st.session_state:
+                        st.session_state.scores = pd.DataFrame(
+                            {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]}
+                        )
+                    ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
+                   
+                    def new_scores():
+                        
+                        if num_code=='0129':
+                            foreman=True
+                        else:
+                            foreman=False
+                        
+                        pension=pma_rates[pma_year]["LS_401k"]
+                        if foreman:
+                            pension=pma_rates[pma_year]["Foreman_401k"]
+                                     
+                        
+                        qty=st.session_state.qty
+                        total_hours=st.session_state.hours+st.session_state.ot
+                        hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
+                        ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
+                        wage_cost=hour_cost+ot_cost
+                        benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792                 #+wage_cost*st.session_state.siu/100
+                        
+                        assessments=total_hours*pma_rates[pma_year]["Cargo_Dues"]+total_hours*pma_rates[pma_year]["Electronic_Input"]+total_hours*pma_rates[pma_year]["Benefits"]+total_hours*pension
+                        total_cost=wage_cost+benefits+assessments
+                        siu_choice=wage_cost*st.session_state.siu/100
+                        
+                        with_siu=total_cost+siu_choice
+                        markup=with_siu*st.session_state.markup/100   ##+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
+                        if foreman:
+                            markup=with_siu*st.session_state.f_markup/100  ###+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
+                                          
+                       
+                        invoice=total_cost+markup
+                        new_score = pd.DataFrame(
+                            {
+                                "Code": [st.session_state.code],
+                                "Shift": [st.session_state.shift],
+                                "Quantity": [st.session_state.qty],
+                                "Hours": [st.session_state.hours*qty],
+                                "OT": [st.session_state.ot*qty],
+                                "Hour Cost": [hour_cost*qty],
+                                "OT Cost": [ot_cost*qty],
+                                "Total Wage": [round(wage_cost*qty,2)],
+                                "Benefits":[round(benefits*qty,2)],
+                                "PMA Assessments":[round(assessments*qty,2)],
+                                "TOTAL COST":[round(total_cost*qty,2)],
+                                "SIU":[round(siu_choice*qty,2)],
+                                "Mark UP":[round(markup*qty,2)],
+                                "INVOICE":[round(invoice*qty,2)]
+                                
+                            }
+                        )
+                        st.session_state.scores = pd.concat(
+                            [st.session_state.scores, new_score], ignore_index=True
+                        )
+                     
+                   
+                 
+                    
+                        
+                    # Form for adding a new score
+                    
+                    with st.form("new_score_form"):
+                        st.write("### Add a New Rank")
+                        form_col1,form_col2,form_col3=st.columns([3,3,4])
+                        with form_col1:
+                            
+                            st.session_state.siu=st.number_input("ENTER SIU (UNEMPLOYMENT) PERCENTAGE",step=1,key="kdsha")
+                            st.session_state.markup=st.number_input("ENTER MARKUP",step=1,key="wer")
+                            st.session_state.f_markup=st.number_input("ENTER FOREMAN MARKUP",step=1,key="wfder")
+                        with form_col2:
+                            st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND","HOOT"])
+    
+                        
+                            # Dropdown for selecting Code
+                            st.session_state.code = st.selectbox(
+                                "Occupation Code", options=list(shortened_occ_codes.index)
+                            )
+                    
+                            # Number input for Quantity
+                            st.session_state.qty = st.number_input(
+                                "Quantity", step=1, value=0, min_value=0
+                        )
+                        with form_col3:
+                            
+                            # Number input for Hours
+                            st.session_state.hours = st.number_input(
+                                "Hours", step=0.5, value=0.0, min_value=0.0
+                            )
+                        
+                            # Number input for OT
+                            st.session_state.ot = st.number_input(
+                                "OT", step=1, value=0, min_value=0
+                            )
+                            
+                            # Form submit button
+                            submitted = st.form_submit_button("Submit")
+                    
+                    # If form is submitted, add the new score
+                    num_code=st.session_state.code[1].strip()
+                    if submitted:
+                        new_scores()
+                        
+                        st.success("Rank added successfully!")
+                    
+                        
+                    with st.container(border=True):
+                        
+                        sub_col1,sub_col2,sub_col3=st.columns([3,3,4])
+                        with sub_col1:
+                            # Display the updated DataFrame
+                            st.write("### Updated Cost Table")
+                        with sub_col2:
+                            template_check=st.checkbox("LOAD FROM TEMPLATE")
+                            if template_check:
+                                with sub_col3:
+                                    template_choice_valid=False
+                                    template_choice=st.selectbox("Select Recorded Template",["Pick From List"]+[i for i in list_files_in_subfolder(target_bucket, rf"labor_templates/")],
+                                                                  label_visibility="collapsed")
+                                    if template_choice!="Pick From List":
+                                        template_choice_valid=True 
+                                    if template_choice_valid:
+                                        loaded_template=gcp_csv_to_df(target_bucket,rf"labor_templates/{template_choice}")
+                                
+                                
+                       
+                   
+                        display=pd.DataFrame(st.session_state.scores)
+                        display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]].sum()
+                        display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]]
+                        display.rename(columns={"SIU":f"%{st.session_state.siu} SIU"},inplace=True)
+                        if template_check and template_choice_valid:
+                            st.dataframe(loaded_template)
+                        else:
+                            #st.write(st.session_state.scores.T.to_dict())
+                            st.dataframe(display)
+                    csv=convert_df(display)
+                    file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
+                    down_col1,down_col2,down_col3,down_col4=st.columns([2,2,2,4])
+                    with down_col1:
+                        st.write(" ")
+                        st.download_button(
+                            label="DOWNLOAD GANG COST",
+                            data=csv,
+                            file_name=file_name,
+                            mime='text/csv')
+                    with down_col3:
+                        filename=st.text_input("Name the Template",key="7dr3")
+                    with down_col2:
+                        st.write(" ")
+                        template=st.button("SAVE AS TEMPLATE",key="srfqw")
+                        if template:
+                            temp=display.to_csv(index=False)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            
+                            # Upload CSV string to GCS
+                            blob = bucket.blob(rf"labor_templates/{filename}.csv")
+                            blob.upload_from_string(temp, content_type="text/csv")
+                                               
+                    
+                    index=st.number_input("Enter Index To Delete",step=1,key="1224aa")
+                    if st.button("DELETE BY INDEX"):
+                        try:
+                            st.session_state.scores=st.session_state.scores.drop(index)
+                            st.session_state.scores.reset_index(drop=True,inplace=True)
+                        except:
+                            pass
+                    if st.button("CLEAR TABLE"):
+                        try:
+                            st.session_state.scores = pd.DataFrame(
+                            {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]}
+                        )
+                            st.rerun()
+                        except:
+                            pass
         if select=='WEATHER':
             st.caption("Live Data for Olympia From Weather.gov API")
             gov_forecast=get_weather()
@@ -1751,265 +2009,8 @@ if authentication_status:
             
               
         if select=="ADMIN" :
-            admin_tab1,admin_tab2,admin_tab3,admin_tab4=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","LABOR"])
-            with admin_tab4:
-                labor_issue=False
-                secondary=True
-                if secondary:
-                    lab_tab1,lab_tab2=st.tabs(["LABOR TEMPLATE", "JOBS"])
-                    with lab_tab2:
-                        lab_col1,lab_col2,lab_col3=st.columns([2,2,2])
-                        with lab_col1:
-                            with st.container(border=True):
-                                
-                                job_vessel=st.text_input("VESSEL",disabled=False)
-                                vessel_length=st.number_input("VESSEL LENGTH",step=1,disabled=False)
-                                job_number=st.text_input("MT JOB NO",disabled=False)
-                                shipper=st.text_input("SHIPPER",disabled=False)
-                                agent=st.selectbox("AGENT",["TALON","ACGI","NORTON LILLY"],disabled=False)
-                                stevedore=st.selectbox("STEVEDORE",["SSA","JONES"],disabled=False)
-                                
-                                alongside_date=st.date_input("ALONGSIDE DATE",disabled=False,key="arr")
-                                alongside_date=datetime.datetime.strftime(alongside_date,"%Y-%m-%d")
-                                
-                                alongside_time=st.time_input("ALONGSIDE TIME",disabled=False,key="arrt")
-                                alongside_time=alongside_time.strftime("%H:%M")
-                                
-                                departure_date=st.date_input("DEPARTURE DATE",disabled=False,key="dep")
-                                departure_date=datetime.datetime.strftime(departure_date,"%Y-%m-%d")
-                               
-                                departure_time=st.time_input("DEPARTURE TIME",disabled=False,key="dept")
-                                departure_time=departure_time.strftime("%H:%M")
-                                
-                                
-                            if st.button("RECORD JOB"):
-                                year="2023"
-                                mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
-                                mt_jobs=json.loads(mt_jobs_)
-                                if year not in mt_jobs:
-                                    mt_jobs[year]={}
-                                mt_jobs[year].update({"Job Number":job_number,"Vessel":job_vessel,"Vessel Length":vessel_length,
-                                                    "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
-                                                    "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time})
-                                mt_jobs_=json.dumps(mt_jobs)
-                                storage_client = storage.Client()
-                                bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"mt_jobs.json")
-                                blob.upload_from_string(mt_jobs_)
-                                st.success(f"RECORDED JOB NO {job_number} ! ")
-                    with lab_tab1:
-                        
-                        foreman=False
-                        with st.container(border=True):
-                            
-                            tinker,tailor=st.columns([5,5])
-                            with tinker:
-                                select_year=st.selectbox("SELECT ILWU PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
-                            with tailor:
-                                select_pmayear=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
-                        
-                        year=select_year.split(' ')[1]
-                        month=select_year.split(' ')[0]
-                        pma_year=select_pmayear.split(' ')[1]
-                        pma_rates=gcp_download(target_bucket,rf"pma_dues.json")
-                        pma_rates=json.loads(pma_rates)
-                        pma_rates_=pd.DataFrame(pma_rates).T
-                        assessment_rates=gcp_download(target_bucket,rf"occ_codes{year}.json")
-                        assessment_rates=json.loads(assessment_rates)
-                        occ_codes=pd.DataFrame(assessment_rates).T
-                        occ_codes=occ_codes.rename_axis('Occ_Code')
-                        shortened_occ_codes=occ_codes.loc[["0036","0037","0055","0092","0101","0103","0115","0129","0213","0215"]]
-                        shortened_occ_codes=shortened_occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
-                        occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
-                        rates=st.checkbox("SELECT TO DISPLAY RATE TABLE FOR THE YEAR",key="iueis")
-                        if rates:
-                            
-                            lan1,lan2=st.columns([2,2])
-                            with lan1:
-                                st.write(occ_codes)
-                            with lan2:
-                                st.write(pma_rates[pma_year])
-                        
-                        
-                        if "scores" not in st.session_state:
-                            st.session_state.scores = pd.DataFrame(
-                                {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]}
-                            )
-                        ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
-                       
-                        def new_scores():
-                            
-                            if num_code=='0129':
-                                foreman=True
-                            else:
-                                foreman=False
-                            
-                            pension=pma_rates[pma_year]["LS_401k"]
-                            if foreman:
-                                pension=pma_rates[pma_year]["Foreman_401k"]
-                                         
-                            
-                            qty=st.session_state.qty
-                            total_hours=st.session_state.hours+st.session_state.ot
-                            hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
-                            ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
-                            wage_cost=hour_cost+ot_cost
-                            benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792                 #+wage_cost*st.session_state.siu/100
-                            
-                            assessments=total_hours*pma_rates[pma_year]["Cargo_Dues"]+total_hours*pma_rates[pma_year]["Electronic_Input"]+total_hours*pma_rates[pma_year]["Benefits"]+total_hours*pension
-                            total_cost=wage_cost+benefits+assessments
-                            siu_choice=wage_cost*st.session_state.siu/100
-                            
-                            with_siu=total_cost+siu_choice
-                            markup=with_siu*st.session_state.markup/100   ##+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
-                            if foreman:
-                                markup=with_siu*st.session_state.f_markup/100  ###+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
-                                              
-                           
-                            invoice=total_cost+markup
-                            new_score = pd.DataFrame(
-                                {
-                                    "Code": [st.session_state.code],
-                                    "Shift": [st.session_state.shift],
-                                    "Quantity": [st.session_state.qty],
-                                    "Hours": [st.session_state.hours*qty],
-                                    "OT": [st.session_state.ot*qty],
-                                    "Hour Cost": [hour_cost*qty],
-                                    "OT Cost": [ot_cost*qty],
-                                    "Total Wage": [round(wage_cost*qty,2)],
-                                    "Benefits":[round(benefits*qty,2)],
-                                    "PMA Assessments":[round(assessments*qty,2)],
-                                    "TOTAL COST":[round(total_cost*qty,2)],
-                                    "SIU":[round(siu_choice*qty,2)],
-                                    "Mark UP":[round(markup*qty,2)],
-                                    "INVOICE":[round(invoice*qty,2)]
-                                    
-                                }
-                            )
-                            st.session_state.scores = pd.concat(
-                                [st.session_state.scores, new_score], ignore_index=True
-                            )
-                         
-                       
-                     
-                        
-                            
-                        # Form for adding a new score
-                        
-                        with st.form("new_score_form"):
-                            st.write("### Add a New Rank")
-                            form_col1,form_col2,form_col3=st.columns([3,3,4])
-                            with form_col1:
-                                
-                                st.session_state.siu=st.number_input("ENTER SIU (UNEMPLOYMENT) PERCENTAGE",step=1,key="kdsha")
-                                st.session_state.markup=st.number_input("ENTER MARKUP",step=1,key="wer")
-                                st.session_state.f_markup=st.number_input("ENTER FOREMAN MARKUP",step=1,key="wfder")
-                            with form_col2:
-                                st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND","HOOT"])
-        
-                            
-                                # Dropdown for selecting Code
-                                st.session_state.code = st.selectbox(
-                                    "Occupation Code", options=list(shortened_occ_codes.index)
-                                )
-                        
-                                # Number input for Quantity
-                                st.session_state.qty = st.number_input(
-                                    "Quantity", step=1, value=0, min_value=0
-                            )
-                            with form_col3:
-                                
-                                # Number input for Hours
-                                st.session_state.hours = st.number_input(
-                                    "Hours", step=0.5, value=0.0, min_value=0.0
-                                )
-                            
-                                # Number input for OT
-                                st.session_state.ot = st.number_input(
-                                    "OT", step=1, value=0, min_value=0
-                                )
-                                
-                                # Form submit button
-                                submitted = st.form_submit_button("Submit")
-                        
-                        # If form is submitted, add the new score
-                        num_code=st.session_state.code[1].strip()
-                        if submitted:
-                            new_scores()
-                            
-                            st.success("Rank added successfully!")
-                        
-                            
-                        with st.container(border=True):
-                            
-                            sub_col1,sub_col2,sub_col3=st.columns([3,3,4])
-                            with sub_col1:
-                                # Display the updated DataFrame
-                                st.write("### Updated Cost Table")
-                            with sub_col2:
-                                template_check=st.checkbox("LOAD FROM TEMPLATE")
-                                if template_check:
-                                    with sub_col3:
-                                        template_choice_valid=False
-                                        template_choice=st.selectbox("Select Recorded Template",["Pick From List"]+[i for i in list_files_in_subfolder(target_bucket, rf"labor_templates/")],
-                                                                      label_visibility="collapsed")
-                                        if template_choice!="Pick From List":
-                                            template_choice_valid=True 
-                                        if template_choice_valid:
-                                            loaded_template=gcp_csv_to_df(target_bucket,rf"labor_templates/{template_choice}")
-                                    
-                                    
-                           
-                       
-                            display=pd.DataFrame(st.session_state.scores)
-                            display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]].sum()
-                            display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]]
-                            display.rename(columns={"SIU":f"%{st.session_state.siu} SIU"},inplace=True)
-                            if template_check and template_choice_valid:
-                                st.dataframe(loaded_template)
-                            else:
-                                #st.write(st.session_state.scores.T.to_dict())
-                                st.dataframe(display)
-                        csv=convert_df(display)
-                        file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
-                        down_col1,down_col2,down_col3,down_col4=st.columns([2,2,2,4])
-                        with down_col1:
-                            st.write(" ")
-                            st.download_button(
-                                label="DOWNLOAD GANG COST",
-                                data=csv,
-                                file_name=file_name,
-                                mime='text/csv')
-                        with down_col3:
-                            filename=st.text_input("Name the Template",key="7dr3")
-                        with down_col2:
-                            st.write(" ")
-                            template=st.button("SAVE AS TEMPLATE",key="srfqw")
-                            if template:
-                                temp=display.to_csv(index=False)
-                                storage_client = storage.Client()
-                                bucket = storage_client.bucket(target_bucket)
-                                
-                                # Upload CSV string to GCS
-                                blob = bucket.blob(rf"labor_templates/{filename}.csv")
-                                blob.upload_from_string(temp, content_type="text/csv")
-                                                   
-                        
-                        index=st.number_input("Enter Index To Delete",step=1,key="1224aa")
-                        if st.button("DELETE BY INDEX"):
-                            try:
-                                st.session_state.scores=st.session_state.scores.drop(index)
-                                st.session_state.scores.reset_index(drop=True,inplace=True)
-                            except:
-                                pass
-                        if st.button("CLEAR TABLE"):
-                            try:
-                                st.session_state.scores = pd.DataFrame(
-                                {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]}
-                            )
-                                st.rerun()
-                            except:
-                                pass
+            admin_tab1,admin_tab2,admin_tab3=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S"])
+            
             
             
             with admin_tab2:

@@ -748,7 +748,7 @@ if authentication_status:
                         else:
                             st.write("##### LABOR")
                             st.dataframe(display)
-                            part1,part2,part3=st.columns([4,4,2])
+                            part1,part2,part3=st.columns([6,2,2])
                             with part1:
                                 st.write("##### EQUIPMENT")
                                 st.dataframe(eq_display)

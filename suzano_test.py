@@ -480,7 +480,33 @@ if authentication_status:
                 pma_rates=json.loads(pma_rates)
                 assessment_rates=gcp_download(target_bucket,rf"occ_codes2023.json")
                 assessment_rates=json.loads(assessment_rates)
-                lab_tab1,lab_tab2=st.tabs(["LABOR TEMPLATE", "JOBS"])
+                lab_tab1,lab_tab2,lab_tab3=st.tabs(["LABOR TEMPLATE", "JOBS","RATES"])
+                with lab_tab3:
+                    with st.container(border=True):
+                        
+                        tinker,tailor=st.columns([5,5])
+                        with tinker:
+                            select_year=st.selectbox("SELECT ILWU PERIOD",["JUL 2023","JUL 2022","JUL 2021"],key="ot1221")
+                        with tailor:
+                            select_pmayear=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"],key="ot12w21")
+                    
+                    year=select_year.split(' ')[1]
+                    month=select_year.split(' ')[0]
+                    pma_year=select_pmayear.split(' ')[1]
+                    pma_rates_=pd.DataFrame(pma_rates).T
+                    occ_codes=pd.DataFrame(assessment_rates).T
+                    occ_codes=occ_codes.rename_axis('Occ_Code')
+                    shortened_occ_codes=occ_codes.loc[["0036","0037","0055","0092","0101","0103","0115","0129","0213","0215"]]
+                    shortened_occ_codes=shortened_occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
+                    occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
+                    rates=st.checkbox("SELECT TO DISPLAY RATE TABLE FOR THE YEAR",key="iueis")
+                    if rates:
+                        
+                        lan1,lan2=st.columns([2,2])
+                        with lan1:
+                            st.write(occ_codes)
+                        with lan2:
+                            st.write(pma_rates[pma_year])
                 with lab_tab2:
                     lab_col1,lab_col2,lab_col3=st.columns([2,2,2])
                     with lab_col1:
@@ -541,14 +567,7 @@ if authentication_status:
                     shortened_occ_codes=occ_codes.loc[["0036","0037","0055","0092","0101","0103","0115","0129","0213","0215"]]
                     shortened_occ_codes=shortened_occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
                     occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
-                    rates=st.checkbox("SELECT TO DISPLAY RATE TABLE FOR THE YEAR",key="iueis")
-                    if rates:
-                        
-                        lan1,lan2=st.columns([2,2])
-                        with lan1:
-                            st.write(occ_codes)
-                        with lan2:
-                            st.write(pma_rates[pma_year])
+                    
                     
                     
                     if "scores" not in st.session_state:

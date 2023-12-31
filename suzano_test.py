@@ -542,7 +542,7 @@ if authentication_status:
                                 mt_jobs[year][job_number]={"INFO":{}}
                             mt_jobs[year][job_number]["INFO"]={"Vessel":job_vessel,"Vessel Length":vessel_length,
                                                 "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
-                                                "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time})
+                                                "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time}
                             mt_jobs_=json.dumps(mt_jobs)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)

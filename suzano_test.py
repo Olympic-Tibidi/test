@@ -766,10 +766,10 @@ if authentication_status:
                                 st.write(f"###### TOTAL LABOR: {display.loc['TOTAL FOR SHIFT','INVOICE']}")
                                 st.write(f"###### TOTAL EQUIPMENT: {eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']}")
                                 if st.session_state.maint:
-                                    st.write(f"###### TOTAL MAINTENANCE: {st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0]}")
-                                    st.write(f"##### TOTAL INVOICE:{display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']+st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0]}")
+                                    st.write(f"###### TOTAL MAINTENANCE: {round(st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0],2)}")
+                                    st.write(f"##### TOTAL INVOICE: {round(display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']+st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0],2)}")
                                 else:
-                                    st.write(f"##### TOTAL INVOICE:{display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']}")
+                                    st.write(f"##### TOTAL INVOICE: {round(display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE'],2)}")
                                             
                             
                                 

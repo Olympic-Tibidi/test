@@ -558,6 +558,19 @@ if authentication_status:
                         st.session_state.eq_scores = pd.DataFrame(
                             {"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
                     ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
+                    def equip_scores():
+                        equipment=st.session_state.equipment
+                        equipment_qty=st.session_state.eqqty
+                        equipment_hrs=st.session_state.eqhrs
+                        equipment_cost=equipment_qty*equipment_hrs*equipment_tariff[equipment]
+                        equipment_markup=equipment_cost*st.session_state.markup
+                        eq_score=pd.DataFrame({ "Equipment": [st.session_state.equipment],
+                                "Quantity": [st.session_state.eqqty],
+                                "Hours": [st.session_state.eqhrs*qty],
+                                "TOTAL COST":equipment_cost,
+                                "Mark UP":[round(equipment_markup,2)],
+                                "EQUIPMENT INVOICE":[round(equipment_cost+equipment_markup,2)]})
+                        st.session_state.eq_scores = pd.concat([st.session_state.eq_scores, eq_score], ignore_index=True)
                    
                     def new_scores():
                         
@@ -587,11 +600,7 @@ if authentication_status:
                         if foreman:
                             markup=with_siu*st.session_state.f_markup/100  ###+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
                         invoice=total_cost+markup
-                        equipment=st.session_state.equipment
-                        equipment_qty=st.session_state.eqqty
-                        equipment_hrs=st.session_state.eqhrs
-                        equipment_cost=equipment_qty*equipment_hrs*equipment_tariff[equipment]
-                        equipment_markup=equipment_cost*st.session_state.markup
+                        
                         
                         new_score = pd.DataFrame(
                             {
@@ -614,13 +623,7 @@ if authentication_status:
                         )
                         st.session_state.scores = pd.concat([st.session_state.scores, new_score], ignore_index=True)
                         
-                        eq_score=pd.DataFrame({ "Equipment": [st.session_state.equipment],
-                                "Quantity": [st.session_state.eqqty],
-                                "Hours": [st.session_state.eqhrs*qty],
-                                "TOTAL COST":equipment_cost,
-                                "Mark UP":[round(equipment_markup,2)],
-                                "EQUIPMENT INVOICE":[round(equipment_cost+equipment_markup,2)]})
-                        st.session_state.eq_scores = pd.concat([st.session_state.eq_scores, eq_score], ignore_index=True)
+                        
                  
                     
                         
@@ -663,10 +666,12 @@ if authentication_status:
                             # Form submit button
                             submitted = st.form_submit_button("Submit")
                         # If form is submitted, add the new score
-                    st.success("Rank added successfully!")
-                    num_code=st.session_state.code[1].strip()
+                    
                     if submitted:
                         new_scores()
+                        st.success("Rank added successfully!")
+                    num_code=st.session_state.code[1].strip()
+                    
                     with st.form("equipment_form"):
                         st.write("##### EQUIPMENT")
                         eqform_col1,eqform_col2,eqform_col3=st.columns([3,3,4])
@@ -680,7 +685,10 @@ if authentication_status:
                         with eqform_col3:
                             st.session_state.eqhrs = st.number_input(
                                 "Equipment Hours",key="sdsss", step=1, value=0, min_value=0)
-                    st.success("Equipment added successfully!")
+                            eq_submitted = st.form_submit_button("Submit Equipment")
+                    if submitted:
+                        eq_scores()
+                        st.success("Equipment added successfully!")
                     
                         
                     with st.container(border=True):

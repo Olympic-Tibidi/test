@@ -752,6 +752,14 @@ if authentication_status:
                             with part1:
                                 st.write("##### EQUIPMENT")
                                 st.dataframe(eq_display)
+                            maint1,maint2,maint3=st.columns([2,2,6])
+                            with maint1:
+                                st.write("##### MAINTENANCE (IF NIGHT/WEEKEND SHIFT)")
+                            with maint2:
+                                maint=st.checkbox("Check to add maint crew")
+                            if maint:
+                                st.session_state.maint=True
+                                st.dataframe(st.session_state.maint_scores)
                             with part2:
                                 st.write(f"###### TOTAL LABOR: {display.loc['TOTAL FOR SHIFT','INVOICE']}")
                                 st.write(f"###### TOTAL EQUIPMENT: {eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']}")
@@ -761,15 +769,8 @@ if authentication_status:
                                 else:
                                     st.write(f"##### TOTAL INVOICE:{display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']}")
                                             
-                            maint1,maint2,maint3=st.columns([2,2,6])
-                            with maint1:
-                                st.write("##### MAINTENANCE (IF NIGHT/WEEKEND SHIFT)")
-                            with maint2:
-                                maint=st.checkbox("Check to add maint crew")
-                            if maint:
-                                st.session_state.maint=True
-                                st.dataframe(st.session_state.maint_scores)
-                                st.rerun()
+                            
+                                
                            
                     clear1,clear2,clear3=st.columns([2,2,4])
                     with clear1:

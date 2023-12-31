@@ -613,7 +613,7 @@ if authentication_status:
                         st.session_state.scores = pd.concat(
                             [st.session_state.scores, new_score], ignore_index=True
                         )
-                        eq_score=pd.DataFrame( "Code": [st.session_state.equipment],
+                        eq_score=pd.DataFrame({ "Code": [st.session_state.equipment],
                                 "Shift": [st.session_state.shift],
                                 "Quantity": [st.session_state.eqqty],
                                 "Hours": [st.session_state.eqhrs*qty],
@@ -626,7 +626,7 @@ if authentication_status:
                                 "TOTAL COST":equipment_cost,
                                 "SIU":0,
                                 "Mark UP":[round(equipment_markup,2)],
-                                "INVOICE":[round(equipment_cost+equipment_markup,2)]
+                                "INVOICE":[round(equipment_cost+equipment_markup,2)]})
                        st.session_state.scores = pd.concat(
                             [st.session_state.scores, new_score], ignore_index=True
                  

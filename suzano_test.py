@@ -478,7 +478,7 @@ if authentication_status:
             if secondary:
                 pma_rates=gcp_download(target_bucket,rf"pma_dues.json")
                 pma_rates=json.loads(pma_rates)
-                assessment_rates=gcp_download(target_bucket,rf"occ_codes{year}.json")
+                assessment_rates=gcp_download(target_bucket,rf"occ_codes2023.json")
                 assessment_rates=json.loads(assessment_rates)
                 lab_tab1,lab_tab2=st.tabs(["LABOR TEMPLATE", "JOBS"])
                 with lab_tab2:

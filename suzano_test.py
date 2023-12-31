@@ -808,7 +808,7 @@ if authentication_status:
                             blob = bucket.blob(rf"labor_templates/{filename}.csv")
                             blob.upload_from_string(temp, content_type="text/csv")
                     with down_col2:
-                        st.write(st.session_state.scores.T.to_dict())
+                        #st.write(st.session_state.scores.T.to_dict())
                         job_no=st.selectbox("SELECT JOB NO",["MT-20"])
                         work_type=st.selectbox("SELECT JOB NO",["DOCK","WAREHOUSE"])
                         work_date=st.date_input("Work Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="work_date")
@@ -820,8 +820,9 @@ if authentication_status:
                                 mt_jobs[year]={}
                             if job_no not in mt_jobs[year]:
                                 mt_jobs[year][job_no]={}
+                                mt_jobs[year][job_no][work_date]={}
+                            mt_jobs[year][job_no][work_date]['LABOR']=st.session_state.scores.T.to_dict()
                             
-                            #if labor not in mt_jobs[year][job_no]
                             
                             
                             mt_jobs_=json.dumps(mt_jobs)

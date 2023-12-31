@@ -617,13 +617,14 @@ if authentication_status:
                     # Form for adding a new score
                     
                     with st.form("new_score_form"):
-                        st.write("### Add a New Rank")
+                        st.write("#### LABOR")
                         form_col1,form_col2,form_col3=st.columns([3,3,4])
                         with form_col1:
                             
                             st.session_state.siu=st.number_input("ENTER SIU (UNEMPLOYMENT) PERCENTAGE",step=1,key="kdsha")
                             st.session_state.markup=st.number_input("ENTER MARKUP",step=1,key="wer")
                             st.session_state.f_markup=st.number_input("ENTER FOREMAN MARKUP",step=1,key="wfder")
+                            
                         with form_col2:
                             st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND","HOOT"])
     
@@ -651,6 +652,10 @@ if authentication_status:
                             
                             # Form submit button
                             submitted = st.form_submit_button("Submit")
+                        st.write("#### EQUIPMENT")
+                        eqform_col1,eqform_col2,eqform_col3=st.columns([3,3,4])
+                        with eqform_col1: 
+                            pass
                     
                     # If form is submitted, add the new score
                     num_code=st.session_state.code[1].strip()

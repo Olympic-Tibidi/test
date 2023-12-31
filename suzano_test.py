@@ -821,6 +821,8 @@ if authentication_status:
                                 mt_jobs[year]={}
                             if job_no not in mt_jobs[year]:
                                 mt_jobs[year][job_no]={}
+                            if "RECORDS" not in mt_jobs[year][job_no]:
+                                mt_jobs[year][job_no]["RECORDS"]={}
                             if work_date not in mt_jobs[year][job_no]["RECORDS"]:
                                 mt_jobs[year][job_no]["RECORDS"][str(work_date)]={}
                             mt_jobs[year][job_no]["RECORDS"][str(work_date)]=st.session_state.scores.T.to_dict()

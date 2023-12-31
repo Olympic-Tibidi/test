@@ -818,10 +818,11 @@ if authentication_status:
                             mt_jobs=json.loads(mt_jobs_)
                             if year not in mt_jobs:
                                 mt_jobs[year]={}
-                            if job_no not in mt_jobs[year]:
+                            if mt_job not in mt_jobs[year]:
                                 mt_jobs[year][job_no]={}
-                                mt_jobs[year][job_no][str(work_date)]={}
-                            mt_jobs[year][job_no][work_date]['LABOR']=st.session_state.scores.T.to_dict()
+                            if work_date not in mt_jobs[year][job_no]["RECORDS"]:
+                                mt_jobs[year][job_no]["RECORDS"][str(work_date)]={}
+                            mt_jobs[year][job_no]["RECORDS"][str(work_date)]=st.session_state.scores.T.to_dict()
                             
                             
                             st.write(mt_jobs)

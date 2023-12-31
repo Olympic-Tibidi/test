@@ -724,7 +724,7 @@ if authentication_status:
                             st.dataframe(st.session_state.eq_scores)
                     clear1,clear2,clear3=st.columns([2,2,4])
                     with clear1:
-                        if st.button("CLEAR TABLE"):
+                        if st.button("CLEAR LABOR TABLE"):
                             try:
                                 st.session_state.scores = pd.DataFrame(
                                 {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],
@@ -733,7 +733,7 @@ if authentication_status:
                             except:
                                 pass
                     with clear2:
-                        if st.button("CLEAR TABLE"):
+                        if st.button("CLEAR EQUIPMENT TABLE",key="54332dca"):
                             try:
                                st.session_state.eq_scores = pd.DataFrame({"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
                                st.rerun()

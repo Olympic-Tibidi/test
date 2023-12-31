@@ -687,7 +687,7 @@ if authentication_status:
                                 "Equipment Hours",key="sdsss", step=1, value=0, min_value=0)
                             eq_submitted = st.form_submit_button("Submit Equipment")
                     if eq_submitted:
-                        eq_scores()
+                        equip_scores()
                         st.success("Equipment added successfully!")
                     
                         

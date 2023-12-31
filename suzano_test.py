@@ -474,7 +474,12 @@ if authentication_status:
         if select=='LABOR':
             labor_issue=False
             secondary=True
+            
             if secondary:
+                pma_rates=gcp_download(target_bucket,rf"pma_dues.json")
+                pma_rates=json.loads(pma_rates)
+                assessment_rates=gcp_download(target_bucket,rf"occ_codes{year}.json")
+                assessment_rates=json.loads(assessment_rates)
                 lab_tab1,lab_tab2=st.tabs(["LABOR TEMPLATE", "JOBS"])
                 with lab_tab2:
                     lab_col1,lab_col2,lab_col3=st.columns([2,2,2])
@@ -530,11 +535,7 @@ if authentication_status:
                     year=select_year.split(' ')[1]
                     month=select_year.split(' ')[0]
                     pma_year=select_pmayear.split(' ')[1]
-                    pma_rates=gcp_download(target_bucket,rf"pma_dues.json")
-                    pma_rates=json.loads(pma_rates)
                     pma_rates_=pd.DataFrame(pma_rates).T
-                    assessment_rates=gcp_download(target_bucket,rf"occ_codes{year}.json")
-                    assessment_rates=json.loads(assessment_rates)
                     occ_codes=pd.DataFrame(assessment_rates).T
                     occ_codes=occ_codes.rename_axis('Occ_Code')
                     shortened_occ_codes=occ_codes.loc[["0036","0037","0055","0092","0101","0103","0115","0129","0213","0215"]]
@@ -694,15 +695,7 @@ if authentication_status:
                     down_col1,down_col2,down_col3,down_col4=st.columns([2,2,2,4])
                     with down_col1:
                         st.write(" ")
-                        st.download_button(
-                            label="DOWNLOAD GANG COST",
-                            data=csv,
-                            file_name=file_name,
-                            mime='text/csv')
-                    with down_col3:
                         filename=st.text_input("Name the Template",key="7dr3")
-                    with down_col2:
-                        st.write(" ")
                         template=st.button("SAVE AS TEMPLATE",key="srfqw")
                         if template:
                             temp=display.to_csv(index=False)
@@ -712,6 +705,11 @@ if authentication_status:
                             # Upload CSV string to GCS
                             blob = bucket.blob(rf"labor_templates/{filename}.csv")
                             blob.upload_from_string(temp, content_type="text/csv")
+                    with down_col2:
+                        job_no=st.selectbox("SELECT JOB NO",["MT-20"])
+                        record=st.button("RECORD TO JOB",key="srfqw")
+                       
+                        
                                                
                     
                     index=st.number_input("Enter Index To Delete",step=1,key="1224aa")

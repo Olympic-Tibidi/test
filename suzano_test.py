@@ -662,6 +662,12 @@ if authentication_status:
                             
                             # Form submit button
                             submitted = st.form_submit_button("Submit")
+                        # If form is submitted, add the new score
+                    st.success("Rank added successfully!")
+                    num_code=st.session_state.code[1].strip()
+                    if submitted:
+                        new_scores()
+                    with st.form("equipment_form"):
                         st.write("##### EQUIPMENT")
                         eqform_col1,eqform_col2,eqform_col3=st.columns([3,3,4])
                         with eqform_col1: 
@@ -674,13 +680,7 @@ if authentication_status:
                         with eqform_col3:
                             st.session_state.eqhrs = st.number_input(
                                 "Equipment Hours",key="sdsss", step=1, value=0, min_value=0)
-                            
-                    # If form is submitted, add the new score
-                    num_code=st.session_state.code[1].strip()
-                    if submitted:
-                        new_scores()
-                        
-                        st.success("Rank added successfully!")
+                    st.success("Equipment added successfully!")
                     
                         
                     with st.container(border=True):

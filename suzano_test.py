@@ -557,7 +557,7 @@ if authentication_status:
                     if "eq_scores" not in st.session_state:
                         st.session_state.eq_scores = pd.DataFrame(
                             {"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
-                        ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
+                    ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
                    
                     def new_scores():
                         

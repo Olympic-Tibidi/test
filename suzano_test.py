@@ -825,7 +825,7 @@ if authentication_status:
                                 mt_jobs[year][job_no]["RECORDS"]={}
                             if work_date not in mt_jobs[year][job_no]["RECORDS"]:
                                 mt_jobs[year][job_no]["RECORDS"][str(work_date)]={}
-                            mt_jobs[year][job_no]["RECORDS"][str(work_date)]=st.session_state.scores.T.to_dict()
+                            mt_jobs[year][job_no]["RECORDS"][str(work_date)]=[st.session_state.scores.T.to_dict(),st.session_state.eq_scores.T.to_dict(),st.session_state.maint_scores.T.to_dict()]
                             
                             
                             st.write(mt_jobs)
@@ -834,7 +834,7 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"mt_jobs.json")
                             blob.upload_from_string(mt_jobs_)
-                            st.success(f"RECORDED JOB NO {job_number} ! ")
+                            st.success(f"RECORDED JOB NO {job_no} ! ")
                         
                        
                         

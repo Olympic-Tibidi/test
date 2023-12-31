@@ -707,7 +707,26 @@ if authentication_status:
                             blob.upload_from_string(temp, content_type="text/csv")
                     with down_col2:
                         job_no=st.selectbox("SELECT JOB NO",["MT-20"])
+                        work_type=st.selectbox("SELECT JOB NO",["DOCK","WAREHOUSE"])
+                        work_date=st.date_input()
                         record=st.button("RECORD TO JOB",key="srfqwdsd")
+                        if record:
+                            mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
+                            mt_jobs=json.loads(mt_jobs_)
+                            if year not in mt_jobs:
+                                mt_jobs[year]={}
+                            if job_no not in mt_jobs[year]:
+                                mt_jobs[year][job_no]={}
+                            #if labor not in mt_jobs[year][job_no]
+                            
+                            
+                            mt_jobs_=json.dumps(mt_jobs)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"mt_jobs.json")
+                            blob.upload_from_string(mt_jobs_)
+                            st.success(f"RECORDED JOB NO {job_number} ! ")
+                        
                        
                         
                                                

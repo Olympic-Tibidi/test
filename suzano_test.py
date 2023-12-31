@@ -707,7 +707,7 @@ if authentication_status:
                             blob.upload_from_string(temp, content_type="text/csv")
                     with down_col2:
                         job_no=st.selectbox("SELECT JOB NO",["MT-20"])
-                        record=st.button("RECORD TO JOB",key="srfqw",key="dxsadsa")
+                        record=st.button("RECORD TO JOB",key="srfqwdsd")
                        
                         
                                                

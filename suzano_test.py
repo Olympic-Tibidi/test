@@ -538,7 +538,9 @@ if authentication_status:
                             mt_jobs=json.loads(mt_jobs_)
                             if year not in mt_jobs:
                                 mt_jobs[year]={}
-                            mt_jobs[year].update({"Job Number":job_number,"Vessel":job_vessel,"Vessel Length":vessel_length,
+                            if job_number not in mt_jobs[year]:
+                                mt_jobs[year][job_number]={"INFO":{}}
+                            mt_jobs[year][job_number]["INFO"]={"Vessel":job_vessel,"Vessel Length":vessel_length,
                                                 "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
                                                 "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time})
                             mt_jobs_=json.dumps(mt_jobs)
@@ -830,7 +832,6 @@ if authentication_status:
                             mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift]['LABOR'][work_type]=st.session_state.scores.T.to_dict()
                             mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift]['EQUIPMENT'][work_type]=st.session_state.eq_scores.T.to_dict()
                             mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift]['MAINTENANCE'][work_type]=st.session_state.maint_scores.T.to_dict()
-                            st.write(mt_jobs)
                             mt_jobs_=json.dumps(mt_jobs)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)

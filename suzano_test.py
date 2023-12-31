@@ -921,13 +921,13 @@ if authentication_status:
             if hadi:
                 ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","SUZANO TRUCK ANALYSIS"])
                 with ttab3:
-                    @st.cache_data
+                   
                     inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                     
                     df=pd.read_json(inv_bill_of_ladings).T
-                    @st.cache_data
+                    
                     ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                    @st.cache_data
+                    
                     labor=gcp_download(target_bucket,rf"trucks.json")
                     labor=json.loads(labor)
                     raw_ro = json.loads(ro)

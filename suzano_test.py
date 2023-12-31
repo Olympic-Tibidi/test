@@ -553,9 +553,11 @@ if authentication_status:
                     
                     if "scores" not in st.session_state:
                         st.session_state.scores = pd.DataFrame(
-                            {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]}
-                        )
-                    ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
+                            {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]})
+                    if "eq_scores" not in st.session_state:
+                        st.session_state.eq_scores = pd.DataFrame(
+                            {"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
+                        ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
                    
                     def new_scores():
                         
@@ -610,24 +612,15 @@ if authentication_status:
                                 
                             }
                         )
-                        st.session_state.scores = pd.concat(
-                            [st.session_state.scores, new_score], ignore_index=True
-                        )
-                        eq_score=pd.DataFrame({ "Code": [st.session_state.equipment],
-                                "Shift": [st.session_state.shift],
+                        st.session_state.scores = pd.concat([st.session_state.scores, new_score], ignore_index=True)
+                        
+                        eq_score=pd.DataFrame({ "Equipment": [st.session_state.equipment],
                                 "Quantity": [st.session_state.eqqty],
                                 "Hours": [st.session_state.eqhrs*qty],
-                                "OT": 0,
-                                "Hour Cost": 0,
-                                "OT Cost": 0,
-                                "Total Wage":0,
-                                "Benefits":0,
-                                "PMA Assessments":0,
                                 "TOTAL COST":equipment_cost,
-                                "SIU":0,
                                 "Mark UP":[round(equipment_markup,2)],
-                                "INVOICE":[round(equipment_cost+equipment_markup,2)]})
-                        #st.session_state.scores = pd.concat([st.session_state.scores, eq_score], ignore_index=True)
+                                "EQUIPMENT INVOICE":[round(equipment_cost+equipment_markup,2)]})
+                        st.session_state.eq_scores = pd.concat([st.session_state.eq_scores, eq_score], ignore_index=True)
                  
                     
                         

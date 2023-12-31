@@ -579,6 +579,9 @@ if authentication_status:
                     if "maint_scores" not in st.session_state:
                         st.session_state.maint_scores = pd.DataFrame(
                             {"Quantity":[2],"Hours": [8], "TOTAL COST":[1272],"Mark UP":[381.6],"MAINTENANCE INVOICE":[1653.6]})
+                    if maint not in st.session_state:
+                        st.session_states.maint=False
+                    
                     ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
                     
                     def equip_scores():
@@ -752,8 +755,11 @@ if authentication_status:
                             with part2:
                                 st.write(f"###### TOTAL LABOR: {display.loc['TOTAL FOR SHIFT','INVOICE']}")
                                 st.write(f"###### TOTAL EQUIPMENT: {eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']}")
-                                st.write(f"###### TOTAL MAINTENANCE: {st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0]}")
-                                st.write(f"##### TOTAL INVOICE:{display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']+st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0]}")
+                                if st.session_state.maint:
+                                    st.write(f"###### TOTAL MAINTENANCE: {st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0]}")
+                                    st.write(f"##### TOTAL INVOICE:{display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']+st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0]}")
+                                else:
+                                    st.write(f"##### TOTAL INVOICE:{display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']}")
                                             
                             maint1,maint2,maint3=st.columns([2,2,6])
                             with maint1:
@@ -761,6 +767,7 @@ if authentication_status:
                             with maint2:
                                 maint=st.checkbox("Check to add maint crew")
                             if maint:
+                                st.session_states.maint=True
                                 st.dataframe(st.session_state.maint_scores)
                             #st.dataframe(st.session_state.eq_scores)
                     clear1,clear2,clear3=st.columns([2,2,4])

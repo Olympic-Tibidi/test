@@ -752,8 +752,8 @@ if authentication_status:
                                 st.write("##### MAINTENANCE (IF NIGHT/WEEKEND SHIFT)")
                             with maint2:
                                 maint=st.checkbox("Check to add maint crew")
-                                if maint:
-                                    st.dataframe(st.session_state.maint_scores)
+                            if maint:
+                                st.dataframe(st.session_state.maint_scores)
                             #st.dataframe(st.session_state.eq_scores)
                     clear1,clear2,clear3=st.columns([2,2,4])
                     with clear1:

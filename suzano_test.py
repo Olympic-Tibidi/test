@@ -767,7 +767,7 @@ if authentication_status:
                             with maint2:
                                 maint=st.checkbox("Check to add maint crew")
                             if maint:
-                                st.session_states.maint=True
+                                st.session_state.maint=True
                                 st.dataframe(st.session_state.maint_scores)
                             #st.dataframe(st.session_state.eq_scores)
                     clear1,clear2,clear3=st.columns([2,2,4])

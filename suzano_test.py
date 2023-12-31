@@ -694,7 +694,7 @@ if authentication_status:
                     file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
                     down_col1,down_col2,down_col3,down_col4=st.columns([2,2,2,4])
                     with down_col1:
-                        st.write(" ")
+                        #st.write(" ")
                         filename=st.text_input("Name the Template",key="7dr3")
                         template=st.button("SAVE AS TEMPLATE",key="srfqw")
                         if template:

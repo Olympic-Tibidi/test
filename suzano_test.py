@@ -697,6 +697,7 @@ if authentication_status:
                         sub_col1,sub_col2,sub_col3=st.columns([3,3,4])
                         with sub_col1:
                             #st.write("##### LABOR TABLE")
+                            pass
                         with sub_col2:
                             template_check=st.checkbox("LOAD FROM TEMPLATE")
                             if template_check:

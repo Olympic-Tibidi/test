@@ -578,7 +578,7 @@ if authentication_status:
                             {"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
                     if "maint_scores" not in st.session_state:
                         st.session_state.maint_scores = pd.DataFrame(
-                            {"Quantity":[2],"Hours": [8], "TOTAL COST":[1272],"Mark UP":[381.6],"EQUIPMENT INVOICE":[1653.6]})
+                            {"Quantity":[2],"Hours": [8], "TOTAL COST":[1272],"Mark UP":[381.6],"MAINTENANCE INVOICE":[1653.6]})
                     ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
                     
                     def equip_scores():
@@ -745,8 +745,16 @@ if authentication_status:
                         else:
                             st.write("##### LABOR")
                             st.dataframe(display)
-                            st.write("##### EQUIPMENT")
-                            st.dataframe(eq_display)
+                            part1,part2,part3=st.columns([4,4,2])
+                            with part1:
+                                st.write("##### EQUIPMENT")
+                                st.dataframe(eq_display)
+                            with part2:
+                                st.write(f"###### TOTAL LABOR: {display.loc['TOTAL FOR SHIFT','INVOICE']}")
+                                st.write(f"###### TOTAL EQUIPMENT: {eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']}")
+                                st.write(f"###### TOTAL MAINTENANCE: {st.session_state.maint_scores['MAINTENANCE INVOICE']}")
+                                st.write(f"##### TOTAL INVOICE:{display.loc['TOTAL FOR SHIFT','INVOICE']}+{eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']}+{st.session_state.maint_scores['MAINTENANCE INVOICE']}")
+                                            
                             maint1,maint2,maint3=st.columns([2,2,6])
                             with maint1:
                                 st.write("##### MAINTENANCE (IF NIGHT/WEEKEND SHIFT)")

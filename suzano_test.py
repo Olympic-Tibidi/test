@@ -563,7 +563,7 @@ if authentication_status:
                         equipment_qty=st.session_state.eqqty
                         equipment_hrs=st.session_state.eqhrs
                         equipment_cost=equipment_qty*equipment_hrs*equipment_tariff[equipment]
-                        equipment_markup=equipment_cost*st.session_state.markup
+                        equipment_markup=equipment_cost*st.session_state.markup/100
                         eq_score=pd.DataFrame({ "Equipment": [st.session_state.equipment],
                                 "Quantity": [equipment_qty],
                                 "Hours": [equipment_hrs],

@@ -576,6 +576,9 @@ if authentication_status:
                     if "eq_scores" not in st.session_state:
                         st.session_state.eq_scores = pd.DataFrame(
                             {"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
+                    if "maint_scores" not in st.session_state:
+                        st.session_state.maint_scores = pd.DataFrame(
+                            {"Quantity":[2],"Hours": [8], "TOTAL COST":[1272],"Mark UP":[381.6],"EQUIPMENT INVOICE":[1653.6]})
                     ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
                     
                     def equip_scores():
@@ -715,7 +718,6 @@ if authentication_status:
                         
                         sub_col1,sub_col2,sub_col3=st.columns([3,3,4])
                         with sub_col1:
-                            #st.write("##### LABOR TABLE")
                             pass
                         with sub_col2:
                             template_check=st.checkbox("LOAD FROM TEMPLATE")
@@ -736,14 +738,22 @@ if authentication_status:
                         display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]].sum()
                         display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]]
                         display.rename(columns={"SIU":f"%{st.session_state.siu} SIU"},inplace=True)
+                        eq_display=st.session_state.eq_scores
+                        eq_display.loc["TOTAL FOR SHIFT"]=eq_display[[ "Quantity","Hours","TOTAL COST","Mark UP","EQUIPMENT INVOICE"]].sum()
                         if template_check and template_choice_valid:
                             st.dataframe(loaded_template)
                         else:
                             st.write("##### LABOR")
                             st.dataframe(display)
                             st.write("##### EQUIPMENT")
-                            st.dataframe(st.session_state.eq_scores)
-                            st.write("##### MAINTENANCE (IF NIGHT/WEEKEND SHIFT)")
+                            st.dataframe(eq_display)
+                            maint1,maint2,maint3=st.columns([2,2,6])
+                            with maint1:
+                                st.write("##### MAINTENANCE (IF NIGHT/WEEKEND SHIFT)")
+                            with maint2:
+                                maint=st.checkbox("Check to add maint crew")
+                                if maint:
+                                    st.dataframe(st.session_state.maint_scores)
                             #st.dataframe(st.session_state.eq_scores)
                     clear1,clear2,clear3=st.columns([2,2,4])
                     with clear1:

@@ -713,7 +713,7 @@ if authentication_status:
                         else:
                             #st.write(st.session_state.scores.T.to_dict())
                             st.dataframe(display)
-                            st.dataframe(eq_score)
+                            st.dataframe(eq_scores)
                     csv=convert_df(display)
                     file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
                     down_col1,down_col2,down_col3,down_col4=st.columns([2,2,2,4])

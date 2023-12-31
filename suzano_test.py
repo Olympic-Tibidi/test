@@ -722,6 +722,24 @@ if authentication_status:
                             #st.write(st.session_state.scores.T.to_dict())
                             st.dataframe(display)
                             st.dataframe(st.session_state.eq_scores)
+                    clear1,clear2,clear3=st.columns([2,2,4])
+                    with clear1:
+                        if st.button("CLEAR TABLE"):
+                            try:
+                                st.session_state.scores = pd.DataFrame(
+                                {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],
+                                 "Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]})
+                                st.rerun()
+                            except:
+                                pass
+                    with clear2:
+                        if st.button("CLEAR TABLE"):
+                            try:
+                               st.session_state.eq_scores = pd.DataFrame({"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
+                               st.rerun()
+                            except:
+                                pass
+                    
                     csv=convert_df(display)
                     file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
                     down_col1,down_col2,down_col3,down_col4=st.columns([2,2,2,4])
@@ -770,14 +788,7 @@ if authentication_status:
                             st.session_state.scores.reset_index(drop=True,inplace=True)
                         except:
                             pass
-                    if st.button("CLEAR TABLE"):
-                        try:
-                            st.session_state.scores = pd.DataFrame(
-                            {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]}
-                        )
-                            st.rerun()
-                        except:
-                            pass
+                    
         if select=='WEATHER':
             st.caption("Live Data for Olympia From Weather.gov API")
             gov_forecast=get_weather()

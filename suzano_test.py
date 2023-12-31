@@ -686,7 +686,7 @@ if authentication_status:
                             st.session_state.eqhrs = st.number_input(
                                 "Equipment Hours",key="sdsss", step=1, value=0, min_value=0)
                             eq_submitted = st.form_submit_button("Submit Equipment")
-                    if submitted:
+                    if eq_submitted:
                         eq_scores()
                         st.success("Equipment added successfully!")
                     

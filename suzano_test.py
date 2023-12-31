@@ -760,6 +760,8 @@ if authentication_status:
                             if maint:
                                 st.session_state.maint=True
                                 st.dataframe(st.session_state.maint_scores)
+                            else:
+                                st.session_state.maint=False
                             with part2:
                                 st.write(f"###### TOTAL LABOR: {display.loc['TOTAL FOR SHIFT','INVOICE']}")
                                 st.write(f"###### TOTAL EQUIPMENT: {eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']}")

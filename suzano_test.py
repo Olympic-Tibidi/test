@@ -522,7 +522,7 @@ if authentication_status:
                             blob.upload_from_string(mt_jobs_)
                             st.success(f"RECORDED JOB NO {job_number} ! ")
                 with lab_tab1:
-                    
+                    equipment_tariff={"CRANE":850,"FORKLIFT":65,"KOMATSU":160}
                     foreman=False
                     with st.container(border=True):
                         
@@ -584,9 +584,13 @@ if authentication_status:
                         markup=with_siu*st.session_state.markup/100   ##+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
                         if foreman:
                             markup=with_siu*st.session_state.f_markup/100  ###+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
-                                          
-                       
                         invoice=total_cost+markup
+                        equipment=st.session_state.equipment
+                        equipment_qty=st.session_state.eqqty
+                        equipment_hrs=st.session_state.eqhrs
+                        equipment_cost=equipment_qty*equipment_hrs*equipment_tariff[equipment]
+                        equipment_markup=equipment_cost*st.session_state.markup
+                        
                         new_score = pd.DataFrame(
                             {
                                 "Code": [st.session_state.code],
@@ -609,15 +613,29 @@ if authentication_status:
                         st.session_state.scores = pd.concat(
                             [st.session_state.scores, new_score], ignore_index=True
                         )
-                     
-                   
+                        eq_score=pd.DataFrame( "Code": [st.session_state.equipment],
+                                "Shift": [st.session_state.shift],
+                                "Quantity": [st.session_state.eqqty],
+                                "Hours": [st.session_state.eqhrs*qty],
+                                "OT": 0,
+                                "Hour Cost": 0,
+                                "OT Cost": 0,
+                                "Total Wage":0,
+                                "Benefits":0,
+                                "PMA Assessments":0,
+                                "TOTAL COST":equipment_cost,
+                                "SIU":0,
+                                "Mark UP":[round(equipment_markup,2)],
+                                "INVOICE":[round(equipment_cost+equipment_markup,2)]
+                       st.session_state.scores = pd.concat(
+                            [st.session_state.scores, new_score], ignore_index=True
                  
                     
                         
                     # Form for adding a new score
                     
                     with st.form("new_score_form"):
-                        st.write("#### LABOR")
+                        st.write("##### LABOR")
                         form_col1,form_col2,form_col3=st.columns([3,3,4])
                         with form_col1:
                             
@@ -652,11 +670,19 @@ if authentication_status:
                             
                             # Form submit button
                             submitted = st.form_submit_button("Submit")
-                        st.write("#### EQUIPMENT")
+                        st.write("##### EQUIPMENT")
                         eqform_col1,eqform_col2,eqform_col3=st.columns([3,3,4])
                         with eqform_col1: 
-                            pass
-                    
+                            st.session_state.equipment = st.selectbox(
+                                "Equipment", options=["KOMATSU","FORKLIFT","CRANE"],key="sds11")
+                        with eqform_col2:
+                            # Number input for Equipment Quantity
+                            st.session_state.eqqty = st.number_input(
+                                "Equipment Quantity", key="sds",step=1, value=0, min_value=0)
+                        with eqform_col3:
+                            st.session_state.eqhrs = st.number_input(
+                                "Equipment Hours",key="sdsss", step=1, value=0, min_value=0)
+                            
                     # If form is submitted, add the new score
                     num_code=st.session_state.code[1].strip()
                     if submitted:

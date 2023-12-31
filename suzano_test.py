@@ -678,7 +678,7 @@ if authentication_status:
                         eqform_col1,eqform_col2,eqform_col3=st.columns([3,3,4])
                         with eqform_col1: 
                             st.session_state.equipment = st.selectbox(
-                                "Equipment", options=["CRANE","FORKLIFT","TRACTOR","KOMATSU","GENIE MANLIFT","Z135 MANLIFT"}],key="sds11")
+                                "Equipment", options=["CRANE","FORKLIFT","TRACTOR","KOMATSU","GENIE MANLIFT","Z135 MANLIFT"],key="sds11")
                         with eqform_col2:
                             # Number input for Equipment Quantity
                             st.session_state.eqqty = st.number_input(

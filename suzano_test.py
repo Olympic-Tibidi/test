@@ -769,7 +769,8 @@ if authentication_status:
                             if maint:
                                 st.session_state.maint=True
                                 st.dataframe(st.session_state.maint_scores)
-                            #st.dataframe(st.session_state.eq_scores)
+                                st.rerun()
+                           
                     clear1,clear2,clear3=st.columns([2,2,4])
                     with clear1:
                         if st.button("CLEAR LABOR TABLE"):

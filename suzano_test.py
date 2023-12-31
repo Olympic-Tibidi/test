@@ -136,7 +136,7 @@ def send_email_with_attachment(subject, body, sender, recipients, password, file
         smtp_server.login(sender, password)
         smtp_server.sendmail(sender, recipients, msg.as_string())
     print("Message sent!")
-
+@st.cache_data
 def gcp_download(bucket_name, source_file_name):
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
@@ -150,7 +150,7 @@ def gcp_download_x(bucket_name, source_file_name):
     blob = bucket.blob(source_file_name)
     data = blob.download_as_bytes()
     return data
-
+@st.cache_data
 def gcp_csv_to_df(bucket_name, source_file_name):
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
@@ -354,7 +354,7 @@ def gen_bill_of_lading():
 def convert_df(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv().encode('utf-8')
-    
+@st.cache_data    
 def get_weather():
     weather=defaultdict(int)
     headers = { 

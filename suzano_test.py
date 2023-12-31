@@ -708,7 +708,7 @@ if authentication_status:
                     with down_col2:
                         job_no=st.selectbox("SELECT JOB NO",["MT-20"])
                         work_type=st.selectbox("SELECT JOB NO",["DOCK","WAREHOUSE"])
-                        work_date=st.date_input("Work Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="work_date",disabled=False,visible=False))
+                        work_date=st.date_input("Work Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="work_date")
                         record=st.button("RECORD TO JOB",key="srfqwdsd")
                         if record:
                             mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")

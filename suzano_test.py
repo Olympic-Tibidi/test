@@ -579,7 +579,7 @@ if authentication_status:
                     if "maint_scores" not in st.session_state:
                         st.session_state.maint_scores = pd.DataFrame(
                             {"Quantity":[2],"Hours": [8], "TOTAL COST":[1272],"Mark UP":[381.6],"MAINTENANCE INVOICE":[1653.6]})
-                    if maint not in st.session_state:
+                    if "maint" not in st.session_state:
                         st.session_states.maint=False
                     
                     ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}

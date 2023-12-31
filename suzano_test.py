@@ -824,7 +824,7 @@ if authentication_status:
                             mt_jobs[year][job_no][work_date]['LABOR']=st.session_state.scores.T.to_dict()
                             
                             
-                            
+                            st.write(mt_jobs)
                             mt_jobs_=json.dumps(mt_jobs)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)

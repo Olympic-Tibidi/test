@@ -696,8 +696,7 @@ if authentication_status:
                         
                         sub_col1,sub_col2,sub_col3=st.columns([3,3,4])
                         with sub_col1:
-                            # Display the updated DataFrame
-                            st.write("### Updated Cost Table")
+                            #st.write("##### LABOR TABLE")
                         with sub_col2:
                             template_check=st.checkbox("LOAD FROM TEMPLATE")
                             if template_check:
@@ -720,9 +719,12 @@ if authentication_status:
                         if template_check and template_choice_valid:
                             st.dataframe(loaded_template)
                         else:
-                            #st.write(st.session_state.scores.T.to_dict())
+                            st.write("##### LABOR")
                             st.dataframe(display)
+                            st.write("##### EQUIPMENT")
                             st.dataframe(st.session_state.eq_scores)
+                            st.write("##### MAINTENANCE (IF NIGHT/WEEKEND SHIFT)")
+                            #st.dataframe(st.session_state.eq_scores)
                     clear1,clear2,clear3=st.columns([2,2,4])
                     with clear1:
                         if st.button("CLEAR LABOR TABLE"):

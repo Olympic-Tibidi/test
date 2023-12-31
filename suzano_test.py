@@ -627,8 +627,8 @@ if authentication_status:
                                 "SIU":0,
                                 "Mark UP":[round(equipment_markup,2)],
                                 "INVOICE":[round(equipment_cost+equipment_markup,2)]})
-                       st.session_state.scores = pd.concat(
-                            [st.session_state.scores, new_score], ignore_index=True
+                        st.session_state.scores = pd.concat(
+                            [st.session_state.scores, eq_score], ignore_index=True
                  
                     
                         

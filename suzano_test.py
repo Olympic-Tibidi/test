@@ -522,7 +522,7 @@ if authentication_status:
                             blob.upload_from_string(mt_jobs_)
                             st.success(f"RECORDED JOB NO {job_number} ! ")
                 with lab_tab1:
-                    equipment_tariff={"CRANE":850,"FORKLIFT":65,"KOMATSU":160}
+                    equipment_tariff={"CRANE":850,"FORKLIFT":65,"TRACTOR":65,"KOMATSU":160,"GENIE MANLIFT":50,"Z135 MANLIFT":95}
                     foreman=False
                     with st.container(border=True):
                         
@@ -558,6 +558,7 @@ if authentication_status:
                         st.session_state.eq_scores = pd.DataFrame(
                             {"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
                     ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
+                    
                     def equip_scores():
                         equipment=st.session_state.equipment
                         equipment_qty=st.session_state.eqqty
@@ -677,7 +678,7 @@ if authentication_status:
                         eqform_col1,eqform_col2,eqform_col3=st.columns([3,3,4])
                         with eqform_col1: 
                             st.session_state.equipment = st.selectbox(
-                                "Equipment", options=["KOMATSU","FORKLIFT","CRANE"],key="sds11")
+                                "Equipment", options=["CRANE","FORKLIFT","TRACTOR","KOMATSU","GENIE MANLIFT","Z135 MANLIFT"}],key="sds11")
                         with eqform_col2:
                             # Number input for Equipment Quantity
                             st.session_state.eqqty = st.number_input(

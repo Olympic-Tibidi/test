@@ -751,8 +751,8 @@ if authentication_status:
                                 st.dataframe(eq_display)
                             with part2:
                                 st.write(f"###### TOTAL LABOR: {display.loc['TOTAL FOR SHIFT','INVOICE']}")
-                                st.write(f"###### TOTAL EQUIPMENT: {eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE'].values()[0]}")
-                                st.write(f"###### TOTAL MAINTENANCE: {st.session_state.maint_scores['MAINTENANCE INVOICE'].values()[0]}")
+                                st.write(f"###### TOTAL EQUIPMENT: {eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']}")
+                                st.write(f"###### TOTAL MAINTENANCE: {st.session_state.maint_scores['MAINTENANCE INVOICE']}")
                                 st.write(f"##### TOTAL INVOICE:{display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']+st.session_state.maint_scores['MAINTENANCE INVOICE']}")
                                             
                             maint1,maint2,maint3=st.columns([2,2,6])

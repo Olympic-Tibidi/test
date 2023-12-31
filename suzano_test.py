@@ -646,7 +646,6 @@ if authentication_status:
                             st.session_state.code = st.selectbox(
                                 "Occupation Code", options=list(shortened_occ_codes.index)
                             )
-                    
                             # Number input for Quantity
                             st.session_state.qty = st.number_input(
                                 "Quantity", step=1, value=0, min_value=0
@@ -668,9 +667,10 @@ if authentication_status:
                         # If form is submitted, add the new score
                     
                     if submitted:
+                        num_code=st.session_state.code[1].strip()
                         new_scores()
                         st.success("Rank added successfully!")
-                    num_code=st.session_state.code[1].strip()
+                    
                     
                     with st.form("equipment_form"):
                         st.write("##### EQUIPMENT")

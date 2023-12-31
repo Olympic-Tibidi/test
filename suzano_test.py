@@ -565,8 +565,8 @@ if authentication_status:
                         equipment_cost=equipment_qty*equipment_hrs*equipment_tariff[equipment]
                         equipment_markup=equipment_cost*st.session_state.markup
                         eq_score=pd.DataFrame({ "Equipment": [st.session_state.equipment],
-                                "Quantity": [st.session_state.eqqty],
-                                "Hours": [st.session_state.eqhrs*qty],
+                                "Quantity": [equipment_qty],
+                                "Hours": [equipment_hrs],
                                 "TOTAL COST":equipment_cost,
                                 "Mark UP":[round(equipment_markup,2)],
                                 "EQUIPMENT INVOICE":[round(equipment_cost+equipment_markup,2)]})

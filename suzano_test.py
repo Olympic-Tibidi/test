@@ -487,11 +487,13 @@ if authentication_status:
                     mt_jobs=json.loads(mt_jobs_)
                     c1,c2,c3=st.columns([2,2,6])
                     with c1:
-                        with st.container(border=True):
-                            by_year=st.selectbox("SELECT YEAR",mt_jobs.keys())
-                            by_job=st.selectbox("SELECT JOB",mt_jobs[by_year].keys())
-                            by_date=st.selectbox("SELECT DATE",mt_jobs[by_year][by_job]["RECORDS"].keys())
-                            by_shift=st.selectbox("SELECT SHIFT",mt_jobs[by_year][by_job]["RECORDS"][by_date].keys())
+                        with st.sidebar():
+                            
+                            with st.container(border=True):
+                                by_year=st.selectbox("SELECT YEAR",mt_jobs.keys())
+                                by_job=st.selectbox("SELECT JOB",mt_jobs[by_year].keys())
+                                by_date=st.selectbox("SELECT DATE",mt_jobs[by_year][by_job]["RECORDS"].keys())
+                                by_shift=st.selectbox("SELECT SHIFT",mt_jobs[by_year][by_job]["RECORDS"][by_date].keys())
                             
                     with c2:
                         info=mt_jobs[by_year][by_job]["INFO"]

@@ -517,7 +517,7 @@ if authentication_status:
                         with st.container(border=True):
                             st.write(f"TOTAL {by_choice} COST for this JOB :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'TOTAL COST')}")
                             st.write(f"TOTAL {by_choice} MARKUP for this JOB :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'Mark UP')}")
-                            st.write(f"TOTAL {by_choice} INVOICE for this JOB :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'INVOICE')}")
+                            st.write(f"TOTAL {by_choice} INVOICE for this JOB :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'{by_choice} INVOICE')}")
                         #st.write(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location])
                         a=pd.DataFrame(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location]).T
                         st.write(a)

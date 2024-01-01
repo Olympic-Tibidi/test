@@ -483,6 +483,16 @@ if authentication_status:
                 lab_tab1,lab_tab2,lab_tab3,lab_tab4=st.tabs(["LABOR TEMPLATE", "JOBS","RATES","LOOKUP"])
 
                 with lab_tab4:
+                    def dfs_sum(dictionary, key):
+                        total_sum = 0
+                    
+                        for k, v in dictionary.items():
+                            if k == key:
+                                total_sum += v
+                            elif isinstance(v, dict):
+                                total_sum += dfs_sum(v, key)
+                    
+                        return total_sum
                     mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
                     mt_jobs=json.loads(mt_jobs_)
                     c1,c2,c3=st.columns([2,2,6])
@@ -504,7 +514,10 @@ if authentication_status:
                                 by_choice=st.radio("SELECT INVOICE",["LABOR","EQUIPMENT","MAINTENANCE"])
                             with d2:
                                 by_location=st.radio("SELECT INVOICE",["DOCK","WAREHOUSE"])
-                    with st.container(border=True):
+                        with st.container(border=True):
+                            st.write(f"TOTAL {by_choice} COST for this JOB :  {dfs_sum(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location],"TOTAL COST"}")
+                            st.write(f"TOTAL {by_choice} MARKUP for this JOB :  {dfs_sum(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location],"Mark UP"}")
+                            st.write(f"TOTAL {by_choice} INVOICE for this JOB :  {dfs_sum(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location],"INVOICE"}")
                         #st.write(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location])
                         a=pd.DataFrame(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location]).T
                         st.write(a)

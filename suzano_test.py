@@ -494,6 +494,11 @@ if authentication_status:
                     with c2:
                         info=mt_jobs[by_year][by_job]["INFO"]
                         st.dataframe(info)
+                    with c3:
+                        with st.container(border=True):
+                            st.dataframe(mt_jobs[by_year][by_job]["RECORDS"][by_date])
+
+                        
                 with lab_tab3:
                     with st.container(border=True):
                         

@@ -536,7 +536,6 @@ if authentication_status:
                             year="2023"
                             mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
                             mt_jobs=json.loads(mt_jobs_)
-                            mt_jobs={}
                             if year not in mt_jobs:
                                 mt_jobs[year]={}
                             if job_number not in mt_jobs[year]:
@@ -812,7 +811,7 @@ if authentication_status:
                             blob.upload_from_string(temp, content_type="text/csv")
                     with down_col2:
                         #st.write(st.session_state.scores.T.to_dict())
-                        job_no=st.selectbox("SELECT JOB NO",["MT-35"])
+                        job_no=st.selectbox("SELECT JOB NO",["MT-20"])
                         year="2023"
                         work_type=st.selectbox("SELECT JOB NO",["DOCK","WAREHOUSE"])
                         work_date=st.date_input("Work Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="work_date")

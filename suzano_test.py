@@ -520,7 +520,7 @@ if authentication_status:
                                 st.write(f"TOTAL {by_location}-{by_choice} COST for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'TOTAL COST')}")
                                 st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'Mark UP')}")
                                 if by_choice=="LABOR":
-                                    st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{INVOICE')}")
+                                    st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'INVOICE')}")
                                 else:
                                     st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{by_choice} INVOICE')}")
                             with e2:

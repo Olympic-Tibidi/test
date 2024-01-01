@@ -480,7 +480,16 @@ if authentication_status:
                 pma_rates=json.loads(pma_rates)
                 assessment_rates=gcp_download(target_bucket,rf"occ_codes2023.json")
                 assessment_rates=json.loads(assessment_rates)
-                lab_tab1,lab_tab2,lab_tab3=st.tabs(["LABOR TEMPLATE", "JOBS","RATES"])
+                lab_tab1,lab_tab2,lab_tab3,lab_tab4=st.tabs(["LABOR TEMPLATE", "JOBS","RATES","LOOKUP"])
+
+                with lab_tab4:
+                    mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
+                    mt_jobs=json.loads(mt_jobs_)
+                    by1,by2=st.tabs(["BY JOB","BY DATE"])
+                    with by1:
+                        by_job=st.selectbox(mt_jobs.keys())
+                        
+                
                 with lab_tab3:
                     with st.container(border=True):
                         

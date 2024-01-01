@@ -539,7 +539,7 @@ if authentication_status:
                             if year not in mt_jobs:
                                 mt_jobs[year]={}
                             if job_number not in mt_jobs[year]:
-                                mt_jobs[year][job_number]={"INFO":{}}
+                                mt_jobs[year][job_number]={"INFO":{},"RECORDS":{}}
                             mt_jobs[year][job_number]["INFO"]={"Vessel":job_vessel,"Vessel Length":vessel_length,
                                                 "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
                                                 "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time}

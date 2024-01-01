@@ -485,19 +485,20 @@ if authentication_status:
                 with lab_tab4:
                     mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
                     mt_jobs=json.loads(mt_jobs_)
-                    c1,c2,c3=st.columns([3,3,3])
+                    c1,c2,c3=st.columns([3,2,5])
                     with c1:
                         with st.container(border=True):
                             by_year=st.selectbox("SELECT YEAR",mt_jobs.keys())
                             by_job=st.selectbox("SELECT JOB",mt_jobs[by_year].keys())
                             by_date=st.selectbox("SELECT DATE",mt_jobs[by_year][by_job]["RECORDS"].keys())
+                            by_type=st.selectbox("SELECT JOB TYPE",mt_jobs[by_year][by_job]["RECORDS"][by_date].keys())
                     with c2:
                         info=mt_jobs[by_year][by_job]["INFO"]
                         st.dataframe(info)
                     with c3:
                         with st.container(border=True):
                             st.dataframe(mt_jobs[by_year][by_job]["RECORDS"][by_date])
-
+                            st.dataframe(mt_jobs[by_year][by_job]["RECORDS"][by_date])
                         
                 with lab_tab3:
                     with st.container(border=True):

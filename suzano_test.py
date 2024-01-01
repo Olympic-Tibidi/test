@@ -489,7 +489,7 @@ if authentication_status:
                     with by1:
                         by_year=st.selectbox("SELECT YEAR",mt_jobs.keys())
                         by_job=st.selectbox("SELECT JOB",mt_jobs[by_year].keys())
-                        info=pd.DataFrame(mt_jobs[by_year][by_job]["INFO"])
+                        info=pd.DataFrame(mt_jobs[by_year][by_job]["INFO"],index=None)
                         by_date=st.selectbox("SELECT DATE",mt_jobs[by_year][by_job].keys())
                         st.dataframe(info)
                 

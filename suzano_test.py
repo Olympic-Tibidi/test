@@ -488,7 +488,7 @@ if authentication_status:
                     by1,by2=st.tabs(["BY JOB","BY DATE"])
                     with by1:
                         by_year=st.selectbox("SELECT JOB",mt_jobs.keys())
-                        by_job=st.selectbox("SELECT JOB",mt_jobs[year].keys())
+                        by_job=st.selectbox("SELECT JOB",mt_jobs[by_year].keys())
                         
                 
                 with lab_tab3:

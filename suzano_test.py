@@ -904,15 +904,15 @@ if authentication_status:
                             if str(work_date) not in mt_jobs[year][job_no]["RECORDS"]:
                                 mt_jobs[year][job_no]["RECORDS"][str(work_date)]={}
                             if st.session_state.shift_record not in mt_jobs[year][job_no]["RECORDS"][str(work_date)]:
-                            mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['LABOR'][work_type]=st.session_state.scores.T.to_dict()
-                            mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['EQUIPMENT'][work_type]=st.session_state.eq_scores.T.to_dict()
-                            mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['MAINTENANCE'][work_type]=st.session_state.maint_scores.T.to_dict()
-                            mt_jobs_=json.dumps(mt_jobs)
-                            storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"mt_jobs.json")
-                            blob.upload_from_string(mt_jobs_)
-                            st.success(f"RECORDED JOB NO {job_no} ! ")
+                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['LABOR'][work_type]=st.session_state.scores.T.to_dict()
+                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['EQUIPMENT'][work_type]=st.session_state.eq_scores.T.to_dict()
+                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['MAINTENANCE'][work_type]=st.session_state.maint_scores.T.to_dict()
+                                mt_jobs_=json.dumps(mt_jobs)
+                                storage_client = storage.Client()
+                                bucket = storage_client.bucket(target_bucket)
+                                blob = bucket.blob(rf"mt_jobs.json")
+                                blob.upload_from_string(mt_jobs_)
+                                st.success(f"RECORDED JOB NO {job_no} ! ")
                         
                        
                         

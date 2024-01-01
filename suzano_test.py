@@ -487,7 +487,7 @@ if authentication_status:
                     mt_jobs=json.loads(mt_jobs_)
                     c1,c2,c3=st.columns([2,2,6])
                     with c1:
-                        with st.sidebar():
+                        with st.sidebar:
                             
                             with st.container(border=True):
                                 by_year=st.selectbox("SELECT YEAR",mt_jobs.keys())

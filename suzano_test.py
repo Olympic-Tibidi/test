@@ -669,7 +669,7 @@ if authentication_status:
                         with form_col2:
                             st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND DAY","WEEKEND NIGHT","HOOT"])
                             st.session_state.shift_record=st.session_state.shift
-                            st.session_state.shift="WEEKEND" if st.session_state.shift in ["WEEKEND DAY","WEEKEND NIGHT"]
+                            st.session_state.shift="WEEKEND" if st.session_state.shift in ["WEEKEND DAY","WEEKEND NIGHT"] else st.session_state.shift
                         
                             # Dropdown for selecting Code
                             st.session_state.code = st.selectbox(

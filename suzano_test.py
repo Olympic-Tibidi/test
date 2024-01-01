@@ -519,7 +519,7 @@ if authentication_status:
                             with e1:
                                 st.write(f"TOTAL {by_location}-{by_choice} COST for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'TOTAL COST')}")
                                 st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'Mark UP')}")
-                                st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{by_choice} INVOICE')}")
+                                st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{by_choice if by_choice!="LABOR" else ""} INVOICE')}")
                             with e2:
                                 st.write(f"TOTAL {by_location}-{by_choice} COST for this JOB :  {sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'TOTAL COST') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]) }")
                                 st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this JOB :  {sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][by_shift][by_choice][by_location],'Mark UP') if by_shift in mt_jobs[by_year][by_job]['RECORDS'][date] else 0 for date in mt_jobs[by_year][by_job]['RECORDS']])}")

@@ -767,32 +767,38 @@ if authentication_status:
                             with part2:
                                 subpart1,subpart2,subpart3=st.columns([3,3,4])
                                 with subpart1:
-                                    st.write(f"###### TOTAL LABOR COST: {round(display.loc['TOTAL FOR SHIFT','TOTAL COST'],2)}")
-                                    st.write(f"###### TOTAL EQUIPMENT COST: {round(eq_display.loc['TOTAL FOR SHIFT','TOTAL COST'],2)}")
-                                    if st.session_state.maint:
-                                        st.write(f"###### TOTAL MAINTENANCE COST: {round(st.session_state.maint_scores['TOTAL COST'].values[0],2)}")
-                                        st.write(f"##### TOTAL COST: {round(display.loc['TOTAL FOR SHIFT','TOTAL COST']+eq_display.loc['TOTAL FOR SHIFT','TOTAL COST']+st.session_state.maint_scores['TOTAL COST'].values[0],2)}")
-                                    else:
-                                        st.write(f"##### TOTAL COST: {round(display.loc['TOTAL FOR SHIFT','TOTAL COST']+eq_display.loc['TOTAL FOR SHIFT','TOTAL COST'],2)}")
+                                    with st.container(border=True):
+                                        st.write(f"###### COSTS")
+                                        st.write(f"###### LABOR: {round(display.loc['TOTAL FOR SHIFT','TOTAL COST'],2)}")
+                                        st.write(f"###### EQUIPMENT: {round(eq_display.loc['TOTAL FOR SHIFT','TOTAL COST'],2)}")
+                                        if st.session_state.maint:
+                                            st.write(f"###### MAINTENANCE: {round(st.session_state.maint_scores['TOTAL COST'].values[0],2)}")
+                                            st.write(f"##### TOTAL: {round(display.loc['TOTAL FOR SHIFT','TOTAL COST']+eq_display.loc['TOTAL FOR SHIFT','TOTAL COST']+st.session_state.maint_scores['TOTAL COST'].values[0],2)}")
+                                        else:
+                                            st.write(f"##### TOTAL: {round(display.loc['TOTAL FOR SHIFT','TOTAL COST']+eq_display.loc['TOTAL FOR SHIFT','TOTAL COST'],2)}")
 
                                 with subpart2:
-                                    st.write(f"###### TOTAL LABOR MARKUP: {round(display.loc['TOTAL FOR SHIFT','Mark UP'],2)}")
-                                    st.write(f"###### TOTAL EQUIPMENT MARKUP: {round(eq_display.loc['TOTAL FOR SHIFT','Mark UP'],2)}")
-                                    if st.session_state.maint:
-                                        st.write(f"###### TOTAL MAINTENANCE MARKUP: {round(st.session_state.maint_scores['Mark UP'].values[0],2)}")
-                                        st.write(f"##### TOTAL MARKUP: {round(display.loc['TOTAL FOR SHIFT','Mark UP']+eq_display.loc['TOTAL FOR SHIFT','Mark UP']+st.session_state.maint_scores['Mark UP'].values[0],2)}")
-                                    else:
-                                        st.write(f"##### TOTAL MARKUP: {round(display.loc['TOTAL FOR SHIFT','Mark UP']+eq_display.loc['TOTAL FOR SHIFT','Mark UP'],2)}")
+                                    with st.container(border=True):
+                                        st.write(f"###### MARKUPS")
+                                        st.write(f"###### LABOR: {round(display.loc['TOTAL FOR SHIFT','Mark UP'],2)}")
+                                        st.write(f"###### EQUIPMENT: {round(eq_display.loc['TOTAL FOR SHIFT','Mark UP'],2)}")
+                                        if st.session_state.maint:
+                                            st.write(f"###### MAINTENANCE: {round(st.session_state.maint_scores['Mark UP'].values[0],2)}")
+                                            st.write(f"##### TOTAL: {round(display.loc['TOTAL FOR SHIFT','Mark UP']+eq_display.loc['TOTAL FOR SHIFT','Mark UP']+st.session_state.maint_scores['Mark UP'].values[0],2)}")
+                                        else:
+                                            st.write(f"##### TOTAL: {round(display.loc['TOTAL FOR SHIFT','Mark UP']+eq_display.loc['TOTAL FOR SHIFT','Mark UP'],2)}")
 
                                 with subpart3:
-                                    st.write(f"###### TOTAL LABOR: {round(display.loc['TOTAL FOR SHIFT','INVOICE'],2)}")
-                                    st.write(f"###### TOTAL EQUIPMENT: {round(eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE'],2)}")
-                                    if st.session_state.maint:
-                                        st.write(f"###### TOTAL MAINTENANCE: {round(st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0],2)}")
-                                        st.write(f"##### TOTAL INVOICE: {round(display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']+st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0],2)}")
-                                    else:
-                                        st.write(f"##### TOTAL INVOICE: {round(display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE'],2)}")
-                                            
+                                    with st.container(border=True):
+                                        st.write(f"###### TOTALS")
+                                        st.write(f"###### TOTAL LABOR: {round(display.loc['TOTAL FOR SHIFT','INVOICE'],2)}")
+                                        st.write(f"###### TOTAL EQUIPMENT: {round(eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE'],2)}")
+                                        if st.session_state.maint:
+                                            st.write(f"###### TOTAL MAINTENANCE: {round(st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0],2)}")
+                                            st.write(f"##### TOTAL INVOICE: {round(display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']+st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0],2)}")
+                                        else:
+                                            st.write(f"##### TOTAL INVOICE: {round(display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE'],2)}")
+                                                
                             
                                 
                            

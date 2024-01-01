@@ -503,6 +503,7 @@ if authentication_status:
                         with d2:
                             by_location=st.radio("SELECT INVOICE",["DOCK","WAREHOUSE"])
                         with st.container(border=True):
+                            st.write(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location])
                             st.dataframe(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location])
                         
                 with lab_tab3:

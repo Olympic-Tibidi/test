@@ -492,12 +492,14 @@ if authentication_status:
                             by_job=st.selectbox("SELECT JOB",mt_jobs[by_year].keys())
                             by_date=st.selectbox("SELECT DATE",mt_jobs[by_year][by_job]["RECORDS"].keys())
                             by_type=st.selectbox("SELECT JOB TYPE",mt_jobs[by_year][by_job]["RECORDS"][by_date].keys())
+                            by_type=st.selectbox("SELECT JOB TYPE",mt_jobs[by_year][by_job]["RECORDS"][by_date].keys())
                     with c2:
                         info=mt_jobs[by_year][by_job]["INFO"]
                         st.dataframe(info)
                     with c3:
+                        choice=st.radio("SELECT INVOICE",["LABOR","EQUIPMENT","MAINTENANCE"])
                         with st.container(border=True):
-                            st.dataframe(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_type])
+                            st.dataframe(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_type][choice])
                         
                 with lab_tab3:
                     with st.container(border=True):

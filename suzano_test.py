@@ -497,8 +497,7 @@ if authentication_status:
                         st.dataframe(info)
                     with c3:
                         with st.container(border=True):
-                            st.dataframe(mt_jobs[by_year][by_job]["RECORDS"][by_date])
-                            st.dataframe(mt_jobs[by_year][by_job]["RECORDS"][by_date])
+                            st.dataframe(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_type])
                         
                 with lab_tab3:
                     with st.container(border=True):

@@ -519,11 +519,17 @@ if authentication_status:
                             with e1:
                                 st.write(f"TOTAL {by_location}-{by_choice} COST for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'TOTAL COST')}")
                                 st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'Mark UP')}")
-                                st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{by_choice if by_choice!='LABOR' else ''} INVOICE')}")
+                                if by_choice=="LABOR":
+                                    st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{INVOICE')}")
+                                else:
+                                    st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{by_choice} INVOICE')}")
                             with e2:
                                 st.write(f"TOTAL {by_location}-{by_choice} COST for this JOB :  {sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'TOTAL COST') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]) }")
                                 st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this JOB :  {sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][by_shift][by_choice][by_location],'Mark UP') if by_shift in mt_jobs[by_year][by_job]['RECORDS'][date] else 0 for date in mt_jobs[by_year][by_job]['RECORDS']])}")
-                                st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this JOB :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{by_choice} INVOICE')}")
+                                if by_choice=="LABOR":
+                                    st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this JOB :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'INVOICE')}")
+                                else:
+                                    st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this JOB :  {dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{by_choice} INVOICE')}")
                         #st.write(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location])
                         a=pd.DataFrame(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location]).T
                         st.write(a)

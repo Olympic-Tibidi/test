@@ -668,6 +668,7 @@ if authentication_status:
                             
                         with form_col2:
                             st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND DAY","WEEKEND NIGHT","HOOT"])
+                            st.session_state.shift_record=st.session_state.shift
                             st.session_state.shift="WEEKEND" if st.session_state.shift in ["WEEKEND DAY","WEEKEND NIGHT"]
                         
                             # Dropdown for selecting Code
@@ -853,11 +854,11 @@ if authentication_status:
                                 mt_jobs[year][job_no]["RECORDS"]={}
                             if str(work_date) not in mt_jobs[year][job_no]["RECORDS"]:
                                 mt_jobs[year][job_no]["RECORDS"][str(work_date)]={}
-                            if st.session_state.shift not in mt_jobs[year][job_no]["RECORDS"][str(work_date)]:
-                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift]={"LABOR":{"DOCK":{},"WAREHOUSE":{}},"EQUIPMENT":{"DOCK":{},"WAREHOUSE":{}},"MAINTENANCE":{"DOCK":{},"WAREHOUSE":{}}}
-                            mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift]['LABOR'][work_type]=st.session_state.scores.T.to_dict()
-                            mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift]['EQUIPMENT'][work_type]=st.session_state.eq_scores.T.to_dict()
-                            mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift]['MAINTENANCE'][work_type]=st.session_state.maint_scores.T.to_dict()
+                            if st.session_state.shift_record not in mt_jobs[year][job_no]["RECORDS"][str(work_date)]:
+                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]={"LABOR":{"DOCK":{},"WAREHOUSE":{}},"EQUIPMENT":{"DOCK":{},"WAREHOUSE":{}},"MAINTENANCE":{"DOCK":{},"WAREHOUSE":{}}}
+                            mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['LABOR'][work_type]=st.session_state.scores.T.to_dict()
+                            mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['EQUIPMENT'][work_type]=st.session_state.eq_scores.T.to_dict()
+                            mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['MAINTENANCE'][work_type]=st.session_state.maint_scores.T.to_dict()
                             mt_jobs_=json.dumps(mt_jobs)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)

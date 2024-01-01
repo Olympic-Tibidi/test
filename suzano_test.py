@@ -667,8 +667,8 @@ if authentication_status:
                             st.session_state.f_markup=st.number_input("ENTER FOREMAN MARKUP",step=1,key="wfder")
                             
                         with form_col2:
-                            st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND","HOOT"])
-    
+                            st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND DAY","WEEKEND NIGHT","HOOT"])
+                            st.session_state.shift="WEEKEND" if st.session_state.shift in ["WEEKEND DAY","WEEKEND NIGHT"]
                         
                             # Dropdown for selecting Code
                             st.session_state.code = st.selectbox(

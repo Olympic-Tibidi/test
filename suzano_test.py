@@ -543,11 +543,11 @@ if authentication_status:
                             mt_jobs[year][job_number]["INFO"]={"Vessel":job_vessel,"Vessel Length":vessel_length,
                                                 "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
                                                 "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time}
-                            mt_jobs_=json.dumps(mt_jobs)
+                            mt_jobs=json.dumps(mt_jobs)
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"mt_jobs.json")
-                            blob.upload_from_string(mt_jobs_)
+                            blob.upload_from_string(mt_jobs)
                             st.success(f"RECORDED JOB NO {job_number} ! ")
                 with lab_tab1:
                     equipment_tariff={"CRANE":850,"FORKLIFT":65,"TRACTOR":65,"KOMATSU":160,"GENIE MANLIFT":50,"Z135 MANLIFT":95}

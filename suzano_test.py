@@ -513,7 +513,7 @@ if authentication_status:
                             with d1:
                                 by_choice=st.radio("SELECT INVOICE",["LABOR","EQUIPMENT","MAINTENANCE"])
                             with d2:
-                                by_location=st.radio("SELECT INVOICE",["DOCK","WAREHOUSE"])
+                                by_location=st.radio("SELECT INVOICE",["DOCK","WAREHOUSE","LINES"])
                         with st.container(border=True):
                             e1,e2,e3=st.columns([4,4,2])
                             with e1:
@@ -904,7 +904,6 @@ if authentication_status:
                             if str(work_date) not in mt_jobs[year][job_no]["RECORDS"]:
                                 mt_jobs[year][job_no]["RECORDS"][str(work_date)]={}
                             if st.session_state.shift_record not in mt_jobs[year][job_no]["RECORDS"][str(work_date)]:
-                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]={"LABOR":{"DOCK":{},"WAREHOUSE":{}},"EQUIPMENT":{"DOCK":{},"WAREHOUSE":{}},"MAINTENANCE":{"DOCK":{},"WAREHOUSE":{}}}
                             mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['LABOR'][work_type]=st.session_state.scores.T.to_dict()
                             mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['EQUIPMENT'][work_type]=st.session_state.eq_scores.T.to_dict()
                             mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['MAINTENANCE'][work_type]=st.session_state.maint_scores.T.to_dict()

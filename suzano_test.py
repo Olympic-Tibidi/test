@@ -487,9 +487,11 @@ if authentication_status:
                     mt_jobs=json.loads(mt_jobs_)
                     by1,by2=st.tabs(["BY JOB","BY DATE"])
                     with by1:
-                        by_year=st.selectbox("SELECT JOB",mt_jobs.keys())
+                        by_year=st.selectbox("SELECT YEAR",mt_jobs.keys())
                         by_job=st.selectbox("SELECT JOB",mt_jobs[by_year].keys())
-                        
+                        info=pd.DataFrame(mt_jobs[by_year][by_job]["INFO"])
+                        by_date=st.selectbox("SELECT DATE",mt_jobs[by_year][by_job].keys())
+                        st.dataframe(info)
                 
                 with lab_tab3:
                     with st.container(border=True):

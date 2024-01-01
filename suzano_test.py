@@ -497,7 +497,7 @@ if authentication_status:
                         info=mt_jobs[by_year][by_job]["INFO"]
                         st.dataframe(info)
                     with c3:
-                        d1,d2,d3=st.columns([3,2,5])
+                        d1,d2,d3=st.columns([4,4,2])
                         with d1:
                             by_choice=st.radio("SELECT INVOICE",["LABOR","EQUIPMENT","MAINTENANCE"])
                         with d2:

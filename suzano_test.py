@@ -485,7 +485,7 @@ if authentication_status:
                 with lab_tab4:
                     mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
                     mt_jobs=json.loads(mt_jobs_)
-                    c1,c2,c3=st.columns([3,2,5])
+                    c1,c2,c3=st.columns([2,2,6])
                     with c1:
                         with st.container(border=True):
                             by_year=st.selectbox("SELECT YEAR",mt_jobs.keys())

@@ -927,11 +927,11 @@ if authentication_status:
                             if st.session_state.shift_record not in mt_jobs[year][job_no]["RECORDS"][str(work_date)]:
                                 mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]={}
                             if "LABOR" not in mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]:
-                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]["LABOR"]={work_type={}}
+                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]["LABOR"]={"DOCK":{},"LINES":{},"WAREHOUSE":{}}
                             if 'EQUIPMENT' not in mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]:
-                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]["EQUIPMENT"]={work_type={}}
+                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]["EQUIPMENT"]={"DOCK":{},"LINES":{},"WAREHOUSE":{}}
                             if 'MAINTENANCE' not in mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]:
-                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]["MAINTENANCE"]={work_type={}}
+                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]["MAINTENANCE"]={"DOCK":{},"LINES":{},"WAREHOUSE":{}}
                             mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['LABOR'][work_type]=st.session_state.scores.T.to_dict()
                             mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['EQUIPMENT'][work_type]=st.session_state.eq_scores.T.to_dict()
                             if st.session_state.maint:

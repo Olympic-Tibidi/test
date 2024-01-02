@@ -929,14 +929,14 @@ if authentication_status:
                             
                             mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['LABOR'][work_type]=st.session_state.scores.T.to_dict()
                             mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['EQUIPMENT'][work_type]=st.session_state.eq_scores.T.to_dict()
-                                if st.session_state.maint:
-                                    mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['MAINTENANCE'][work_type]=st.session_state.maint_scores.T.to_dict()
-                                mt_jobs_=json.dumps(mt_jobs)
-                                storage_client = storage.Client()
-                                bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"mt_jobs.json")
-                                blob.upload_from_string(mt_jobs_)
-                                st.success(f"RECORDED JOB NO {job_no} ! ")
+                            if st.session_state.maint:
+                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['MAINTENANCE'][work_type]=st.session_state.maint_scores.T.to_dict()
+                            mt_jobs_=json.dumps(mt_jobs)
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"mt_jobs.json")
+                            blob.upload_from_string(mt_jobs_)
+                            st.success(f"RECORDED JOB NO {job_no} ! ")
                         
                        
                         

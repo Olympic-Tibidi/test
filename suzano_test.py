@@ -907,15 +907,16 @@ if authentication_status:
                             blob = bucket.blob(rf"labor_templates/{filename}.csv")
                             blob.upload_from_string(temp, content_type="text/csv")
                     with down_col2:
+                        mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
+                        mt_jobs=json.loads(mt_jobs_)
                         #st.write(st.session_state.scores.T.to_dict())
-                        job_no=st.selectbox("SELECT JOB NO",["MT-20"])
+                        job_no=st.selectbox("SELECT JOB NO",[i for i in mt_jobs)
                         year="2023"
                         work_type=st.selectbox("SELECT JOB NO",["DOCK","WAREHOUSE","LINES"])
                         work_date=st.date_input("Work Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="work_date")
                         record=st.button("RECORD TO JOB",key="srfqwdsd")
                         if record:
-                            mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
-                            mt_jobs=json.loads(mt_jobs_)
+                            
                             if year not in mt_jobs:
                                 mt_jobs[year]={}
                             if job_no not in mt_jobs[year]:

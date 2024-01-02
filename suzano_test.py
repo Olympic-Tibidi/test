@@ -483,7 +483,7 @@ if authentication_status:
                 lab_tab1,lab_tab2,lab_tab3,lab_tab4=st.tabs(["LABOR TEMPLATE", "JOBS","RATES","LOOKUP"])
 
                 with lab_tab4:
-                    itsreadytab4=False
+                    itsreadytab4=True
                     if itsreadytab4:
                         
                         def dfs_sum(dictionary, key):

@@ -581,6 +581,7 @@ if authentication_status:
                             vessel_length=st.number_input("VESSEL LENGTH",step=1,disabled=False)
                             job_number=st.text_input("MT JOB NO",disabled=False)
                             shipper=st.text_input("SHIPPER",disabled=False)
+                            cargo=st.text_input("CARGO",disabled=False)
                             agent=st.selectbox("AGENT",["TALON","ACGI","NORTON LILLY"],disabled=False)
                             stevedore=st.selectbox("STEVEDORE",["SSA","JONES"],disabled=False)
                             
@@ -605,7 +606,7 @@ if authentication_status:
                                 mt_jobs[year]={}
                             if job_number not in mt_jobs[year]:
                                 mt_jobs[year][job_number]={"INFO":{},"RECORDS":{}}
-                            mt_jobs[year][job_number]["INFO"]={"Vessel":job_vessel,"Vessel Length":vessel_length,
+                            mt_jobs[year][job_number]["INFO"]={"Vessel":job_vessel,"Vessel Length":vessel_length,"Cargo":cargo,
                                                 "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
                                                 "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time}
                             mt_jobs=json.dumps(mt_jobs)

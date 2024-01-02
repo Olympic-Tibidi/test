@@ -483,66 +483,69 @@ if authentication_status:
                 lab_tab1,lab_tab2,lab_tab3,lab_tab4=st.tabs(["LABOR TEMPLATE", "JOBS","RATES","LOOKUP"])
 
                 with lab_tab4:
-                    def dfs_sum(dictionary, key):
-                        total_sum = 0
-                    
-                        for k, v in dictionary.items():
-                            if k == key:
-                                total_sum += v
-                            elif isinstance(v, dict):
-                                total_sum += dfs_sum(v, key)
-                    
-                        return total_sum
-                    mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
-                    mt_jobs=json.loads(mt_jobs_)
-                    c1,c2,c3=st.columns([2,2,6])
-                    with c1:
-                        with st.container(border=True):
-                            by_year=st.selectbox("SELECT YEAR",mt_jobs.keys())
-                            by_job=st.selectbox("SELECT JOB",mt_jobs[by_year].keys())
-                            by_date=st.selectbox("SELECT DATE",mt_jobs[by_year][by_job]["RECORDS"].keys())
-                            by_shift=st.selectbox("SELECT SHIFT",mt_jobs[by_year][by_job]["RECORDS"][by_date].keys())
-                            
-                    with c2:
-                        info=mt_jobs[by_year][by_job]["INFO"]
-                        st.dataframe(info)
-                    with c3:
-                        with st.container(border=True):
-                            
-                            d1,d2,d3=st.columns([4,4,2])
-                            with d1:
-                                by_choice=st.radio("SELECT INVOICE",["LABOR","EQUIPMENT","MAINTENANCE"])
-                            with d2:
-                                by_location=st.radio("SELECT INVOICE",["DOCK","WAREHOUSE","LINES"])
-                        with st.container(border=True):
-                            e1,e2,e3=st.columns([4,4,2])
-                            with e1:
-                                st.write(f"TOTAL {by_location}-{by_choice} COST for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'TOTAL COST'),2)}")
-                                st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'Mark UP'),2)}")
-                                if by_choice=="LABOR":
-                                    st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'INVOICE'),2)}")
-                                else:
-                                    st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{by_choice} INVOICE'),2)}")
-                            with e2:
-                                st.write(f"TOTAL {by_location}-{by_choice} COST for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'TOTAL COST') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
-                                st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'Mark UP') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
-                                if by_choice=="LABOR":
-                                    st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'INVOICE') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
-                                else:
-                                    st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],f'{by_choice} INVOICE') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
-                        #st.write(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location])
-                    a=pd.DataFrame(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location]).T
-                    if by_choice=="LABOR":
-                        try:
-                            a.loc["TOTAL FOR SHIFT"]=a[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]].sum()
-                        except:
-                            pass
-                    else:
-                        try:
-                            a.loc["TOTAL FOR SHIFT"]=a[[ "Quantity","Hours","TOTAL COST","Mark UP",f"{by_choice} INVOICE"]].sum()
-                        except:
-                            pass
-                    st.write(a)
+                    itsreadytab4=False
+                    if itsreadytab4:
+                        
+                        def dfs_sum(dictionary, key):
+                            total_sum = 0
+                        
+                            for k, v in dictionary.items():
+                                if k == key:
+                                    total_sum += v
+                                elif isinstance(v, dict):
+                                    total_sum += dfs_sum(v, key)
+                        
+                            return total_sum
+                        mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
+                        mt_jobs=json.loads(mt_jobs_)
+                        c1,c2,c3=st.columns([2,2,6])
+                        with c1:
+                            with st.container(border=True):
+                                by_year=st.selectbox("SELECT YEAR",mt_jobs.keys())
+                                by_job=st.selectbox("SELECT JOB",mt_jobs[by_year].keys())
+                                by_date=st.selectbox("SELECT DATE",mt_jobs[by_year][by_job]["RECORDS"].keys())
+                                by_shift=st.selectbox("SELECT SHIFT",mt_jobs[by_year][by_job]["RECORDS"][by_date].keys())
+                                
+                        with c2:
+                            info=mt_jobs[by_year][by_job]["INFO"]
+                            st.dataframe(info)
+                        with c3:
+                            with st.container(border=True):
+                                
+                                d1,d2,d3=st.columns([4,4,2])
+                                with d1:
+                                    by_choice=st.radio("SELECT INVOICE",["LABOR","EQUIPMENT","MAINTENANCE"])
+                                with d2:
+                                    by_location=st.radio("SELECT INVOICE",["DOCK","WAREHOUSE","LINES"])
+                            with st.container(border=True):
+                                e1,e2,e3=st.columns([4,4,2])
+                                with e1:
+                                    st.write(f"TOTAL {by_location}-{by_choice} COST for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'TOTAL COST'),2)}")
+                                    st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'Mark UP'),2)}")
+                                    if by_choice=="LABOR":
+                                        st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'INVOICE'),2)}")
+                                    else:
+                                        st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{by_choice} INVOICE'),2)}")
+                                with e2:
+                                    st.write(f"TOTAL {by_location}-{by_choice} COST for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'TOTAL COST') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
+                                    st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'Mark UP') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
+                                    if by_choice=="LABOR":
+                                        st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'INVOICE') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
+                                    else:
+                                        st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],f'{by_choice} INVOICE') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
+                            #st.write(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location])
+                        a=pd.DataFrame(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location]).T
+                        if by_choice=="LABOR":
+                            try:
+                                a.loc["TOTAL FOR SHIFT"]=a[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]].sum()
+                            except:
+                                pass
+                        else:
+                            try:
+                                a.loc["TOTAL FOR SHIFT"]=a[[ "Quantity","Hours","TOTAL COST","Mark UP",f"{by_choice} INVOICE"]].sum()
+                            except:
+                                pass
+                        st.write(a)
                             
                            
                         

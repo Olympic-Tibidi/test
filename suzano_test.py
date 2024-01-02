@@ -484,7 +484,7 @@ if authentication_status:
 
                 with lab_tab4:
                     itsreadytab4=False
-                    if not itsreadytab4:
+                    if itsreadytab4:
                         
                         def dfs_sum(dictionary, key):
                             total_sum = 0

@@ -910,7 +910,7 @@ if authentication_status:
                         mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
                         mt_jobs=json.loads(mt_jobs_)
                         #st.write(st.session_state.scores.T.to_dict())
-                        job_no=st.selectbox("SELECT JOB NO",[i for i in mt_jobs["2023"])
+                        job_no=st.selectbox("SELECT JOB NO",[i for i in mt_jobs["2023"]])
                         year="2023"
                         work_type=st.selectbox("SELECT JOB NO",["DOCK","WAREHOUSE","LINES"])
                         work_date=st.date_input("Work Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="work_date")

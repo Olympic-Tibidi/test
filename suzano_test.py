@@ -4042,7 +4042,7 @@ if authentication_status:
                         inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                         inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
                         ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                        ro = pd.read_json(ro)
+                        raw_ro = json.loads(ro)
                         grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
                         bols=grouped_df.T.to_dict()
                         grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)

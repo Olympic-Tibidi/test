@@ -4004,7 +4004,7 @@ if authentication_status:
                         inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308"])
                         kf=inv_bill_of_ladings.iloc[1:].copy()
                         kf['issued'] = pd.to_datetime(kf['issued'])
-                        kf=kf[kf['vessel']==inv_vessel
+                        kf=kf[kf['vessel']==inv_vessel]
                         kf['Date'] = kf['issued'].dt.date
                         kf['Date'] = pd.to_datetime(kf['Date'])
                         # Create a date range from the minimum to maximum date in the 'issued' column

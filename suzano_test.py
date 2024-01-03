@@ -4047,6 +4047,7 @@ if authentication_status:
                         bols=grouped_df.T.to_dict()
                         grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
                         info=grouped_df.T.to_dict()
+                        info_=info.copy()
                         for i in bols: #### for each bill of lading
                             for val in bols[i]:##   (for each release order on that bill of lading)
                                 found_key = next((key for key in info.keys() if val in key), None)

@@ -4047,13 +4047,14 @@ if authentication_status:
                         bols=grouped_df.T.to_dict()
                         grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
                         info=grouped_df.T.to_dict()
-                        for i in bols:
-                            for val in bols[i]:
+                        for i in bols: #### for each bill of lading
+                            for val in bols[i]:##   (for each release order on that bill of lading)
                                 found_key = next((key for key in info.keys() if val in key), None)
+                                print(found_key)
                                 qt=info[found_key]['quantity']
-                                info.update({found_key:{'total':ro.loc[int(val),"KIRKENES-2304"]['001']['total'],
-                                                      'shipped':qt,'remaining':ro.loc[int(val),"KIRKENES-2304"]['001']['remaining']}})
-                        new=pd.DataFrame(info).T
+                                info_.update({found_key:{'total':sum([raw_ro[val][sales]['total'] for sales in raw_ro[val]]) if val in ro else 0,
+                                                      'shipped':qt,'remaining':sum([raw_ro[val][sales]['remaining'] for sales in raw_ro[val]])}})
+                        new=pd.DataFrame(info_).T
                         new=new.reset_index()
                         new.groupby('level_1')['remaining'].sum()
                         

@@ -619,7 +619,7 @@ if authentication_status:
                             blob.upload_from_string(mt_jobs)
                             st.success(f"RECORDED JOB NO {job_number} ! ")
                 with lab_tab1:
-                    equipment_tariff={"CRANE":850,"FORKLIFT":65,"TRACTOR":65,"KOMATSU":160,"GENIE MANLIFT":50,"Z135 MANLIFT":95}
+                    equipment_tariff={"CRANE":850,"FORKLIFT":65,"TRACTOR":65,"KOMATSU":152.9,"GENIE MANLIFT":50,"Z135 MANLIFT":95}
                     foreman=False
                     with st.container(border=True):
                         

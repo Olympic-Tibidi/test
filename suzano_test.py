@@ -2244,8 +2244,8 @@ if authentication_status:
                 maintenance=False
                 if not maintenance:
                     
-                    initial_tons =st.number_input("CARGO SIZE (TONS)",  help=None,step=1, on_change=None, disabled=False, label_visibility="visible",key="fdee2a")
-                    daily_rate = st.number_input("DAILY SHIPMENT TONNAGE",  help=None, on_change=None, disabled=False, label_visibility="visible",key="fdee2aedseq")
+                    initial_tons =st.number_input("CARGO SIZE (TONS)",  help=None,step=1, on_change=None,step=1, disabled=False, label_visibility="visible",key="fdee2a")
+                    daily_rate = st.number_input("DAILY SHIPMENT TONNAGE",  help=None, on_change=None,step=1, disabled=False, label_visibility="visible",key="fdee2aedseq")
                     storage_rate = st.number_input("STORAGE RATE DAILY ($)",value=0.15, help="dsds", on_change=None, disabled=False, label_visibility="visible",key="fdee2dsdseq")
                     free_days_till = st.number_input("FREE DAYS",value=15, help="dssds",step=1, on_change=None, disabled=False, label_visibility="visible",key="fd3242dsdseq")
                     balances = {}
@@ -2272,7 +2272,7 @@ if authentication_status:
                                 # If storage free days are over, start applying storage charges
                             elif day % 7 in ([5,6]):
                                 balances[day]={"Remaining":tons_remaining,"Charge":0,"Accumulated":accumulated}
-                            if day >30:
+                            if day >free_days_till:
                                 charge = round(tons_remaining*storage_rate,2)  # You can adjust the storage charge after the free days
                                 accumulated+=charge
                                 accumulated=round(accumulated,2)
@@ -2283,9 +2283,7 @@ if authentication_status:
                         return balances
                     
                     # Create a date range
-                    start_date = pd.to_datetime('today').date()
-                    end_date = start_date + pd.DateOffset(days=120)  # Adjust as needed
-                    date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+                   
                     
                         # Calculate balances
                         
@@ -2294,9 +2292,14 @@ if authentication_status:
                         if calc:
                             balances = calculate_balance(initial_tons, daily_rate, storage_rate)
                             d=pd.DataFrame(balances).T
+
+                            start_date = pd.to_datetime('today').date()
+                            end_date = start_date + pd.DateOffset(days=120)  # Adjust as needed
+                            date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+                    
                             d.rename_axis("Days",inplace=True)
                             d.columns=["Remaining Tonnage","Daily Charge","Accumulated Charge"]
-                            st.write(f"####  Cargo: {initial_tons} - Loadout Rate/Day: {daily_rate} Tons" )
+                            st.write(f"####  Cargo: {initial_tons} - Loadout Rate/Day: {daily_rate} Tons - Free Days : {free_days_till}" )
                             st.write(f"##### TOTAL CHARGES:  ${round(d.loc[len(d),'Accumulated Charge'],1)}" )
                             st.write(f"##### DURATION OF LOADOUT:  {len(d)} Days")
                     if calc:

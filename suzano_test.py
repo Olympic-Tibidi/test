@@ -2321,6 +2321,7 @@ if authentication_status:
                                 arrowhead=4,
                                 ax=-50,
                                 ay=-30,
+                                font=dict(size=16),
                                 bgcolor='rgba(255, 255, 255, 0.6)',
                             )
                             

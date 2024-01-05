@@ -2279,8 +2279,10 @@ if authentication_status:
                     
                   
                    
-                    initial_tons =st.slider("CARGO SIZE (TONS)",  0,25000,100,key="fdee2a")
-                    daily_rate = st.number_input("DAILY SHIPMENT TONNAGE",  help=None, on_change=None,step=1, disabled=False, label_visibility="visible",key="fdee2aedseq")
+                    initial_tons =st.number_input("START TONNAGE",  help=None, on_change=None,step=50, disabled=False, label_visibility="visible",key="fas2aedseq")
+                    daily_rate=st.slider("DAILY SHIPMENT TONNAGE",  (0,600),(170,300),key="fdee2a")
+                    daily_rate=300
+                    daily_rate# = st.number_input("DAILY SHIPMENT TONNAGE",  help=None, on_change=None,step=1, disabled=False, label_visibility="visible",key="fdee2aedseq")
                     storage_rate = st.number_input("STORAGE RATE DAILY ($)",value=0.15, help="dsds", on_change=None, disabled=False, label_visibility="visible",key="fdee2dsdseq")
                     free_days_till = st.number_input("FREE DAYS",value=15, help="dssds",step=1, on_change=None, disabled=False, label_visibility="visible",key="fd3242dsdseq")
                     balances = {}

@@ -2296,12 +2296,13 @@ if authentication_status:
                             start_date = pd.to_datetime('today').date()
                             end_date = start_date + pd.DateOffset(days=120)  # Adjust as needed
                             date_range = pd.date_range(start=start_date, end=end_date, freq='D')
-                    
+                            total=round(d.loc[len(d),'Accumulated Charge'],1)
                             d.rename_axis("Days",inplace=True)
                             d.columns=["Remaining Tonnage","Daily Charge","Accumulated Charge"]
-                            st.write(f"####  Cargo: {initial_tons} - Loadout Rate/Day: {daily_rate} Tons - Free Days : {free_days_till}" )
-                            st.write(f"##### TOTAL CHARGES:  ${round(d.loc[len(d),'Accumulated Charge'],1)}" )
+                            st.write(f"######  Cargo: {initial_tons} - Loadout Rate/Day: {daily_rate} Tons - Free Days : {free_days_till}" )
+                            st.write(f"##### TOTAL CHARGES:  ${total}" )
                             st.write(f"##### DURATION OF LOADOUT:  {len(d)} Days")
+                            st.write(f"##### MONTHLY REVENUE: ${round(total/len(d)*30,1} ")
                     if calc:
                         st.write(d)
             

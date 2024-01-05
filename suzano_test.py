@@ -2310,18 +2310,32 @@ if authentication_status:
                         with c1:
                             st.write(d)
                         with c2:
+
                             fig = px.bar(d, x=d.index, y="Accumulated Charge", title="Accumulated Charges Over Days")
 
                             # Add a horizontal line for the monthly average charge
+                            average_charge = d["Accumulated Charge"].mean()
                             fig.add_shape(
                                 dict(
                                     type="line",
                                     x0=d.index.min(),
                                     x1=d.index.max(),
-                                    y0=d["Accumulated Charge"].mean(),
-                                    y1=d["Accumulated Charge"].mean(),
+                                    y0=average_charge,
+                                    y1=average_charge,
                                     line=dict(color="red", dash="dash"),
                                 )
+                            )
+                            
+                            # Add annotation with the average charge value
+                            fig.add_annotation(
+                                x=d.index.max(),
+                                y=average_charge,
+                                text=f'Average Charge: ${average_charge:.2f}',
+                                showarrow=True,
+                                arrowhead=4,
+                                ax=-50,
+                                ay=-30,
+                                bgcolor='rgba(255, 255, 255, 0.6)',
                             )
                             
                             # Set layout options
@@ -2336,11 +2350,6 @@ if authentication_status:
                                     }
                                 ],
                             )
-                            
-                            
-                            
-                            
-                            # Show the plot
                             st.plotly_chart(fig)
 
                     

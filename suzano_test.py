@@ -2299,13 +2299,52 @@ if authentication_status:
                             d.rename_axis("Days",inplace=True)
                             d.columns=["Remaining Tonnage","Daily Charge","Accumulated Charge"]
                             total=round(d.loc[len(d),'Accumulated Charge'],1)
+                    with st.container(border=True):        
+                        if calc:
                             st.write(f"######  Cargo: {initial_tons} - Loadout Rate/Day: {daily_rate} Tons - Free Days : {free_days_till}" )
                             st.write(f"##### TOTAL CHARGES:  ${total}" )
                             st.write(f"##### DURATION OF LOADOUT:  {len(d)} Days")
                             st.write(f"##### MONTHLY REVENUE: ${round(total/len(d)*30,1)} ")
+                    c1,c2=st.columns([5,5])
                     if calc:
-                        st.write(d)
-            
+                        with c1:
+                            st.write(d)
+                        with c2:
+                            fig = px.bar(d, x=d.index, y="Accumulated Charge", title="Accumulated Charges Over Days")
+
+                            # Add a horizontal line for the monthly average charge
+                            fig.add_shape(
+                                dict(
+                                    type="line",
+                                    x0=d.index.min(),
+                                    x1=d.index.max(),
+                                    y0=d["Accumulated Charge"].mean(),
+                                    y1=d["Accumulated Charge"].mean(),
+                                    line=dict(color="red", dash="dash"),
+                                )
+                            )
+                            
+                            # Set layout options
+                            fig.update_layout(
+                                xaxis_title="Days",
+                                yaxis_title="Accumulated Charge",
+                                sliders=[
+                                    {
+                                        "steps": [
+                                            {"args": [[{"type": "scatter", "x": d.index, "y": d["Accumulated Charge"]}], "layout"], "label": "All", "method": "animate"},
+                                        ],
+                                    }
+                                ],
+                            )
+                            
+                            
+                            
+                            
+                            # Show the plot
+                            st.plotly_chart(fig)
+
+                    
+                    
             
             
             with admin_tab2:

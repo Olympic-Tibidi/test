@@ -2294,7 +2294,6 @@ if authentication_status:
                         if calc:
                             balances = calculate_balance(initial_tons, daily_rate, storage_rate)
                             d=pd.DataFrame(balances).T
-                            st.write(d)
                             start_date = pd.to_datetime('today').date()
                             end_date = start_date + pd.DateOffset(days=120)  # Adjust as needed
                             date_range = pd.date_range(start=start_date, end=end_date, freq='D')

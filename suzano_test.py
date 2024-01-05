@@ -2243,14 +2243,6 @@ if authentication_status:
             with admin_tab4:
                 maintenance=False
                 if not maintenance:
-                    
-                   
-                    
-                    
-                    # Function to calculate remaining balance
-                    
-                    
-                    
                     def calculate_balance(start_tons, daily_rate, storage_rate):
                         balances={}
                         tons_remaining = start_tons
@@ -2273,12 +2265,10 @@ if authentication_status:
                                 accumulated+=charge
                                 accumulated=round(accumulated,2)
                                 balances[day]={"Remaining":tons_remaining,"Charge":charge,"Accumulated":accumulated}
-                    
                             
                             day+=1
                         return balances
-                    
-                  
+                        
                     here1,here2,here3=st.columns([2,5,3])
                     
                     with here1:
@@ -2287,7 +2277,6 @@ if authentication_status:
                             daily_rate=st.slider("DAILY SHIPMENT TONNAGE",min_value=248, max_value=544, step=10,key="fdee2a")
                             storage_rate = st.number_input("STORAGE RATE DAILY ($)",value=0.15, help="dsds", on_change=None, disabled=False, label_visibility="visible",key="fdee2dsdseq")
                             free_days_till = st.selectbox("FREE DAYS",[15,30,45,60])
-                    
                     
                     with here3:
                         with st.container(border=True):    
@@ -2308,12 +2297,10 @@ if authentication_status:
                             st.write(f"##### TOTAL CHARGES:  ${total}" )
                             st.write(f"##### DURATION OF LOADOUT:  {len(d)} Days")
                             st.write(f"##### MONTHLY REVENUE: ${round(total/len(d)*30,1)} ")
-                    
-
                             fig = px.bar(d, x=d.index, y="Accumulated Charge", title="Accumulated Charges Over Days")
         
                             # Add a horizontal line for the monthly average charge
-                            average_charge = d["Accumulated Charge"].mean()
+                            average_charge = round(total/len(d)*30,1)
                             fig.add_shape(
                                 dict(
                                     type="line",

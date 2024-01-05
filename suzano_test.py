@@ -2244,7 +2244,7 @@ if authentication_status:
                 maintenance=False
                 if not maintenance:
                     
-                    initial_tons =st.number_input("CARGO SIZE (TONS)",  help=None,step=1, on_change=None,step=1, disabled=False, label_visibility="visible",key="fdee2a")
+                    initial_tons =st.number_input("CARGO SIZE (TONS)",  help=None,step=1, on_change=None, disabled=False, label_visibility="visible",key="fdee2a")
                     daily_rate = st.number_input("DAILY SHIPMENT TONNAGE",  help=None, on_change=None,step=1, disabled=False, label_visibility="visible",key="fdee2aedseq")
                     storage_rate = st.number_input("STORAGE RATE DAILY ($)",value=0.15, help="dsds", on_change=None, disabled=False, label_visibility="visible",key="fdee2dsdseq")
                     free_days_till = st.number_input("FREE DAYS",value=15, help="dssds",step=1, on_change=None, disabled=False, label_visibility="visible",key="fd3242dsdseq")

@@ -2302,7 +2302,7 @@ if authentication_status:
                             st.write(f"######  Cargo: {initial_tons} - Loadout Rate/Day: {daily_rate} Tons - Free Days : {free_days_till}" )
                             st.write(f"##### TOTAL CHARGES:  ${total}" )
                             st.write(f"##### DURATION OF LOADOUT:  {len(d)} Days")
-                            st.write(f"##### MONTHLY REVENUE: ${round(total/len(d)*30,1} ")
+                            st.write(f"##### MONTHLY REVENUE: ${round(total/len(d)*30,1)} ")
                     if calc:
                         st.write(d)
             

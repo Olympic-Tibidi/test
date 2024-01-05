@@ -2280,7 +2280,7 @@ if authentication_status:
                   
                    
                     initial_tons =st.number_input("START TONNAGE",  help=None, on_change=None,step=50, disabled=False, label_visibility="visible",key="fas2aedseq")
-                    daily_rate=st.slider("DAILY SHIPMENT TONNAGE",  0,600,(170,300),key="fdee2a")
+                    daily_rate=st.slider("DAILY SHIPMENT TONNAGE",  240,420,10,key="fdee2a")
                     daily_rate=300
                     daily_rate# = st.number_input("DAILY SHIPMENT TONNAGE",  help=None, on_change=None,step=1, disabled=False, label_visibility="visible",key="fdee2aedseq")
                     storage_rate = st.number_input("STORAGE RATE DAILY ($)",value=0.15, help="dsds", on_change=None, disabled=False, label_visibility="visible",key="fdee2dsdseq")
@@ -2298,8 +2298,9 @@ if authentication_status:
                             start_date = pd.to_datetime('today').date()
                             end_date = start_date + pd.DateOffset(days=120)  # Adjust as needed
                             date_range = pd.date_range(start=start_date, end=end_date, freq='D')
-                            d.rename_axis("Days",inplace=True)
+                            
                             d.columns=["Remaining Tonnage","Daily Charge","Accumulated Charge"]
+                            d.rename_axis("Days",inplace=True)
                             total=round(d.loc[len(d),'Accumulated Charge'],1)
                     with st.container(border=True):        
                         if calc:

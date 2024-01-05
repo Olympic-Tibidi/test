@@ -2280,15 +2280,15 @@ if authentication_status:
                     
                   
                     here1,here2,here3=st.columns([2,3,5])
-                    balances = calculate_balance(initial_tons, daily_rate, storage_rate)
-                    d=pd.DataFrame(balances).T
+                    
                     with here1:
                         with st.container(border=True):
                             initial_tons =st.number_input("START TONNAGE",  help=None, on_change=None,step=50, disabled=False, label_visibility="visible",key="fas2aedseq")
                             daily_rate=st.slider("DAILY SHIPMENT TONNAGE",min_value=248, max_value=544, step=10,key="fdee2a")
                             storage_rate = st.number_input("STORAGE RATE DAILY ($)",value=0.15, help="dsds", on_change=None, disabled=False, label_visibility="visible",key="fdee2dsdseq")
                             free_days_till = st.selectbox("FREE DAYS",[15,30,45,60])
-                    
+                    balances = calculate_balance(initial_tons, daily_rate, storage_rate)
+                    d=pd.DataFrame(balances).T
                     
                     with here3:
                         with st.container(border=True):    

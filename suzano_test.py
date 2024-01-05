@@ -2279,7 +2279,9 @@ if authentication_status:
                         return balances
                     
                   
-                    here1,here2,here3=st.columns([3,3,4])
+                    here1,here2,here3=st.columns([2,3,5])
+                    balances = calculate_balance(initial_tons, daily_rate, storage_rate)
+                    d=pd.DataFrame(balances).T
                     with here1:
                         with st.container(border=True):
                             initial_tons =st.number_input("START TONNAGE",  help=None, on_change=None,step=50, disabled=False, label_visibility="visible",key="fas2aedseq")
@@ -2288,10 +2290,9 @@ if authentication_status:
                             free_days_till = st.selectbox("FREE DAYS",[15,30,45,60])
                     
                     
-                    with here2:
+                    with here3:
                         with st.container(border=True):    
-                            balances = calculate_balance(initial_tons, daily_rate, storage_rate)
-                            d=pd.DataFrame(balances).T
+                            
                             start_date = pd.to_datetime('today').date()
                             end_date = start_date + pd.DateOffset(days=120)  # Adjust as needed
                             date_range = pd.date_range(start=start_date, end=end_date, freq='D')
@@ -2301,7 +2302,7 @@ if authentication_status:
                             total=round(d.loc[len(d),'Accumulated Charge'],1)
                             st.dataframe(d)
 
-                    with here3:
+                    with here2:
                         with st.container(border=True):     
                             st.write(f"######  Cargo: {initial_tons} - Loadout Rate/Day: {daily_rate} Tons - Free Days : {free_days_till}" )
                             st.write(f"##### TOTAL CHARGES:  ${total}" )

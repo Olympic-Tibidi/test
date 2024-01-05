@@ -2316,7 +2316,7 @@ if authentication_status:
                             fig.add_annotation(
                                 x=d.index.max()//3,
                                 y=average_charge,
-                                text=f'Average Monthly Income: ${average_charge:.2f}',
+                                text=f'Monthly Average Income: <b>${average_charge:.2f}</b> and <i>italic text</i>',
                                 showarrow=True,
                                 arrowhead=4,
                                 ax=-50,

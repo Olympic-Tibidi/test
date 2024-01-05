@@ -2279,7 +2279,7 @@ if authentication_status:
                         return balances
                     
                   
-                    here1,here2,here3=st.columns([2,3,5])
+                    here1,here2,here3=st.columns([2,5,3])
                     
                     with here1:
                         with st.container(border=True):

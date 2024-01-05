@@ -2287,12 +2287,12 @@ if authentication_status:
                             daily_rate=st.slider("DAILY SHIPMENT TONNAGE",min_value=248, max_value=544, step=10,key="fdee2a")
                             storage_rate = st.number_input("STORAGE RATE DAILY ($)",value=0.15, help="dsds", on_change=None, disabled=False, label_visibility="visible",key="fdee2dsdseq")
                             free_days_till = st.selectbox("FREE DAYS",[15,30,45,60])
-                    balances = calculate_balance(initial_tons, daily_rate, storage_rate)
-                    d=pd.DataFrame(balances).T
+                    
                     
                     with here3:
                         with st.container(border=True):    
-                            
+                            balances = calculate_balance(initial_tons, daily_rate, storage_rate)
+                            d=pd.DataFrame(balances).T
                             start_date = pd.to_datetime('today').date()
                             end_date = start_date + pd.DateOffset(days=120)  # Adjust as needed
                             date_range = pd.date_range(start=start_date, end=end_date, freq='D')

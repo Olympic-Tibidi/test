@@ -2309,46 +2309,46 @@ if authentication_status:
                             st.write(f"##### MONTHLY REVENUE: ${round(total/len(d)*30,1)} ")
                     
 
-                    fig = px.bar(d, x=d.index, y="Accumulated Charge", title="Accumulated Charges Over Days")
-
-                    # Add a horizontal line for the monthly average charge
-                    average_charge = d["Accumulated Charge"].mean()
-                    fig.add_shape(
-                        dict(
-                            type="line",
-                            x0=d.index.min(),
-                            x1=d.index.max(),
-                            y0=average_charge,
-                            y1=average_charge,
-                            line=dict(color="red", dash="dash"),
-                        )
-                    )
-                    
-                    # Add annotation with the average charge value
-                    fig.add_annotation(
-                        x=d.index.max(),
-                        y=average_charge,
-                        text=f'Average Charge: ${average_charge:.2f}',
-                        showarrow=True,
-                        arrowhead=4,
-                        ax=-50,
-                        ay=-30,
-                        bgcolor='rgba(255, 255, 255, 0.6)',
-                    )
-                    
-                    # Set layout options
-                    fig.update_layout(
-                        xaxis_title="Days",
-                        yaxis_title="Accumulated Charge",
-                        sliders=[
-                            {
-                                "steps": [
-                                    {"args": [[{"type": "scatter", "x": d.index, "y": d["Accumulated Charge"]}], "layout"], "label": "All", "method": "animate"},
+                            fig = px.bar(d, x=d.index, y="Accumulated Charge", title="Accumulated Charges Over Days")
+        
+                            # Add a horizontal line for the monthly average charge
+                            average_charge = d["Accumulated Charge"].mean()
+                            fig.add_shape(
+                                dict(
+                                    type="line",
+                                    x0=d.index.min(),
+                                    x1=d.index.max(),
+                                    y0=average_charge,
+                                    y1=average_charge,
+                                    line=dict(color="red", dash="dash"),
+                                )
+                            )
+                            
+                            # Add annotation with the average charge value
+                            fig.add_annotation(
+                                x=d.index.max(),
+                                y=average_charge,
+                                text=f'Average Charge: ${average_charge:.2f}',
+                                showarrow=True,
+                                arrowhead=4,
+                                ax=-50,
+                                ay=-30,
+                                bgcolor='rgba(255, 255, 255, 0.6)',
+                            )
+                            
+                            # Set layout options
+                            fig.update_layout(
+                                xaxis_title="Days",
+                                yaxis_title="Accumulated Charge",
+                                sliders=[
+                                    {
+                                        "steps": [
+                                            {"args": [[{"type": "scatter", "x": d.index, "y": d["Accumulated Charge"]}], "layout"], "label": "All", "method": "animate"},
+                                        ],
+                                    }
                                 ],
-                            }
-                        ],
-                    )
-                    st.plotly_chart(fig)
+                            )
+                            st.plotly_chart(fig)
 
                     
                     

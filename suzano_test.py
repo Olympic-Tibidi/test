@@ -2299,6 +2299,7 @@ if authentication_status:
                             d.columns=["Remaining Tonnage","Daily Charge","Accumulated Charge"]
                             d.rename_axis("Days",inplace=True)
                             total=round(d.loc[len(d),'Accumulated Charge'],1)
+                            st.dataframe(d)
 
                     with here3:
                         with st.container(border=True):     

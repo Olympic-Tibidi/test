@@ -2252,6 +2252,7 @@ if authentication_status:
                     
                     
                     def calculate_balance(start_tons, daily_rate, storage_rate):
+                        balances={}
                         tons_remaining = start_tons
                         accumulated=0
                         day=1
@@ -2278,20 +2279,17 @@ if authentication_status:
                         return balances
                     
                   
-                   
-                    initial_tons =st.number_input("START TONNAGE",  help=None, on_change=None,step=50, disabled=False, label_visibility="visible",key="fas2aedseq")
-                    daily_rate=st.slider("DAILY SHIPMENT TONNAGE",min_value=248, max_value=544, step=10,key="fdee2a")
-                    #daily_rate=300
-                   
-                    storage_rate = st.number_input("STORAGE RATE DAILY ($)",value=0.15, help="dsds", on_change=None, disabled=False, label_visibility="visible",key="fdee2dsdseq")
-                    free_days_till = st.selectbox("FREE DAYS",[15,30,45,60])
-                    balances = {}
+                    here1,here2,here3=st.columns([3,3,4])
+                    with here1:
+                        with st.container(border=True):
+                            initial_tons =st.number_input("START TONNAGE",  help=None, on_change=None,step=50, disabled=False, label_visibility="visible",key="fas2aedseq")
+                            daily_rate=st.slider("DAILY SHIPMENT TONNAGE",min_value=248, max_value=544, step=10,key="fdee2a")
+                            storage_rate = st.number_input("STORAGE RATE DAILY ($)",value=0.15, help="dsds", on_change=None, disabled=False, label_visibility="visible",key="fdee2dsdseq")
+                            free_days_till = st.selectbox("FREE DAYS",[15,30,45,60])
                     
-                        # Calculate balances
-                        
-                    with st.container(border=True):
-                        calc=st.button("SUBMIT SIMULATION")
-                        if calc:
+                    
+                    with here2:
+                        with st.container(border=True):    
                             balances = calculate_balance(initial_tons, daily_rate, storage_rate)
                             d=pd.DataFrame(balances).T
                             start_date = pd.to_datetime('today').date()
@@ -2301,58 +2299,55 @@ if authentication_status:
                             d.columns=["Remaining Tonnage","Daily Charge","Accumulated Charge"]
                             d.rename_axis("Days",inplace=True)
                             total=round(d.loc[len(d),'Accumulated Charge'],1)
-                    with st.container(border=True):        
-                        if calc:
+
+                    with here3:
+                        with st.container(border=True):     
                             st.write(f"######  Cargo: {initial_tons} - Loadout Rate/Day: {daily_rate} Tons - Free Days : {free_days_till}" )
                             st.write(f"##### TOTAL CHARGES:  ${total}" )
                             st.write(f"##### DURATION OF LOADOUT:  {len(d)} Days")
                             st.write(f"##### MONTHLY REVENUE: ${round(total/len(d)*30,1)} ")
-                    c1,c2=st.columns([5,5])
-                    if calc:
-                        with c1:
-                            st.write(d)
-                        with c2:
+                    
 
-                            fig = px.bar(d, x=d.index, y="Accumulated Charge", title="Accumulated Charges Over Days")
+                    fig = px.bar(d, x=d.index, y="Accumulated Charge", title="Accumulated Charges Over Days")
 
-                            # Add a horizontal line for the monthly average charge
-                            average_charge = d["Accumulated Charge"].mean()
-                            fig.add_shape(
-                                dict(
-                                    type="line",
-                                    x0=d.index.min(),
-                                    x1=d.index.max(),
-                                    y0=average_charge,
-                                    y1=average_charge,
-                                    line=dict(color="red", dash="dash"),
-                                )
-                            )
-                            
-                            # Add annotation with the average charge value
-                            fig.add_annotation(
-                                x=d.index.max(),
-                                y=average_charge,
-                                text=f'Average Charge: ${average_charge:.2f}',
-                                showarrow=True,
-                                arrowhead=4,
-                                ax=-50,
-                                ay=-30,
-                                bgcolor='rgba(255, 255, 255, 0.6)',
-                            )
-                            
-                            # Set layout options
-                            fig.update_layout(
-                                xaxis_title="Days",
-                                yaxis_title="Accumulated Charge",
-                                sliders=[
-                                    {
-                                        "steps": [
-                                            {"args": [[{"type": "scatter", "x": d.index, "y": d["Accumulated Charge"]}], "layout"], "label": "All", "method": "animate"},
-                                        ],
-                                    }
+                    # Add a horizontal line for the monthly average charge
+                    average_charge = d["Accumulated Charge"].mean()
+                    fig.add_shape(
+                        dict(
+                            type="line",
+                            x0=d.index.min(),
+                            x1=d.index.max(),
+                            y0=average_charge,
+                            y1=average_charge,
+                            line=dict(color="red", dash="dash"),
+                        )
+                    )
+                    
+                    # Add annotation with the average charge value
+                    fig.add_annotation(
+                        x=d.index.max(),
+                        y=average_charge,
+                        text=f'Average Charge: ${average_charge:.2f}',
+                        showarrow=True,
+                        arrowhead=4,
+                        ax=-50,
+                        ay=-30,
+                        bgcolor='rgba(255, 255, 255, 0.6)',
+                    )
+                    
+                    # Set layout options
+                    fig.update_layout(
+                        xaxis_title="Days",
+                        yaxis_title="Accumulated Charge",
+                        sliders=[
+                            {
+                                "steps": [
+                                    {"args": [[{"type": "scatter", "x": d.index, "y": d["Accumulated Charge"]}], "layout"], "label": "All", "method": "animate"},
                                 ],
-                            )
-                            st.plotly_chart(fig)
+                            }
+                        ],
+                    )
+                    st.plotly_chart(fig)
 
                     
                     

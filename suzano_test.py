@@ -2327,7 +2327,7 @@ if authentication_status:
                             
                             # Add annotation with the average charge value
                             fig.add_annotation(
-                                x=d.index.max(),
+                                x=d.index.mean(),
                                 y=average_charge,
                                 text=f'Average Charge: ${average_charge:.2f}',
                                 showarrow=True,

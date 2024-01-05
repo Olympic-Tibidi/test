@@ -2283,7 +2283,7 @@ if authentication_status:
                     
                     with here1:
                         with st.container(border=True):
-                            initial_tons =st.number_input("START TONNAGE",  help=None, on_change=None,step=50, disabled=False, label_visibility="visible",key="fas2aedseq")
+                            initial_tons =st.number_input("START TONNAGE", min_value=1000, help=None, on_change=None,step=50, disabled=False, label_visibility="visible",key="fas2aedseq")
                             daily_rate=st.slider("DAILY SHIPMENT TONNAGE",min_value=248, max_value=544, step=10,key="fdee2a")
                             storage_rate = st.number_input("STORAGE RATE DAILY ($)",value=0.15, help="dsds", on_change=None, disabled=False, label_visibility="visible",key="fdee2dsdseq")
                             free_days_till = st.selectbox("FREE DAYS",[15,30,45,60])

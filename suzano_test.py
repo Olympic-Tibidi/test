@@ -696,7 +696,7 @@ if authentication_status:
                         markup=with_siu*st.session_state.markup/100   ##+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
                         if foreman:
                             markup=with_siu*st.session_state.f_markup/100  ###+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
-                        invoice=total_cost+markup
+                        invoice=total_cost+markup+siu_choice
                         
                         
                         new_score = pd.DataFrame(

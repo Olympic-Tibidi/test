@@ -5354,8 +5354,11 @@ if authentication_status:
                 inv4tab1,inv4tab2,inv4tab3=st.tabs(["DAILY SHIPMENT REPORT","INVENTORY","UNREGISTERED LOTS FOUND"])
                 with inv4tab1:
                     
+                    amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000}
+                    inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308"])
                     kf=inv_bill_of_ladings.iloc[1:].copy()
                     kf['issued'] = pd.to_datetime(kf['issued'])
+                    kf=kf[kf['vessel']==inv_vessel]
                     kf['Date'] = kf['issued'].dt.date
                     kf['Date'] = pd.to_datetime(kf['Date'])
                     # Create a date range from the minimum to maximum date in the 'issued' column
@@ -5370,7 +5373,7 @@ if authentication_status:
                     merged_df_grouped=merged_df.groupby('Date')[['quantity','Shipped Tonnage']].sum()
                     merged_df_grouped['Accumulated_Quantity'] = merged_df_grouped['quantity'].cumsum()
                     merged_df_grouped["Accumulated_Tonnage"]=merged_df_grouped['Accumulated_Quantity']*2
-                    merged_df_grouped["Remaining_Units"]=[9200-i for i in merged_df_grouped['Accumulated_Quantity']]
+                    merged_df_grouped["Remaining_Units"]=[amount_dict[inv_vessel]-i for i in merged_df_grouped['Accumulated_Quantity']]
                     merged_df_grouped["Remaining_Tonnage"]=merged_df_grouped["Remaining_Units"]*2
                     merged_df_grouped.rename(columns={'quantity':"Shipped Quantity", 'Accumulated_Quantity':"Shipped Qty To_Date",
                                                       'Accumulated_Tonnage':"Shipped Tonnage To_Date"},inplace=True)

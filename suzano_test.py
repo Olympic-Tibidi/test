@@ -3263,6 +3263,7 @@ if authentication_status:
                     
                         mf=True
                         load_mf_number_issued=False
+                        st.write(destination)
                         carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
                         if carrier_code=="123456-KBX":
                             if 'load_mf_number' not in st.session_state:

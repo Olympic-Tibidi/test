@@ -434,8 +434,7 @@ authenticator = stauth.Authenticate(
 
 name, authentication_status, username = authenticator.login(fields={'PORT OF OLYMPIA TOS LOGIN', 'main'})
 
-fields: dict, default {'Form name':'Login', 'Username':'Username', 'Password':'Password', 'Login':'Login'}
-Customizes the text of headers, buttons and other fields.
+
 
 if authentication_status:
     authenticator.logout('Logout', 'main')

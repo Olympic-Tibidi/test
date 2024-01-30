@@ -150,7 +150,7 @@ def gcp_download_x(bucket_name, source_file_name):
     blob = bucket.blob(source_file_name)
     data = blob.download_as_bytes()
     return data
-@st.cache_data
+
 def gcp_csv_to_df(bucket_name, source_file_name):
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
@@ -354,7 +354,7 @@ def gen_bill_of_lading():
 def convert_df(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv().encode('utf-8')
-@st.cache_data    
+    
 def get_weather():
     weather=defaultdict(int)
     headers = { 
@@ -462,16 +462,15 @@ if authentication_status:
             st.markdown(f"Wind: {forecast['current']['wind_dir']}-{forecast['current']['wind_mph']}")
             st.markdown(f"Cloud Cover: %{forecast['current']['cloud']}")
             #st.markdown(f"Chance of Rain Today: %{forecast['forecast']['forecastday'][0]['day']['daily_chance_of_rain']} ")
-            #st.markdown(f"Current Precipitation: {forecast['current']['precip_in']} Inches")
-           # st.markdown(f"Day's Total Expected Rain: {forecast['forecast']['forecastday'][0]['day']['totalprecip_in']} Inches")
+            st.markdown(f"Current Precipitation: {forecast['current']['precip_in']} Inches")
+            #st.markdown(f"Day's Total Expected Rain: {forecast['forecast']['forecastday'][0]['day']['totalprecip_in']} Inches")
             events=[]
             for i,j in enumerate(forecast['forecast']['forecastday'][:3]):
                 if forecast['forecast']['forecastday'][i]['astro']['moon_phase'] in ['New Moon','Full Moon']:
                     events.append(f"{forecast['forecast']['forecastday'][i]['astro']['moon_phase']} Coming up in {i} {'days' if i>1 else 'day'}. Check for King Tides for the following days.")
             if len(events)>0:
                 st.warning(events[0])
-
-        if select=='LABOR':
+        if select=="LABOR":
             labor_issue=False
             secondary=True
             
@@ -619,7 +618,7 @@ if authentication_status:
                             blob.upload_from_string(mt_jobs)
                             st.success(f"RECORDED JOB NO {job_number} ! ")
                 with lab_tab1:
-                    equipment_tariff={"CRANE":850,"FORKLIFT":65,"TRACTOR":65,"KOMATSU":152.9,"GENIE MANLIFT":50,"Z135 MANLIFT":95}
+                    equipment_tariff={"CRANE":850,"FORKLIFT":65,"TRACTOR":65,"KOMATSU":160,"GENIE MANLIFT":50,"Z135 MANLIFT":95}
                     foreman=False
                     with st.container(border=True):
                         
@@ -696,7 +695,7 @@ if authentication_status:
                         markup=with_siu*st.session_state.markup/100   ##+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
                         if foreman:
                             markup=with_siu*st.session_state.f_markup/100  ###+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
-                        invoice=total_cost+markup+siu_choice
+                        invoice=total_cost+markup
                         
                         
                         new_score = pd.DataFrame(
@@ -955,7 +954,6 @@ if authentication_status:
                             st.session_state.scores.reset_index(drop=True,inplace=True)
                         except:
                             pass
-                    
         if select=='WEATHER':
             st.caption("Live Data for Olympia From Weather.gov API")
             gov_forecast=get_weather()
@@ -1146,82 +1144,8 @@ if authentication_status:
             if fin_password=="marineterm98501!":
                 hadi=True
             if hadi:
-                ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","SUZANO TRUCK ANALYSIS"])
-                with ttab3:
-                   
-                    inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                    
-                    df=pd.read_json(inv_bill_of_ladings).T
-                    
-                    ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                    
-                    labor=gcp_download(target_bucket,rf"trucks.json")
-                    labor=json.loads(labor)
-                    raw_ro = json.loads(ro)
-                    temp_dict={}
-                    for rel_ord in raw_ro:
-                        
-                        
-                        for sales in raw_ro[rel_ord]:
-                            temp_dict[rel_ord,sales]={}
-                            dest=raw_ro[rel_ord][sales]['destination']
-                            vessel=raw_ro[rel_ord][sales]['vessel']
-                            total=raw_ro[rel_ord][sales]['total']
-                            remaining=raw_ro[rel_ord][sales]['remaining']
-                            temp_dict[rel_ord,sales]={'destination': dest,'vessel': vessel,'total':total,'remaining':remaining}
-                    temp_df=pd.DataFrame(temp_dict).T
-                    #temp_df
-                    
-                    temp_df['First Shipment'] = temp_df.index.map(df.groupby(['release_order','sales_order'])['issued'].first())
-                    
-                    for i in temp_df.index:
-                        if temp_df.loc[i,'remaining']<=2:
-                            temp_df.loc[i,"Last Shipment"]=df.groupby(['release_order','sales_order']).issued.last().loc[i]
-                            temp_df.loc[i,"Duration"]=(pd.to_datetime(temp_df.loc[i,"Last Shipment"])-pd.to_datetime(temp_df.loc[i,"First Shipment"])).days+1
-                    
-                    temp_df['Last Shipment'] = temp_df['Last Shipment'].fillna(datetime.datetime.now())
-                    
-                    ####
-                    
-                    def business_days(start_date, end_date):
-                        return pd.date_range(start=start_date, end=end_date, freq=BDay())
-                    temp_df['# of Shipment Days'] = temp_df.apply(lambda row: len(business_days(row['First Shipment'], row['Last Shipment'])), axis=1)
-                    df_temp=df.copy()
-                    df_temp["issued"]=[pd.to_datetime(i).date() for i in df_temp["issued"]]
-                    for i in temp_df.index:
-                        temp_df.loc[i,"Utilized Shipment Days"]=df_temp.groupby(["release_order",'sales_order'])[["issued"]].nunique().loc[i,'issued']
-                    temp_df['First Shipment'] = temp_df['First Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y'))
-                    temp_df['Last Shipment'] = temp_df['Last Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y') if type(x)==str else None)
-                    liste=['Duration','# of Shipment Days',"Utilized Shipment Days"]
-                    for col in liste:
-                        temp_df[col] = temp_df[col].apply(lambda x: f" {int(x)} days" if not pd.isna(x) else np.nan)
-                    temp_df['remaining'] = temp_df['remaining'].apply(lambda x: int(x))
-                    temp_df.columns=['Destination', 'Vessel', 'Total Units', 'Remaining Units', 'First Shipment',
-                           'Last Shipment', 'Duration', '# of Calendar Shipment Days',
-                           'Utilized Calendar Shipment Days']
-                    st.write(temp_df)
-                    a=df_temp.groupby(["issued"])[['quantity']].sum()
-                    a.index=pd.to_datetime(a.index)
-                    
-                    
-                    labor=pd.DataFrame(labor).T
-                    labor.index=pd.to_datetime(labor.index)
-                    for index in a.index:
-                        try:
-                            a.loc[index,'cost']=labor.loc[index,'cost']
-                        except:
-                            pass
-                    a['quantity']=2*a['quantity']
-                    a['Per_Ton']=a['cost']/a['quantity']
-                    trucks=df_temp.groupby(["issued"])[['vehicle']].count().vehicle.values
-                    a.insert(0,'trucks',trucks)
-                    a['Per_Ton']=round(a['Per_Ton'],1)
-                    a.columns=["# of Trucks","Shipped Tonnage","Total Cost","Cost Per Ton"]
-                    a.index=[i.date() for i in a.index]
-                    a["Shipped Tonnage"]=[int(i) for i in a["Shipped Tonnage"]]
-                    a["Total Cost"]= a["Total Cost"].map('${:,.2f}'.format)
-                    a["Cost Per Ton"]= a["Cost Per Ton"].map('${:,.2f}'.format)
-                    st.table(a)
+                ttab1,ttab2=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES"])
+                
                 with ttab2:
                     
                     if st.checkbox("UPLOAD LEDGER CSV",key="fsdsw"):
@@ -2338,16 +2262,12 @@ if authentication_status:
                                 ],
                             )
                             st.plotly_chart(fig)
-
                     
-                    
-            
-            
             with admin_tab2:
                 bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 admin_bill_of_ladings=json.loads(bill_data)
                 admin_bill_of_ladings=pd.DataFrame.from_dict(admin_bill_of_ladings).T[1:]
-                @st.cache_data
+                
                 def convert_df(df):
                     # IMPORTANT: Cache the conversion to prevent computation on every rerun
                     return df.to_csv().encode('utf-8')
@@ -2422,7 +2342,7 @@ if authentication_status:
                 
               
                 release_order_tab1,release_order_tab2,release_order_tab3=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE","RELEASE ORDER STATUS"])
-                with release_order_tab3: #### RELEASE ORDER STATUS ####
+                with release_order_tab3:
                     maintenance=False
                     if not maintenance:
                         inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
@@ -2443,9 +2363,12 @@ if authentication_status:
                                                     
                         new=pd.DataFrame(info).T
                         new=new.reset_index()
+                        #new.groupby('level_1')['remaining'].sum()
                         new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
+                        new.index=[i for i in new.index]
+                        #new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
                         new.index=[i+1 for i in new.index]
-                        new.index=[i+1 for i in new.index]
+                        new.loc["Total"]=new[["Total","Shipped","Remaining"]].sum()
                         release_orders = [str(key[0]) for key in info.keys()]
                         release_orders=[str(i) for i in release_orders]
                         release_orders = pd.Categorical(release_orders)
@@ -2586,8 +2509,8 @@ if authentication_status:
                             monthly.index=[calendar.month_abbr[k] for k in [i.month for i in monthly.index]]
                             monthly= monthly.rename_axis('Month', axis=0)
                             st.dataframe(monthly)
-                
-                with release_order_tab1:  ####  CREATE RELEASE ORDER ###
+                        
+                with release_order_tab1:
                     #vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])  ###-###
                    
                     add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER",disabled=False)
@@ -3604,7 +3527,7 @@ if authentication_status:
                                         faults.append(1)
                                         with st.expander(f"**:red[Bale No : {i+1}-{x} This LOT# NOT IN INVENTORY!---VERIFY BALE {x} CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles]**"):
                                             st.write("Verify that the bale came from the pile that has the units for this release order and click to inventory")
-                                            if st.button("ADD UNIT TO INVENTORY",key=f"{x}"):
+                                            if st.button("ADD BALE TO INVENTORY",key=f"{x}"):
                                                 updated_bill=bill_mapping.copy()
                                                 updated_bill[vessel][x[:load_digit]]={"Batch":batch,"Ocean_bl":ocean_bill_of_lading}
                                                 updated_bill=json.dumps(updated_bill)
@@ -3856,8 +3779,8 @@ if authentication_status:
                             body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                             #st.write(body)           
                             sender = "warehouseoly@gmail.com"
-                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                            recipients = ["afsiny@portolympia.com"]
+                            recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                            #recipients = ["afsiny@portolympia.com"]
                             password = "xjvxkmzbpotzeuuv"
                     
                   
@@ -3935,7 +3858,7 @@ if authentication_status:
                 
                         
         if select=="INVENTORY" :
-            #Inventory=gcp_csv_to_df(target_bucket, "kirkenes_with_ghosts_found.csv")
+            Inventory=gcp_csv_to_df(target_bucket, "kirkenes_with_ghosts_found.csv")
             data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
             bill_of_ladings=json.loads(data)
             mill_info=json.loads(gcp_download(target_bucket,rf"mill_info.json"))
@@ -4104,6 +4027,7 @@ if authentication_status:
                 else:
                     inv4tab1,inv4tab2,inv4tab3=st.tabs(["DAILY SHIPMENT REPORT","INVENTORY","UNREGISTERED LOTS FOUND"])
                     with inv4tab1:
+                        
                         amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000}
                         inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308"])
                         kf=inv_bill_of_ladings.iloc[1:].copy()
@@ -4139,7 +4063,6 @@ if authentication_status:
                             file_name=f'INVENTORY REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
                             mime='text/csv')            
                     with inv4tab2:
-                        
                         combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
                         combined["Batch"]=combined["Batch"].astype(str)
                         
@@ -4149,28 +4072,31 @@ if authentication_status:
                         raw_ro = json.loads(ro)
                         grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
                         bols=grouped_df.T.to_dict()
+                        
                         grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
                         info=grouped_df.T.to_dict()
                         info_=info.copy()
-                        for i in bols: #### for each bill of lading
-                            for val in bols[i]:##   (for each release order on that bill of lading)
-                                found_key = next((key for key in info.keys() if val in key), None)
-                                print(found_key)
-                                qt=info[found_key]['quantity']
-                                info_.update({found_key:{'total':sum([raw_ro[val][sales]['total'] for sales in raw_ro[val]]) if val in ro else 0,
-                                                      'shipped':qt,'remaining':sum([raw_ro[val][sales]['remaining'] for sales in raw_ro[val]])}})
+                        for bol in bols: #### for each bill of lading
+                            for rel_ord in bols[bol]:##   (for each release order on that bill of lading)
+                                found_keys = [key for key in info.keys() if rel_ord in key]
+                                for key in found_keys:
+                                    #print(key)
+                                    qt=info[key]['quantity']
+                                    info_.update({key:{'total':sum([raw_ro[rel_ord][sales]['total'] for sales in raw_ro[rel_ord]]) if rel_ord in ro else 0,
+                                                      'shipped':qt,'remaining':sum([raw_ro[rel_ord][sales]['remaining'] for sales in raw_ro[rel_ord]])}})
                         new=pd.DataFrame(info_).T
                         new=new.reset_index()
                         new.groupby('level_1')['remaining'].sum()
                         
-                        temp=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[["quantity"]].sum()
-                        temp1=combined.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
-                        temp=pd.merge(temp, temp1, left_index=True, right_index=True, how='outer', suffixes=('_df1', '_df2'))
-                        temp=temp[["Bales","quantity","Remaining"]]
+                        temp1=new.groupby("level_1")[["total","shipped","remaining"]].sum()
+                        temp2=combined.groupby("Ocean B/L")[["Bales","Shipped","Remaining"]].sum()/8
+                        temp=temp2.copy()
+                        temp["Shipped"]=temp.index.map(lambda x: temp1.loc[x,"shipped"] if x in temp1.index else 0)
                         temp.columns=["Total","Shipped","Remaining"]
                         temp["Remaining"]=temp.Total-temp.Shipped
                         temp.loc["TOTAL"]=temp.sum(axis=0)
                         tempo=temp*2
+
                         inv_col1,inv_col2=st.columns([2,2])
                         with inv_col1:
                             st.subheader("By Ocean BOL,UNITS")
@@ -4178,7 +4104,7 @@ if authentication_status:
                         with inv_col2:
                             st.subheader("By Ocean BOL,TONS")
                             st.dataframe(tempo)
-                      
+                
                     with inv4tab3:
                         alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                         alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])
@@ -4260,6 +4186,7 @@ if authentication_status:
                 new.index=[i+1 for i in new.index]
                 #new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
                 new.index=[i+1 for i in new.index]
+                new.loc["Total"]=new[["Total","Shipped","Remaining"]].sum()
                 release_orders = [str(key[0]) for key in info.keys()]
                 release_orders=[str(i) for i in release_orders]
                 release_orders = pd.Categorical(release_orders)
@@ -4523,7 +4450,10 @@ if authentication_status:
                 
                     mf=True
                     load_mf_number_issued=False
-                    carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
+                    if destination=="CLEARWATER-Lewiston,ID":
+                        carrier_code=st.selectbox("Carrier Code",[info[current_release_order][current_sales_order]["carrier_code"],"432602-NTG"],disabled=False,key=29)
+                    else:
+                        carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
                     if carrier_code=="123456-KBX":
                         if 'load_mf_number' not in st.session_state:
                             st.session_state.load_mf_number = None
@@ -4836,7 +4766,6 @@ if authentication_status:
                                             st.rerun()
                             
                     if bale_load_input is not None:
-                    
                         bale_textsplit = bale_load_input.splitlines()                       
                         bale_textsplit=[i for i in bale_textsplit if len(i)>8]                           
                         seen=set()
@@ -5492,6 +5421,8 @@ if authentication_status:
             new.index=[i+1 for i in new.index]
             #new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
             new.index=[i+1 for i in new.index]
+            new.loc["Total"]=new[["Total","Shipped","Remaining"]].sum()
+            
             release_orders = [str(key[0]) for key in info.keys()]
             release_orders=[str(i) for i in release_orders]
             release_orders = pd.Categorical(release_orders)

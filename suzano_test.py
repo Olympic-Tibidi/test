@@ -432,7 +432,8 @@ authenticator = stauth.Authenticate(
     config['preauthorized']
 )
 
-name, authentication_status, username = authenticator.login('PORT OF OLYMPIA TOS LOGIN', 'main')
+fields = {'form_name': 'PORT OF OLYMPIA TOS LOGIN', 'other_field': 'main'}
+name, authentication_status, username = authenticator.login(fields)
 
 if authentication_status:
     authenticator.logout('Logout', 'main')

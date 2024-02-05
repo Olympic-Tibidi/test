@@ -3448,8 +3448,8 @@ if authentication_status:
                                     faults.append(1)
                                     st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")
                                 else:
-                                    
-                                    if x[:load_digit] in bill_mapping[vessel]:
+                                        
+                                    if x[:load_digit] in bill_mapping[vessel] or vessel=="LAGUNA-3142" :
                                         if audit_unit(x):
                                             if x in seen:
                                                 st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)

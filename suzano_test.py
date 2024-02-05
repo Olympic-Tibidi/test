@@ -3291,6 +3291,8 @@ if authentication_status:
                         st.session_state.updated_quantity=updated_quantity
                     load_digit=-2 if vessel=="KIRKENES-2304" else -3
                     def audit_unit(x):
+                        if vessel=="LAGUNA-3142":
+                            return True
                         if vessel=="KIRKENES-2304":
                             if len(x)>=10:
                                 if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-2]]["Batch"]!=batch:

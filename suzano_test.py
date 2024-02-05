@@ -4364,7 +4364,7 @@ if authentication_status:
             load_col1,load_col2=st.columns([9,1])
             
             with load_col1:
-                wrap_dict={"ISU":"UNWRAPPED","ISP":"WRAPPED"}
+                wrap_dict={"ISU":"UNWRAPPED","ISP":"WRAPPED","AEP":"WRAPPED"}
                 wrap=info[current_release_order][current_sales_order]["grade"]
                 ocean_bill_of_=info[current_release_order][current_sales_order]["ocean_bill_of_lading"]
                 unitized=info[current_release_order][current_sales_order]["unitized"]
@@ -4557,6 +4557,8 @@ if authentication_status:
                     st.session_state.updated_quantity=updated_quantity
                 load_digit=-2 if vessel=="KIRKENES-2304" else -3
                 def audit_unit(x):
+                    if vessel=="LAGUNA-3142":
+                        return True
                     if vessel=="KIRKENES-2304":
                         if len(x)>=10:
                             if bill_mapping[vessel][x[:-2]]["Ocean_bl"]!=ocean_bill_of_lading and bill_mapping[vessel][x[:-2]]["Batch"]!=batch:
@@ -4712,8 +4714,8 @@ if authentication_status:
                                 faults.append(1)
                                 st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")
                             else:
-                                
-                                if x[:load_digit] in bill_mapping[vessel]:
+                                    
+                                if x[:load_digit] in bill_mapping[vessel] or vessel=="LAGUNA-3142" :
                                     if audit_unit(x):
                                         if x in seen:
                                             st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
@@ -4770,6 +4772,7 @@ if authentication_status:
                                             st.rerun()
                             
                     if bale_load_input is not None:
+                    
                         bale_textsplit = bale_load_input.splitlines()                       
                         bale_textsplit=[i for i in bale_textsplit if len(i)>8]                           
                         seen=set()
@@ -4794,7 +4797,7 @@ if authentication_status:
                                     faults.append(1)
                                     with st.expander(f"**:red[Bale No : {i+1}-{x} This LOT# NOT IN INVENTORY!---VERIFY BALE {x} CAME FROM {vessel} - {'Unwrapped' if grade=='ISU' else 'wrapped'} piles]**"):
                                         st.write("Verify that the bale came from the pile that has the units for this release order and click to inventory")
-                                        if st.button("ADD UNIT TO INVENTORY",key=f"{x}"):
+                                        if st.button("ADD BALE TO INVENTORY",key=f"{x}"):
                                             updated_bill=bill_mapping.copy()
                                             updated_bill[vessel][x[:load_digit]]={"Batch":batch,"Ocean_bl":ocean_bill_of_lading}
                                             updated_bill=json.dumps(updated_bill)
@@ -5046,8 +5049,8 @@ if authentication_status:
                         body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                         #st.write(body)           
                         sender = "warehouseoly@gmail.com"
-                        recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                        #recipients = ["afsiny@portolympia.com"]
+                        #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                        recipients = ["afsiny@portolympia.com"]
                         password = "xjvxkmzbpotzeuuv"
                 
               

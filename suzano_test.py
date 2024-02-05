@@ -3098,7 +3098,7 @@ if authentication_status:
                 load_col1,load_col2=st.columns([9,1])
                 
                 with load_col1:
-                    wrap_dict={"ISU":"UNWRAPPED","ISP":"WRAPPED"}
+                    wrap_dict={"ISU":"UNWRAPPED","ISP":"WRAPPED","AEP":"WRAPPED"}
                     wrap=info[current_release_order][current_sales_order]["grade"]
                     ocean_bill_of_=info[current_release_order][current_sales_order]["ocean_bill_of_lading"]
                     unitized=info[current_release_order][current_sales_order]["unitized"]

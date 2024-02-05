@@ -2512,7 +2512,7 @@ if authentication_status:
                             monthly= monthly.rename_axis('Month', axis=0)
                             st.dataframe(monthly)
                         
-                with release_order_tab1:
+                with release_order_tab1:   ###CREATE RELEASE ORDER
                     #vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])  ###-###
                    
                     add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER",disabled=False)
@@ -2569,7 +2569,7 @@ if authentication_status:
                         #st.write(destination_list)
                         destination=st.selectbox("SELECT DESTINATION",destination_list)
                         sales_order_item=st.text_input("Sales Order Item")  
-                        vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"],key="tre")
+                        vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142],key="tre")
                         ocean_bill_of_lading=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel].keys())   #######
                         wrap=st.text_input("Grade",batch_mapping[vessel][ocean_bill_of_lading]["grade"],disabled=True)   ##### batch mapping injection
                         batch=st.text_input("Batch No",batch_mapping[vessel][ocean_bill_of_lading]["batch"],disabled=True)   #####

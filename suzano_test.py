@@ -3783,8 +3783,8 @@ if authentication_status:
                             body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                             #st.write(body)           
                             sender = "warehouseoly@gmail.com"
-                            recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                            #recipients = ["afsiny@portolympia.com"]
+                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                            recipients = ["afsiny@portolympia.com"]
                             password = "xjvxkmzbpotzeuuv"
                     
                   

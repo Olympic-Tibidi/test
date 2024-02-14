@@ -3657,7 +3657,7 @@ if authentication_status:
                     data1 = [
                         ['VESSEL', vessel,'LOAD DATE',f'{bol_date}'],
                         [ 'OBL', f'{bol_obl}','GROSS WEIGHT',f'{bol_weight}'],
-                        [ 'RELEASE ORDER',f'{bol_ro}','VEHICLE ID',f'{bol_vehiclero}'],
+                        [ 'RELEASE ORDER',f'{bol_ro}','VEHICLE ID',f'{bol_vehicle}'],
                         [ 'CARRIER', f'{bol_carrier}','ADMT',f'{bol_admt}'],
                     ]
                 

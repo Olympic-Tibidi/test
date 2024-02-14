@@ -3665,7 +3665,7 @@ if authentication_status:
                     table1 = Table(data1,colWidths=135,rowHeights=25)
                 
                     # Add style to the table
-                   style = TableStyle([
+                    style = TableStyle([
                                         ('BACKGROUND', (0, 0), (0, 3), (0.8, 0.7, 0.6)),  # Background color
                                         ('BACKGROUND', (2, 0), (-2, -1), (0.8, 0.7, 0.6)),  # Background color
                                         ('INNERGRID', (0, 0), (-1, -1), 0.25, (0.2, 0.2, 0.2)),  # Inner grid style

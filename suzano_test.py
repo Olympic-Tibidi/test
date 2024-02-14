@@ -3672,6 +3672,7 @@ if authentication_status:
                                         ('BOX', (0, 0), (-1, -1), 0.25, (0.2, 0.2, 0.2)),  # Box style
                                         ('WORDWRAP', (0, 0), (-1, -1), True),  # Enable text wrapping
                                     ])
+                    table1.setStyle(style)
                     # Draw the table on the canvas
                     table1.wrapOn(c, 0, 0)
                     table1.drawOn(c, 30, 630)  # Position the table at (100, 500)

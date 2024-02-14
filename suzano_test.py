@@ -3638,7 +3638,7 @@ if authentication_status:
                 def create_pdf():
                     # Create a PDF document
                     c = canvas.Canvas("example.pdf", pagesize=letter)
-                
+                    buffer = io.BytesIO()
                     # Set title and draw text
                     c.setTitle("Sample PDF")
                     c.setFont("Helvetica", 16)  # Set the default font family and size

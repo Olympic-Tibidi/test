@@ -3781,8 +3781,8 @@ if authentication_status:
                 
                 st.download_button(
                         label="DOWNLOAD BOL",
-                        data=csv,
-                        file_name=pdf_file,
+                        data=pdf_file,
+                        file_name="BOL",
                         mime='text/csv')
                 
                 

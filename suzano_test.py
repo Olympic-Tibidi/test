@@ -3778,7 +3778,7 @@ if authentication_status:
                 
                 pdf_file = create_pdf()
                 
-                pdf = pdfium.PdfDocument("tests/resources/multipage.pdf")
+                pdf = pdfium.PdfDocument(pdf_file)
 
                 # Loop over pages and render
                 for i in range(len(pdf)):

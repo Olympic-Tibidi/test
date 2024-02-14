@@ -3778,7 +3778,7 @@ if authentication_status:
                 
                 pdf_file = create_pdf()
                 
-                
+                st.write(pdf_file, format='pdf')
                 # with open(pdf_file, "rb") as pdf_file:
                 #     PDFbyte = pdf_file.read()
                 

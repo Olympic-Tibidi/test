@@ -3779,16 +3779,14 @@ if authentication_status:
                 pdf_file = create_pdf()
                 
                 
-                   
+                st.download_button(
+                        label="DOWNLOAD BOL",
+                        data=csv,
+                        file_name=pdf_file,
+                        mime='text/csv')
                 
                 
-                pdf_bytes = create_pdf()
-                base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
-                pdf_display = f'<embed src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf">'
-                pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
-                st.markdown("""
-                        <embed src="https://thomasmorestudies.org/wp-content/uploads/2020/09/Richard.pdf" width="800" height="800">
-                        """, unsafe_allow_html=True)
+                
 
 
 

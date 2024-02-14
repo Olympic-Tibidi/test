@@ -3778,12 +3778,13 @@ if authentication_status:
                 
                 pdf_file = create_pdf()
                 
-                doc = fitz.open(pdffile)
-                page = doc.load_page(0)  # number of page
-                pix = page.get_pixmap()
-                output = "outfile.png"
-                pix.save(output)
-                doc.close()
+                pdf = pdfium.PdfDocument("tests/resources/multipage.pdf")
+
+                # Loop over pages and render
+                for i in range(len(pdf)):
+                    page = pdf[i]
+                    image = page.render(scale=4).to_pil()
+                    image.save(f"output_{i:03d}.jpg")
                 
                 
                 pdf_bytes = create_pdf()

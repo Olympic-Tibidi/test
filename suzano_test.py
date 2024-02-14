@@ -3619,7 +3619,7 @@ if authentication_status:
 
 
                 
-                bill_of_lading_number,bill_of_ladings=gen_bill_of_lading()
+                bol,bill_of_ladings=gen_bill_of_lading()
                 if load_mf_number_issued:
                     bill_of_lading_number=st.session_state.load_mf_number
                 obl=ocean_bill_of_lading

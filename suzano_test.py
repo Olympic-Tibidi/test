@@ -3621,7 +3621,7 @@ if authentication_status:
                 
                 bol,bill_of_ladings=gen_bill_of_lading()
                 if load_mf_number_issued:
-                    bill_of_lading_number=st.session_state.load_mf_number
+                    bol=st.session_state.load_mf_number
                 bol_obl=ocean_bill_of_lading
                 bol_ro=release_order_number
                 bol_carrier=carrier_code
@@ -3665,11 +3665,13 @@ if authentication_status:
                     table1 = Table(data1,colWidths=135,rowHeights=25)
                 
                     # Add style to the table
-                    table1.setStyle(TableStyle([('BACKGROUND', (0, 0), (0, 3), (0.8, 0.7, 0.6)),
-                                               ('BACKGROUND', (2, 0), (-2,-1), (0.8, 0.7, 0.6))]))
-                    style = TableStyle([('INNERGRID', (0,0), (-1,-1), 0.25, (0.2, 0.2, 0.2)),
-                                        ('BOX', (0,0), (-1,-1), 0.25, (0.2, 0.2, 0.2))])
-                    table1.setStyle(style)
+                   style = TableStyle([
+                                        ('BACKGROUND', (0, 0), (0, 3), (0.8, 0.7, 0.6)),  # Background color
+                                        ('BACKGROUND', (2, 0), (-2, -1), (0.8, 0.7, 0.6)),  # Background color
+                                        ('INNERGRID', (0, 0), (-1, -1), 0.25, (0.2, 0.2, 0.2)),  # Inner grid style
+                                        ('BOX', (0, 0), (-1, -1), 0.25, (0.2, 0.2, 0.2)),  # Box style
+                                        ('WORDWRAP', (0, 0), (-1, -1), True),  # Enable text wrapping
+                                    ])
                     # Draw the table on the canvas
                     table1.wrapOn(c, 0, 0)
                     table1.drawOn(c, 30, 630)  # Position the table at (100, 500)

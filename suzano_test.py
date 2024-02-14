@@ -3617,21 +3617,25 @@ if authentication_status:
                 st.markdown(f"**Last Submitted Bill Of Ladings (From most recent) : {last_submitted}**")
                 st.write(destination)
 
-                bol="11502345"
-                obl="GSSWKIR6013D"
-                ro="3159648"
-                carrier="123456"
+
+                
+                bill_of_lading_number,bill_of_ladings=gen_bill_of_lading()
+                if load_mf_number_issued:
+                    bill_of_lading_number=st.session_state.load_mf_number
+                obl=ocean_bill_of_lading
+                ro=release_order_number
+                carrier=carrier_code
                 customer_po="43234789 OLYM"
                 date=datetime.datetime.strftime(datetime.datetime.now(),"%b %d,%Y %H:%M")
                 
-                admt=19.9476
+                admt=quantity*19.9476
                 weight=44092.5
-                vehicle="MX34678"
+                vehicle=vehicle_id
                 batch="0045302855"
-                grade="ISU"
+                grade=wrap
                 dryness="89.764%"
-                mt=20
-                bales=80
+                mt=quantity*2
+                bales=quantity*8
                 
                 
                 

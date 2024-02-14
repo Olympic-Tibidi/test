@@ -51,7 +51,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 #from IPython.display import IFrame
 from reportlab.platypus import Table, TableStyle
-
+from pdf2image import convert_from_path
 #import streamlit_option_menu
 #from streamlit_modal import Modal
 

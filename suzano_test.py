@@ -3625,7 +3625,7 @@ if authentication_status:
                 bol_obl=ocean_bill_of_lading
                 bol_ro=release_order_number
                 bol_carrier=carrier_code
-                bol_customer_po=f"{info[current_release_order][po_number]} OLYM"
+                bol_customer_po=f"{info[current_release_order]['po_number']} OLYM"
                 bol_date=datetime.datetime.strftime(datetime.datetime.now(),"%b %d,%Y %H:%M")
                 
                 bol_admt=admt=round(float(info[current_release_order][current_sales_order]["dryness"])/90*st.session_state.updated_quantity*2,4)

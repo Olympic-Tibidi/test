@@ -3782,8 +3782,10 @@ if authentication_status:
                 
                 
                 st.write(pdf_file, format='pdf')
+                with open("example.pdf", "rb") as pdf_file:
+                    PDFbyte = pdf_file.read()
                 st.download_button(label="Download PDF Tutorial", 
-                        data=                pdf_file ,
+                        data=PDFbyte,
                         file_name="pandas-clean-id-column.pdf",
                         mime='application/octet-stream')
                                 

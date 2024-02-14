@@ -3638,7 +3638,7 @@ if authentication_status:
                 def create_pdf():
                     # Create a PDF document
                     buffer = io.BytesIO()
-                    c = canvas.Canvas(buffer, pagesize=letter)
+                    c = canvas.Canvas("example.pdf", pagesize=letter)
                     
                     # Set title and draw text
                     c.setTitle("Sample PDF")
@@ -3771,19 +3771,19 @@ if authentication_status:
                     
                     # Save the PDF document
                     c.save()
-                    pdf_bytes = buffer.getvalue()
-                    buffer.close()
+                    # pdf_bytes = buffer.getvalue()
+                    # buffer.close()
                 
-                    return pdf_bytes,"example.pdf"
+                    return "example.pdf"
                    # return "example.pdf"
                 
-                pdf_file,pdf = create_pdf()
+                pdf_file = create_pdf()
                 
                 
                 
-                st.write(pdf, format='pdf')
+                st.write(pdf_file, format='pdf')
                 st.download_button(label="Download PDF Tutorial", 
-                        data=                pdf ,
+                        data=                pdf_file ,
                         file_name="pandas-clean-id-column.pdf",
                         mime='application/octet-stream')
                                 

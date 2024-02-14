@@ -3622,20 +3622,20 @@ if authentication_status:
                 bol,bill_of_ladings=gen_bill_of_lading()
                 if load_mf_number_issued:
                     bill_of_lading_number=st.session_state.load_mf_number
-                obl=ocean_bill_of_lading
-                ro=release_order_number
-                carrier=carrier_code
-                customer_po="43234789 OLYM"
-                date=datetime.datetime.strftime(datetime.datetime.now(),"%b %d,%Y %H:%M")
+                bol_obl=ocean_bill_of_lading
+                bol_ro=release_order_number
+                bol_carrier=carrier_code
+                bol_customer_po=f"{info[current_release_order][po_number]} OLYM"
+                bol_date=datetime.datetime.strftime(datetime.datetime.now(),"%b %d,%Y %H:%M")
                 
-                admt=quantity*19.9476
-                weight=44092.5
-                vehicle=vehicle_id
-                batch="0045302855"
-                grade=wrap
-                dryness="89.764%"
-                mt=quantity*2
-                bales=quantity*8
+                bol_admt=admt=round(float(info[current_release_order][current_sales_order]["dryness"])/90*st.session_state.updated_quantity*2,4)
+                bol_weight=round(quantity*2*2204.62,1)
+                bol_vehicle=vehicle_id
+                bol_batch=batch
+                bol_grade=wrap
+                bol_dryness=f"{info[current_release_order][current_sales_order]["dryness"]}%"
+                bol_mt=quantity*2
+                bol_bales=quantity*8
                 
                 
                 
@@ -3655,10 +3655,10 @@ if authentication_status:
                     
                     
                     data1 = [
-                        ['VESSEL', 'KIRKENES','LOAD DATE',f'{date}'],
-                        [ 'OBL', f'{obl}','GROSS WEIGHT',f'{weight}'],
-                        [ 'RELEASE ORDER',f'{ro}','VEHICLE ID',f'{ro}'],
-                        [ 'CARRIER', f'{carrier}','ADMT',f'{admt}'],
+                        ['VESSEL', vessel,'LOAD DATE',f'{bol_date}'],
+                        [ 'OBL', f'{bol_obl}','GROSS WEIGHT',f'bol_{weight}'],
+                        [ 'RELEASE ORDER',f'{bol_ro}','VEHICLE ID',f'{bol_vehiclero}'],
+                        [ 'CARRIER', f'{bol_carrier}','ADMT',f'{bol_admt}'],
                     ]
                 
                     # Create a table
@@ -3693,7 +3693,7 @@ if authentication_status:
                     
                     data2 = [
                         ['Batch #', 'Grade','Dryness','MT','Bales'],
-                        [ batch, grade,dryness,mt,bales]
+                        [ bol_batch, bol_grade,bol_dryness,bol_mt,bol_bales]
                         
                     ]
                 

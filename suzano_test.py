@@ -3760,8 +3760,8 @@ if authentication_status:
                     
                     c.setFont("Helvetica-Bold", 11)
                     data3 = [
-                        ['', f'                                                                 {date}'],
-                        ['', f'                                                                 {date}']   ]
+                        ['', f'                                                                 {bol_date}'],
+                        ['', f'                                                                 {bol_date}']   ]
                     
                     table3= Table(data3,colWidths=280,rowHeights=30)
                     table3.setStyle(TableStyle([('BACKGROUND', (0, 0), (0, 1), (0.8, 0.7, 0.6))]))

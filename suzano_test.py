@@ -3633,7 +3633,7 @@ if authentication_status:
                 bol_vehicle=vehicle_id
                 bol_batch=batch
                 bol_grade=wrap
-                bol_dryness=f"{info[current_release_order][current_sales_order]["dryness"]}%"
+                bol_dryness=f"{info[current_release_order][current_sales_order]['dryness']}%"
                 bol_mt=quantity*2
                 bol_bales=quantity*8
                 

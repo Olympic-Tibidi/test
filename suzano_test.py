@@ -3781,7 +3781,7 @@ if authentication_status:
                 
                 
                 
-                st.write(PDFbyte, format='pdf')
+                st.write(pdf, format='pdf')
                 st.download_button(label="Download PDF Tutorial", 
                         data=                pdf ,
                         file_name="pandas-clean-id-column.pdf",

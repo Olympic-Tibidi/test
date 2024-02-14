@@ -435,7 +435,6 @@ authenticator = stauth.Authenticate(
 name, authentication_status, username = authenticator.login(fields={'PORT OF OLYMPIA TOS LOGIN', 'main'})
 
 
-
 if authentication_status:
     authenticator.logout('Logout', 'main')
     if username == 'ayilmaz' or username=='gatehouse':
@@ -2532,7 +2531,7 @@ if authentication_status:
                         wrap_edit=st.text_input("Grade",to_edit[release_order_number][sales_order_item_edit]["grade"],disabled=False)
                         batch_edit=st.text_input("Batch No",to_edit[release_order_number][sales_order_item_edit]["batch"],disabled=False)
                         dryness_edit=st.text_input("Dryness",to_edit[release_order_number][sales_order_item_edit]["dryness"],disabled=False)
-                        admt_edit=st.text_input("ADMT PER UNIT",round(int(batch_mapping[vessel_edit][ocean_bill_of_lading_edit]["dryness"])/90,6),disabled=False)
+                        admt_edit=st.text_input("ADMT PER UNIT",round(float(batch_mapping[vessel_edit][ocean_bill_of_lading_edit]["dryness"])/90,6),disabled=False)
                         unitized_edit=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
                         quantity_edit=st.number_input("Quantity of Units", 0, disabled=False, label_visibility="visible")
                         tonnage_edit=2*quantity_edit
@@ -2553,7 +2552,7 @@ if authentication_status:
                         wrap_add=st.text_input("Grade",batch_mapping[vessel_add][ocean_bill_of_lading_add]["grade"],disabled=True) 
                         batch_add=st.text_input("Batch No",batch_mapping[vessel_add][ocean_bill_of_lading_add]["batch"],disabled=False)
                         dryness_add=st.text_input("Dryness",batch_mapping[vessel_add][ocean_bill_of_lading_add]["dryness"],disabled=False)
-                        admt_add=st.text_input("ADMT PER UNIT",round(int(batch_mapping[vessel_add][ocean_bill_of_lading_add]["dryness"])/90,6),disabled=False)
+                        admt_add=st.text_input("ADMT PER UNIT",round(float(batch_mapping[vessel_add][ocean_bill_of_lading_add]["dryness"])/90,6),disabled=False)
                         unitized_add=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
                         quantity_add=st.number_input("Quantity of Units", 0, disabled=False, label_visibility="visible")
                         tonnage_add=2*quantity_add
@@ -2574,7 +2573,7 @@ if authentication_status:
                         wrap=st.text_input("Grade",batch_mapping[vessel][ocean_bill_of_lading]["grade"],disabled=True)   ##### batch mapping injection
                         batch=st.text_input("Batch No",batch_mapping[vessel][ocean_bill_of_lading]["batch"],disabled=True)   #####
                         dryness=st.text_input("Dryness",batch_mapping[vessel][ocean_bill_of_lading]["dryness"],disabled=True)   #####
-                        admt=st.text_input("ADMT PER UNIT",round(int(batch_mapping[vessel][ocean_bill_of_lading]["dryness"])/90,6),disabled=True)  #####
+                        admt=st.text_input("ADMT PER UNIT",round(float(batch_mapping[vessel][ocean_bill_of_lading]["dryness"])/90,6),disabled=True)  #####
                         unitized=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
                         quantity=st.number_input("Quantity of Units", min_value=1, max_value=5000, value=1, step=1,  key=None, help=None, on_change=None, disabled=False, label_visibility="visible")
                         tonnage=2*quantity
@@ -3189,7 +3188,7 @@ if authentication_status:
                         mf=True
                         load_mf_number_issued=False
                         if destination=="CLEARWATER-Lewiston,ID":
-                            carrier_code=st.selectbox("Carrier Code",[info[current_release_order][current_sales_order]["carrier_code"],"432602-NTG"],disabled=False,key=29)
+                            carrier_code=st.selectbox("Carrier Code",[info[current_release_order][current_sales_order]["carrier_code"],"310897-Ashley"],disabled=False,key=29)
                         else:
                             carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
                         if carrier_code=="123456-KBX":
@@ -3613,6 +3612,7 @@ if authentication_status:
                 last_submitted=load_admin_bill_of_ladings.index[-3:].to_list()
                 last_submitted.reverse()
                 st.markdown(f"**Last Submitted Bill Of Ladings (From most recent) : {last_submitted}**")
+                st.write(destination)
                 if yes and mf:
                     
                     if st.button('**:blue[SUBMIT EDI]**'):
@@ -3839,8 +3839,8 @@ if authentication_status:
                                 subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
                                 body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
                                 sender = "warehouseoly@gmail.com"
-                                recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                                #recipients = ["afsiny@portolympia.com"]
+                                #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                recipients = ["afsiny@portolympia.com"]
                                 password = "xjvxkmzbpotzeuuv"
                                 send_email(subject, body, sender, recipients, password)
                             
@@ -4455,7 +4455,7 @@ if authentication_status:
                     mf=True
                     load_mf_number_issued=False
                     if destination=="CLEARWATER-Lewiston,ID":
-                        carrier_code=st.selectbox("Carrier Code",[info[current_release_order][current_sales_order]["carrier_code"],"432602-NTG"],disabled=False,key=29)
+                        carrier_code=st.selectbox("Carrier Code",[info[current_release_order][current_sales_order]["carrier_code"],"310897-Ashley"],disabled=False,key=29)
                     else:
                         carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
                     if carrier_code=="123456-KBX":
@@ -4763,8 +4763,8 @@ if authentication_status:
                                             subject=f"FOUND UNIT {x} NOT IN INVENTORY"
                                             body=f"Clerk identified an uninventoried {'Unwrapped' if grade=='ISU' else 'wrapped'} unit {x}, and after verifying the physical pile, inventoried it into Ocean Bill Of Lading : {ocean_bill_of_lading} for vessel {vessel}. Unit has been put into alien unit list."
                                             sender = "warehouseoly@gmail.com"
-                                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                                            recipients = ["afsiny@portolympia.com"]
+                                            recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                            #recipients = ["afsiny@portolympia.com"]
                                             password = "xjvxkmzbpotzeuuv"
                                             send_email(subject, body, sender, recipients, password)
                                             time.sleep(0.1)
@@ -5049,8 +5049,8 @@ if authentication_status:
                         body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                         #st.write(body)           
                         sender = "warehouseoly@gmail.com"
-                        #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                        recipients = ["afsiny@portolympia.com"]
+                        recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                        #recipients = ["afsiny@portolympia.com"]
                         password = "xjvxkmzbpotzeuuv"
                 
               

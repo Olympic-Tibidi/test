@@ -3779,7 +3779,7 @@ if authentication_status:
                 pdf_file = create_pdf()
                 
                 
-                    image.save(f"output_{i:03d}.jpg")
+                   
                 
                 
                 pdf_bytes = create_pdf()

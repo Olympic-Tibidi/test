@@ -3672,7 +3672,7 @@ if authentication_status:
                                         ('BACKGROUND', (2, 0), (-2, -1), (0.8, 0.7, 0.6)),  # Background color
                                         ('INNERGRID', (0, 0), (-1, -1), 0.25, (0.2, 0.2, 0.2)),  # Inner grid style
                                         ('BOX', (0, 0), (-1, -1), 0.25, (0.2, 0.2, 0.2)),  # Box style
-                                        ('WORDWRAP', (0, 0), (-1, -1), True),  # Enable text wrapping
+                                        ('WORDWRAP', (3, 0), (3, -1), True),  # Enable text wrapping
                                     ])
                     table1.setStyle(style)
                     # Draw the table on the canvas
@@ -3793,7 +3793,7 @@ if authentication_status:
               
                 st.download_button(label="CREATE/DOWNLOAD BOL", 
                         data=create_pdf(),
-                        file_name="pandas-clean-id-column.pdf",
+                        file_name=f"{bol}.pdf",
                         mime='application/octet-stream')
                                 
                 

@@ -3780,19 +3780,15 @@ if authentication_status:
                     c.save()
                     # pdf_bytes = buffer.getvalue()
                     # buffer.close()
-                
-                    return "example.pdf"
+                    with open("example.pdf", "rb") as pdf_file:
+                        PDFbyte = pdf_file.read()
+                    return PDFbyte
                    # return "example.pdf"
                 
-                pdf_file = create_pdf()
-                with open("example.pdf", "rb") as pdf_file:
-                    PDFbyte = pdf_file.read()
-                return PDFbyte
+                #pdf_file = create_pdf()
                 
                 
-                
-                #with open("example.pdf", "rb") as pdf_file:
-                #    PDFbyte = pdf_file.read()
+              
                 st.download_button(label="CREATE/DOWNLOAD BOL", 
                         data=create_pdf(),
                         file_name="pandas-clean-id-column.pdf",

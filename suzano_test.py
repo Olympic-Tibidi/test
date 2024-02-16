@@ -3636,10 +3636,13 @@ if authentication_status:
                 bol_dryness=f"{info[current_release_order][current_sales_order]['dryness']}%"
                 bol_mt=quantity*2
                 bol_bales=quantity*8
-                
-                
+                bol_destination=info[current_release_order]["destination"]
+                mill_data=json.loads(gcp_download(target_bucket,rf"new_mill_database.json"))
+                st.write(mill_data)
                 
                 def create_pdf():
+                    mill_data=json.loads(gcp_download(target_bucket,rf"new_mill_database.json"))
+                    
                     # Create a PDF document
                     buffer = io.BytesIO()
                     c = canvas.Canvas("example.pdf", pagesize=letter)

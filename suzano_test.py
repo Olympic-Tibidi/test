@@ -3793,7 +3793,7 @@ if authentication_status:
                 #pdf_file = create_pdf()
                 
                 
-                st.write(bol_date.date)
+                st.write(bol_date.date())
                 st.download_button(label="CREATE/DOWNLOAD BOL", 
                         data=create_pdf(),
                         file_name=f"{destination}-{bol_ro}-{bol}.pdf",

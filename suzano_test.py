@@ -3785,14 +3785,16 @@ if authentication_status:
                    # return "example.pdf"
                 
                 pdf_file = create_pdf()
-                
+                with open("example.pdf", "rb") as pdf_file:
+                    PDFbyte = pdf_file.read()
+                return PDFbyte
                 
                 
                 
                 #with open("example.pdf", "rb") as pdf_file:
                 #    PDFbyte = pdf_file.read()
                 st.download_button(label="CREATE/DOWNLOAD BOL", 
-                        data=pdf_file,
+                        data=create_pdf(),
                         file_name="pandas-clean-id-column.pdf",
                         mime='application/octet-stream')
                                 

@@ -3693,10 +3693,10 @@ if authentication_status:
                     c.drawString(140, 580, "915 Washington St NE")
                     c.drawString(140, 560, "Olympia,WA 98501")
                     c.drawString(140, 540, "United States")
-                    c.drawString(390, 600, "Clearwater Paper Corporation")
-                    c.drawString(390, 580, "Consumer Products Division")
-                    c.drawString(390, 560, "801 Mill Rd")
-                    c.drawString(390, 540, "Lewiston,ID 93501 USA")
+                    c.drawString(390, 600, mill_data[destination]["BOL_Name"])
+                    c.drawString(390, 580, mill_data[destination]["BOL_Name_2"])
+                    c.drawString(390, 560, mill_data[destination]["BOL_Addr_1"])
+                    c.drawString(390, 540, mill_data[destination]["BOL_Addr_2"])
                     
                     data2 = [
                         ['Batch #', 'Grade','Dryness','MT','Bales'],

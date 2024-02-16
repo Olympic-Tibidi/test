@@ -3792,7 +3792,7 @@ if authentication_status:
                 #with open("example.pdf", "rb") as pdf_file:
                 #    PDFbyte = pdf_file.read()
                 st.download_button(label="CREATE/DOWNLOAD BOL", 
-                        data=PDFfile,
+                        data=pdf_file,
                         file_name="pandas-clean-id-column.pdf",
                         mime='application/octet-stream')
                                 

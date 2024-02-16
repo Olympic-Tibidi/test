@@ -3625,6 +3625,8 @@ if authentication_status:
                 bol_obl=ocean_bill_of_lading
                 bol_ro=release_order_number
                 bol_carrier=carrier_code
+                if bol_carrier=="432602-NOLAN TRANSPORTATION GROUP":
+                    bol_carrier="432602-NTG"
                 bol_customer_po=f"{info[current_release_order]['po_number']} OLYM"
                 bol_date=datetime.datetime.strftime(datetime.datetime.now(),"%b %d,%Y %H:%M")
                 
@@ -3664,7 +3666,7 @@ if authentication_status:
                     ]
                 
                     # Create a table
-                    col_widths = [135, 200, 135, 135]
+                    col_widths = [100, 200, 100, 135]
                     table1 = Table(data1,colWidths=col_widths,rowHeights=25)
                 
                     # Add style to the table

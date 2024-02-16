@@ -3664,7 +3664,8 @@ if authentication_status:
                     ]
                 
                     # Create a table
-                    table1 = Table(data1,colWidths=135,rowHeights=25)
+                    col_widths = [135, 200, 135, 135]
+                    table1 = Table(data1,colWidths=col_widths,rowHeights=25)
                 
                     # Add style to the table
                     style = TableStyle([

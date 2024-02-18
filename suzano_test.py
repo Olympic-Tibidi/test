@@ -55,6 +55,9 @@ import pypdfium2 as pdfium
 #import streamlit_option_menu
 #from streamlit_modal import Modal
 
+#import streamlit_option_menu
+#from streamlit_modal import Modal
+
 st.set_page_config(layout="wide")
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"
@@ -2529,7 +2532,7 @@ if authentication_status:
                         po_number_edit=st.text_input("PO No",to_edit[release_order_number]["po_number"],disabled=False)
                         destination_edit=st.text_input("Destination",to_edit[release_order_number]["destination"],disabled=False)
                         sales_order_item_edit=st.selectbox("Sales Order Item",list(to_edit[release_order_number].keys())[2:],disabled=False)
-                        vessel_edit=vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"],key="poFpoa")
+                        vessel_edit=vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142"],key="poFpoa")
                         ocean_bill_of_lading_edit=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel_edit].keys(),key="trdfeerw") 
                         wrap_edit=st.text_input("Grade",to_edit[release_order_number][sales_order_item_edit]["grade"],disabled=False)
                         batch_edit=st.text_input("Batch No",to_edit[release_order_number][sales_order_item_edit]["batch"],disabled=False)
@@ -3615,9 +3618,8 @@ if authentication_status:
                 last_submitted=load_admin_bill_of_ladings.index[-3:].to_list()
                 last_submitted.reverse()
                 st.markdown(f"**Last Submitted Bill Of Ladings (From most recent) : {last_submitted}**")
-                st.write(destination)
 
-
+                ####  BOL CREATION
                 
                 bol,bill_of_ladings=gen_bill_of_lading()
                 if load_mf_number_issued:
@@ -3654,7 +3656,7 @@ if authentication_status:
                     c.drawString(30, 750, "STRAIGHT BILL OF LADING")
                     c.setFont("Times-Bold", 16)
                     
-                    c.drawString(450, 750, f"BOL #: {bol}")
+                    c.drawString(420, 750, f"BOL #: {bol}")
                     
                     
                     
@@ -3687,17 +3689,17 @@ if authentication_status:
                     c.rect(300, 525 ,270, 100)
                     
                     c.setFont("Times-Bold", 13)
-                    c.drawString(40, 600, "SHIP FROM :")
-                    c.drawString(310, 600, "SHIP TO :")
+                    c.drawString(35, 610, "SHIP FROM :")
+                    c.drawString(315, 610, "SHIP TO :")
                     c.setFont("Helvetica", 13)
-                    c.drawString(140, 600, "Port Of Olympia")
-                    c.drawString(140, 580, "915 Washington St NE")
-                    c.drawString(140, 560, "Olympia,WA 98501")
-                    c.drawString(140, 540, "United States")
-                    c.drawString(360, 600, mill_data[destination]["BOL_Name"])
-                    c.drawString(360, 580, mill_data[destination]["BOL_Name_2"])
-                    c.drawString(360, 560, mill_data[destination]["BOL_Addr_1"])
-                    c.drawString(360, 540, mill_data[destination]["BOL_Addr_2"])
+                    c.drawString(120, 590, "Port Of Olympia")
+                    c.drawString(120, 570, "915 Washington St NE")
+                    c.drawString(120, 550, "Olympia,WA 98501")
+                    c.drawString(120, 530, "United States")
+                    c.drawString(340, 590, mill_data[destination]["BOL_Name"])
+                    c.drawString(340, 570, mill_data[destination]["BOL_Name_2"])
+                    c.drawString(340, 550, mill_data[destination]["BOL_Addr_1"])
+                    c.drawString(340, 530, mill_data[destination]["BOL_Addr_2"])
                     
                     data2 = [
                         ['Batch #', 'Grade','Dryness','MT','Bales'],
@@ -3797,14 +3799,8 @@ if authentication_status:
                         data=create_pdf(),
                         file_name=f"{calendar.month_name[datetime.datetime.now().month][:3]}-{datetime.datetime.now().day}-{destination}-{bol}.pdf",
                         mime='application/octet-stream')
-                                
                 
                 
-
-
-
-
-
                 
                 if yes and mf:
                     
@@ -4032,8 +4028,8 @@ if authentication_status:
                                 subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
                                 body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
                                 sender = "warehouseoly@gmail.com"
-                                #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                                recipients = ["afsiny@portolympia.com"]
+                                recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                #recipients = ["afsiny@portolympia.com"]
                                 password = "xjvxkmzbpotzeuuv"
                                 send_email(subject, body, sender, recipients, password)
                             
@@ -4226,7 +4222,7 @@ if authentication_status:
                     with inv4tab1:
                         
                         amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000}
-                        inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308"])
+                        inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142"])
                         kf=inv_bill_of_ladings.iloc[1:].copy()
                         kf['issued'] = pd.to_datetime(kf['issued'])
                         kf=kf[kf['vessel']==inv_vessel]
@@ -4304,7 +4300,7 @@ if authentication_status:
                 
                     with inv4tab3:
                         alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
-                        alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"])
+                        alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142"])
                         alien_list=pd.DataFrame(alien_units[alien_vessel]).T
                         alien_list.reset_index(inplace=True)
                         alien_list.index=alien_list.index+1
@@ -5072,6 +5068,188 @@ if authentication_status:
             last_submitted=load_admin_bill_of_ladings.index[-3:].to_list()
             last_submitted.reverse()
             st.markdown(f"**Last Submitted Bill Of Ladings (From most recent) : {last_submitted}**")
+
+            ####  BOL CREATION
+            
+            bol,bill_of_ladings=gen_bill_of_lading()
+            if load_mf_number_issued:
+                bol=st.session_state.load_mf_number
+            bol_obl=ocean_bill_of_lading
+            bol_ro=release_order_number
+            bol_carrier=carrier_code
+            if bol_carrier=="432602-NOLAN TRANSPORTATION GROUP":
+                bol_carrier="432602-NTG"
+            bol_customer_po=f"{info[current_release_order]['po_number']} OLYM"
+            bol_date=datetime.datetime.strftime(datetime.datetime.now(),"%b %d,%Y %H:%M")
+            
+            bol_admt=admt=round(float(info[current_release_order][current_sales_order]["dryness"])/90*st.session_state.updated_quantity*2,4)
+            bol_weight=round(quantity*2*2204.62,1)
+            bol_vehicle=vehicle_id
+            bol_batch=batch
+            bol_grade=wrap
+            bol_dryness=f"{info[current_release_order][current_sales_order]['dryness']}%"
+            bol_mt=quantity*2
+            bol_bales=quantity*8
+            bol_destination=info[current_release_order]["destination"]
+           
+            
+            def create_pdf():
+                mill_data=json.loads(gcp_download(target_bucket,rf"new_mill_database.json"))
+                
+                # Create a PDF document
+                buffer = io.BytesIO()
+                c = canvas.Canvas("example.pdf", pagesize=letter)
+                
+                # Set title and draw text
+                c.setTitle("Sample PDF")
+                c.setFont("Helvetica", 16)  # Set the default font family and size
+                c.drawString(30, 750, "STRAIGHT BILL OF LADING")
+                c.setFont("Times-Bold", 16)
+                
+                c.drawString(420, 750, f"BOL #: {bol}")
+                
+                
+                
+                data1 = [
+                    ['VESSEL', vessel,'LOAD DATE',f'{bol_date}'],
+                    [ 'OBL', f'{bol_obl}','GROSS WEIGHT',f'{bol_weight}'],
+                    [ 'RELEASE ORDER',f'{bol_ro}','VEHICLE ID',f'{bol_vehicle}'],
+                    [ 'CARRIER', f'{bol_carrier}','ADMT',f'{bol_admt}'],
+                ]
+            
+                # Create a table
+                col_widths = [100, 200, 100, 135]
+                table1 = Table(data1,colWidths=col_widths,rowHeights=25)
+            
+                # Add style to the table
+                style = TableStyle([
+                                    ('BACKGROUND', (0, 0), (0, 3), (0.8, 0.7, 0.6)),  # Background color
+                                    ('BACKGROUND', (2, 0), (-2, -1), (0.8, 0.7, 0.6)),  # Background color
+                                    ('INNERGRID', (0, 0), (-1, -1), 0.25, (0.2, 0.2, 0.2)),  # Inner grid style
+                                    ('BOX', (0, 0), (-1, -1), 0.25, (0.2, 0.2, 0.2)),  # Box style
+                                    ('WORDWRAP', (3, 1), (3, -1), True),  # Enable text wrapping
+                                ])
+                table1.setStyle(style)
+                # Draw the table on the canvas
+                table1.wrapOn(c, 0, 0)
+                table1.drawOn(c, 30, 630)  # Position the table at (100, 500)
+                
+                # Draw a rectangle
+                c.rect(30, 525 ,270, 100)
+                c.rect(300, 525 ,270, 100)
+                
+                c.setFont("Times-Bold", 13)
+                c.drawString(35, 610, "SHIP FROM :")
+                c.drawString(315, 610, "SHIP TO :")
+                c.setFont("Helvetica", 13)
+                c.drawString(120, 590, "Port Of Olympia")
+                c.drawString(120, 570, "915 Washington St NE")
+                c.drawString(120, 550, "Olympia,WA 98501")
+                c.drawString(120, 530, "United States")
+                c.drawString(340, 590, mill_data[destination]["BOL_Name"])
+                c.drawString(340, 570, mill_data[destination]["BOL_Name_2"])
+                c.drawString(340, 550, mill_data[destination]["BOL_Addr_1"])
+                c.drawString(340, 530, mill_data[destination]["BOL_Addr_2"])
+                
+                data2 = [
+                    ['Batch #', 'Grade','Dryness','MT','Bales'],
+                    [ bol_batch, bol_grade,bol_dryness,bol_mt,bol_bales]
+                    
+                ]
+            
+                table2= Table(data2,colWidths=108,rowHeights=25)
+                table2.setStyle(TableStyle([('BACKGROUND', (0, 0), (4, 0), (0.8, 0.7, 0.6))]))
+                table2.setStyle(style)
+                table2.wrapOn(c, 0, 0)
+                table2.drawOn(c, 30, 470)  # Position the table at (100, 500)
+                
+                c.drawString(150, 430, "FSC Certified Products. FSC Mix Credit. SCS-COC-009938")
+                
+                c.setFont("Helvetica-Bold", 13)
+                c.rect(30,300,537,100)
+                c.drawString(200, 380, "Truck Inspection Record")
+                c.setFont("Helvetica", 13)
+                c.drawString(110, 360, "Truck is clean and deemed suitable for transporting product.")
+                c.line(50,325,200,325)
+                c.line(360,325,500,325)
+                c.drawString(115, 310, "Sign")
+                c.drawString(400, 310, "Print Name")
+                
+                
+                c.rect(30, 250, 250, 50)
+                c.rect(280, 250, 287, 50)
+                c.drawString(350, 270, "Corrective action if answer “NO”")
+                c.drawString(35, 280, "If trailer is in poor condition, do not load!")
+                c.drawString(35, 260,"The Port will contact the customer.")
+                
+                c.rect(30, 220, 250, 30)
+                c.rect(280, 220, 30, 30)
+                c.rect(310, 220, 30, 30)
+                c.rect(340, 220, 227, 30)
+                c.drawString(290, 232, "Y")
+                c.drawString(320, 232, "N")
+                c.drawString(32, 230, "Is the Trailer clean?")
+                
+                c.rect(30, 190, 250, 30)
+                c.rect(280, 190, 30, 30)
+                c.rect(310, 190, 30, 30)
+                c.rect(340, 190, 227, 30)
+                c.drawString(290, 202, "Y")
+                c.drawString(320, 202, "N")
+                c.drawString(32, 200, "Is the trailer free of debris?")
+                
+                c.rect(30, 160, 250, 30)
+                c.rect(280, 160, 30, 30)
+                c.rect(310, 160, 30, 30)
+                c.rect(340, 160, 227, 30)
+                c.drawString(290, 172, "Y")
+                c.drawString(320, 172, "N")
+                c.drawString(32, 170, "Is the trailer free of pest/rodent activity?")
+                
+                c.rect(30, 130, 250, 30)
+                c.rect(280, 130, 30, 30)
+                c.rect(310, 130, 30, 30)
+                c.rect(340, 130, 227, 30)
+                c.drawString(290, 142, "Y")
+                c.drawString(320, 142, "N")
+                c.drawString(32, 140, "Is the trailer free of odors?")
+                
+                c.setFont("Helvetica-Bold", 6)
+                c.drawString(32, 120,"ATTN Trucker: Your signature will acknowledge receipt of the correct description, (size and grade) AND total amount of ______ pieces. THIS WAREHOUSE will NOT be responsible if shipment")
+                c.drawString(32, 110,"of incorrect product is made for the loading and securing of product. Trucker is responsible for providing or approving the load plan and for securing the product for over-the-road transportation.")
+                
+                c.setFont("Helvetica-Bold", 11)
+                data3 = [
+                    ['', f'                                                                 {bol_date}'],
+                    ['', f'                                                                 {bol_date}']   ]
+                
+                table3= Table(data3,colWidths=280,rowHeights=30)
+                table3.setStyle(TableStyle([('BACKGROUND', (0, 0), (0, 1), (0.8, 0.7, 0.6))]))
+                table3.setStyle(style)
+                table3.wrapOn(c, 0, 0)
+                table3.drawOn(c, 20, 45)  # Position the table at (100, 500)
+                c.drawString(32, 82,"Carrier Signature/ Pick up date")
+                c.drawString(32, 52,"Warehouse Signature/ Pick up date")
+                
+                
+                
+                # Save the PDF document
+                c.save()
+                # pdf_bytes = buffer.getvalue()
+                # buffer.close()
+                with open("example.pdf", "rb") as pdf_file:
+                    PDFbyte = pdf_file.read()
+                return PDFbyte
+               # return "example.pdf"
+            
+            #pdf_file = create_pdf()
+            
+            
+            st.download_button(label="CREATE/DOWNLOAD BOL", 
+                    data=create_pdf(),
+                    file_name=f"{calendar.month_name[datetime.datetime.now().month][:3]}-{datetime.datetime.now().day}-{destination}-{bol}.pdf",
+                    mime='application/octet-stream')
+            
             if yes and mf:
                 
                 if st.button('**:blue[SUBMIT EDI]**'):

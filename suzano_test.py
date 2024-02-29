@@ -3073,8 +3073,8 @@ if authentication_status:
                 
                 current_release_order=work_order
                 current_sales_order=work_order_.split(" ")[1][1:]
-                vessel=dispatched[work_order][i]["vessel"]
-                destination=dispatched[work_order][i]['destination']
+                vessel=dispatched[work_order][0]["vessel"]
+                destination=dispatched[work_order][0]['destination']
                 
                 
                 

@@ -3060,7 +3060,7 @@ if authentication_status:
                         try:
                             menu_destinations[f"{rel_ord} -{sales}"]=dispatched[rel_ord][sales]["destination"]
                             
-                            break
+                            
                         except:
                             pass
                 if 'work_order_' not in st.session_state:

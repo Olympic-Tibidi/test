@@ -3058,7 +3058,7 @@ if authentication_status:
                     for sales in dispatched[rel_ord]:
                         
                         try:
-                            menu_destinations[f"{rel_ord} -{sales}"][=dispatched[rel_ord][sales]["destination"]
+                            menu_destinations[f"{rel_ord} -{sales}"]=dispatched[rel_ord][sales]["destination"]
                             
                             break
                         except:

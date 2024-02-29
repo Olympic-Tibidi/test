@@ -3071,15 +3071,22 @@ if authentication_status:
                 work_order=work_order_.split(" ")[0]
                 order=["001","002","003","004","005","006"]
                 
-                for i in order:                   ##############HERE we check all the sales orders in dispatched[releaseordernumber] dictionary. it breaks after it finds the first sales order
-                    if i in dispatched[work_order].keys():
-                        current_release_order=work_order
-                        current_sales_order=i
-                        vessel=dispatched[work_order][i]["vessel"]
-                        destination=dispatched[work_order][i]['destination']
-                        break
-                    else:
-                        pass
+                current_release_order=work_order
+                current_sales_order=work_order_.split(" ")[1][1:]
+                vessel=dispatched[work_order][i]["vessel"]
+                destination=dispatched[work_order][i]['destination']
+                
+                
+                
+               #for i in order:                   ##############HERE we check all the sales orders in dispatched[releaseordernumber] dictionary. it breaks after it finds the first sales order
+               #     if i in dispatched[work_order].keys():
+               #         current_release_order=work_order
+                #        current_sales_order=i
+                 #       vessel=dispatched[work_order][i]["vessel"]
+                  #      destination=dispatched[work_order][i]['destination']
+                  #      break
+                  #  else:
+                  #      pass
                 try:
                     next_release_order=dispatched['002']['release_order']    #############################  CHECK HERE ######################## FOR MIXED LOAD
                     next_sales_order=dispatched['002']['sales_order']

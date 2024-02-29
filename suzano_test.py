@@ -3058,14 +3058,14 @@ if authentication_status:
                     for sales in dispatched[rel_ord]:
                         
                         try:
-                            menu_destinations[rel_ord]=dispatched[rel_ord][sales]["destination"]
+                            menu_destinations[f"{rel_ord} -{sales}"][=dispatched[rel_ord][sales]["destination"]
                             
                             break
                         except:
                             pass
                 if 'work_order_' not in st.session_state:
                     st.session_state.work_order_ = None
-                liste=[f"{i} to {menu_destinations[i]}" for i in dispatched.keys()]
+                liste=[f"{i} to {menu_destinations[i]}" for i in menu_destinations.keys()]
                 work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=liste.index(st.session_state.work_order_) if st.session_state.work_order_ else 0) 
                 st.session_state.work_order_=work_order_
                 work_order=work_order_.split(" ")[0]

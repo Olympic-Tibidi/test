@@ -2532,7 +2532,7 @@ if authentication_status:
                         po_number_edit=st.text_input("PO No",to_edit[release_order_number]["po_number"],disabled=False)
                         destination_edit=st.text_input("Destination",to_edit[release_order_number]["destination"],disabled=False)
                         sales_order_item_edit=st.selectbox("Sales Order Item",list(to_edit[release_order_number].keys())[2:],disabled=False)
-                        vessel_edit=vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142"],key="poFpoa")
+                        vessel_edit=vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142","LYSEFJORD-2308"],key="poFpoa")
                         ocean_bill_of_lading_edit=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel_edit].keys(),key="trdfeerw") 
                         wrap_edit=st.text_input("Grade",to_edit[release_order_number][sales_order_item_edit]["grade"],disabled=False)
                         batch_edit=st.text_input("Batch No",to_edit[release_order_number][sales_order_item_edit]["batch"],disabled=False)
@@ -2553,7 +2553,7 @@ if authentication_status:
                         po_number_add=st.text_input("PO No",to_add[release_order_number]["po_number"],disabled=False)
                         destination_add=st.text_input("Destination",to_add[release_order_number]["destination"],disabled=False)
                         sales_order_item_add=st.text_input("Sales Order Item",disabled=False)
-                        vessel_add=vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142"],key="popoa")
+                        vessel_add=vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142","LYSEFJORD-2308"],key="popoa")
                         ocean_bill_of_lading_add=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel_add].keys(),key="treerw")  
                         wrap_add=st.text_input("Grade",batch_mapping[vessel_add][ocean_bill_of_lading_add]["grade"],disabled=True) 
                         batch_add=st.text_input("Batch No",batch_mapping[vessel_add][ocean_bill_of_lading_add]["batch"],disabled=False)
@@ -2574,7 +2574,7 @@ if authentication_status:
                         #st.write(destination_list)
                         destination=st.selectbox("SELECT DESTINATION",destination_list)
                         sales_order_item=st.text_input("Sales Order Item")  
-                        vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142"],key="tre")
+                        vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142","LYSEFJORD-2308"],key="tre")
                         ocean_bill_of_lading=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel].keys())   #######
                         wrap=st.text_input("Grade",batch_mapping[vessel][ocean_bill_of_lading]["grade"],disabled=True)   ##### batch mapping injection
                         batch=st.text_input("Batch No",batch_mapping[vessel][ocean_bill_of_lading]["batch"],disabled=True)   #####

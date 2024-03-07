@@ -2523,7 +2523,7 @@ if authentication_status:
                     add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER",disabled=False)
                     edit=st.checkbox("CHECK TO EDIT EXISTING RELEASE ORDER")
                     batch_mapping=gcp_download(target_bucket,rf"batch_mapping.json")
-                    batch_mapping=json.load(batch_mapping)
+                    batch_mapping=json.loads(batch_mapping)
                     if edit:
                         
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/ORDERS/")[1:]] if i not in junk]))

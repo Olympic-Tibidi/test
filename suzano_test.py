@@ -4240,7 +4240,7 @@ if authentication_status:
                     with inv4tab1:
                         
                         amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000}
-                        inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142"])
+                        inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142","LYSEFJORD-2308"])
                         kf=inv_bill_of_ladings.iloc[1:].copy()
                         kf['issued'] = pd.to_datetime(kf['issued'])
                         kf=kf[kf['vessel']==inv_vessel]

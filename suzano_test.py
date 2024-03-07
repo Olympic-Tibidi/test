@@ -2997,7 +2997,7 @@ if authentication_status:
                                 
                                 release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",rel_ors,key="tatata")
                                 release_order_number_mf=release_order_number_mf.split(" ")[0]
-                                sale_number_mf=release_order_number_mf.split(" ")[1]
+                                sale_number_mf=release_order_number_mf.split("-")[1]
                                 input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
                                 if input_mf_numbers is not None:
                                     input_mf_numbers = input_mf_numbers.splitlines()

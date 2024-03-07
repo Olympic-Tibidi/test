@@ -2988,7 +2988,7 @@ if authentication_status:
                                 if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"]:
                                     for sale in release_order_database[i]:
                                         if release_order_database[i][sale]["remaining"]>0:
-                                            rel_ors.append(f"{i}-{sale}-{release_order_database[i]["001"]["destination"]}")
+                                            rel_ors.append(f"{i}-{sale}-{release_order_database[i]['001']['destination']}")
                             #st.write(release_order_dest_map)      
                             destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"]]
                             if len(rel_ors)==0:

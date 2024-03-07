@@ -3004,9 +3004,9 @@ if authentication_status:
                                     input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]####### CAREFUL THIS ASSUMES SAME DIGIT MF EACH TIME
                                
                                 if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
-                                    if release_order_number_mf not in mf_numbers.keys():   
+                                    if release_order_number_mf not in mf_numbers:   
                                         mf_numbers[release_order_number_mf]=[]
-                                    if sale_number_mf not in mf_numbers[release_order_number_mf].keys():
+                                    if sale_number_mf not in mf_numbers[release_order_number_mf]:
                                         mf_numbers[release_order_number_mf][sale_number_mf]+=input_mf_numbers
                                     
                                     mf_numbers[release_order_number_mf][sale_number_mf]=list(set(mf_numbers[release_order_number_mf][sale_number_mf]))

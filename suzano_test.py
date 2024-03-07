@@ -2988,15 +2988,16 @@ if authentication_status:
                                 if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"]:
                                     for sale in release_order_database[i]:
                                         if release_order_database[i][sale]["remaining"]>0:
-                                            rel_ors.append(f"{i}-{sale}")
-                            st.write(release_order_dest_map)      
+                                            rel_ors.append(f"{i}-{sale}-{release_order_database[i]["001"]["destination"]}")
+                            #st.write(release_order_dest_map)      
                             destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"]]
-                            if len(destinations_of_release_orders)==0:
+                            if len(rel_ors)==0:
                                 st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
                             else:
                                 
-                                release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",destinations_of_release_orders,key="tatata")
+                                release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",rel_ors,key="tatata")
                                 release_order_number_mf=release_order_number_mf.split(" ")[0]
+                                sale_number_mf=release_order_number_mf.split(" ")[1]
                                 input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
                                 if input_mf_numbers is not None:
                                     input_mf_numbers = input_mf_numbers.splitlines()
@@ -3004,9 +3005,11 @@ if authentication_status:
                                
                                 if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
                                     if release_order_number_mf not in mf_numbers.keys():   
-                                        mf_numbers[release_order_number_mf]=[]
-                                    mf_numbers[release_order_number_mf]+=input_mf_numbers
-                                    mf_numbers[release_order_number_mf]=list(set(mf_numbers[release_order_number_mf]))
+                                        mf_numbers[release_order_number_mf][=[]
+                                    if sale_number_mf not in mf_numbers[release_order_number_mf].keys():
+                                        mf_numbers[release_order_number_mf][sale_number_mf]+=input_mf_numbers
+                                    
+                                    mf_numbers[release_order_number_mf][sale_number_mf]=list(set(mf_numbers[release_order_number_mf][sale_number_mf]))
                                     mf_data=json.dumps(mf_numbers)
                                     storage_client = storage.Client()
                                     bucket = storage_client.bucket(target_bucket)

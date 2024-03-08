@@ -371,7 +371,7 @@ def get_weather():
             'DNT' : '1', # Do Not Track Request Header 
             'Connection' : 'close' }
 
-    url='http://api.weatherapi.com/v1/forecast.json?key=5fa3f1f7859a415b9e6145743230912&q=98502&days=7'
+    url='http://api.weatherapi.com/v1/forecast.json?key=5fa3f1f7859a415b9e6145743230912&q=98501&days=7'
     #response = get(url,headers=headers)
     response=get(url,headers=headers)
     #data = json.loads(response.text)
@@ -1030,7 +1030,7 @@ if authentication_status:
                 fig.add_trace(go.Bar(x=index, y=chance_rain,name='Chance of Rain'))
                 fig.add_trace(go.Scatter(x=index, y=cloud, mode='lines', name='Cloud Cover'))
                 # Add traces for other weather parameters...
-                rain_threshold = 0.04
+                rain_threshold = 0.02
                 fig.add_shape(
                     dict(
                         type='line',
@@ -1045,10 +1045,10 @@ if authentication_status:
                 fig.add_annotation(
                         go.layout.Annotation(
                             x=0.5,  # Set x to the middle of the x-axis (adjust as needed)
-                            y=0.045,
+                            y=rain_threshold+0.005,
                             xref='paper',
                             yref='y',
-                            text='0.04 inches/h',
+                            text=f'{rain_threshold} inches/h',
                             showarrow=False,
                             font=dict(color='red', size=14),
                         )
@@ -2983,34 +2983,24 @@ if authentication_status:
                         if goahead:
                             
                             gp_release_orders=[i for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] ]   # and (release_order_database[i]["001"]["remaining"]>0|release_order_database[i]["001"]["remaining"]>0)
-                            rel_ors=[]
-                            for i in release_order_database:
-                                if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"]:
-                                    for sale in release_order_database[i]:
-                                        if release_order_database[i][sale]["remaining"]>0:
-                                            rel_ors.append(f"{i}-{sale}-{release_order_database[i]['001']['destination']}")
-                            #st.write(release_order_dest_map)      
+                            
                             destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"]]
-                            if len(rel_ors)==0:
+                            if len(destinations_of_release_orders)==0:
                                 st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
                             else:
                                 
-                                release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",rel_ors,key="tatata")
+                                release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",destinations_of_release_orders,key="tatata")
                                 release_order_number_mf=release_order_number_mf.split(" ")[0]
-                                sale_number_mf=release_order_number_mf.split("-")[1]
                                 input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
                                 if input_mf_numbers is not None:
                                     input_mf_numbers = input_mf_numbers.splitlines()
                                     input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]####### CAREFUL THIS ASSUMES SAME DIGIT MF EACH TIME
                                
                                 if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
-                                    if release_order_number_mf not in mf_numbers:   
+                                    if release_order_number_mf not in mf_numbers.keys():   
                                         mf_numbers[release_order_number_mf]=[]
-                                    if sale_number_mf not in mf_numbers[release_order_number_mf]:
-                                        mf_numbers[release_order_number_mf][sale_number_mf]=[]
-                                        mf_numbers[release_order_number_mf][sale_number_mf]+=input_mf_numbers
-                                    
-                                    mf_numbers[release_order_number_mf][sale_number_mf]=list(set(mf_numbers[release_order_number_mf][sale_number_mf]))
+                                    mf_numbers[release_order_number_mf]+=input_mf_numbers
+                                    mf_numbers[release_order_number_mf]=list(set(mf_numbers[release_order_number_mf]))
                                     mf_data=json.dumps(mf_numbers)
                                     storage_client = storage.Client()
                                     bucket = storage_client.bucket(target_bucket)
@@ -3076,7 +3066,7 @@ if authentication_status:
                 if 'work_order_' not in st.session_state:
                     st.session_state.work_order_ = None
                 liste=[f"{i} to {menu_destinations[i]}" for i in menu_destinations.keys()]
-                st.write(liste)
+                #st.write(liste)
                 work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=0 if st.session_state.work_order_ else 0) 
                 st.session_state.work_order_=work_order_
                 work_order=work_order_.split(" ")[0]
@@ -4046,8 +4036,8 @@ if authentication_status:
                                 subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
                                 body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
                                 sender = "warehouseoly@gmail.com"
-                                recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                                #recipients = ["afsiny@portolympia.com"]
+                                #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                recipients = ["afsiny@portolympia.com"]
                                 password = "xjvxkmzbpotzeuuv"
                                 send_email(subject, body, sender, recipients, password)
                             
@@ -4240,11 +4230,10 @@ if authentication_status:
                     with inv4tab1:
                         
                         amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000}
-                        inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142","LYSEFJORD-2308"])
+                        inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142"])
                         kf=inv_bill_of_ladings.iloc[1:].copy()
                         kf['issued'] = pd.to_datetime(kf['issued'])
                         if inv_vessel in kf['vessel']:
-                            
                             kf['Date'] = kf['issued'].dt.date
                             kf['Date'] = pd.to_datetime(kf['Date'])
                             # Create a date range from the minimum to maximum date in the 'issued' column
@@ -4276,6 +4265,7 @@ if authentication_status:
                                 mime='text/csv')   
                         else:
                             st.markdown("No Shipments yet from this vessel!")
+                            
                     with inv4tab2:
                         combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
                         combined["Batch"]=combined["Batch"].astype(str)
@@ -4529,28 +4519,36 @@ if authentication_status:
                 for sales in dispatched[rel_ord]:
                     
                     try:
-                        menu_destinations[rel_ord]=dispatched[rel_ord][sales]["destination"]
+                        menu_destinations[f"{rel_ord} -{sales}"]=dispatched[rel_ord][sales]["destination"]
                         
-                        break
+                        
                     except:
                         pass
             if 'work_order_' not in st.session_state:
                 st.session_state.work_order_ = None
-            liste=[f"{i} to {menu_destinations[i]}" for i in dispatched.keys()]
-            work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=liste.index(st.session_state.work_order_) if st.session_state.work_order_ else 0) 
+            liste=[f"{i} to {menu_destinations[i]}" for i in menu_destinations.keys()]
+            #st.write(liste)
+            work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=0 if st.session_state.work_order_ else 0) 
             st.session_state.work_order_=work_order_
             work_order=work_order_.split(" ")[0]
             order=["001","002","003","004","005","006"]
             
-            for i in order:                   ##############HERE we check all the sales orders in dispatched[releaseordernumber] dictionary. it breaks after it finds the first sales order
-                if i in dispatched[work_order].keys():
-                    current_release_order=work_order
-                    current_sales_order=i
-                    vessel=dispatched[work_order][i]["vessel"]
-                    destination=dispatched[work_order][i]['destination']
-                    break
-                else:
-                    pass
+            current_release_order=work_order
+            current_sales_order=work_order_.split(" ")[1][1:]
+            vessel=dispatched[work_order][current_sales_order]["vessel"]
+            destination=dispatched[work_order][current_sales_order]['destination']
+            
+            
+            
+           #for i in order:                   ##############HERE we check all the sales orders in dispatched[releaseordernumber] dictionary. it breaks after it finds the first sales order
+           #     if i in dispatched[work_order].keys():
+           #         current_release_order=work_order
+            #        current_sales_order=i
+             #       vessel=dispatched[work_order][i]["vessel"]
+              #      destination=dispatched[work_order][i]['destination']
+              #      break
+              #  else:
+              #      pass
             try:
                 next_release_order=dispatched['002']['release_order']    #############################  CHECK HERE ######################## FOR MIXED LOAD
                 next_sales_order=dispatched['002']['sales_order']
@@ -5689,36 +5687,38 @@ if authentication_status:
                     inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308"])
                     kf=inv_bill_of_ladings.iloc[1:].copy()
                     kf['issued'] = pd.to_datetime(kf['issued'])
-                    kf=kf[kf['vessel']==inv_vessel]
-                    kf['Date'] = kf['issued'].dt.date
-                    kf['Date'] = pd.to_datetime(kf['Date'])
-                    # Create a date range from the minimum to maximum date in the 'issued' column
-                    date_range = pd.date_range(start=kf['Date'].min(), end=kf['Date'].max(), freq='D')
-                    
-                    # Create a DataFrame with the date range
-                    date_df = pd.DataFrame({'Date': date_range})
-                    # Merge the date range DataFrame with the original DataFrame based on the 'Date' column
-                    merged_df = pd.merge(date_df, kf, how='left', on='Date')
-                    merged_df['quantity'].fillna(0, inplace=True)
-                    merged_df['Shipped Tonnage']=merged_df['quantity']*2
-                    merged_df_grouped=merged_df.groupby('Date')[['quantity','Shipped Tonnage']].sum()
-                    merged_df_grouped['Accumulated_Quantity'] = merged_df_grouped['quantity'].cumsum()
-                    merged_df_grouped["Accumulated_Tonnage"]=merged_df_grouped['Accumulated_Quantity']*2
-                    merged_df_grouped["Remaining_Units"]=[amount_dict[inv_vessel]-i for i in merged_df_grouped['Accumulated_Quantity']]
-                    merged_df_grouped["Remaining_Tonnage"]=merged_df_grouped["Remaining_Units"]*2
-                    merged_df_grouped.rename(columns={'quantity':"Shipped Quantity", 'Accumulated_Quantity':"Shipped Qty To_Date",
-                                                      'Accumulated_Tonnage':"Shipped Tonnage To_Date"},inplace=True)
-                    merged_df_grouped=merged_df_grouped.reset_index()
-                    merged_df_grouped["Date"]=merged_df_grouped['Date'].dt.strftime('%m-%d-%Y, %A')
-                    #merged_df_grouped=merged_df_grouped.set_index("Date",drop=True)
-                  
-                    st.dataframe(merged_df_grouped)
-                    csv_inventory=convert_df(merged_df_grouped)
-                    st.download_button(
-                        label="DOWNLOAD INVENTORY REPORT AS CSV",
-                        data=csv_inventory,
-                        file_name=f'INVENTORY REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
-                        mime='text/csv')            
+                    if inv_vessel in kf['vessel']:
+                        kf['Date'] = kf['issued'].dt.date
+                        kf['Date'] = pd.to_datetime(kf['Date'])
+                        # Create a date range from the minimum to maximum date in the 'issued' column
+                        date_range = pd.date_range(start=kf['Date'].min(), end=kf['Date'].max(), freq='D')
+                        
+                        # Create a DataFrame with the date range
+                        date_df = pd.DataFrame({'Date': date_range})
+                        # Merge the date range DataFrame with the original DataFrame based on the 'Date' column
+                        merged_df = pd.merge(date_df, kf, how='left', on='Date')
+                        merged_df['quantity'].fillna(0, inplace=True)
+                        merged_df['Shipped Tonnage']=merged_df['quantity']*2
+                        merged_df_grouped=merged_df.groupby('Date')[['quantity','Shipped Tonnage']].sum()
+                        merged_df_grouped['Accumulated_Quantity'] = merged_df_grouped['quantity'].cumsum()
+                        merged_df_grouped["Accumulated_Tonnage"]=merged_df_grouped['Accumulated_Quantity']*2
+                        merged_df_grouped["Remaining_Units"]=[amount_dict[inv_vessel]-i for i in merged_df_grouped['Accumulated_Quantity']]
+                        merged_df_grouped["Remaining_Tonnage"]=merged_df_grouped["Remaining_Units"]*2
+                        merged_df_grouped.rename(columns={'quantity':"Shipped Quantity", 'Accumulated_Quantity':"Shipped Qty To_Date",
+                                                          'Accumulated_Tonnage':"Shipped Tonnage To_Date"},inplace=True)
+                        merged_df_grouped=merged_df_grouped.reset_index()
+                        merged_df_grouped["Date"]=merged_df_grouped['Date'].dt.strftime('%m-%d-%Y, %A')
+                        #merged_df_grouped=merged_df_grouped.set_index("Date",drop=True)
+                      
+                        st.dataframe(merged_df_grouped)
+                        csv_inventory=convert_df(merged_df_grouped)
+                        st.download_button(
+                            label="DOWNLOAD INVENTORY REPORT AS CSV",
+                            data=csv_inventory,
+                            file_name=f'INVENTORY REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
+                            mime='text/csv')   
+                    else:
+                        st.markdown("No Shipments yet from this vessel!")
                 with inv4tab2:
                     combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
                     combined["Batch"]=combined["Batch"].astype(str)

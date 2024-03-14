@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit as st
 from streamlit_profiler import Profiler
-
+from st_files_connection import FilesConnection
 
 import streamlit.components.v1 as components
 #import cv2
@@ -469,6 +469,10 @@ with Profiler():
             st.markdown(custom_style, unsafe_allow_html=True)
                   
             if select=="ADMIN" :
+
+                conn = st.connection('gcs', type=FilesConnection)
+                a = conn.read(f"{target_bucket}/batch_mapping.json", ttl=600)
+                st.write(a)
                 admin_tab1,admin_tab2,admin_tab3=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S"])
                 
                         

@@ -8,6 +8,7 @@ seaborn==0.12.2
 streamlit==1.29.0
 openpyxl
 gcsfs
+st-files-connection
 git+https://github.com/streamlit/files-connection
 plotly
 google-cloud-storage

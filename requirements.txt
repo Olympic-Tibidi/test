@@ -16,4 +16,4 @@ beautifulsoup4==4.9.3
 html5lib==1.1
 reportlab
 pypdfium2
-
+streamlit_profiler

@@ -529,13 +529,22 @@ with Profiler():
                 
                               
                 with admin_tab1:
-                    carrier_list_=gcp_download(target_bucket,rf"carrier.json")
-                    carrier_list=json.loads(carrier_list_)
-                    mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
-                    mill_shipments=json.loads(mill_shipments)
-                    mill_df=pd.DataFrame.from_dict(mill_shipments).T
-                    mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
-                    mill_df["New Product"]=mill_df["New Product"].astype(str)
+                    map=gcp_download(target_bucket,rf"map.json")
+                    
+                    #carrier_list_=gcp_download(target_bucket,rf"carrier.json")
+                    #carrier_list=json.loads(carrier_list_)
+                    carrier_list=map['carriers']
+                    
+                    #mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
+                    #mill_shipments=json.loads(mill_shipments)
+                    mill_shipments=map['mill_info']
+
+                    
+                    # mill_df=pd.DataFrame.from_dict(mill_shipments).T
+                    # mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
+                    # mill_df["New Product"]=mill_df["New Product"].astype(str)
+
+                    
                     try:
                         release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                         release_order_database=json.loads(release_order_database)
@@ -546,7 +555,7 @@ with Profiler():
                     release_order_tab1,release_order_tab2,release_order_tab3=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE","RELEASE ORDER STATUS"])
                     
                     with release_order_tab3:  ### RELEASE ORDER STATUS
-                        maintenance=False
+                        maintenance=True
                         if not maintenance:
                             inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                             inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
@@ -714,12 +723,12 @@ with Profiler():
                                 st.dataframe(monthly)
                             
                     with release_order_tab1:   ###CREATE RELEASE ORDER
-                  {"3159648": {"destination": "CLEARWATER-Lewiston,ID", "po_number": "1394316-OLYM", "complete": true, "001": {"vessel": "KIRKENES-2304", "batch": "45302855", "ocean_bill_of_lading": "GSSWKIR6013D", "grade": "ISU", "dryness": "89.764", "carrier_code": "432237-SCOTT LOGISTICS CORP", "unitized": "UNITIZED", "total": 450, "shipped": 450.0, "remaining": 0.0}},
                        
                         add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER",disabled=False)
                         edit=st.checkbox("CHECK TO EDIT EXISTING RELEASE ORDER")
-                        batch_mapping=gcp_download(target_bucket,rf"batch_mapping.json")
-                        batch_mapping=json.loads(batch_mapping)
+                        #batch_mapping=gcp_download(target_bucket,rf"batch_mapping.json")
+                        #batch_mapping=json.loads(batch_mapping)
+                        batch_mapping=map['batch_mapping']
                         if edit:
                             
                             release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in release_order_database]))

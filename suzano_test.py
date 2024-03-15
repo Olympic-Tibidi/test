@@ -57,7 +57,7 @@ import calendar
 st.set_page_config(layout="wide")
 
 #os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = st.secrets['c']
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = st.secrets[GOOGLE_APPLICATION_CREDENTIALS]
 
 target_bucket="new_suzano"
 utc_difference=7

@@ -57,7 +57,7 @@ import calendar
 st.set_page_config(layout="wide")
 
 #os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = st.secrets['connection.gcs']
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = st.secrets['private_key']
 
 target_bucket="new_suzano"
 utc_difference=7

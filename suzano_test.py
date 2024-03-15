@@ -470,9 +470,9 @@ with Profiler():
                   
             if select=="ADMIN" :
 
-                conn = st.connection('gcs', type=FilesConnection)
-                a = conn.read(f"new_suzano/batch_mapping.json", ttl=600)
-                st.write(a)
+                #conn = st.connection('gcs', type=FilesConnection)
+                #a = conn.read(f"new_suzano/batch_mapping.json", ttl=600)
+                #st.write(a)
                 admin_tab1,admin_tab2,admin_tab3=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S"])
                 
                         

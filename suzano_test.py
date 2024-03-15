@@ -148,7 +148,7 @@ def gcp_download(bucket_name, source_file_name):
     return data
 def gcp_download(bucket_name, source_file_name):
     conn = st.connection('gcs', type=FilesConnection)
-    a = conn.read(f"{bucket_name}/{source_file_name}.json", ttl=600)
+    a = conn.read(f"{bucket_name}/{source_file_name}", ttl=600)
     return a
 def gcp_download_x(bucket_name, source_file_name):
     storage_client = storage.Client()

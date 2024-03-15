@@ -543,7 +543,7 @@ with Profiler():
                               
                 with admin_tab1:
                     map=gcp_download(target_bucket,rf"map.json")
-                    map=json.loads(map)
+                    #map=json.loads(map)
                     
                     #carrier_list_=gcp_download(target_bucket,rf"carrier.json")
                     #carrier_list=json.loads(carrier_list_)

@@ -146,7 +146,10 @@ def gcp_download(bucket_name, source_file_name):
     blob = bucket.blob(source_file_name)
     data = blob.download_as_text()
     return data
-
+def gcp_download(bucket_name, source_file_name):
+    conn = st.connection('gcs', type=FilesConnection)
+    a = conn.read(f"{bucket_name}/{source_file_name}.json", ttl=600)
+    return a
 def gcp_download_x(bucket_name, source_file_name):
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
@@ -473,7 +476,7 @@ with Profiler():
 
                 conn = st.connection('gcs', type=FilesConnection)
                 a = conn.read(f"new_suzano/batch_mapping.json", ttl=600)
-                #st.write(a)
+                st.write(a)
                 admin_tab1,admin_tab2,admin_tab3=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S"])
                 
                         

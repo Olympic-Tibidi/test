@@ -549,9 +549,9 @@ with Profiler():
                     #carrier_list=json.loads(carrier_list_)
                     carrier_list=map['carriers']
                     
-                    #mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
-                    #mill_shipments=json.loads(mill_shipments)
-                    mill_shipments=map['mill_info']
+                    mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
+                    mill_shipments=json.loads(mill_shipments)
+                    #mill_shipments=map['mill_info']
 
                     
                     # mill_df=pd.DataFrame.from_dict(mill_shipments).T

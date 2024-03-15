@@ -151,7 +151,7 @@ def gcp_download(bucket_name, source_file_name):
     blob = bucket.blob(source_file_name)
     data = blob.download_as_text()
     return data
-def gcp_download(bucket_name, source_file_name):
+def gcp_download_new(bucket_name, source_file_name):
     conn = st.connection('gcs', type=FilesConnection)
     a = conn.read(f"{bucket_name}/{source_file_name}", ttl=600)
     return a
@@ -481,7 +481,7 @@ with Profiler():
 
                 conn = st.connection('gcs', type=FilesConnection)
                 a = conn.read(f"new_suzano/map.json", ttl=600)
-                st.write(a)
+                #st.write(a)
                 admin_tab1,admin_tab2,admin_tab3=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S"])
                 
                         
@@ -542,7 +542,7 @@ with Profiler():
                 
                               
                 with admin_tab1:
-                    map=gcp_download(target_bucket,rf"map.json")
+                    map=gcp_download_new(target_bucket,rf"map.json")
                     #map=json.loads(map)
                     
                     #carrier_list_=gcp_download(target_bucket,rf"carrier.json")

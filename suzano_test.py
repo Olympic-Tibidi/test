@@ -2196,7 +2196,7 @@ with Profiler():
                     bol_mapping=gcp_download(target_bucket,rf"bol_mapping.json")
                     bol_mapping = json.loads(bol_mapping)
                     
-                    maintenance=True
+                    maintenance=False
                                     
                     if maintenance:
                         st.title("CURRENTLY UNDER MAINTENANCE, CHECK BACK LATER")

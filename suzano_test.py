@@ -51,13 +51,18 @@ import plotly.graph_objects as go
 
 from pandas.tseries.offsets import BDay
 import calendar
+from google.cloud import documentai
+from google.oauth2 import service_account
 
+credentials = service_account.Credentials.from_service_account_info(st.secrets["gcs_connections"])
+
+client = documentai.DocumentProcessorServiceClient(credentials=credentials)
 
 
 st.set_page_config(layout="wide")
 
 #os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = st.secrets['private_key']
+#os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = st.secrets['private_key']
 
 target_bucket="new_suzano"
 utc_difference=7

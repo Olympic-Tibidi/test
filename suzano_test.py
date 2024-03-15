@@ -2256,7 +2256,10 @@ with Profiler():
                             
                             bols_allocated={}
                             for rel in raw_ro:
+                                st.write(rel)
                                 for sale in raw_ro[rel]:
+
+                                    st.write(sale)
                                     member=raw_ro[rel][sale]['ocean_bill_of_lading']
                                     if member not in bols_allocated:
                                         bols_allocated[member]={}

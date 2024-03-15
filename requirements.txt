@@ -18,3 +18,4 @@ html5lib==1.1
 reportlab
 pypdfium2
 streamlit_profiler
+google-cloud-documentai

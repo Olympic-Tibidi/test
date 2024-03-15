@@ -1199,9 +1199,22 @@ with Profiler():
                             goahead=True
                             if goahead:
                                 
-                                gp_release_orders=[i for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] ]   # and (release_order_database[i]["001"]["remaining"]>0|release_order_database[i]["001"]["remaining"]>0)
+                                def check_home(ro):
+                                    keys=[sale for sale in release_order_database[ro]]
+                                    destination=release_order_database[ro][keys[0]]['destination']
+                                    remains=[release_order_database[ro][key]["remaining"] for key in keys]
+                                    #print(sum(remains))
+                                    result=True
+                                    if destination not in ["GP-Clatskanie,OR","GP-Halsey,OR"]:
+                                        result=False 
+                                    if sum(remains)==0:
+                                        result=False
+                                    
+                                    return result
                                 
-                                destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"]]
+                                #gp_release_orders=[i for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] ]   # and (release_order_database[i]["001"]["remaining"]>0|release_order_database[i]["001"]["remaining"]>0)
+                                
+                                destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database if check_home(i)]
                                 if len(destinations_of_release_orders)==0:
                                     st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
                                 else:

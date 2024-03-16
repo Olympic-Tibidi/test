@@ -2107,11 +2107,18 @@ with Profiler():
                             
             if select=="INVENTORY" :
                
-                data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                #data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 bill_of_ladings=json.loads(data)
                 mill_info=json.loads(gcp_download(target_bucket,rf"mill_info.json"))
-                inv2,inv3,inv4,inv5,inv6=st.tabs(["SUZANO DAILY REPORTS","EDI BANK","MAIN INVENTORY","SUZANO MILL SHIPMENT SCHEDULE/PROGRESS","RELEASE ORDER STATUS"])
                 
+                inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
+                ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                raw_ro = json.loads(ro)
+                bol_mapping=gcp_download(target_bucket,rf"bol_mapping.json")
+                bol_mapping = json.loads(bol_mapping)
+                
+                inv2,inv3,inv4,inv5,inv6=st.tabs(["SUZANO DAILY REPORTS","EDI BANK","MAIN INVENTORY","SUZANO MILL SHIPMENT SCHEDULE/PROGRESS","RELEASE ORDER STATUS"])
                 
                 with inv2:
                     
@@ -2186,15 +2193,12 @@ with Profiler():
     
                     
                 with inv4:
-                    #combined=gcp_csv_to_df(target_bucket,rf"combined.csv")
-                    #combined["Batch"]=combined["Batch"].astype(str)
                     
                     inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                     inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
                     ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                     raw_ro = json.loads(ro)
-                    bol_mapping=gcp_download(target_bucket,rf"bol_mapping.json")
-                    bol_mapping = json.loads(bol_mapping)
+                    
                     
                     maintenance=False
                                     
@@ -2206,7 +2210,7 @@ with Profiler():
                         inv4tab1,inv4tab2,inv4tab3=st.tabs(["DAILY SHIPMENT REPORT","INVENTORY","UNREGISTERED LOTS FOUND"])
                         with inv4tab1:
                             
-                            amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000,"LYSEFJORD-2308":10000,"LAGUNA-3142":250}
+                            amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000,"LYSEFJORD-2308":10000,"LAGUNA-3142":370}
                             inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308","LYSEFJORD-2308","LAGUNA-3142"])
                             kf=inv_bill_of_ladings.iloc[1:].copy()
                             kf['issued'] = pd.to_datetime(kf['issued'])
@@ -2313,9 +2317,7 @@ with Profiler():
                             
                           
                 with inv5:
-                    #inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                    #inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
-                    maintenance=True
+                  maintenance=True
                     if maintenance:
                         st.title("CURRENTLY IN MAINTENANCE, CHECK BACK LATER")
                     else:
@@ -2360,10 +2362,7 @@ with Profiler():
     
     
                 with inv6:
-                    inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                    inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
-                    ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                    raw_ro = json.loads(ro)
+                    
                     grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
                     info=grouped_df.T.to_dict()
                     for rel_ord in raw_ro:

@@ -234,78 +234,79 @@ def list_files_in_subfolder(bucket_name, folder_name):
     filenames = [blob.name.split('/')[-1] for blob in blobs]
 
     return filenames
-def store_release_order_data(release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code):
+def store_release_order_data(data,release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,grade,dryness,carrier_code,unitized,total,remaining):
        
     # Create a dictionary to store the release order data
-    release_order_data = { release_order_number:{
+    data[release_order_number]={
         
         
         'destination':destination,
         "po_number":po_number,
+        "complete":False,
         sales_order_item: {
         "vessel":vessel,
         "batch": batch,
         "ocean_bill_of_lading": ocean_bill_of_lading,
-        "grade": wrap,
+        "grade": grade,
         "dryness":dryness,
-        "transport_type": transport_type,
         "carrier_code": carrier_code,
         "unitized":unitized,
-        "quantity":quantity,
-        "tonnage":tonnage,
-        "shipped":0,
-        "remaining":quantity       
+        "total":total,
+         "shipped":0,
+        "remaining":total       
         }}              
-    }
+    
     
                          
 
     # Convert the dictionary to JSON format
-    json_data = json.dumps(release_order_data)
+    json_data = json.dumps(data)
     return json_data
 
-def add_release_order_data(file,release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code):
+def add_release_order_data(data,release_order_number,sales_order_item,vessel,batch,ocean_bill_of_lading,grade,dryness,carrier_code,unitized,total,shipped,remaining):
        
-    # Edit the loaded current dictionary.
-    file[release_order_number]["destination"]= destination
-    file[release_order_number]["po_number"]= po_number
-    if sales_order_item not in file[release_order_number]:
-        file[release_order_number][sales_order_item]={}
-    file[release_order_number][sales_order_item]["vessel"]= vessel
-    file[release_order_number][sales_order_item]["batch"]= batch
-    file[release_order_number][sales_order_item]["ocean_bill_of_lading"]= ocean_bill_of_lading
-    file[release_order_number][sales_order_item]["grade"]= wrap
-    file[release_order_number][sales_order_item]["dryness"]= dryness
-    file[release_order_number][sales_order_item]["transport_type"]= transport_type
-    file[release_order_number][sales_order_item]["carrier_code"]= carrier_code
-    file[release_order_number][sales_order_item]["unitized"]= unitized
-    file[release_order_number][sales_order_item]["quantity"]= quantity
-    file[release_order_number][sales_order_item]["tonnage"]= tonnage
-    file[release_order_number][sales_order_item]["shipped"]= 0
-    file[release_order_number][sales_order_item]["remaining"]= quantity
+    
+    if sales_order_item not in data[release_order_number]:
+        data[release_order_number][sales_order_item]={}
+    data[release_order_number][sales_order_item]["vessel"]= vessel
+    data[release_order_number][sales_order_item]["batch"]= batch
+    data[release_order_number][sales_order_item]["ocean_bill_of_lading"]= ocean_bill_of_lading
+    data[release_order_number][sales_order_item]["grade"]= grade
+    data[release_order_number][sales_order_item]["dryness"]= dryness
+    data[release_order_number][sales_order_item]["carrier_code"]= carrier_code
+    data[release_order_number][sales_order_item]["unitized"]= unitized
+    data[release_order_number][sales_order_item]["total"]= total
+    data[release_order_number][sales_order_item]["shipped"]= 0
+    data[release_order_number][sales_order_item]["remaining"]= total
     
     
        
 
     # Convert the dictionary to JSON format
-    json_data = json.dumps(file)
+    json_data = json.dumps(data)
     return json_data
 
-def edit_release_order_data(file,sales_order_item,quantity,tonnage,shipped,remaining,carrier_code):
+def edit_release_order_data(data,release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,grade,dryness,carrier_code,unitized,total,shipped,remaining):
        
     # Edit the loaded current dictionary.
-    
-    file[release_order_number][sales_order_item]["quantity"]= quantity
-    file[release_order_number][sales_order_item]["tonnage"]= tonnage
-    file[release_order_number][sales_order_item]["shipped"]= shipped
-    file[release_order_number][sales_order_item]["remaining"]= remaining
-    file[release_order_number][sales_order_item]["carrier_code"]= carrier_code
+    data[release_order_number][sales_order_item]["destination"]= destination
+    data[release_order_number][sales_order_item]["po_number"]=po_number
+    data[release_order_number][sales_order_item]["vessel"]= vessel
+    data[release_order_number][sales_order_item]["batch"]= batch
+    data[release_order_number][sales_order_item]["ocean_bill_of_lading"]= ocean_bill_of_lading
+    data[release_order_number][sales_order_item]["grade"]= grade
+    data[release_order_number][sales_order_item]["dryness"]= dryness
+    data[release_order_number][sales_order_item]["carrier_code"]= carrier_code
+    data[release_order_number][sales_order_item]["unitized"]= unitized
+    data[release_order_number][sales_order_item]["total"]= total
+    data[release_order_number][sales_order_item]["shipped"]= shipped
+    data[release_order_number][sales_order_item]["remaining"]= total
     
     
        
 
     # Convert the dictionary to JSON format
-    json_data = json.dumps(file)
+    json_data = json.dumps(data)
     return json_data
 
 def process():
@@ -543,21 +544,18 @@ with Profiler():
                               
                 with admin_tab1:
                     map=gcp_download_new(target_bucket,rf"map.json")
-                    #map=json.loads(map)
-                    
-                    #carrier_list_=gcp_download(target_bucket,rf"carrier.json")
-                    #carrier_list=json.loads(carrier_list_)
+                    st.write(map)
                     carrier_list=map['carriers']
+                    mill_info=map["mill_info']
                     
-                    mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
-                    mill_shipments=json.loads(mill_shipments)
-                    #mill_shipments=map['mill_info']
+                    # mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
+                    # mill_shipments=json.loads(mill_shipments)
+                    # mill_shipments=map['mill_info']
 
                     
                     mill_df=pd.DataFrame.from_dict(mill_shipments).T
-                    mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
-                    #mill_df["New Product"]=mill_df["New Product"].astype(str)
-
+                    #mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
+                  
                     
                     try:
                         release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")

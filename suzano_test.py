@@ -2280,7 +2280,7 @@ with Profiler():
                             
                             grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
                             st.write(grouped_df)
-                            info=grouped_df.to_dict()
+                            info=grouped_df.T.to_dict()
                             info_=info.copy()
                             st.write(info)
                             for bol in bols: #### for each bill of lading

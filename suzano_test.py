@@ -2246,12 +2246,17 @@ with Profiler():
                         with inv4tab2:
                             
     
+#raw_ro = json.loads(ro)
+                            grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
+                            bols=grouped_df.T.to_dict()
+                            #st.write(bol_mapping)
+                            
+                            
+                            
+                            
                             bols_allocated={}
                             for rel in raw_ro:
-                                
-                                group=[i for i in raw_ro[rel] if i in ["001","002","003","004","005"]]
-                                for sale in group:
-                                    
+                                for sale in raw_ro[rel]:
                                     member=raw_ro[rel][sale]['ocean_bill_of_lading']
                                     if member not in bols_allocated:
                                         bols_allocated[member]={}
@@ -2263,16 +2268,17 @@ with Profiler():
                                         bols_allocated[member]["Total"]+=raw_ro[rel][sale]['total']
                                         bols_allocated[member]["Remaining"]+=raw_ro[rel][sale]['remaining']
                             
+                            #raw_ro = json.loads(ro)
                             grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
                             bols=grouped_df.T.to_dict()
                             
+                            
+                            
+                            
+                            
                             grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
-                            st.write(grouped_df)
-                            grouped_df.reset_index(inplace=True)
-                            grouped_df.set_index('ocean_bill_of_lading',inplace=True)
                             info=grouped_df.T.to_dict()
                             info_=info.copy()
-                            st.write(info)
                             for bol in bols: #### for each bill of lading
                                 for rel_ord in bols[bol]:##   (for each release order on that bill of lading)
                                     found_keys = [key for key in info.keys() if rel_ord in key]

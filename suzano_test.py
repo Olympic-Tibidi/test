@@ -2246,13 +2246,6 @@ with Profiler():
                         with inv4tab2:
                             
     
-                            grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
-                            bols=grouped_df.T.to_dict()
-                           
-                            
-                            
-                            
-                            
                             bols_allocated={}
                             for rel in raw_ro:
                                 
@@ -2270,16 +2263,13 @@ with Profiler():
                                         bols_allocated[member]["Total"]+=raw_ro[rel][sale]['total']
                                         bols_allocated[member]["Remaining"]+=raw_ro[rel][sale]['remaining']
                             
-                            #raw_ro = json.loads(ro)
                             grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
                             bols=grouped_df.T.to_dict()
                             
-                            st.write(bols)
-                            
-                            
-                            
                             grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
                             st.write(grouped_df)
+                            grouped_df.reset_index(inplace=True)
+                            grouped_df.set_index('ocean_bill_of_lading',inplace=True)
                             info=grouped_df.T.to_dict()
                             info_=info.copy()
                             st.write(info)

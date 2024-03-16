@@ -2246,20 +2246,18 @@ with Profiler():
                         with inv4tab2:
                             
     
-                            #raw_ro = json.loads(ro)
                             grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
                             bols=grouped_df.T.to_dict()
-                            #st.write(bol_mapping)
+                           
                             
                             
                             
                             
                             bols_allocated={}
                             for rel in raw_ro:
-                                st.write(rel)
+                                
                                 group=[i for i in raw_ro[rel] if i in ["001","002","003","004","005"]]
                                 for sale in group:
-
                                     
                                     member=raw_ro[rel][sale]['ocean_bill_of_lading']
                                     if member not in bols_allocated:
@@ -2276,13 +2274,14 @@ with Profiler():
                             grouped_df = inv_bill_of_ladings.groupby('ocean_bill_of_lading')['release_order'].agg(set)
                             bols=grouped_df.T.to_dict()
                             
-                            
+                            st.write(bols)
                             
                             
                             
                             grouped_df = inv_bill_of_ladings.groupby(['release_order','ocean_bill_of_lading','destination'])[['quantity']].agg(sum)
                             info=grouped_df.T.to_dict()
                             info_=info.copy()
+                            st.write(info_)
                             for bol in bols: #### for each bill of lading
                                 for rel_ord in bols[bol]:##   (for each release order on that bill of lading)
                                     found_keys = [key for key in info.keys() if rel_ord in key]

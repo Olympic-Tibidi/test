@@ -546,7 +546,7 @@ with Profiler():
                     map=gcp_download_new(target_bucket,rf"map.json")
                     st.write(map)
                     carrier_list=map['carriers']
-                    mill_info=map["mill_info']
+                    mill_info=map["mill_info"]
                     
                     # mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
                     # mill_shipments=json.loads(mill_shipments)

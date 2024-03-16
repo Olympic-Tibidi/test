@@ -2317,7 +2317,8 @@ with Profiler():
                             
                           
                 with inv5:
-                  maintenance=True
+                    
+                    maintenance=True
                     if maintenance:
                         st.title("CURRENTLY IN MAINTENANCE, CHECK BACK LATER")
                     else:
@@ -2342,8 +2343,8 @@ with Profiler():
                         data=csv_weekly,
                         file_name=f'WEEKLY SHIPMENT REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
                         mime='text/csv')
-    
-    
+        
+        
                        
                         zf['issued'] = pd.to_datetime(zf['issued'])                   
                        
@@ -2359,7 +2360,7 @@ with Profiler():
                         fig.update_layout(width=1000, height=700)  # You can adjust the width and height values as needed
                         
                         st.plotly_chart(fig)
-    
+
     
                 with inv6:
                     

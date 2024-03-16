@@ -2108,7 +2108,7 @@ with Profiler():
             if select=="INVENTORY" :
                
                 #data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                bill_of_ladings=json.loads(data)
+                #bill_of_ladings=json.loads(data)
                 mill_info=json.loads(gcp_download(target_bucket,rf"mill_info.json"))
                 
                 inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")

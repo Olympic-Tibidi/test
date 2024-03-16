@@ -544,17 +544,15 @@ with Profiler():
                               
                 with admin_tab1:
                     map=gcp_download_new(target_bucket,rf"map.json")
-                    st.write(map)
+                    release_order_database=gcp_download_new(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                    
                     carrier_list=map['carriers']
                     mill_info=map["mill_info"]
                     
-                    # mill_shipments=gcp_download(target_bucket,rf"mill_shipments.json")
-                    # mill_shipments=json.loads(mill_shipments)
-                    # mill_shipments=map['mill_info']
-
+               
                     
-                    mill_df=pd.DataFrame.from_dict(mill_shipments).T
-                    #mill_df["Terminal Code"]=mill_df["Terminal Code"].astype(str)
+                    mill_df=pd.DataFrame.from_dict(mill_info).T
+
                   
                     
                     try:

@@ -2164,6 +2164,14 @@ if authentication_status:
                 #annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(active_orders, active_frame["Total"], destinations)]
                 #fig.update_layout(annotations=annotations)
 
+                for i in range(len(active_orders)):
+                    x_val = active_orders[i]
+                    total_quantity = active_frame.loc[x_val, "Total"]
+                    destination = raw_ro[x_val]['destination']
+                    annotation_text = f"{x_val}<br>{destination}"  # Customize the annotation text as needed
+                    fig.add_annotation(x=x_val, y=total_quantity, text=annotation_text,
+                                       showarrow=True, arrowhead=4, ax=0, ay=-30)
+                
                 fig.update_layout(title='Shipment Status',
                                   xaxis_title='Release Orders',
                                   yaxis_title='Quantities',
@@ -2171,13 +2179,7 @@ if authentication_status:
                                   width=1300,
                                   height=700,
                                   xaxis=dict(tickangle=-90, type='category'))
-                for i in active_orders:
-                    st.write(i)
-                                         # Reference system for text's x and y coordinates   xref="x", yref="y",
-                    fig.add_annotation(x=i, y=active_frame.loc[i,"Total"],   
-                                        text="Funny text<br>inside the box",
-                                        showarrow=False # Hide arrow 
-                                    )
+                
                 st.plotly_chart(fig)
                 
                 

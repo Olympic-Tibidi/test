@@ -1134,14 +1134,14 @@ with Profiler():
                     
                     with load_col1:
                         wrap_dict={"ISU":"UNWRAPPED","ISP":"WRAPPED","AEP":"WRAPPED"}
-                        wrap=info[current_release_order][current_sales_order]["grade"]
-                        ocean_bill_of_=info[current_release_order][current_sales_order]["ocean_bill_of_lading"]
-                        unitized=info[current_release_order][current_sales_order]["unitized"]
-                        quant_=info[current_release_order][current_sales_order]["quantity"]
+                        wrap=release_order_database[current_release_order][current_sales_order]["grade"]
+                        ocean_bill_of_=release_order_database[current_release_order][current_sales_order]["ocean_bill_of_lading"]
+                        unitized=release_order_database[current_release_order][current_sales_order]["unitized"]
+                        quant_=release_order_database[current_release_order][current_sales_order]["quantity"]
                         real_quant=int(math.floor(quant_))
-                        ship_=info[current_release_order][current_sales_order]["shipped"]
+                        ship_=release_order_database[current_release_order][current_sales_order]["shipped"]
                         ship_bale=(ship_-math.floor(ship_))*8
-                        remaining=info[current_release_order][current_sales_order]["remaining"]                #######      DEFINED "REMAINING" HERE FOR CHECKS
+                        remaining=release_order_database[current_release_order][current_sales_order]["remaining"]                #######      DEFINED "REMAINING" HERE FOR CHECKS
                         temp={f"<b>Release Order #":current_release_order,"<b>Destination":destination,"<b>VESSEL":vessel}
                         temp2={"<b>Ocean B/L":ocean_bill_of_,"<b>Type":wrap_dict[wrap],"<b>Prep":unitized}
                         temp3={"<b>Total Units":quant_,"<b>Shipped Units":ship_,"<b>Remaining Units":remaining}

@@ -854,7 +854,7 @@ with Profiler():
                                     remains=[release_order_database[ro][key]["remaining"] for key in keys]
                                     if sum(remains)==0:
                                         return False
-                                    return f"{ro} to {destination}
+                                    return f"{ro} to {destination}"
                                 
                             destinations_of_release_orders=[check_home(i) for i in release_order_database if check_home(i) ]
                             if len(destinations_of_release_orders)==0:

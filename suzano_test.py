@@ -1833,19 +1833,21 @@ with Profiler():
                                 st.write(filename,current_release_order,current_sales_order,destination,ocean_bill_of_lading,terminal_bill_of_lading,wrap)
                                 this_shipment_aliens=[]
                                 for i in pure_loads:
-                                    
-                                    if i in alien_units[vessel]:       
-                                        alien_units[vessel][i]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
-                                                "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S"),
-                                                "Destination":destination,"Release_Order":current_release_order,"Terminal_Bill_of Lading":terminal_bill_of_lading,"Truck":vehicle_id}
-                                        this_shipment_aliens.append(i)
-                                    if i not in alien_units[vessel]:
-                                        if i[:-2] in [u[:-2] for u in alien_units[vessel]]:
-                                            alien_units[vessel][i]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
-                                                "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S"),
-                                                "Destination":destination,"Release_Order":current_release_order,"Terminal_Bill_of Lading":terminal_bill_of_lading,"Truck":vehicle_id}
-                                            this_shipment_aliens.append(i)
+                                    try:
                                             
+                                        if i in alien_units[vessel]:       
+                                            alien_units[vessel][i]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
+                                                    "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S"),
+                                                    "Destination":destination,"Release_Order":current_release_order,"Terminal_Bill_of Lading":terminal_bill_of_lading,"Truck":vehicle_id}
+                                            this_shipment_aliens.append(i)
+                                        if i not in alien_units[vessel]:
+                                            if i[:-2] in [u[:-2] for u in alien_units[vessel]]:
+                                                alien_units[vessel][i]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
+                                                    "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S"),
+                                                    "Destination":destination,"Release_Order":current_release_order,"Terminal_Bill_of Lading":terminal_bill_of_lading,"Truck":vehicle_id}
+                                                this_shipment_aliens.append(i)
+                                    except:
+                                        pass
                                 alien_units=json.dumps(alien_units)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)

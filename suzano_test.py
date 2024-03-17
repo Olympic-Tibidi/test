@@ -2104,7 +2104,7 @@ if authentication_status:
                     resampled_quantity=resampled_quantity.reset_index()
                     resampled_quantity["WEEK"][:-1]=[i.strftime("%Y-%m-%d") for i in resampled_quantity["WEEK"][:-1]]
                     resampled_quantity.set_index("WEEK",drop=True,inplace=True)
-                    st.dataframe(resampled_quantity)
+                    st.write(resampled_quantity)
                     
                     st.download_button(
                     label="DOWNLOAD WEEKLY REPORT AS CSV",

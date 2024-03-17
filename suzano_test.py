@@ -2154,8 +2154,8 @@ if authentication_status:
                 active_orders = active_frame.index
                
                 fig = go.Figure()
-                fig.add_trace(go.Bar(x=release_orders, y=active_frame["Total"], name='Total', marker_color='lightgray'))
-                fig.add_trace(go.Bar(x=release_orders, y=active_frame["Shipped"], name='Shipped', marker_color='blue', opacity=0.7))
+                fig.add_trace(go.Bar(x=active_orders, y=active_frame["Total"], name='Total', marker_color='lightgray'))
+                fig.add_trace(go.Bar(x=active_orders, y=active_frame["Shipped"], name='Shipped', marker_color='blue', opacity=0.7))
                 remaining_data = [remaining if remaining > 0 else None for remaining in status_frame["Remaining"][:-1]]
                 fig.add_trace(go.Scatter(x=active_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
                 

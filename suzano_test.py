@@ -2161,7 +2161,7 @@ if authentication_status:
                 remaining_data = [remaining if remaining > 0 else None for remaining in status_frame["Remaining"][:-1]]
                 fig.add_trace(go.Scatter(x=active_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
                 
-                annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(active_orders, active_frame["Total"], destinations)]
+                #annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(active_orders, active_frame["Total"], destinations)]
                 fig.update_layout(annotations=annotations)
 
                 fig.update_layout(title='Shipment Status',
@@ -2171,7 +2171,12 @@ if authentication_status:
                                   width=1300,
                                   height=700,
                                   xaxis=dict(tickangle=-90, type='category'))
-                
+                for i in active_orders:
+                    fig.add_annotation(x=i, y=active_frame[active_frame["Release Order #"]==i]["Total"],
+                                        xref="x", yref="y",  # Reference system for text's x and y coordinates
+                                        text="Funny text<br>inside the box",
+                                        showarrow=False # Hide arrow 
+                                    )
                 st.plotly_chart(fig)
                 
                 

@@ -1071,15 +1071,18 @@ with Profiler():
             
     
                 map=gcp_download_new(target_bucket,rf"map.json")
-                release_order_database=gcp_download_new(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                release_order_database=json.loads(release_order_database)
                 dispatched=gcp_download_new(target_bucket,rf"dispatched.json")
                 carrier_list=map['carriers']
                 mill_info=map["mill_info"]
                 
                 bill_mapping=gcp_download_new(target_bucket,"bill_mapping.json")   ###### DOWNLOADS
-                mf_numbers_for_load=gcp_download_new(target_bucket,rf"release_orders/mf_numbers.json")  ###### DOWNLOADS
+                mf_numbers_for_load=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")  ###### DOWNLOADS
+                mf_numbers_for_load=json.loads(mf_numbers_for_load)
 
-                bill_of_ladings=gcp_download_new(target_bucket,rf"terminal_bill_of_ladings.json")   ###### DOWNLOADS
+                bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")   ###### DOWNLOADS
+                bill_of_ladings=json.loads(bill_of_ladings)
                 
                 no_dispatch=0
                

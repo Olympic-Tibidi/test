@@ -1080,11 +1080,12 @@ with Profiler():
                 mf_numbers_for_load=gcp_download_new(target_bucket,rf"release_orders/mf_numbers.json")  ###### DOWNLOADS
                
                 no_dispatch=0
-                number=None
+               
+                number=None  
                 if number not in st.session_state:
                     st.session_state.number=number
                                
-                st.write(dispatched)
+              
                 double_load=False
                 
                 if len(dispatched.keys())>0 and not no_dispatch:
@@ -1092,10 +1093,10 @@ with Profiler():
                     
                     for rel_ord in dispatched.keys():
                         for sales in dispatched[rel_ord]:
-                            st.write(rel_ord,sales)
+                            #st.write(rel_ord,sales)
                             try:
                                 menu_destinations[f"{rel_ord} -{sales}"]=dispatched[rel_ord][sales]["destination"]
-                                st.write(rel_ord,sales)
+                                #st.write(rel_ord,sales)
                                 
                             except:
                                 pass

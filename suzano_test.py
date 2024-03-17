@@ -2172,8 +2172,9 @@ if authentication_status:
                                   height=700,
                                   xaxis=dict(tickangle=-90, type='category'))
                 for i in active_orders:
-                    fig.add_annotation(x=i, y=active_frame.loc[i,"Total"],
-                                        xref="x", yref="y",  # Reference system for text's x and y coordinates
+                    st.write(i)
+                                         # Reference system for text's x and y coordinates   xref="x", yref="y",
+                    fig.add_annotation(x=i, y=active_frame.loc[i,"Total"],   
                                         text="Funny text<br>inside the box",
                                         showarrow=False # Hide arrow 
                                     )

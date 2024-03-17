@@ -2152,6 +2152,7 @@ if authentication_status:
                 release_orders = status_frame.index[:-1]
                 release_orders = pd.Categorical(release_orders)
                 active_order_names = [f"{i} to {raw_ro[i]['destination']}" for i in active_frame.index]
+                destinations=[raw_ro[i]['destination'] for i in active_frame.index]
                 active_orders=active_frame.index
                
                 fig = go.Figure()
@@ -2160,7 +2161,7 @@ if authentication_status:
                 remaining_data = [remaining if remaining > 0 else None for remaining in status_frame["Remaining"][:-1]]
                 fig.add_trace(go.Scatter(x=active_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
                 
-                annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(release_orders, total_quantities, destinations)]
+                annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(active_orders, active_frame["Total"], destinations)]
                 fig.update_layout(annotations=annotations)
 
                 fig.update_layout(title='Shipment Status',

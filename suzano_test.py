@@ -842,58 +842,52 @@ with Profiler():
                             st.write(pd.DataFrame(completed_release_order_dest_map).T)
                        
                         with rls_tab3:
-                            mf_numbers_=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
-                            mf_numbers=json.loads(mf_numbers_)
-                            goahead=True
-                            if goahead:
-                                
-                                def check_home(ro):
-                                    keys=[sale for sale in release_order_database[ro]]
-                                    destination=release_order_database[ro][keys[0]]['destination']
-                                    remains=[release_order_database[ro][key]["remaining"] for key in keys]
-                                    #print(sum(remains))
-                                    result=True
-                                    if destination not in ["GP-Clatskanie,OR","GP-Halsey,OR"]:
-                                        result=False 
-                                    if sum(remains)==0:
-                                        result=False
-                                    
-                                    return result
-                                
-                                #gp_release_orders=[i for i in release_order_database if release_order_database[i]["001"]["destination"] in ["GP-Clatskanie,OR","GP-Halsey,OR"] ]   # and (release_order_database[i]["001"]["remaining"]>0|release_order_database[i]["001"]["remaining"]>0)
-                                
-                                destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database if check_home(i)]
-                                if len(destinations_of_release_orders)==0:
-                                    st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
+                            
+                            mf_numbers=gcp_download_new(target_bucket,rf"release_orders/mf_numbers.json")
+                            
+                            def check_home(ro):
+                                destination=release_order_database[ro]['destination']
+                                if destination not in ["GP-Clatskanie,OR","GP-Halsey,OR"]:
+                                    return False 
                                 else:
-                                    
-                                    release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",destinations_of_release_orders,key="tatata")
-                                    release_order_number_mf=release_order_number_mf.split(" ")[0]
-                                    input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
-                                    if input_mf_numbers is not None:
-                                        input_mf_numbers = input_mf_numbers.splitlines()
-                                        input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]####### CAREFUL THIS ASSUMES SAME DIGIT MF EACH TIME
-                                   
-                                    if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
-                                        if release_order_number_mf not in mf_numbers.keys():   
-                                            mf_numbers[release_order_number_mf]=[]
-                                        mf_numbers[release_order_number_mf]+=input_mf_numbers
-                                        mf_numbers[release_order_number_mf]=list(set(mf_numbers[release_order_number_mf]))
-                                        mf_data=json.dumps(mf_numbers)
-                                        storage_client = storage.Client()
-                                        bucket = storage_client.bucket(target_bucket)
-                                        blob = bucket.blob(rf"release_orders/mf_numbers.json")
-                                        blob.upload_from_string(mf_data)
-                                    if st.button("REMOVE MF NUMBERS",key="ioerssu" ):
-                                        for i in input_mf_numbers:
-                                            if i in mf_numbers[release_order_number_mf]:
-                                                mf_numbers[release_order_number_mf].remove(i)
-                                        mf_data=json.dumps(mf_numbers)
-                                        storage_client = storage.Client()
-                                        bucket = storage_client.bucket(target_bucket)
-                                        blob = bucket.blob(rf"release_orders/mf_numbers.json")
-                                        blob.upload_from_string(mf_data)
-                                    st.write(mf_numbers)
+                                    keys=[sale for sale in release_order_database[ro] if sale in ["001","002","003","004","005"]]
+                                    remains=[release_order_database[ro][key]["remaining"] for key in keys]
+                                    if sum(remains)==0:
+                                        return False
+                                    return True
+                                
+                            destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database if check_home(i)]
+                            if len(destinations_of_release_orders)==0:
+                                st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
+                            else:
+                                
+                                release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",destinations_of_release_orders,key="tatata")
+                                release_order_number_mf=release_order_number_mf.split(" ")[0]
+                                input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
+                                if input_mf_numbers is not None:
+                                    input_mf_numbers = input_mf_numbers.splitlines()
+                                    input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]####### CAREFUL THIS ASSUMES SAME DIGIT MF EACH TIME
+                               
+                                if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
+                                    if release_order_number_mf not in mf_numbers.keys():   
+                                        mf_numbers[release_order_number_mf]=[]
+                                    mf_numbers[release_order_number_mf]+=input_mf_numbers
+                                    mf_numbers[release_order_number_mf]=list(set(mf_numbers[release_order_number_mf]))
+                                    mf_data=json.dumps(mf_numbers)
+                                    storage_client = storage.Client()
+                                    bucket = storage_client.bucket(target_bucket)
+                                    blob = bucket.blob(rf"release_orders/mf_numbers.json")
+                                    blob.upload_from_string(mf_data)
+                                if st.button("REMOVE MF NUMBERS",key="ioerssu" ):
+                                    for i in input_mf_numbers:
+                                        if i in mf_numbers[release_order_number_mf]:
+                                            mf_numbers[release_order_number_mf].remove(i)
+                                    mf_data=json.dumps(mf_numbers)
+                                    storage_client = storage.Client()
+                                    bucket = storage_client.bucket(target_bucket)
+                                    blob = bucket.blob(rf"release_orders/mf_numbers.json")
+                                    blob.upload_from_string(mf_data)
+                                st.write(mf_numbers)
                     with release_order_tab3:  ### RELEASE ORDER STATUS
                         maintenance=True
                         if not maintenance:

@@ -627,14 +627,14 @@ with Profiler():
                         if create_release_order:
                             
                             if add: 
-                                temp=add_release_order_data(release_order_database,release_order_number,destination_add,po_number_add,sales_order_item_add,vessel_add,batch_add,ocean_bill_of_lading_add,grade_add,dryness_add,carrier_code_add,unitized_add,total_add,shipped_add,remaining_add)
+                                temp=add_release_order_data(release_order_database,release_order_number,destination_add,po_number_add,sales_order_item_add,vessel_add,batch_add,ocean_bill_of_lading_add,grade_add,dryness_add,carrier_code_add,unitized_add,quantity_add,shipped_add,remaining_add)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                                 blob.upload_from_string(temp)
                                 st.success(f"ADDED sales order item {sales_order_item_add} to release order {release_order_number}!")
                             elif edit:
-                                temp=edit_release_order_data(release_order_database,release_order_number,destination_edit,po_number_edit,sales_order_item_edit,vessel_edit,batch_edit,ocean_bill_of_lading_edit,grade_edit,dryness_edit,carrier_code_edit,unitized_edit,total_edit,shipped_edit,remaining_edit)
+                                temp=edit_release_order_data(release_order_database,release_order_number,destination_edit,po_number_edit,sales_order_item_edit,vessel_edit,batch_edit,ocean_bill_of_lading_edit,grade_edit,dryness_edit,carrier_code_edit,unitized_edit,quantity_edit,shipped_edit,remaining_edit)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
@@ -642,7 +642,7 @@ with Profiler():
                                 st.success(f"Edited release order {release_order_number} successfully!")
                                 
                             else:
-                                temp=store_release_order_data(release_order_database,release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,grade,dryness,carrier_code,unitized,total,remaining)
+                                temp=store_release_order_data(release_order_database,release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,grade,dryness,carrier_code,unitized,quantity,remaining)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")

@@ -1915,21 +1915,18 @@ with Profiler():
                     
                             
             if select=="INVENTORY" :
-               
-                #data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                #bill_of_ladings=json.loads(data)
-                mill_info=json.loads(gcp_download(target_bucket,rf"mill_info.json"))
-                
+
+                map=gcp_download_new(target_bucket,rf"map.json")
+                mill_info=map["mill_info"]
                 inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
                 ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                 raw_ro = json.loads(ro)
-                bol_mapping=gcp_download(target_bucket,rf"bol_mapping.json")
-                bol_mapping = json.loads(bol_mapping)
+                bol_mapping = map["bol_mapping"]
                 
-                inv2,inv3,inv4,inv5,inv6=st.tabs(["SUZANO DAILY REPORTS","EDI BANK","MAIN INVENTORY","SUZANO MILL SHIPMENT SCHEDULE/PROGRESS","RELEASE ORDER STATUS"])
+                suzano,edi_bank,main_inventory,mill_progress,status=st.tabs(["SUZANO DAILY REPORTS","EDI BANK","MAIN INVENTORY","SUZANO MILL SHIPMENT SCHEDULE/PROGRESS","RELEASE ORDER STATUS"])
                 
-                with inv2:
+                with suzano:
                     
                     def convert_df(df):
                         # IMPORTANT: Cache the conversion to prevent computation on every rerun
@@ -1984,7 +1981,7 @@ with Profiler():
                         st.write("NO REPORTS RECORDED")
                     
     
-                with inv3:
+                with edi_bank:
                     edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
                     requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
                     try:
@@ -2001,23 +1998,17 @@ with Profiler():
                     
     
                     
-                with inv4:
-                    
-                    inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                    inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
-                    ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                    raw_ro = json.loads(ro)
-                    
+                with main_inventory:
                     
                     maintenance=False
                                     
                     if maintenance:
                         st.title("CURRENTLY UNDER MAINTENANCE, CHECK BACK LATER")
-    
                                    
                     else:
-                        inv4tab1,inv4tab2,inv4tab3=st.tabs(["DAILY SHIPMENT REPORT","INVENTORY","UNREGISTERED LOTS FOUND"])
-                        with inv4tab1:
+                        daily,inventory,unregistered=st.tabs(["DAILY SHIPMENT REPORT","INVENTORY","UNREGISTERED LOTS FOUND"])
+                        
+                        with daily:
                             
                             amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000,"LYSEFJORD-2308":10000,"LAGUNA-3142":370}
                             inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308","LYSEFJORD-2308","LAGUNA-3142"])
@@ -2056,10 +2047,7 @@ with Profiler():
                                 mime='text/csv')   
                             
                                 
-                        with inv4tab2:
-                            
-    
-
+                        with inventory:
                             bols = {}
                             for key, value in raw_ro.items():
                                 for item_key, item_value in value.items():
@@ -2115,7 +2103,7 @@ with Profiler():
                             #with inv_col2:
                             st.subheader("By Ocean BOL,TONS")
                             st.dataframe(tempo)               
-                        with inv4tab3:
+                        with unregistered:
                             alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                             alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142"])
                             alien_list=pd.DataFrame(alien_units[alien_vessel]).T
@@ -2125,7 +2113,7 @@ with Profiler():
                             st.dataframe(alien_list)
                             
                           
-                with inv5:
+                with mill_progress:
                     
                     maintenance=True
                     if maintenance:
@@ -2171,7 +2159,7 @@ with Profiler():
                         st.plotly_chart(fig)
 
     
-                with inv6:
+                with status:
                     
                     grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
                     info=grouped_df.T.to_dict()

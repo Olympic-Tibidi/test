@@ -2197,7 +2197,6 @@ with Profiler():
                                       height=700,
                                       xaxis=dict(tickangle=-90, type='category'))
                     
-                    st.dataframe(new)
                     st.plotly_chart(fig)
                     
                     

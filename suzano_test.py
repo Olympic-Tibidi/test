@@ -832,8 +832,10 @@ with Profiler():
                             completed_release_order_dest_map={}
                             for i in completed:
                                 for sale in [s for s in release_order_database[i] if s in ["001","002","003","004","005"]]:
-                                    completed_release_order_dest_map[i]=[sale,release_order_database[i][sale]["ocean_bill_of_lading"],release_order_database[i][sale]["grade"],
-                                                                         release_order_database[i][sale]["destination"],release_order_database[i][sale]["vessel"],
+                                    completed_release_order_dest_map[i]=[sale,release_order_database[i]["destination"],
+                                                                         release_order_database[i][sale]["ocean_bill_of_lading"],
+                                                                         release_order_database[i][sale]["grade"],
+                                                                         release_order_database[i][sale]["vessel"],
                                                                          release_order_database[i][sale]["total"]]
                           
                             

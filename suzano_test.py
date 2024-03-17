@@ -487,7 +487,7 @@ with Profiler():
                 
                         
                 with admin_tab2:   #### BILL OF LADINGS
-                    admin_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                    bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                     admin_bill_of_ladings=json.loads(bill_data)
                     admin_bill_of_ladings=pd.DataFrame.from_dict(admin_bill_of_ladings).T[1:]
                     admin_bill_of_ladings["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in admin_bill_of_ladings["issued"]]

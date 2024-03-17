@@ -1918,10 +1918,12 @@ with Profiler():
 
                 map=gcp_download_new(target_bucket,rf"map.json")
                 mill_info=map["mill_info"]
-                inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
-                ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                raw_ro = json.loads(ro)
+                #inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                #inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
+                inv_bill_of_ladings=gcp_download_new(target_bucket,rf"terminal_bill_of_ladings.json")
+                inv_bill_of_ladings=pd.dataframe(inv_bill_of_ladings).T
+                ro=gcp_download_new(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                #raw_ro = json.loads(ro)
                 bol_mapping = map["bol_mapping"]
                 
                 suzano,edi_bank,main_inventory,mill_progress,status=st.tabs(["SUZANO DAILY REPORTS","EDI BANK","MAIN INVENTORY","SUZANO MILL SHIPMENT SCHEDULE/PROGRESS","RELEASE ORDER STATUS"])

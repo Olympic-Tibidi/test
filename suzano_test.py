@@ -1921,7 +1921,7 @@ with Profiler():
                 #inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 #inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
                 inv_bill_of_ladings=gcp_download_new(target_bucket,rf"terminal_bill_of_ladings.json")
-                inv_bill_of_ladings=pd.dataframe(inv_bill_of_ladings).T
+                inv_bill_of_ladings=pd.DataFrame(inv_bill_of_ladings).T
                 ro=gcp_download_new(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                 #raw_ro = json.loads(ro)
                 bol_mapping = map["bol_mapping"]

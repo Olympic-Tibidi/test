@@ -2176,8 +2176,7 @@ with Profiler():
                     st.dataframe(status_frame)
 
                     
-                    release_orders = [str(key[0]) for key in status_dict.keys()]
-                    release_orders=[str(i) for i in release_orders]
+                    release_orders = status_frame.index[:-1]
                     release_orders = pd.Categorical(release_orders)
                     
                     total_quantities = [item['total'] for item in info.values()]
@@ -2191,15 +2190,15 @@ with Profiler():
                     fig = go.Figure()
                     
                     # Add bars for total quantities
-                    fig.add_trace(go.Bar(x=release_orders, y=total_quantities, name='Total', marker_color='lightgray'))
+                    fig.add_trace(go.Bar(x=release_orders, y=status_frame["Total"][:-1], name='Total', marker_color='lightgray'))
                     
                     # Add filled bars for shipped quantities
-                    fig.add_trace(go.Bar(x=release_orders, y=shipped_quantities, name='Shipped', marker_color='blue', opacity=0.7))
+                    fig.add_trace(go.Bar(x=release_orders, y=status_frame["Shipped"][:-1], name='Shipped', marker_color='blue', opacity=0.7))
                     
                     # Add remaining quantities as separate scatter points
                     #fig.add_trace(go.Scatter(x=release_orders, y=remaining_quantities, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
                     
-                    remaining_data = [remaining if remaining > 0 else None for remaining in remaining_quantities]
+                    remaining_data = [remaining if remaining > 0 else None for remaining in status_frame["Remaining"][:-1]]
                     fig.add_trace(go.Scatter(x=release_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
                     
                     # Add destinations as annotations

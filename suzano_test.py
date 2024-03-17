@@ -2172,9 +2172,11 @@ with Profiler():
                                                 "Shipped":raw_ro[ro][sale]['shipped'],
                                                 "Remaining":raw_ro[ro][sale]['remaining']}
                     status_frame=pd.DataFrame(status_dict).T.set_index("Release Order #",drop=True)
-
                     status_frame.loc["Total"]=status_frame[["Total","Shipped","Remaining"]].sum()
-                    release_orders = [str(key[0]) for key in info.keys()]
+                    st.dataframe(status_frame)
+
+                    
+                    release_orders = [str(key[0]) for key in status_dict.keys()]
                     release_orders=[str(i) for i in release_orders]
                     release_orders = pd.Categorical(release_orders)
                     
@@ -2212,13 +2214,12 @@ with Profiler():
                                       width=1300,
                                       height=700,
                                       xaxis=dict(tickangle=-90, type='category'))
-                    #relcol1,relcol2=st.columns([5,5])
-                    #with relcol1:
-                        #st.dataframe(new)
-                    #with relcol2:
-                        #st.plotly_chart(fig)
+                    
                     st.dataframe(new)
                     st.plotly_chart(fig)
+                    
+                    
+                    
                     temp_dict={}
                     for rel_ord in raw_ro:
                         

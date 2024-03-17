@@ -723,7 +723,7 @@ with Profiler():
                                     else:
                                         st.markdown(f"**:blue[Sales Order Item] : {targets[0]}**")
                                     st.markdown(f"**:blue[Destination] : {target['destination']}**")
-                                    st.write(f"        Total Quantity-Tonnage : {target[targets[0]]['total']} Units - {2*target[targets[0]]['total']} Metric Tons")
+                                    st.write(f"        Total Quantity: {target[targets[0]]['total']} Units - {2*target[targets[0]]['total']} Metric Tons")
                                     st.write(f"        Ocean Bill Of Lading : {target[targets[0]]['ocean_bill_of_lading']}")
                                     st.write(f"        Batch : {target[targets[0]]['batch']} WIRES : {target[targets[0]]['unitized']}")
                                     st.write(f"        Units Shipped : {target[targets[0]]['shipped']} Units - {2*target[targets[0]]['shipped']} Metric Tons")
@@ -742,7 +742,7 @@ with Profiler():
                                         else:
                                             st.markdown(f"**:blue[Sales Order Item] : {targets[1]}**")
                                         st.markdown(f"**:blue[Destination : {target['destination']}]**")
-                                        st.write(f"        Total Quantity-Tonnage : {target[targets[1]]['quantity']} Units - {2*target[targets[1]]['total']} Metric Tons")                        
+                                        st.write(f"        Total Quantity : {target[targets[1]]['quantity']} Units - {2*target[targets[1]]['total']} Metric Tons")                        
                                         st.write(f"        Ocean Bill Of Lading : {target[targets[1]]['ocean_bill_of_lading']}")
                                         st.write(f"        Batch : {target[targets[1]]['batch']} WIRES : {target[targets[1]]['unitized']}")
                                         st.write(f"        Units Shipped : {target[targets[1]]['shipped']} Units - {2*target[targets[1]]['shipped']} Metric Tons")
@@ -765,7 +765,7 @@ with Profiler():
                                         else:
                                             st.markdown(f"**:blue[Sales Order Item] : {targets[2]}**")
                                         st.markdown(f"**:blue[Destination : {target['destination']}]**")
-                                        st.write(f"        Total Quantity-Tonnage : {target[targets[2]]['quantity']} Units - {2*target[targets[2]]['total']} Metric Tons")
+                                        st.write(f"        Total Quantity : {target[targets[2]]['quantity']} Units - {2*target[targets[2]]['total']} Metric Tons")
                                         st.write(f"        Ocean Bill Of Lading : {target[targets[2]]['ocean_bill_of_lading']}")
                                         st.write(f"        Batch : {target[targets[2]]['batch']} WIRES : {target[targets[2]]['unitized']}")
                                         st.write(f"        Units Shipped : {target[targets[2]]['shipped']} Units - {2*target[targets[2]]['shipped']} Metric Tons")
@@ -789,7 +789,7 @@ with Profiler():
                                         else:
                                             st.markdown(f"**:blue[Sales Order Item] : {targets[3]}**")
                                         st.markdown(f"**:blue[Destination : {target['destination']}]**")
-                                        st.write(f"        Total Quantity-Tonnage : {target[targets[3]]['quantity']} Units - {2*target[targets[3]]['total']} Metric Tons")
+                                        st.write(f"        Total Quantity : {target[targets[3]]['quantity']} Units - {2*target[targets[3]]['total']} Metric Tons")
                                         st.write(f"        Ocean Bill Of Lading : {target[targets[3]]['ocean_bill_of_lading']}")
                                         st.write(f"        Batch : {target[targets[3]]['batch']} WIRES : {target[targets[3]]['unitized']}")
                                         st.write(f"        Units Shipped : {target[targets[3]]['shipped']} Units - {2*target[targets[3]]['shipped']} Metric Tons")

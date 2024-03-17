@@ -607,7 +607,7 @@ with Profiler():
                             
                             release_order_number=st.text_input("Release Order Number")
                             po_number=st.text_input("PO No")
-                            destination_list=list(set([f"{i}-{j}" for i,j in zip(mill_df["Group"].tolist(),mill_df["Final Destination"].tolist())]))
+                            destination_list=[i for i in mill_info.keys()]
                             #st.write(destination_list)
                             destination=st.selectbox("SELECT DESTINATION",destination_list)
                             sales_order_item=st.text_input("Sales Order Item")  

@@ -653,63 +653,28 @@ with Profiler():
                             
                     with release_order_tab2:  ##   RELEASE ORDER DATABASE ##
                         
-                        #vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308"],key="other")
+         
                         rls_tab1,rls_tab2,rls_tab3=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS","ENTER MF NUMBERS"])
-                        data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")  #################
-                        try:
-                            release_order_database=json.loads(data)
-                        except: 
-                            release_order_dictionary={}
-                        
+                                                
                         with rls_tab1:
                             
-                            completed_release_orders=[]   #### Check if any of them are completed.
-                         
                             
-                            for key in release_order_database:
-                                not_yet=0
-                                for sales in release_order_database[key]:
-                                    if release_order_database[key][sales]["remaining"]>0:
-                                        not_yet=1
-                                    else:
-                                        pass
-                                if not_yet==0:
-                                    completed_release_orders.append(key)
-                        
-                            files_in_folder_ = [i.replace(".json","") for i in list_files_in_subfolder(target_bucket, rf"release_orders/ORDERS/")]   ### REMOVE json extension from name
-                            
-                            junk=gcp_download(target_bucket,rf"junk_release.json")
-                            junk=json.loads(junk)
-                            files_in_folder=[i for i in files_in_folder_ if i not in completed_release_orders]        ###  CHECK IF COMPLETED
-                            files_in_folder=[i for i in files_in_folder if i not in junk.keys()]        ###  CHECK IF COMPLETED
-                            #st.write(release_order_database)
-                            
-                            ###       Make Release order destinaiton map for dropdown menu
-                            
-                            release_order_dest_map={} 
-                            for i in release_order_database:
-                                for sales in release_order_database[i]:
-                                    release_order_dest_map[i]=release_order_database[i][sales]["destination"]
-                            #st.write(release_order_dest_map)
-                            destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in files_in_folder if i!=""]
+                            #files_in_folder=[i for i in release_order_database if release_order_database[i]["complete"]!=True]]        ###  CHECK IF COMPLETED
+
+                            destinations_of_release_orders=[f"{i} to {release_order_database[i]['destination']}" for i in release_order_database if release_order_database[i]["complete"]!=True]
                             
                             ###       Dropdown menu
                             nofile=0
                             requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
                             requested_file=requested_file_.split(" ")[0]
                      
-                            
-                           
-                            data=gcp_download(target_bucket,rf"release_orders/ORDERS/{requested_file}.json")
-                            release_order_json = json.loads(data)
-                                
+                                        
+                                                         
                                 
                             target=release_order_json[requested_file]
-                            destination=target['destination']
-                            po_number=target["po_number"]
-                            if len(target.keys())==0:
-                                nofile=1
-                               
+                            destination=release_order_database[requested_file]['destination']
+                            po_number=release_order_database[requested_file]['po_number']
+                           
                             number_of_sales_orders=len([i for i in target if i not in ["destination","po_number"]])   ##### WRONG CAUSE THERE IS NOW DESTINATION KEYS
                         
                             

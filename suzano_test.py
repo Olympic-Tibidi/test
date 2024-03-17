@@ -2164,7 +2164,7 @@ if authentication_status:
                 #annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(active_orders, active_frame["Total"], destinations)]
                 #fig.update_layout(annotations=annotations)
 
-                fig.add_annotation(x="3172296", y=800, text=annotation_text,
+                fig.add_annotation(x="3172296", y=800, text="destination",
                                        showarrow=True, arrowhead=4, ax=0, ay=-30)
                 
                 fig.update_layout(title='Shipment Status',

@@ -1127,8 +1127,6 @@ with Profiler():
                     
 
                     
-                    vessel=info[current_release_order][current_sales_order]["vessel"]
-                
                         
                     
                     st.markdown(rf'**:blue[CURRENTLY WORKING] :**')

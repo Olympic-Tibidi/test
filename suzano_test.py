@@ -711,7 +711,8 @@ with Profiler():
                                             
                                 targets=[i for i in target if i in ["001","002","003","004","005"]] ####doing this cause we set jason path {downloadedfile[releaseorder] as target. i have to use one of the keys (release order number) that is in target list
                                 sales_orders_completed=[k for k in targets if target[k]['remaining']<=0]
-                                
+                                st.write(targets)
+                                st.write(sales_orders_completed)
                                 with rel_col1:
                                     
                                     st.markdown(f"**:blue[Release Order Number] : {requested_file}**")

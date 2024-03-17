@@ -667,43 +667,9 @@ with Profiler():
                             
                             rel_col1,rel_col2,rel_col3,rel_col4=st.columns([2,2,2,2])
                            
-                            # #### DISPATCHED CLEANUP  #######    WHY  ???
-                            
-                            # try:
-                            #     dispatched=gcp_download(target_bucket,rf"dispatched.json")
-                            #     dispatched=json.loads(dispatched)
-                            #     #st.write(dispatched)
-                            # except:
-                            #     pass
-                            # to_delete=[]            
-                            # try:
-                            #     for i in dispatched.keys():
-                            #         if not dispatched[i].keys():
-                            #             del dispatched[i]
-                                    
-                            #     for k in to_delete:
-                            #         dispatched.pop(k)
-                            #         #st.write("deleted k")
-                               
-                            #     json_data = json.dumps(dispatched)
-                            #     storage_client = storage.Client()
-                            #     bucket = storage_client.bucket(target_bucket)
-                            #     blob = bucket.blob(rf"dispatched.json")
-                            #     blob.upload_from_string(json_data)
-                            # except:
-                            #     pass
-                            
-                                
-                            
-                            
-                            
-                            ### END CLEAN DISPATCH
-            
-                            
-                                                  
                             if nofile!=1 :         
                                             
-                                targets=[i for i in target if i in ["001","002","003","004","005"]] ####doing this cause we set jason path {downloadedfile[releaseorder] as target. i have to use one of the keys (release order number) that is in target list
+                                targets=[i for i in target if i in ["001","002","003","004","005"]] 
                                 sales_orders_completed=[k for k in targets if target[k]['remaining']<=0]
                                 with rel_col1:
                                     
@@ -861,34 +827,18 @@ with Profiler():
                             else:
                                 st.write("NO RELEASE ORDERS IN DATABASE")
                         with rls_tab2:
-                            data=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                            completed_release_orders=[]
-                            for key in release_order_database:
-                                not_yet=0
-                                for sales in release_order_database[key]:
-                                    if release_order_database[key][sales]["remaining"]>0:
-                                        not_yet=1
-                                    else:
-                                        pass
-                                if not_yet==0:
-                                    completed_release_orders.append(key)
-                            
-                            #for completed in completed_release_orders:
-                                #st.write(completed)
-                                #data=gcp_download(target_bucket,rf"release_orders/ORDERS/{completed}.json")
-                                #comp_rel_order=json.loads(data)
-                            
+                            completed=[i for i in release_order_database if release_order_database[i]["complete"]==True]
+                                                        
                             completed_release_order_dest_map={}
-                            for i in release_order_database:
-                                if i in completed_release_orders:
-                                    completed_release_order_dest_map[i]=release_order_database[i]["001"]#["destination"]
-                            if len(pd.DataFrame(completed_release_order_dest_map).T)>=1:
-                                st.write(pd.DataFrame(completed_release_order_dest_map).T)
-                                
-                                #destinations_of_completed_release_orders=[f"{i} to {completed_release_order_dest_map[i]}" for i in completed_release_orders]
-                                #requested_file_=st.selectbox("COMPLETED RELEASE ORDERS",destinations_of_completed_release_orders,key=16)
-                                #requested_file=requested_file_.split(" ")[0]
-                                #nofile=0
+                            for i in completed:
+                                for sale in [s for s in release_order_database[i] if s in ["001","002","003","004","005"]]:
+                                    completed_release_order_dest_map[i]=[sale,release_order_database[i][sale]["ocean_bill_of_lading"],release_order_database[i][sale]["grade"],
+                                                                         release_order_database[i][sale]["destination"],release_order_database[i][sale]["vessel"],
+                                                                         release_order_database[i][sale]["total"]]
+                          
+                            
+                            st.write(pd.DataFrame(completed_release_order_dest_map).T)
+                       
                         with rls_tab3:
                             mf_numbers_=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                             mf_numbers=json.loads(mf_numbers_)

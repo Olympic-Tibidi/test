@@ -2151,7 +2151,7 @@ if authentication_status:
                 
                 release_orders = status_frame.index[:-1]
                 release_orders = pd.Categorical(release_orders)
-                active_orders = active_frame.index
+                active_orders = [f"{i} to {raw_ro[i]['destination']}" for i in active_frame.index]
                
                 fig = go.Figure()
                 fig.add_trace(go.Bar(x=active_orders, y=active_frame["Total"], name='Total', marker_color='lightgray'))

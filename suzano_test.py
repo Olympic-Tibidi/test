@@ -2202,12 +2202,11 @@ with Profiler():
                     
                     
                     temp_dict={}
+                        
                     for rel_ord in raw_ro:
-                        
-                        
-                        for sales in raw_ro[rel_ord]:
+                        for sales in [i for i in raw_ro[rel_ord] if in ["001","002","003","004","005"]]:
                             temp_dict[rel_ord,sales]={}
-                            dest=raw_ro[rel_ord][sales]['destination']
+                            dest=raw_ro[rel_ord]['destination']
                             vessel=raw_ro[rel_ord][sales]['vessel']
                             total=raw_ro[rel_ord][sales]['total']
                             remaining=raw_ro[rel_ord][sales]['remaining']

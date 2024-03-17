@@ -2165,7 +2165,7 @@ if authentication_status:
                 #fig.update_layout(annotations=annotations)
 
                 for i in range(len(active_orders)):
-                    x_val = active_orders[i]
+                    x_val = str(active_orders[i])
                     st.write(x_val)
                     total_quantity = active_frame.loc[x_val, "Total"]
                     destination = raw_ro[x_val]['destination']

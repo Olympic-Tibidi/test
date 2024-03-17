@@ -878,6 +878,7 @@ with Profiler():
                                     bucket = storage_client.bucket(target_bucket)
                                     blob = bucket.blob(rf"release_orders/mf_numbers.json")
                                     blob.upload_from_string(mf_data)
+                                    st.success(f"MF numbers entered to {release_order_number_mf} successfully!")
                                 if st.button("REMOVE MF NUMBERS",key="ioerssu" ):
                                     for i in input_mf_numbers:
                                         if i in mf_numbers[release_order_number_mf]:

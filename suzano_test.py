@@ -1166,14 +1166,13 @@ with Profiler():
                        
                             
                         with sub_load_col3:
-                            
-                           
-                            if remaining<=10:
-                                st.markdown(rf'**:red[CAUTION : Remaining : {remaining} Units]**')
         
                             st.markdown(rf'**Total Units : {quant_}**')
                             st.markdown(rf'**Shipped Units : {ship_}**')
-                            st.markdown(rf'**Remaining Units : {remaining}**')
+                            if remaining<=10:
+                                st.markdown(rf'**:red[CAUTION : Remaining : {remaining} Units]**')
+                            else:
+                                st.markdown(rf'**Remaining Units : {remaining}**')
                         with sub_load_col4:
                             
                         

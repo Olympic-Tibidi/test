@@ -658,29 +658,22 @@ with Profiler():
                                                 
                         with rls_tab1:
                             
-                            
-                            #files_in_folder=[i for i in release_order_database if release_order_database[i]["complete"]!=True]]        ###  CHECK IF COMPLETED
-
                             destinations_of_release_orders=[f"{i} to {release_order_database[i]['destination']}" for i in release_order_database if release_order_database[i]["complete"]!=True]
                             
                             ###       Dropdown menu
                             nofile=0
                             requested_file_=st.selectbox("ACTIVE RELEASE ORDERS",destinations_of_release_orders)
                             requested_file=requested_file_.split(" ")[0]
-                     
+
+                            target=release_order_database[requested_file]
+                            destination=target['destination']
+                            po_number=target['po_number']
                                         
-                                                         
-                                
-                            target=release_order_json[requested_file]
-                            destination=release_order_database[requested_file]['destination']
-                            po_number=release_order_database[requested_file]['po_number']
-                           
                             number_of_sales_orders=len([i for i in target if i not in ["destination","po_number"]])   ##### WRONG CAUSE THERE IS NOW DESTINATION KEYS
-                        
-                            
                             
                             rel_col1,rel_col2,rel_col3,rel_col4=st.columns([2,2,2,2])
-                            #### DISPATCHED CLEANUP  #######
+                           
+                            #### DISPATCHED CLEANUP  #######    WHY  ???
                             
                             try:
                                 dispatched=gcp_download(target_bucket,rf"dispatched.json")
@@ -716,7 +709,7 @@ with Profiler():
                                                   
                             if nofile!=1 :         
                                             
-                                targets=[i for i in target if i not in ["destination","po_number"]] ####doing this cause we set jason path {downloadedfile[releaseorder] as target. i have to use one of the keys (release order number) that is in target list
+                                targets=[i for i in target if i in ["001","002","003","004","005"]] ####doing this cause we set jason path {downloadedfile[releaseorder] as target. i have to use one of the keys (release order number) that is in target list
                                 sales_orders_completed=[k for k in targets if target[k]['remaining']<=0]
                                 
                                 with rel_col1:
@@ -730,7 +723,7 @@ with Profiler():
                                     else:
                                         st.markdown(f"**:blue[Sales Order Item] : {targets[0]}**")
                                     st.markdown(f"**:blue[Destination] : {target['destination']}**")
-                                    st.write(f"        Total Quantity-Tonnage : {target[targets[0]]['quantity']} Units - {target[targets[0]]['tonnage']} Metric Tons")
+                                    st.write(f"        Total Quantity-Tonnage : {target[targets[0]]['total']} Units - {target[targets[0]]['tonnage']} Metric Tons")
                                     st.write(f"        Ocean Bill Of Lading : {target[targets[0]]['ocean_bill_of_lading']}")
                                     st.write(f"        Batch : {target[targets[0]]['batch']} WIRES : {target[targets[0]]['unitized']}")
                                     st.write(f"        Units Shipped : {target[targets[0]]['shipped']} Units - {2*target[targets[0]]['shipped']} Metric Tons")

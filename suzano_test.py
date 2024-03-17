@@ -2179,29 +2179,13 @@ with Profiler():
                     release_orders = status_frame.index[:-1]
                     release_orders = pd.Categorical(release_orders)
                     
-                    total_quantities = [item['total'] for item in info.values()]
-                    shipped_quantities = [item['shipped'] for item in info.values()]
-                    remaining_quantities = [item['remaining'] for item in info.values()]
-                    destinations = [key[2] for key in info.keys()]
-                    # Calculate the percentage of shipped quantities
-                    #percentage_shipped = [shipped / total * 100 for shipped, total in zip(shipped_quantities, total_quantities)]
-                    
-                    # Create a Plotly bar chart
+                   
                     fig = go.Figure()
-                    
-                    # Add bars for total quantities
                     fig.add_trace(go.Bar(x=release_orders, y=status_frame["Total"][:-1], name='Total', marker_color='lightgray'))
-                    
-                    # Add filled bars for shipped quantities
                     fig.add_trace(go.Bar(x=release_orders, y=status_frame["Shipped"][:-1], name='Shipped', marker_color='blue', opacity=0.7))
-                    
-                    # Add remaining quantities as separate scatter points
-                    #fig.add_trace(go.Scatter(x=release_orders, y=remaining_quantities, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
-                    
                     remaining_data = [remaining if remaining > 0 else None for remaining in status_frame["Remaining"][:-1]]
                     fig.add_trace(go.Scatter(x=release_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
                     
-                    # Add destinations as annotations
                     annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(release_orders, total_quantities, destinations)]
                     #fig.update_layout(annotations=annotations)
                     

@@ -2204,7 +2204,7 @@ with Profiler():
                     temp_dict={}
                         
                     for rel_ord in raw_ro:
-                        for sales in [i for i in raw_ro[rel_ord] if in ["001","002","003","004","005"]]:
+                        for sales in [i for i in raw_ro[rel_ord] if i in ["001","002","003","004","005"]]:
                             temp_dict[rel_ord,sales]={}
                             dest=raw_ro[rel_ord]['destination']
                             vessel=raw_ro[rel_ord][sales]['vessel']

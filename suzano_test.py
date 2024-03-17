@@ -2162,7 +2162,7 @@ if authentication_status:
                 fig.add_trace(go.Scatter(x=active_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
                 
                 #annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(active_orders, active_frame["Total"], destinations)]
-                fig.update_layout(annotations=annotations)
+                #fig.update_layout(annotations=annotations)
 
                 fig.update_layout(title='Shipment Status',
                                   xaxis_title='Release Orders',

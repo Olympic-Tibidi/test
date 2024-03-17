@@ -2186,10 +2186,9 @@ with Profiler():
                     remaining_data = [remaining if remaining > 0 else None for remaining in status_frame["Remaining"][:-1]]
                     fig.add_trace(go.Scatter(x=release_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
                     
-                    annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(release_orders, total_quantities, destinations)]
+                    #annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(release_orders, total_quantities, destinations)]
                     #fig.update_layout(annotations=annotations)
-                    
-                    # Update layout
+ 
                     fig.update_layout(title='Shipment Status',
                                       xaxis_title='Release Orders',
                                       yaxis_title='Quantities',

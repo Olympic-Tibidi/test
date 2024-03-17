@@ -854,9 +854,9 @@ with Profiler():
                                     remains=[release_order_database[ro][key]["remaining"] for key in keys]
                                     if sum(remains)==0:
                                         return False
-                                    return True
+                                    return f"{ro} to {destination}
                                 
-                            destinations_of_release_orders=[f"{i} to {release_order_dest_map[i]}" for i in release_order_database if check_home(i)]
+                            destinations_of_release_orders=[check_home(i) for i in release_order_database if check_home(i) ]
                             if len(destinations_of_release_orders)==0:
                                 st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
                             else:

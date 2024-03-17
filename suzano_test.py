@@ -1093,15 +1093,13 @@ with Profiler():
                     
                     for rel_ord in dispatched.keys():
                         for sales in dispatched[rel_ord]:
-                            #st.write(rel_ord,sales)
                             try:
                                 menu_destinations[f"{rel_ord} -{sales}"]=dispatched[rel_ord][sales]["destination"]
-                                #st.write(rel_ord,sales)
-                                
                             except:
                                 pass
                     if 'work_order_' not in st.session_state:
                         st.session_state.work_order_ = None
+                    st.write(menu_destinations)
                     liste=[f"{i} to {menu_destinations[i]}" for i in menu_destinations.keys()]
                     #st.write(liste)
                     work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=0 if st.session_state.work_order_ else 0) 
@@ -1116,15 +1114,7 @@ with Profiler():
                     
                     
                     
-                   #for i in order:                   ##############HERE we check all the sales orders in dispatched[releaseordernumber] dictionary. it breaks after it finds the first sales order
-                   #     if i in dispatched[work_order].keys():
-                   #         current_release_order=work_order
-                    #        current_sales_order=i
-                     #       vessel=dispatched[work_order][i]["vessel"]
-                      #      destination=dispatched[work_order][i]['destination']
-                      #      break
-                      #  else:
-                      #      pass
+          
                     try:
                         next_release_order=dispatched['002']['release_order']    #############################  CHECK HERE ######################## FOR MIXED LOAD
                         next_sales_order=dispatched['002']['sales_order']
@@ -1163,28 +1153,35 @@ with Profiler():
                         sub_load_col1,sub_load_col2,sub_load_col3,sub_load_col4=st.columns([3,3,3,3])
                         
                         with sub_load_col1:   
-                            
+                            st.markdown(rf'**Release Order-{current_release_order}**')
+                            st.markdown(rf'**Destination : {destination}**')
+                            st.markdown(rf'**VESSEL-{vessel}**')
                             #st.write (pd.DataFrame(temp.items(),columns=["Inquiry","Data"]).to_html (escape=False, index=False), unsafe_allow_html=True)
-                            st.write (temp.items())
+                     
                         with sub_load_col2:
+                            st.markdown(rf'**Ocean B/L: {ocean_bill_of_}**')
+                            st.markdown(rf'**Type : {wrap_dict[wrap]}**')
+                            st.markdown(rf'**Prep": {unitized}**')
                             #st.write (pd.DataFrame(temp2.items(),columns=["Inquiry","Data"]).to_html (escape=False, index=False), unsafe_allow_html=True)
-                            st.write (temp2.items())
+                       
+                            
                         with sub_load_col3:
                             
-                            #st.markdown(rf'**Total Quantity : {quant_} Units - {quant_*2} Tons**')
-                            #st.markdown(rf'**Shipped : {ship_} Units - {ship_*2} Tons**')
-                            
+                           
                             if remaining<=10:
                                 st.markdown(rf'**:red[CAUTION : Remaining : {remaining} Units]**')
-    
-                            #a=pd.DataFrame(temp3.items(),columns=["UNITS","Data"])
-                          #  a["Data"]=a["Data"].astype("float")
-                           # st.write (a.to_html (escape=False, index=False), unsafe_allow_html=True)
-                            st.write (temp2.items())
+        
+                            st.markdown(rf'**Total Units : {quant_}**')
+                            st.markdown(rf'**Shipped Units : {ship_}**')
+                            st.markdown(rf'**Remaining Units": {remaining}**')
                         with sub_load_col4:
+                            
                         
                             #st.write (pd.DataFrame(temp5.items(),columns=["TONNAGE","Data"]).to_html (escape=False, index=False), unsafe_allow_html=True)
-                            st.write (temp5.items())
+                            
+                            st.markdown(rf'**Total Tonnage : {quant_*2}**')
+                            st.markdown(rf'**Shipped Tonnage : {ship_*2}**')
+                            st.markdown(rf'**Remaining Tonnage": {remaining*2}**')
                     
                     with load_col2:
                         if double_load:

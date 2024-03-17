@@ -1485,7 +1485,7 @@ with Profiler():
                                                     st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                                     faults.append(1)
                                                     st.markdown("**:red[This unit has been scanned TWICE!]**")
-                                                if x in load_dict.keys():
+                                                if x in past_loads:
                                                     st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                                     faults.append(1)
                                                     st.markdown("**:red[This unit has been SHIPPED!]**")   
@@ -1612,7 +1612,7 @@ with Profiler():
                         quantity=st.number_input("**Scanned Quantity of Units**",st.session_state.updated_quantity, key=None, help=None, on_change=None, disabled=True, label_visibility="visible")
                         st.markdown(f"**{quantity*2} TONS - {round(quantity*2*2204.62,1)} Pounds**")
                         
-                        admt=round(float(info[current_release_order][current_sales_order]["dryness"])/90*st.session_state.updated_quantity*2,4)
+                        admt=round(float(release_order_database[current_release_order][current_sales_order]["dryness"])/90*st.session_state.updated_quantity*2,4)
                         st.markdown(f"**ADMT= {admt} TONS**")
                     manual_time=False   
                     #st.write(faults)                  

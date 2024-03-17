@@ -2134,10 +2134,10 @@ with Profiler():
                         resampled_quantity["WEEK"][:-1]=[i.strftime("%Y-%m-%d") for i in resampled_quantity["WEEK"][:-1]]
                         resampled_quantity.set_index("WEEK",drop=True,inplace=True)
                         st.dataframe(resampled_quantity)
-                        csv_weekly=convert_df(resampled_quantity)
+                        
                         st.download_button(
                         label="DOWNLOAD WEEKLY REPORT AS CSV",
-                        data=csv_weekly,
+                        data=convert_df(resampled_quantity),
                         file_name=f'WEEKLY SHIPMENT REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
                         mime='text/csv')
         
@@ -2161,26 +2161,19 @@ with Profiler():
     
                 with status:
                     
-                    grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
-                    info=grouped_df.T.to_dict()
-                    for rel_ord in raw_ro:
-                        for sales in raw_ro[rel_ord]:
-                            try:
-                                found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
-                                qt=info[found_key]['quantity']
-                            except:
-                                qt=0
-                            info[rel_ord,sales,raw_ro[rel_ord][sales]['destination']]={'total':raw_ro[rel_ord][sales]['total'],
-                                                    'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}
-                                                
-                    new=pd.DataFrame(info).T
-                    new=new.reset_index()
-                    #new.groupby('level_1')['remaining'].sum()
-                    new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
-                    new.index=[i+1 for i in new.index]
-                    #new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
-                    new.index=[i+1 for i in new.index]
-                    new.loc["Total"]=new[["Total","Shipped","Remaining"]].sum()
+                    status_dict={}
+                    sales_group=["001","002","003","004","005"]
+                    for ro in raw_ro:
+                        for sale in [i for i in raw_ro[ro] if i in sales_group]:
+                            status_dict[ro]={"Release Order #":ro,"Sales Order #":sale,
+                                                "Destination":raw_ro[ro]['destination'],
+                                                "Ocean BOL":raw_ro[ro][sale]['ocean_bill_of_lading'],
+                                                "Total":raw_ro[ro][sale]['total'],
+                                                "Shipped":raw_ro[ro][sale]['shipped'],
+                                                "Remaining":raw_ro[ro][sale]['remaining']}
+                    status_frame=pd.DataFrame(status_dict).T.set_index("Release Order #",drop=True)
+
+                    status_frame.loc["Total"]=new[["Total","Shipped","Remaining"]].sum()
                     release_orders = [str(key[0]) for key in info.keys()]
                     release_orders=[str(i) for i in release_orders]
                     release_orders = pd.Categorical(release_orders)

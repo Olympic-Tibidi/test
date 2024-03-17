@@ -524,14 +524,15 @@ with Profiler():
                 with admin_tab3:
                     edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
                     requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
-                    data=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}"),
                     
-                       
-                    st.text_area("EDI",requested_edi,height=400)                                
+                    display_edi=st.toggle("DISPLAY EDI")
+                    if display_edi:
+                        data=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}")
+                        st.text_area("EDI",requested_edi,height=400)                                
                    
                     st.download_button(
                         label="DOWNLOAD EDI",
-                        data=data,
+                        data=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}"),
                         file_name=f'{requested_edi_file}',
                         mime='text/csv')
     

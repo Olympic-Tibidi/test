@@ -2200,7 +2200,7 @@ with Profiler():
                     st.plotly_chart(fig)
                     
                     
-                    duration=st.radio("Duration Report")
+                    duration=st.toggle("Duration Report")
                     if duration:
                         
                         temp_dict={}

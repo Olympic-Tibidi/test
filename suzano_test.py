@@ -528,7 +528,7 @@ with Profiler():
                     display_edi=st.toggle("DISPLAY EDI")
                     if display_edi:
                         data=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}")
-                        st.text_area("EDI",requested_edi,height=400)                                
+                        st.text_area("EDI",data,height=400)                                
                    
                     st.download_button(
                         label="DOWNLOAD EDI",

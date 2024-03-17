@@ -545,19 +545,13 @@ with Profiler():
                 with admin_tab1:
                     map=gcp_download_new(target_bucket,rf"map.json")
                     release_order_database=gcp_download_new(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                    
+                    dispatch=gcp_download(target_bucket,rf"dispatched.json")
+                    dispatch=json.loads(dispatch)
                     carrier_list=map['carriers']
                     mill_info=map["mill_info"]
-                    
-               
-                    
-                    mill_df=pd.DataFrame.from_dict(mill_info).T
-
                           
                     release_order_tab1,release_order_tab2,release_order_tab3=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE","RELEASE ORDER STATUS"])
                     
-                    
-                            
                     with release_order_tab1:   ###CREATE RELEASE ORDER
                        
                         add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER",disabled=False)
@@ -673,31 +667,31 @@ with Profiler():
                             
                             rel_col1,rel_col2,rel_col3,rel_col4=st.columns([2,2,2,2])
                            
-                            #### DISPATCHED CLEANUP  #######    WHY  ???
+                            # #### DISPATCHED CLEANUP  #######    WHY  ???
                             
-                            try:
-                                dispatched=gcp_download(target_bucket,rf"dispatched.json")
-                                dispatched=json.loads(dispatched)
-                                #st.write(dispatched)
-                            except:
-                                pass
-                            to_delete=[]            
-                            try:
-                                for i in dispatched.keys():
-                                    if not dispatched[i].keys():
-                                        del dispatched[i]
+                            # try:
+                            #     dispatched=gcp_download(target_bucket,rf"dispatched.json")
+                            #     dispatched=json.loads(dispatched)
+                            #     #st.write(dispatched)
+                            # except:
+                            #     pass
+                            # to_delete=[]            
+                            # try:
+                            #     for i in dispatched.keys():
+                            #         if not dispatched[i].keys():
+                            #             del dispatched[i]
                                     
-                                for k in to_delete:
-                                    dispatched.pop(k)
-                                    #st.write("deleted k")
+                            #     for k in to_delete:
+                            #         dispatched.pop(k)
+                            #         #st.write("deleted k")
                                
-                                json_data = json.dumps(dispatched)
-                                storage_client = storage.Client()
-                                bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"dispatched.json")
-                                blob.upload_from_string(json_data)
-                            except:
-                                pass
+                            #     json_data = json.dumps(dispatched)
+                            #     storage_client = storage.Client()
+                            #     bucket = storage_client.bucket(target_bucket)
+                            #     blob = bucket.blob(rf"dispatched.json")
+                            #     blob.upload_from_string(json_data)
+                            # except:
+                            #     pass
                             
                                 
                             
@@ -711,8 +705,6 @@ with Profiler():
                                             
                                 targets=[i for i in target if i in ["001","002","003","004","005"]] ####doing this cause we set jason path {downloadedfile[releaseorder] as target. i have to use one of the keys (release order number) that is in target list
                                 sales_orders_completed=[k for k in targets if target[k]['remaining']<=0]
-                                st.write(targets)
-                                st.write(sales_orders_completed)
                                 with rel_col1:
                                     
                                     st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
@@ -807,18 +799,14 @@ with Profiler():
                                 
                       
                                 
-                                hangisi=st.selectbox("**:green[SELECT SALES ORDER ITEM TO DISPATCH]**",([i for i in target if i not in sales_orders_completed and i not in ["destination","po_number"]]))
+                                hangisi=st.selectbox("**:green[SELECT SALES ORDER ITEM TO DISPATCH]**",([i for i in ["001","002","003","004","005"] if i not in sales_orders_completed]))
                                 dol1,dol2,dol3,dol4=st.columns([2,2,2,2])
                                 with dol1:
                                    
                                     if st.button("DISPATCH TO WAREHOUSE",key="lala"):
-                                       
-                                        
-                                        
-                                        dispatch=dispatched.copy()
                                         try:
                                             last=list(dispatch[requested_file].keys())[-1]
-                                            #dispatch[requested_file]={}
+                                         
                                             dispatch[requested_file][hangisi]={"vessel":vessel,"date":datetime.datetime.strftime(datetime.datetime.today()-datetime.timedelta(hours=7),"%b-%d-%Y"),
                                                         "time":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%H:%M:%S"),
                                                          "release_order":requested_file,"sales_order":hangisi,"destination":destination,"ocean_bill_of_lading":target[hangisi]["ocean_bill_of_lading"],"batch":target[hangisi]["batch"]}
@@ -835,30 +823,7 @@ with Profiler():
                                         blob = bucket.blob(rf"dispatched.json")
                                         blob.upload_from_string(json_data)
                                         st.markdown(f"**DISPATCHED Release Order Number {requested_file} Item No : {hangisi} to Warehouse**")
-                                with dol4:
-                                    
-                                    if st.button("DELETE SALES ORDER ITEM",key="lalag"):
-                                        
-                                        data_d=gcp_download("olym_suzano",rf"release_orders/{vessel}/{requested_file}.json")
-                                        to_edit_d=json.loads(data_d)
-                                        to_edit_d[vessel][requested_file].pop(hangisi)
-                                        #st.write(to_edit_d)
-                                        
-                                        json_data = json.dumps(to_edit_d)
-                                        storage_client = storage.Client()
-                                        bucket = storage_client.bucket(target_bucket)
-                                        blob = bucket.blob(rf"release_orders/{vessel}/{requested_file}.json")
-                                        blob.upload_from_string(json_data)
-                                    if st.button("DELETE RELEASE ORDER ITEM!",key="laladg"):
-                                        junk=gcp_download(target_bucket,rf"junk_release.json")
-                                        junk=json.loads(junk)
-                                       
-                                        junk[requested_file]=1
-                                        json_data = json.dumps(junk)
-                                        storage_client = storage.Client()
-                                        bucket = storage_client.bucket(target_bucket)
-                                        blob = bucket.blob(rf"junk_release.json")
-                                        blob.upload_from_string(json_data)
+                                
                                                
                                 with dol2:  
                                     if st.button("CLEAR DISPATCH QUEUE!"):
@@ -870,8 +835,7 @@ with Profiler():
                                         blob.upload_from_string(json_data)
                                         st.markdown(f"**CLEARED ALL DISPATCHES**")   
                                 with dol3:
-                                    dispatch=gcp_download(target_bucket,rf"dispatched.json")
-                                    dispatch=json.loads(dispatch)
+                                    
                                     try:
                                         item=st.selectbox("CHOOSE ITEM",dispatch.keys())
                                         if st.button("CLEAR DISPATCH ITEM"):                                       
@@ -886,16 +850,11 @@ with Profiler():
                                         pass
                                 st.markdown("**CURRENT DISPATCH QUEUE**")
                                 try:
-                                    dispatch=gcp_download(target_bucket,rf"dispatched.json")
-                                    dispatch=json.loads(dispatch)
-                                    try:
-                                        for dispatched_release in dispatch.keys():
-                                            #st.write(dispatched_release)
-                                            for sales in dispatch[dispatched_release].keys():
-                                                #st.write(sales)
-                                                st.markdown(f'**Release Order = {dispatched_release}, Sales Item : {sales}, Destination : {dispatch[dispatched_release][sales]["destination"]} .**')
-                                    except:
-                                        pass
+                                    for dispatched_release in dispatch.keys():
+                                        #st.write(dispatched_release)
+                                        for sales in dispatch[dispatched_release].keys():
+                                            #st.write(sales)
+                                            st.markdown(f'**Release Order = {dispatched_release}, Sales Item : {sales}, Destination : {dispatch[dispatched_release][sales]["destination"]} .**')
                                 except:
                                     st.write("NO DISPATCH ITEMS")
                             

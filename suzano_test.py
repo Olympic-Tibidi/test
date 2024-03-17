@@ -491,7 +491,7 @@ with Profiler():
                     #admin_bill_of_ladings=json.loads(bill_data)
                     admin_bill_of_ladings=pd.DataFrame.from_dict(admin_bill_of_ladings).T[1:]
                     admin_bill_of_ladings["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in admin_bill_of_ladings["issued"]]
-                    @st.cache_data
+                    
                     def convert_df(df):
                         # IMPORTANT: Cache the conversion to prevent computation on every rerun
                         return df.to_csv().encode('utf-8')

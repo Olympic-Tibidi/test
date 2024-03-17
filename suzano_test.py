@@ -2143,7 +2143,7 @@ if authentication_status:
                                             "Shipped":raw_ro[ro][sale]['shipped'],
                                             "Remaining":raw_ro[ro][sale]['remaining']}
                 status_frame=pd.DataFrame(status_dict).T.set_index("Release Order #",drop=True)
-                active_frame=status_frame[status_frame["remaining"]>0]
+                active_frame=status_frame[status_frame["Remaining"]>0]
                 status_frame.loc["Total"]=status_frame[["Total","Shipped","Remaining"]].sum
                 
                 st.dataframe(status_frame)

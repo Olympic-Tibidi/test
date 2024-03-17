@@ -2146,7 +2146,7 @@ if authentication_status:
                 active_frame=status_frame[status_frame["Remaining"]>0]
                 status_frame.loc["Total"]=status_frame[["Total","Shipped","Remaining"]].sum()
                 
-                st.dataframe(status_frame)
+                st.table(status_frame)
 
                 
                 release_orders = status_frame.index[:-1]

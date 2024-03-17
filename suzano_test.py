@@ -2143,19 +2143,21 @@ if authentication_status:
                                             "Shipped":raw_ro[ro][sale]['shipped'],
                                             "Remaining":raw_ro[ro][sale]['remaining']}
                 status_frame=pd.DataFrame(status_dict).T.set_index("Release Order #",drop=True)
-                status_frame.loc["Total"]=status_frame[["Total","Shipped","Remaining"]].sum()
+                active_frame=status_frame[status_frame["remaining"]>0]
+                status_frame.loc["Total"]=status_frame[["Total","Shipped","Remaining"]].sum
+                
                 st.dataframe(status_frame)
 
                 
                 release_orders = status_frame.index[:-1]
                 release_orders = pd.Categorical(release_orders)
-                
+                active_orders = active_frame.index
                
                 fig = go.Figure()
-                fig.add_trace(go.Bar(x=release_orders, y=status_frame["Total"][:-1], name='Total', marker_color='lightgray'))
-                fig.add_trace(go.Bar(x=release_orders, y=status_frame["Shipped"][:-1], name='Shipped', marker_color='blue', opacity=0.7))
+                fig.add_trace(go.Bar(x=release_orders, y=active_frame["Total"], name='Total', marker_color='lightgray'))
+                fig.add_trace(go.Bar(x=release_orders, y=active_frame["Shipped"], name='Shipped', marker_color='blue', opacity=0.7))
                 remaining_data = [remaining if remaining > 0 else None for remaining in status_frame["Remaining"][:-1]]
-                fig.add_trace(go.Scatter(x=release_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
+                fig.add_trace(go.Scatter(x=active_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
                 
                 #annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(release_orders, total_quantities, destinations)]
                 #fig.update_layout(annotations=annotations)

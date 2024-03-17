@@ -2166,9 +2166,10 @@ if authentication_status:
 
                 for i in range(len(active_orders)):
                     x_val = active_orders[i]
+                    print(x_val)
                     total_quantity = active_frame.loc[x_val, "Total"]
                     destination = raw_ro[x_val]['destination']
-                    annotation_text = f"{x_val}<br>{destination}"  # Customize the annotation text as needed
+                    annotation_text = f"{x_val}<br>{destination}" 
                     fig.add_annotation(x=x_val, y=total_quantity, text=annotation_text,
                                        showarrow=True, arrowhead=4, ax=0, ay=-30)
                 

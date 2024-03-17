@@ -594,7 +594,6 @@ with Profiler():
                             tonnage_add=2*quantity_add
                             shipped_add=0
                             remaining_add=st.number_input("Remaining # of Units", quantity_add,disabled=True)
-                            transport_type_add=st.radio("Select Transport Type",("TRUCK","RAIL"))
                             carrier_code_add=st.selectbox("Carrier Code",[f"{key}-{item}" for key,item in carrier_list.items()])            
                         
                         else:  ### If creating new release order

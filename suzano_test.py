@@ -2146,7 +2146,7 @@ if authentication_status:
                 active_frame=status_frame[status_frame["Remaining"]>0]
                 status_frame.loc["Total"]=status_frame[["Total","Shipped","Remaining"]].sum()
                 
-                st.table(status_frame)
+                st.markdown(status_frame.to_html(render_links=True),unsafe_allow_html=True)
 
                 
                 release_orders = status_frame.index[:-1]

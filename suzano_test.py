@@ -1070,25 +1070,20 @@ with Profiler():
             if select=="LOADOUT" :
             
     
-                    
+                map=gcp_download_new(target_bucket,rf"map.json")
+                release_order_database=gcp_download_new(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                dispatched=gcp_download_new(target_bucket,rf"dispatched.json")
+                carrier_list=map['carriers']
+                mill_info=map["mill_info"]
                 
-                bill_mapping=gcp_download(target_bucket,"bill_mapping.json")   ###### DOWNLOADS
-                bill_mapping=json.loads(bill_mapping)                    
-                mill_info_=gcp_download(target_bucket,rf"mill_info.json")   ###### DOWNLOADS
-                mill_info=json.loads(mill_info_)
-                mf_numbers_for_load=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")  ###### DOWNLOADS
-                mf_numbers_for_load=json.loads(mf_numbers_for_load)
+                bill_mapping=gcp_download_new(target_bucket,"bill_mapping.json")   ###### DOWNLOADS
+                mf_numbers_for_load=gcp_download_new(target_bucket,rf"release_orders/mf_numbers.json")  ###### DOWNLOADS
+               
                 no_dispatch=0
                 number=None
                 if number not in st.session_state:
                     st.session_state.number=number
-                try:
-                    dispatched=gcp_download(target_bucket,"dispatched.json")    ###### DOWNLOADS
-                    dispatched=json.loads(dispatched)
-                except:
-                    no_dispatch=1
-                    pass
-               
+                               
                 st.write(dispatched)
                 double_load=False
                 

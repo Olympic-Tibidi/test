@@ -234,7 +234,7 @@ def list_files_in_subfolder(bucket_name, folder_name):
     filenames = [blob.name.split('/')[-1] for blob in blobs]
 
     return filenames
-def store_release_order_data(data,release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,grade,dryness,carrier_code,unitized,total,remaining):
+def store_release_order_data(data,release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,grade,dryness,carrier_code,unitized,total):
        
     # Create a dictionary to store the release order data
     data[release_order_number]={
@@ -642,7 +642,7 @@ with Profiler():
                                 st.success(f"Edited release order {release_order_number} successfully!")
                                 
                             else:
-                                temp=store_release_order_data(release_order_database,release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,grade,dryness,carrier_code,unitized,quantity,remaining)
+                                temp=store_release_order_data(release_order_database,release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,grade,dryness,carrier_code,unitized,quantity)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")

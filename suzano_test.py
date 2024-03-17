@@ -553,191 +553,16 @@ with Profiler():
                     
                     mill_df=pd.DataFrame.from_dict(mill_info).T
 
-                  
-                    
-                    try:
-                        release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                        release_order_database=json.loads(release_order_database)
-                    except:
-                        release_order_database={}
-                    
-                  
+                          
                     release_order_tab1,release_order_tab2,release_order_tab3=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE","RELEASE ORDER STATUS"])
                     
-                    with release_order_tab3:  ### RELEASE ORDER STATUS
-                        maintenance=True
-                        if not maintenance:
-                            inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                            inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
-                            ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                            raw_ro = json.loads(ro)
-                            grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
-                            info=grouped_df.T.to_dict()
-                            for rel_ord in raw_ro:
-                                for sales in raw_ro[rel_ord]:
-                                    try:
-                                        found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
-                                        qt=info[found_key]['quantity']
-                                    except:
-                                        qt=0
-                                    info[rel_ord,sales,raw_ro[rel_ord][sales]['destination']]={'total':raw_ro[rel_ord][sales]['total'],
-                                                            'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}
-                                                        
-                            new=pd.DataFrame(info).T
-                            new=new.reset_index()
-                            #new.groupby('level_1')['remaining'].sum()
-                            new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
-                            new.index=[i for i in new.index]
-                            #new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
-                            new.index=[i+1 for i in new.index]
-                            new.loc["Total"]=new[["Total","Shipped","Remaining"]].sum()
-                            release_orders = [str(key[0]) for key in info.keys()]
-                            release_orders=[str(i) for i in release_orders]
-                            release_orders = pd.Categorical(release_orders)
-                            
-                            total_quantities = [item['total'] for item in info.values()]
-                            shipped_quantities = [item['shipped'] for item in info.values()]
-                            remaining_quantities = [item['remaining'] for item in info.values()]
-                            destinations = [key[2] for key in info.keys()]
-                            # Calculate the percentage of shipped quantities
-                            #percentage_shipped = [shipped / total * 100 for shipped, total in zip(shipped_quantities, total_quantities)]
-                            
-                            # Create a Plotly bar chart
-                            fig = go.Figure()
-                            
-                            # Add bars for total quantities
-                            fig.add_trace(go.Bar(x=release_orders, y=total_quantities, name='Total', marker_color='lightgray'))
-                            
-                            # Add filled bars for shipped quantities
-                            fig.add_trace(go.Bar(x=release_orders, y=shipped_quantities, name='Shipped', marker_color='blue', opacity=0.7))
-                            
-                            # Add remaining quantities as separate scatter points
-                            #fig.add_trace(go.Scatter(x=release_orders, y=remaining_quantities, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
-                            
-                            remaining_data = [remaining if remaining > 0 else None for remaining in remaining_quantities]
-                            fig.add_trace(go.Scatter(x=release_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
-                            
-                            # Add destinations as annotations
-                            annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(release_orders, total_quantities, destinations)]
-                            #fig.update_layout(annotations=annotations)
-                            
-                            # Update layout
-                            fig.update_layout(title='Shipment Status',
-                                              xaxis_title='Release Orders',
-                                              yaxis_title='Quantities',
-                                              barmode='overlay',
-                                              xaxis=dict(tickangle=-90, type='category'))
-                            relcol1,relcol2=st.columns([5,5])
-                            with relcol1:
-                                st.dataframe(new)
-                            with relcol2:
-                                st.plotly_chart(fig)
-                            
-                            temp_dict={}
-                            for rel_ord in raw_ro:
-                                
-                                
-                                for sales in raw_ro[rel_ord]:
-                                    temp_dict[rel_ord,sales]={}
-                                    dest=raw_ro[rel_ord][sales]['destination']
-                                    vessel=raw_ro[rel_ord][sales]['vessel']
-                                    total=raw_ro[rel_ord][sales]['total']
-                                    remaining=raw_ro[rel_ord][sales]['remaining']
-                                    temp_dict[rel_ord,sales]={'destination': dest,'vessel': vessel,'total':total,'remaining':remaining}
-                            temp_df=pd.DataFrame(temp_dict).T
-                          
-                            temp_df= temp_df.rename_axis(['release_order','sales_order'], axis=0)
-                        
-                            temp_df['First Shipment'] = temp_df.index.map(inv_bill_of_ladings.groupby(['release_order','sales_order'])['issued'].first())
-                            
-                            for i in temp_df.index:
-                                if temp_df.loc[i,'remaining']<=2:
-                                    try:
-                                        temp_df.loc[i,"Last Shipment"]=inv_bill_of_ladings.groupby(['release_order','sales_order']).issued.last().loc[i]
-                                    except:
-                                        temp_df.loc[i,"Last Shipment"]=datetime.datetime.now()
-                                    temp_df.loc[i,"Duration"]=(pd.to_datetime(temp_df.loc[i,"Last Shipment"])-pd.to_datetime(temp_df.loc[i,"First Shipment"])).days+1
-                            
-                            temp_df['First Shipment'] = temp_df['First Shipment'].fillna(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S'))
-                            temp_df['Last Shipment'] = temp_df['Last Shipment'].fillna(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S'))
-                            
-                            ####
-                            
-                            def business_days(start_date, end_date):
-                                return pd.date_range(start=start_date, end=end_date, freq=BDay())
-                            temp_df['# of Shipment Days'] = temp_df.apply(lambda row: len(business_days(row['First Shipment'], row['Last Shipment'])), axis=1)
-                            df_temp=inv_bill_of_ladings.copy()
-                            df_temp["issued"]=[pd.to_datetime(i).date() for i in df_temp["issued"]]
-                            for i in temp_df.index:
-                                try:
-                                    temp_df.loc[i,"Utilized Shipment Days"]=df_temp.groupby(["release_order",'sales_order'])[["issued"]].nunique().loc[i,'issued']
-                                except:
-                                    temp_df.loc[i,"Utilized Shipment Days"]=0
-                            
-                            temp_df['First Shipment'] = temp_df['First Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y'))
-                            temp_df['Last Shipment'] = temp_df['Last Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y') if type(x)==str else None)
-                            liste=['Duration','# of Shipment Days',"Utilized Shipment Days"]
-                            for col in liste:
-                                temp_df[col] = temp_df[col].apply(lambda x: f" {int(x)} days" if not pd.isna(x) else np.nan)
-                            temp_df['remaining'] = temp_df['remaining'].apply(lambda x: int(x))
-                            temp_df.columns=['Destination', 'Vessel', 'Total Units', 'Remaining Units', 'First Shipment',
-                                   'Last Shipment', 'Duration', '# of Calendar Shipment Days',
-                                   'Utilized Calendar Shipment Days']
-                            st.dataframe(temp_df)
-                            a=df_temp.groupby(["issued"])[['quantity']].sum()
-                            a.index=pd.to_datetime(a.index)
-                            labor=gcp_download(target_bucket,rf"trucks.json")
-                            labor = json.loads(labor)
-                            
-                            labor=pd.DataFrame(labor).T
-                            labor.index=pd.to_datetime(labor.index)
-                            for index in a.index:
-                                try:
-                                    a.loc[index,'cost']=labor.loc[index,'cost']
-                                except:
-                                    pass
-                            a['quantity']=2*a['quantity']
-                            a['Per_Ton']=a['cost']/a['quantity']
-                            trucks=df_temp.groupby(["issued"])[['vehicle']].count().vehicle.values
-                            a.insert(0,'trucks',trucks)
-                            a['Per_Ton']=round(a['Per_Ton'],1)
-                            w=a.copy()
-                            m=a.copy()
-                            cost_choice=st.radio("Select Daily/Weekly/Monthly Cost Analysis",["DAILY","WEEKLY","MONTHLY"])
-                            if cost_choice=="DAILY":
-                                a['Per_Ton']=["${:.2f}".format(number) for number in a['Per_Ton']]
-                                a['cost']=["${:.2f}".format(number) for number in a['cost']]
-                                a.index=[i.date() for i in a.index]
-                                a= a.rename_axis('Day', axis=0)
-                                a.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
-                                st.dataframe(a)
-                            if cost_choice=="WEEKLY":
-                                w.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
-                                weekly=w.dropna()
-                                weekly=weekly.resample('W').sum()
-                                weekly['Cost Per Ton']=round(weekly['Total Cost']/weekly['Tons Shipped'],1)
-                                weekly['Cost Per Ton']=["${:.2f}".format(number) for number in weekly['Cost Per Ton']]
-                                weekly['Total Cost']=["${:.2f}".format(number) for number in weekly['Total Cost']]
-                                weekly.index=[i.date() for i in weekly.index]
-                                weekly= weekly.rename_axis('Week', axis=0)
-                                st.dataframe(weekly)
-                            if cost_choice=="MONTHLY":
-                                m.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
-                                monthly=m.dropna()
-                                monthly=monthly.resample('M').sum()
-                                monthly['Cost Per Ton']=round(monthly['Total Cost']/monthly['Tons Shipped'],1)
-                                monthly['Cost Per Ton']=["${:.2f}".format(number) for number in monthly['Cost Per Ton']]
-                                monthly['Total Cost']=["${:.2f}".format(number) for number in monthly['Total Cost']]
-                                monthly.index=[calendar.month_abbr[k] for k in [i.month for i in monthly.index]]
-                                monthly= monthly.rename_axis('Month', axis=0)
-                                st.dataframe(monthly)
+                    
                             
                     with release_order_tab1:   ###CREATE RELEASE ORDER
                        
                         add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER",disabled=False)
                         edit=st.checkbox("CHECK TO EDIT EXISTING RELEASE ORDER")
-                        #batch_mapping=gcp_download(target_bucket,rf"batch_mapping.json")
-                        #batch_mapping=json.loads(batch_mapping)
+                       
                         batch_mapping=map['batch_mapping']
                         if edit:
                             
@@ -777,6 +602,7 @@ with Profiler():
                             remaining_add=st.number_input("Remaining # of Units", quantity_add,disabled=True)
                             transport_type_add=st.radio("Select Transport Type",("TRUCK","RAIL"))
                             carrier_code_add=st.selectbox("Carrier Code",[f"{key}-{item}" for key,item in carrier_list.items()])            
+                        
                         else:  ### If creating new release order
                             
                             release_order_number=st.text_input("Release Order Number")
@@ -787,85 +613,43 @@ with Profiler():
                             sales_order_item=st.text_input("Sales Order Item")  
                             vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142","LYSEFJORD-2308"],key="tre")
                             ocean_bill_of_lading=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel].keys())   #######
-                            wrap=st.text_input("Grade",batch_mapping[vessel][ocean_bill_of_lading]["grade"],disabled=True)   ##### batch mapping injection
+                            grade=st.text_input("Grade",batch_mapping[vessel][ocean_bill_of_lading]["grade"],disabled=True)   ##### batch mapping injection
                             batch=st.text_input("Batch No",batch_mapping[vessel][ocean_bill_of_lading]["batch"],disabled=True)   #####
                             dryness=st.text_input("Dryness",batch_mapping[vessel][ocean_bill_of_lading]["dryness"],disabled=True)   #####
                             admt=st.text_input("ADMT PER UNIT",round(float(batch_mapping[vessel][ocean_bill_of_lading]["dryness"])/90,6),disabled=True)  #####
                             unitized=st.selectbox("UNITIZED/DE-UNITIZED",["UNITIZED","DE-UNITIZED"],disabled=False)
                             quantity=st.number_input("Quantity of Units", min_value=1, max_value=5000, value=1, step=1,  key=None, help=None, on_change=None, disabled=False, label_visibility="visible")
                             tonnage=2*quantity
-                            #queue=st.number_input("Place in Queue", min_value=1, max_value=20, value=1, step=1,  key=None, help=None, on_change=None, disabled=False, label_visibility="visible")
-                            transport_type=st.radio("Select Transport Type",("TRUCK","RAIL"))
                             carrier_code=st.selectbox("Carrier Code",[f"{key}-{item}" for key,item in carrier_list.items()])            
-                        
-            
+                   
                         create_release_order=st.button("SUBMIT")
+                        
                         if create_release_order:
                             
                             if add: 
-                                data=gcp_download(target_bucket,rf"release_orders/ORDERS/{release_order_number}.json")
-                                to_edit=json.loads(data)
-                                temp=add_release_order_data(to_add,release_order_number,destination_add,po_number_add,sales_order_item_add,vessel_add,batch_add,ocean_bill_of_lading_add,wrap_add,dryness_add,unitized_add,quantity_add,tonnage_add,transport_type_add,carrier_code_add)
+                                temp=add_release_order_data(release_order_database,release_order_number,destination_add,po_number_add,sales_order_item_add,vessel_add,batch_add,ocean_bill_of_lading_add,grade_add,dryness_add,carrier_code_add,unitized_add,total_add,shipped_add,remaining_add)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"release_orders/ORDERS/{release_order_number}.json")
+                                blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                                 blob.upload_from_string(temp)
                                 st.success(f"ADDED sales order item {sales_order_item_add} to release order {release_order_number}!")
                             elif edit:
-                                data=gcp_download(target_bucket,rf"release_orders/ORDERS/{release_order_number}.json")
-                                to_edit=json.loads(data)
-                                temp=edit_release_order_data(to_edit,sales_order_item_edit,quantity_edit,tonnage_edit,shipped_edit,remaining_edit,carrier_code_edit)
+                                temp=edit_release_order_data(release_order_database,release_order_number,destination_edit,po_number_edit,sales_order_item_edit,vessel_edit,batch_edit,ocean_bill_of_lading_edit,grade_edit,dryness_edit,carrier_code_edit,unitized_edit,total_edit,shipped_edit,remaining_edit)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"release_orders/ORDERS/{release_order_number}.json")
+                                blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                                 blob.upload_from_string(temp)
                                 st.success(f"Edited release order {release_order_number} successfully!")
                                 
                             else:
-                                
-                                temp=store_release_order_data(release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,wrap,dryness,unitized,quantity,tonnage,transport_type,carrier_code)
+                                temp=store_release_order_data(release_order_database,release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,grade,dryness,carrier_code,unitized,total,remaining)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"release_orders/ORDERS/{release_order_number}.json")
+                                blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                                 blob.upload_from_string(temp)
                                 st.success(f"Created release order {release_order_number} successfully!")
                             
-                            try:
-                                junk=gcp_download(target_bucket,rf"release_orders/{vessel}/junk_release.json")
-                            except:
-                                junk=gcp_download(target_bucket,rf"junk_release.json")
-                            junk=json.loads(junk)
-                            try:
-                                del junk[release_order_number]
-                                jason_data=json.dumps(junk)
-                                storage_client = storage.Client()
-                                bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"junk_release.json")
-                                blob.upload_from_string(jason_data)
-                            except:
-                                pass
-                            
-    
-                            
-    
-                            if edit:
-                                release_order_database[release_order_number][sales_order_item_edit]={"destination":destination_edit,"vessel":vessel_edit,"total":quantity_edit,"remaining":remaining_edit}
-                            elif add:
-                                if sales_order_item_add not in release_order_database[release_order_number]:
-                                    release_order_database[release_order_number][sales_order_item_add]={}
-                                    release_order_database[release_order_number][sales_order_item_add]={"destination":destination_add,"vessel":vessel_add,"total":quantity_add,"remaining":quantity_add}
-                            else:
-                                release_order_database[release_order_number]={}
-                                release_order_database[release_order_number][sales_order_item]={}
-                                
-                                release_order_database[release_order_number][sales_order_item]={"destination":destination,"vessel":vessel,"total":quantity,"remaining":quantity}
-                                st.write(f"Updated Release Order Database")
-                            
-                            release_orders_json=json.dumps(release_order_database)
-                            storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
-                            blob.upload_from_string(release_orders_json)
+                 
                             
                     with release_order_tab2:  ##   RELEASE ORDER DATABASE ##
                         
@@ -1242,6 +1026,173 @@ with Profiler():
                                         blob = bucket.blob(rf"release_orders/mf_numbers.json")
                                         blob.upload_from_string(mf_data)
                                     st.write(mf_numbers)
+                    with release_order_tab3:  ### RELEASE ORDER STATUS
+                        maintenance=True
+                        if not maintenance:
+                            inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                            inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
+                            ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                            raw_ro = json.loads(ro)
+                            grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
+                            info=grouped_df.T.to_dict()
+                            for rel_ord in raw_ro:
+                                for sales in raw_ro[rel_ord]:
+                                    try:
+                                        found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
+                                        qt=info[found_key]['quantity']
+                                    except:
+                                        qt=0
+                                    info[rel_ord,sales,raw_ro[rel_ord][sales]['destination']]={'total':raw_ro[rel_ord][sales]['total'],
+                                                            'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}
+                                                        
+                            new=pd.DataFrame(info).T
+                            new=new.reset_index()
+                            #new.groupby('level_1')['remaining'].sum()
+                            new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
+                            new.index=[i for i in new.index]
+                            #new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
+                            new.index=[i+1 for i in new.index]
+                            new.loc["Total"]=new[["Total","Shipped","Remaining"]].sum()
+                            release_orders = [str(key[0]) for key in info.keys()]
+                            release_orders=[str(i) for i in release_orders]
+                            release_orders = pd.Categorical(release_orders)
+                            
+                            total_quantities = [item['total'] for item in info.values()]
+                            shipped_quantities = [item['shipped'] for item in info.values()]
+                            remaining_quantities = [item['remaining'] for item in info.values()]
+                            destinations = [key[2] for key in info.keys()]
+                            # Calculate the percentage of shipped quantities
+                            #percentage_shipped = [shipped / total * 100 for shipped, total in zip(shipped_quantities, total_quantities)]
+                            
+                            # Create a Plotly bar chart
+                            fig = go.Figure()
+                            
+                            # Add bars for total quantities
+                            fig.add_trace(go.Bar(x=release_orders, y=total_quantities, name='Total', marker_color='lightgray'))
+                            
+                            # Add filled bars for shipped quantities
+                            fig.add_trace(go.Bar(x=release_orders, y=shipped_quantities, name='Shipped', marker_color='blue', opacity=0.7))
+                            
+                            # Add remaining quantities as separate scatter points
+                            #fig.add_trace(go.Scatter(x=release_orders, y=remaining_quantities, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
+                            
+                            remaining_data = [remaining if remaining > 0 else None for remaining in remaining_quantities]
+                            fig.add_trace(go.Scatter(x=release_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
+                            
+                            # Add destinations as annotations
+                            annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(release_orders, total_quantities, destinations)]
+                            #fig.update_layout(annotations=annotations)
+                            
+                            # Update layout
+                            fig.update_layout(title='Shipment Status',
+                                              xaxis_title='Release Orders',
+                                              yaxis_title='Quantities',
+                                              barmode='overlay',
+                                              xaxis=dict(tickangle=-90, type='category'))
+                            relcol1,relcol2=st.columns([5,5])
+                            with relcol1:
+                                st.dataframe(new)
+                            with relcol2:
+                                st.plotly_chart(fig)
+                            
+                            temp_dict={}
+                            for rel_ord in raw_ro:
+                                
+                                
+                                for sales in raw_ro[rel_ord]:
+                                    temp_dict[rel_ord,sales]={}
+                                    dest=raw_ro[rel_ord][sales]['destination']
+                                    vessel=raw_ro[rel_ord][sales]['vessel']
+                                    total=raw_ro[rel_ord][sales]['total']
+                                    remaining=raw_ro[rel_ord][sales]['remaining']
+                                    temp_dict[rel_ord,sales]={'destination': dest,'vessel': vessel,'total':total,'remaining':remaining}
+                            temp_df=pd.DataFrame(temp_dict).T
+                          
+                            temp_df= temp_df.rename_axis(['release_order','sales_order'], axis=0)
+                        
+                            temp_df['First Shipment'] = temp_df.index.map(inv_bill_of_ladings.groupby(['release_order','sales_order'])['issued'].first())
+                            
+                            for i in temp_df.index:
+                                if temp_df.loc[i,'remaining']<=2:
+                                    try:
+                                        temp_df.loc[i,"Last Shipment"]=inv_bill_of_ladings.groupby(['release_order','sales_order']).issued.last().loc[i]
+                                    except:
+                                        temp_df.loc[i,"Last Shipment"]=datetime.datetime.now()
+                                    temp_df.loc[i,"Duration"]=(pd.to_datetime(temp_df.loc[i,"Last Shipment"])-pd.to_datetime(temp_df.loc[i,"First Shipment"])).days+1
+                            
+                            temp_df['First Shipment'] = temp_df['First Shipment'].fillna(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S'))
+                            temp_df['Last Shipment'] = temp_df['Last Shipment'].fillna(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S'))
+                            
+                            ####
+                            
+                            def business_days(start_date, end_date):
+                                return pd.date_range(start=start_date, end=end_date, freq=BDay())
+                            temp_df['# of Shipment Days'] = temp_df.apply(lambda row: len(business_days(row['First Shipment'], row['Last Shipment'])), axis=1)
+                            df_temp=inv_bill_of_ladings.copy()
+                            df_temp["issued"]=[pd.to_datetime(i).date() for i in df_temp["issued"]]
+                            for i in temp_df.index:
+                                try:
+                                    temp_df.loc[i,"Utilized Shipment Days"]=df_temp.groupby(["release_order",'sales_order'])[["issued"]].nunique().loc[i,'issued']
+                                except:
+                                    temp_df.loc[i,"Utilized Shipment Days"]=0
+                            
+                            temp_df['First Shipment'] = temp_df['First Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y'))
+                            temp_df['Last Shipment'] = temp_df['Last Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y') if type(x)==str else None)
+                            liste=['Duration','# of Shipment Days',"Utilized Shipment Days"]
+                            for col in liste:
+                                temp_df[col] = temp_df[col].apply(lambda x: f" {int(x)} days" if not pd.isna(x) else np.nan)
+                            temp_df['remaining'] = temp_df['remaining'].apply(lambda x: int(x))
+                            temp_df.columns=['Destination', 'Vessel', 'Total Units', 'Remaining Units', 'First Shipment',
+                                   'Last Shipment', 'Duration', '# of Calendar Shipment Days',
+                                   'Utilized Calendar Shipment Days']
+                            st.dataframe(temp_df)
+                            a=df_temp.groupby(["issued"])[['quantity']].sum()
+                            a.index=pd.to_datetime(a.index)
+                            labor=gcp_download(target_bucket,rf"trucks.json")
+                            labor = json.loads(labor)
+                            
+                            labor=pd.DataFrame(labor).T
+                            labor.index=pd.to_datetime(labor.index)
+                            for index in a.index:
+                                try:
+                                    a.loc[index,'cost']=labor.loc[index,'cost']
+                                except:
+                                    pass
+                            a['quantity']=2*a['quantity']
+                            a['Per_Ton']=a['cost']/a['quantity']
+                            trucks=df_temp.groupby(["issued"])[['vehicle']].count().vehicle.values
+                            a.insert(0,'trucks',trucks)
+                            a['Per_Ton']=round(a['Per_Ton'],1)
+                            w=a.copy()
+                            m=a.copy()
+                            cost_choice=st.radio("Select Daily/Weekly/Monthly Cost Analysis",["DAILY","WEEKLY","MONTHLY"])
+                            if cost_choice=="DAILY":
+                                a['Per_Ton']=["${:.2f}".format(number) for number in a['Per_Ton']]
+                                a['cost']=["${:.2f}".format(number) for number in a['cost']]
+                                a.index=[i.date() for i in a.index]
+                                a= a.rename_axis('Day', axis=0)
+                                a.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
+                                st.dataframe(a)
+                            if cost_choice=="WEEKLY":
+                                w.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
+                                weekly=w.dropna()
+                                weekly=weekly.resample('W').sum()
+                                weekly['Cost Per Ton']=round(weekly['Total Cost']/weekly['Tons Shipped'],1)
+                                weekly['Cost Per Ton']=["${:.2f}".format(number) for number in weekly['Cost Per Ton']]
+                                weekly['Total Cost']=["${:.2f}".format(number) for number in weekly['Total Cost']]
+                                weekly.index=[i.date() for i in weekly.index]
+                                weekly= weekly.rename_axis('Week', axis=0)
+                                st.dataframe(weekly)
+                            if cost_choice=="MONTHLY":
+                                m.columns=["# of Trucks","Tons Shipped","Total Cost","Cost Per Ton"]
+                                monthly=m.dropna()
+                                monthly=monthly.resample('M').sum()
+                                monthly['Cost Per Ton']=round(monthly['Total Cost']/monthly['Tons Shipped'],1)
+                                monthly['Cost Per Ton']=["${:.2f}".format(number) for number in monthly['Cost Per Ton']]
+                                monthly['Total Cost']=["${:.2f}".format(number) for number in monthly['Total Cost']]
+                                monthly.index=[calendar.month_abbr[k] for k in [i.month for i in monthly.index]]
+                                monthly= monthly.rename_axis('Month', axis=0)
+                                st.dataframe(monthly)
                             else:
                                 #st.write("NO RELEASE ORDER FOR THIS VESSEL IN DATABASE")
                                 pass

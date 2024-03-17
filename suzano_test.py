@@ -1512,7 +1512,7 @@ with Profiler():
                                                     blob = bucket.blob(rf"bill_mapping.json")
                                                     blob.upload_from_string(updated_bill)
     
-                                                    alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
+                                                    alien_units=gcp_download_new(target_bucket,rf"alien_units.json")
                                                     alien_units[vessel][x]={}
                                                     alien_units[vessel][x]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
                                                                             "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S")}
@@ -1635,11 +1635,9 @@ with Profiler():
                         
                         
                     
-                    load_bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json") ###### DOWNLOADS
-                    load_admin_bill_of_ladings=json.loads(load_bill_data)
-                    load_admin_bill_of_ladings=pd.DataFrame.from_dict(load_admin_bill_of_ladings).T[1:]
-                    load_admin_bill_of_ladings=load_admin_bill_of_ladings.sort_values(by="issued")
-                    last_submitted=load_admin_bill_of_ladings.index[-3:].to_list()
+                    liste=[(i,datetime.datetime.strptime(bill_of_ladings[i]['issued'],"%Y-%m-%d %H:%M:%S")) for i in bill_of_ladings if i!="11502400"]
+                    liste.sort(key=lambda a: a[1])
+                    last_submitted=[i[0] for i in liste[-3:]]
                     last_submitted.reverse()
                     st.markdown(f"**Last Submitted Bill Of Ladings (From most recent) : {last_submitted}**")
     

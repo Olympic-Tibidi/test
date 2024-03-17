@@ -525,19 +525,18 @@ with Profiler():
                     edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
                     requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
                     data=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}"),
-                    try:
+                    
                        
-                        st.text_area("EDI",requested_edi,height=400)                                
-                       
-                        st.download_button(
-                            label="DOWNLOAD EDI",
-                            data=data,
-                            file_name=f'{requested_edi_file}',
-                            mime='text/csv')
+                    st.text_area("EDI",requested_edi,height=400)                                
+                   
+                    st.download_button(
+                        label="DOWNLOAD EDI",
+                        data=data,
+                        file_name=f'{requested_edi_file}',
+                        mime='text/csv')
     
-                    except:
-                        st.write("NO EDI FILES IN DIRECTORY")
-                                                                                     
+                  
+                      
                 
                                 
     

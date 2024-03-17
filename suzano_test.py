@@ -1137,7 +1137,7 @@ with Profiler():
                         wrap=release_order_database[current_release_order][current_sales_order]["grade"]
                         ocean_bill_of_=release_order_database[current_release_order][current_sales_order]["ocean_bill_of_lading"]
                         unitized=release_order_database[current_release_order][current_sales_order]["unitized"]
-                        quant_=release_order_database[current_release_order][current_sales_order]["quantity"]
+                        quant_=release_order_database[current_release_order][current_sales_order]["total"]
                         real_quant=int(math.floor(quant_))
                         ship_=release_order_database[current_release_order][current_sales_order]["shipped"]
                         ship_bale=(ship_-math.floor(ship_))*8

@@ -1640,8 +1640,6 @@ with Profiler():
                     last_submitted=[i[0] for i in liste[-3:]]
                     last_submitted.reverse()
                     st.markdown(f"**Last Submitted Bill Of Ladings (From most recent) : {last_submitted}**")
-    
-                    
                     
                     
                     
@@ -1672,11 +1670,9 @@ with Profiler():
                                 st.write(error)
                             if proceed:
                                 carrier_code=carrier_code.split("-")[0]
-                                try:
-                                    suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
-                                    suzano_report=json.loads(suzano_report_)
-                                except:
-                                    suzano_report={}
+                                
+                                suzano_report=gcp_download_new(target_bucket,rf"suzano_report.json")
+
                                 consignee=destination.split("-")[0]
                                 consignee_city=mill_info[destination]["city"]
                                 consignee_state=mill_info[destination]["state"]
@@ -1755,9 +1751,9 @@ with Profiler():
                                     info[next_release_order][next_sales_order]["shipped"]=info[next_release_order][next_sales_order]["shipped"]+len(second_textsplit)
                                     info[next_release_order][next_sales_order]["remaining"]=info[next_release_order][next_sales_order]["remaining"]-len(second_textsplit)
                                 else:
-                                    info[current_release_order][current_sales_order]["shipped"]=info[current_release_order][current_sales_order]["shipped"]+quantity
-                                    info[current_release_order][current_sales_order]["remaining"]=info[current_release_order][current_sales_order]["remaining"]-quantity
-                                if info[current_release_order][current_sales_order]["remaining"]<=0:
+                                    release_order_database[current_release_order][current_sales_order]["shipped"]=release_order_database[current_release_order][current_sales_order]["shipped"]+quantity
+                                    release_order_database[current_release_order][current_sales_order]["remaining"]=release_order_database[current_release_order][current_sales_order]["remaining"]-quantity
+                                if release_order_database[current_release_order][current_sales_order]["remaining"]<=0:
                                     to_delete=[]
                                     for release in dispatched.keys():
                                         if release==current_release_order:
@@ -1775,27 +1771,16 @@ with Profiler():
                                     blob = bucket.blob(rf"dispatched.json")
                                     blob.upload_from_string(json_data)       
                                 
-                                json_data = json.dumps(info)
+                                json_data = json.dumps(release_order_database)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"release_orders/ORDERS/{current_release_order}.json")
+                                blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                                 blob.upload_from_string(json_data)
                                 success_container2=st.empty()
                                 time.sleep(0.1)                            
                                 success_container2.success(f"Updated Release Order {current_release_order}",icon="✅")
         
-                                try:
-                                    release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                                    release_order_database=json.loads(release_order_database)
-                                except:
-                                    release_order_database={}
-                               
-                                release_order_database[current_release_order][current_sales_order]["remaining"]=release_order_database[current_release_order][current_sales_order]["remaining"]-quantity
-                                release_order_database=json.dumps(release_order_database)
-                                storage_client = storage.Client()
-                                bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
-                                blob.upload_from_string(release_order_database)
+                              
                                 success_container3=st.empty()
                                 time.sleep(0.1)                            
                                 success_container3.success(f"Updated Release Order Database",icon="✅")

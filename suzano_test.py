@@ -2167,7 +2167,7 @@ if authentication_status:
                 # fig.add_annotation(x="3172296", y=800, text="destination",
                 #                        showarrow=True, arrowhead=4, ax=0, ay=-30)
                 
-                fig.update_layout(title='Shipment Status',
+                fig.update_layout(title='ACTIVE RELEASE ORDERS',
                                   xaxis_title='Release Orders',
                                   yaxis_title='Quantities',
                                   barmode='overlay',

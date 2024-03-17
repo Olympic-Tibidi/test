@@ -1078,7 +1078,9 @@ with Profiler():
                 
                 bill_mapping=gcp_download_new(target_bucket,"bill_mapping.json")   ###### DOWNLOADS
                 mf_numbers_for_load=gcp_download_new(target_bucket,rf"release_orders/mf_numbers.json")  ###### DOWNLOADS
-               
+
+                bill_of_ladings=gcp_download_new(target_bucket,rf"terminal_bill_of_ladings.json")   ###### DOWNLOADS
+                
                 no_dispatch=0
                
                 number=None  
@@ -1099,9 +1101,9 @@ with Profiler():
                                 pass
                     if 'work_order_' not in st.session_state:
                         st.session_state.work_order_ = None
-                    st.write(menu_destinations)
+                        
                     liste=[f"{i} to {menu_destinations[i]}" for i in menu_destinations.keys()]
-                    #st.write(liste)
+                
                     work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=0 if st.session_state.work_order_ else 0) 
                     st.session_state.work_order_=work_order_
                     work_order=work_order_.split(" ")[0]
@@ -1122,8 +1124,8 @@ with Profiler():
                     except:
                         
                         pass
-                    info=gcp_download(target_bucket,rf"release_orders/ORDERS/{work_order}.json")     ###### DOWNLOADS
-                    info=json.loads(info)
+                    
+
                     
                     vessel=info[current_release_order][current_sales_order]["vessel"]
                 
@@ -1161,7 +1163,7 @@ with Profiler():
                         with sub_load_col2:
                             st.markdown(rf'**Ocean B/L: {ocean_bill_of_}**')
                             st.markdown(rf'**Type : {wrap_dict[wrap]}**')
-                            st.markdown(rf'**Prep": {unitized}**')
+                            st.markdown(rf'**Prep : {unitized}**')
                             #st.write (pd.DataFrame(temp2.items(),columns=["Inquiry","Data"]).to_html (escape=False, index=False), unsafe_allow_html=True)
                        
                             
@@ -1173,7 +1175,7 @@ with Profiler():
         
                             st.markdown(rf'**Total Units : {quant_}**')
                             st.markdown(rf'**Shipped Units : {ship_}**')
-                            st.markdown(rf'**Remaining Units": {remaining}**')
+                            st.markdown(rf'**Remaining Units : {remaining}**')
                         with sub_load_col4:
                             
                         
@@ -1181,7 +1183,7 @@ with Profiler():
                             
                             st.markdown(rf'**Total Tonnage : {quant_*2}**')
                             st.markdown(rf'**Shipped Tonnage : {ship_*2}**')
-                            st.markdown(rf'**Remaining Tonnage": {remaining*2}**')
+                            st.markdown(rf'**Remaining Tonnage : {remaining*2}**')
                     
                     with load_col2:
                         if double_load:
@@ -1201,26 +1203,23 @@ with Profiler():
                     yes=False
                   
                     release_order_number=current_release_order
-                    if info[current_release_order][current_sales_order]["transport_type"]=="TRUCK":
-                        medium="TRUCK"
-                    else:
-                        medium="RAIL"
+                    medium="TRUCK"
                     
                     with col1:
                     ######################  LETS GET RID OF INPUT BOXES TO SIMPLIFY LONGSHORE SCREEN
-                        #terminal_code=st.text_input("Terminal Code","OLYM",disabled=True)
+               
                         terminal_code="OLYM"
-                        #file_date=st.date_input("File Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="file_dates",disabled=True)
+                        
                         file_date=datetime.datetime.today()-datetime.timedelta(hours=utc_difference)
                         if file_date not in st.session_state:
                             st.session_state.file_date=file_date
                         file_time = st.time_input('FileTime', datetime.datetime.now()-datetime.timedelta(hours=utc_difference),step=60,disabled=False)
-                       #delivery_date=st.date_input("Delivery Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="delivery_date",disabled=True,visible=False)
+                      
                         delivery_date=datetime.datetime.today()-datetime.timedelta(hours=utc_difference)
-                       #eta_date=st.date_input("ETA Date (For Trucks same as delivery date)",delivery_date,key="eta_date",disabled=True)
                         eta_date=delivery_date
-                        carrier_code=info[current_release_order][current_sales_order]["carrier_code"]
-                        vessel=info[current_release_order][current_sales_order]["vessel"]
+                        
+                        carrier_code=release_order_database[current_release_order][current_sales_order]["carrier_code"]
+                        vessel=release_order_database[current_release_order][current_sales_order]["vessel"]
                         transport_sequential_number="TRUCK"
                         transport_type="TRUCK"
                         placeholder = st.empty()
@@ -1230,10 +1229,10 @@ with Profiler():
                             mf=True
                             load_mf_number_issued=False
                             if destination=="CLEARWATER-Lewiston,ID":
-                                carrier_code=st.selectbox("Carrier Code",[info[current_release_order][current_sales_order]["carrier_code"],"310897-Ashley"],disabled=False,key=29)
+                                carrier_code=st.selectbox("Carrier Code",[carrier_code,"310897-Ashley"],disabled=False,key=29)
                             else:
-                                carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=9)
-                            if carrier_code=="123456-KBX":
+                                carrier_code=st.text_input("Carrier Code",carrier_code,disabled=True,key=9)
+                            if destination in ["GP-Halsey,OR","GP-Clatskanie,OR"] and carrier_code=="123456-KBX" :
                                 if 'load_mf_number' not in st.session_state:
                                     st.session_state.load_mf_number = None
                                 if release_order_number in mf_numbers_for_load.keys():
@@ -1313,17 +1312,13 @@ with Profiler():
                             #terminal_bill_of_lading=st.text_input("Terminal Bill of Lading",disabled=False)
                             pass
                         else:
-                            #release_order_number=st.text_input("Release Order Number",current_release_order,disabled=True,help="Release Order Number without the Item no")
                             release_order_number=current_release_order
-                            #sales_order_item=st.text_input("Sales Order Item (Material Code)",current_sales_order,disabled=True)
                             sales_order_item=current_sales_order
-                            #ocean_bill_of_lading=st.text_input("Ocean Bill Of Lading",info[current_release_order][current_sales_order]["ocean_bill_of_lading"],disabled=True)
-                            ocean_bill_of_lading=info[current_release_order][current_sales_order]["ocean_bill_of_lading"]
+                            ocean_bill_of_lading=release_order_database[current_release_order][current_sales_order]["ocean_bill_of_lading"]
                             
-                             #batch=st.text_input("Batch",info[current_release_order][current_sales_order]["batch"],disabled=True)
-                            batch=info[current_release_order][current_sales_order]["batch"]
-                            #grade=st.text_input("Grade",info[current_release_order][current_sales_order]["grade"],disabled=True)
-                            grade=info[current_release_order][current_sales_order]["grade"]
+                            batch=release_order_database[current_release_order][current_sales_order]["batch"]
+                     
+                            grade=release_order_database[current_release_order][current_sales_order]["grade"]
                             
                    
                         updated_quantity=0
@@ -1459,15 +1454,11 @@ with Profiler():
                                 
                         ####   IF NOT double load
                         else:
-                            units_shipped=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")   ###### DOWNLOADS
-                            units_shipped=pd.read_json(units_shipped).T
-                            load_dict={}
-                            for row in units_shipped.index[1:]:
-                                for unit in units_shipped.loc[row,'loads'].keys():
-                                    load_dict[unit]={"BOL":row,"RO":units_shipped.loc[row,'release_order'],"destination":units_shipped.loc[row,'destination'],
-                                                     "OBOL":units_shipped.loc[row,'ocean_bill_of_lading'],
-                                                     "grade":units_shipped.loc[row,'grade'],"carrier_Id":units_shipped.loc[row,'carrier_id'],
-                                                     "vehicle":units_shipped.loc[row,'vehicle'],"date":units_shipped.loc[row,'issued'] }
+                            
+                            past_loads=[]
+                            for row in bill_of_ladings.keys():
+                                if row!="11502400":
+                                    past_loads+=[load for load in bill_of_ladings[row]['loads'].keys()]
                             faults=[]
                             bale_faults=[]
                             fault_messaging={}
@@ -1483,8 +1474,8 @@ with Profiler():
                                 seen=set()
                                 alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                                 for i,x in enumerate(textsplit):
-                                    alternate_vessel=[ship for ship in bill_mapping if ship!=vessel][0]
-                                    if x[:load_digit] in bill_mapping[alternate_vessel]:
+                                    alternate_vessels=[ship for ship in bill_mapping if ship!=vessel]
+                                    if x[:load_digit] in ["ds"]:
                                         st.markdown(f"**:red[Unit No : {i+1}-{x}]**",unsafe_allow_html=True)
                                         faults.append(1)
                                         st.markdown("**:red[THIS LOT# IS FROM THE OTHER VESSEL!]**")

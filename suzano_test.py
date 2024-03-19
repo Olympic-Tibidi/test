@@ -1882,8 +1882,7 @@ if authentication_status:
             mill_info=map["mill_info"]
             inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
             inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
-            #inv_bill_of_ladings=gcp_download_new(target_bucket,rf"terminal_bill_of_ladings.json")
-            #inv_bill_of_ladings=pd.DataFrame(inv_bill_of_ladings).T
+         
             raw_ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
             raw_ro = json.loads(raw_ro)
             bol_mapping = map["bol_mapping"]
@@ -2836,7 +2835,8 @@ if authentication_status:
                     if proceed:
                         carrier_code=carrier_code.split("-")[0]
                         
-                        suzano_report=gcp_download_new(target_bucket,rf"suzano_report.json")
+                        suzano_report=gcp_download(target_bucket,rf"suzano_report.json")
+                        json.loads(suzano_report)
 
                         consignee=destination.split("-")[0]
                         consignee_city=mill_info[destination]["city"]

@@ -544,7 +544,8 @@ if authentication_status:
                           
             with admin_tab1:
                 map=gcp_download_new(target_bucket,rf"map.json")
-                release_order_database=gcp_download_new(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                release_order_database=json.loads(release_order_database)
                 dispatch=gcp_download(target_bucket,rf"dispatched.json")
                 dispatch=json.loads(dispatch)
                 carrier_list=map['carriers']
@@ -1073,7 +1074,8 @@ if authentication_status:
             map=gcp_download_new(target_bucket,rf"map.json")
             release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
             release_order_database=json.loads(release_order_database)
-            dispatched=gcp_download_new(target_bucket,rf"dispatched.json")
+            dispatched=gcp_download(target_bucket,rf"dispatched.json")
+            dispatched=json.loads(dispatched)
             carrier_list=map['carriers']
             mill_info=map["mill_info"]
             
@@ -1674,7 +1676,8 @@ if authentication_status:
                         if proceed:
                             carrier_code=carrier_code.split("-")[0]
                             
-                            suzano_report=gcp_download_new(target_bucket,rf"suzano_report.json")
+                            suzano_report=gcp_download(target_bucket,rf"suzano_report.json")
+                            suzano_report=json.loads(suzano_report)
 
                             consignee=destination.split("-")[0]
                             consignee_city=mill_info[destination]["city"]

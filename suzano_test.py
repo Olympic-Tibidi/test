@@ -773,14 +773,10 @@ if authentication_status:
                                     try:
                                         last=list(dispatch[requested_file].keys())[-1]
                                      
-                                        dispatch[requested_file][hangisi]={"vessel":vessel,"date":datetime.datetime.strftime(datetime.datetime.today()-datetime.timedelta(hours=7),"%b-%d-%Y"),
-                                                    "time":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%H:%M:%S"),
-                                                     "release_order":requested_file,"sales_order":hangisi,"destination":destination,"ocean_bill_of_lading":target[hangisi]["ocean_bill_of_lading"],"batch":target[hangisi]["batch"]}
+                                        dispatch[requested_file][hangisi]={"release_order":requested_file,"sales_order":hangisi,"destination":destination}
                                     except:
                                         dispatch[requested_file]={}
-                                        dispatch[requested_file][hangisi]={"vessel":vessel,"date":datetime.datetime.strftime(datetime.datetime.today()-datetime.timedelta(hours=7),"%b-%d-%Y"),
-                                                    "time":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=7),"%H:%M:%S"),
-                                                     "release_order":requested_file,"sales_order":hangisi,"destination":destination,"ocean_bill_of_lading":target[hangisi]["ocean_bill_of_lading"],"batch":target[hangisi]["batch"]}
+                                        dispatch[requested_file][hangisi]={"release_order":requested_file,"sales_order":hangisi,"destination":destination}
             
                                     
                                     json_data = json.dumps(dispatch)
@@ -817,9 +813,7 @@ if authentication_status:
                             st.markdown("**CURRENT DISPATCH QUEUE**")
                             try:
                                 for dispatched_release in dispatch.keys():
-                                    #st.write(dispatched_release)
                                     for sales in dispatch[dispatched_release].keys():
-                                        #st.write(sales)
                                         st.markdown(f'**Release Order = {dispatched_release}, Sales Item : {sales}, Destination : {dispatch[dispatched_release][sales]["destination"]} .**')
                             except:
                                 st.write("NO DISPATCH ITEMS")
@@ -1116,8 +1110,8 @@ if authentication_status:
                 
                 current_release_order=work_order
                 current_sales_order=work_order_.split(" ")[1][1:]
-                vessel=dispatched[work_order][current_sales_order]["vessel"]
-                destination=dispatched[work_order][current_sales_order]['destination']
+                vessel=release_order_database[current_release_order][current_sales_order]["vessel"]
+                destination=release_order_database[current_release_order]['destination']
                 
                 
                 
@@ -1782,11 +1776,7 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                             blob.upload_from_string(json_data)
-                            success_container2=st.empty()
-                            time.sleep(0.1)                            
-                            success_container2.success(f"Updated Release Order {current_release_order}",icon="✅")
-    
-                          
+                                                      
                             success_container3=st.empty()
                             time.sleep(0.1)                            
                             success_container3.success(f"Updated Release Order Database",icon="✅")
@@ -2286,8 +2276,8 @@ if authentication_status:
             
             current_release_order=work_order
             current_sales_order=work_order_.split(" ")[1][1:]
-            vessel=dispatched[work_order][current_sales_order]["vessel"]
-            destination=dispatched[work_order][current_sales_order]['destination']
+            vessel=release_order_database[current_release_order][current_sales_order]["vessel"]
+            destination=release_order_database[current_release_order]['destination']
             
             
             

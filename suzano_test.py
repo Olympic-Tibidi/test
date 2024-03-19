@@ -2836,7 +2836,7 @@ if authentication_status:
                         carrier_code=carrier_code.split("-")[0]
                         
                         suzano_report=gcp_download(target_bucket,rf"suzano_report.json")
-                        json.loads(suzano_report)
+                        suzano_report=json.loads(suzano_report)
 
                         consignee=destination.split("-")[0]
                         consignee_city=mill_info[destination]["city"]

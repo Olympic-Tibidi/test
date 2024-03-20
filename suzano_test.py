@@ -665,158 +665,160 @@ if authentication_status:
                                     
                         number_of_sales_orders=len([i for i in target if i not in ["destination","po_number"]])   ##### WRONG CAUSE THERE IS NOW DESTINATION KEYS
                         
-                        rel_col1,rel_col2,rel_col3,rel_col4=st.columns([2,2,2,2])
+                        
                        
                         if nofile!=1 :         
-                                        
-                            targets=[i for i in target if i in ["001","002","003","004","005"]] 
-                            sales_orders_completed=[k for k in targets if target[k]['remaining']<=0]
-                            with rel_col1:
-                                
-                                st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
-                                st.markdown(f"**:blue[PO Number] : {target['po_number']}**")
-                                if targets[0] in sales_orders_completed:
-                                    st.markdown(f"**:orange[Sales Order Item : {targets[0]} - COMPLETED]**")
-                                    target0_done=True
-                                    
-                                else:
-                                    st.markdown(f"**:blue[Sales Order Item] : {targets[0]}**")
-                                st.markdown(f"**:blue[Destination] : {target['destination']}**")
-                                st.write(f"        Total Quantity: {target[targets[0]]['total']} Units - {2*target[targets[0]]['total']} Metric Tons")
-                                st.write(f"        Ocean Bill Of Lading : {target[targets[0]]['ocean_bill_of_lading']}")
-                                st.write(f"        Batch : {target[targets[0]]['batch']} WIRES : {target[targets[0]]['unitized']}")
-                                st.write(f"        Units Shipped : {target[targets[0]]['shipped']} Units - {2*target[targets[0]]['shipped']} Metric Tons")
-                                if 0<target[targets[0]]['remaining']<=10:
-                                    st.markdown(f"**:red[Units Remaining : {target[targets[0]]['remaining']} Units - {2*target[targets[0]]['remaining']} Metric Tons]**")
-                                elif target[targets[0]]['remaining']<=0:
-                                    st.markdown(f":orange[Units Remaining : {target[targets[0]]['remaining']} Units - {2*target[targets[0]]['remaining']} Metric Tons]")                                                                        
-                                else:
-                                    st.write(f"       Units Remaining : {target[targets[0]]['remaining']} Units - {2*target[targets[0]]['remaining']} Metric Tons")
-                            with rel_col2:
-                                try:
-                                
+                            with st.container(border=True):
+                                rel_ccol1,rel_ccol2,rel_ccol3,rel_ccol4=st.columns([2,2,2,2])
+                                targets=[i for i in target if i in ["001","002","003","004","005"]] 
+                                sales_orders_completed=[k for k in targets if target[k]['remaining']<=0]
+                                with rel_ccol1:
                                     st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
-                                    if targets[1] in sales_orders_completed:
-                                        st.markdown(f"**:orange[Sales Order Item : {targets[1]} - COMPLETED]**")                                    
-                                    else:
-                                        st.markdown(f"**:blue[Sales Order Item] : {targets[1]}**")
-                                    st.markdown(f"**:blue[Destination : {target['destination']}]**")
-                                    st.write(f"        Total Quantity : {target[targets[1]]['total']} Units - {2*target[targets[1]]['total']} Metric Tons")                        
-                                    st.write(f"        Ocean Bill Of Lading : {target[targets[1]]['ocean_bill_of_lading']}")
-                                    st.write(f"        Batch : {target[targets[1]]['batch']} WIRES : {target[targets[1]]['unitized']}")
-                                    st.write(f"        Units Shipped : {target[targets[1]]['shipped']} Units - {2*target[targets[1]]['shipped']} Metric Tons")
-                                    if 0<target[targets[1]]['remaining']<=10:
-                                        st.markdown(f"**:red[Units Remaining : {target[targets[1]]['remaining']} Units - {2*target[targets[1]]['remaining']} Metric Tons]**")
-                                    elif target[targets[1]]['remaining']<=0:
-                                        st.markdown(f":orange[Units Remaining : {target[targets[1]]['remaining']} Units - {2*target[targets[1]]['remaining']} Metric Tons]")
-                                    else:
-                                        st.write(f"       Units Remaining : {target[targets[1]]['remaining']} Units - {2*target[targets[1]]['remaining']} Metric Tons")
+                                with rel_ccol2:
+                                    st.markdown(f"**:blue[Destination] : {target['destination']}**")
+                                with rel_ccol3:
+                                    st.markdown(f"**:blue[PO Number] : {target['po_number']}**")
+                                with rel_ccol4:
+                                    st.markdown(f"**:blue[...]**")
+                                st.divider()
+                                rel_col1,rel_col2,rel_col3,rel_col4=st.columns([2,2,2,2])
+                                with rel_col1:
+                                    
+                                    if targets[0] in sales_orders_completed:
+                                        st.markdown(f"**:orange[Sales Order Item : {targets[0]} - COMPLETED]**")
+                                        target0_done=True
                                         
-                                except:
-                                    pass
+                                    else:
+                                        st.markdown(f"**:blue[Sales Order Item] : {targets[0]}**")
+                                    
+                                    st.write(f"        Total Quantity: {target[targets[0]]['total']} Units - {2*target[targets[0]]['total']} Tons")
+                                    st.write(f"        Ocean Bill Of Lading : {target[targets[0]]['ocean_bill_of_lading']}")
+                                    st.write(f"        Batch : {target[targets[0]]['batch']} WIRES : {target[targets[0]]['unitized']}")
+                                    st.write(f"        Units Shipped : {target[targets[0]]['shipped']} Units - {2*target[targets[0]]['shipped']} Tons")
+                                    if 0<target[targets[0]]['remaining']<=10:
+                                        st.markdown(f"**:red[Units Remaining : {target[targets[0]]['remaining']} Units - {2*target[targets[0]]['remaining']} Tons]**")
+                                    elif target[targets[0]]['remaining']<=0:
+                                        st.markdown(f":orange[Units Remaining : {target[targets[0]]['remaining']} Units - {2*target[targets[0]]['remaining']} Tons]")                                                                        
+                                    else:
+                                        st.write(f"       Units Remaining : {target[targets[0]]['remaining']} Units - {2*target[targets[0]]['remaining']} Tons")
+                                with rel_col2:
+                                    try:
+                                        if targets[1] in sales_orders_completed:
+                                            st.markdown(f"**:orange[Sales Order Item : {targets[1]} - COMPLETED]**")                                    
+                                        else:
+                                            st.markdown(f"**:blue[Sales Order Item] : {targets[1]}**")
+                                        st.write(f"        Total Quantity : {target[targets[1]]['total']} Units - {2*target[targets[1]]['total']} Tons")                        
+                                        st.write(f"        Ocean Bill Of Lading : {target[targets[1]]['ocean_bill_of_lading']}")
+                                        st.write(f"        Batch : {target[targets[1]]['batch']} WIRES : {target[targets[1]]['unitized']}")
+                                        st.write(f"        Units Shipped : {target[targets[1]]['shipped']} Units - {2*target[targets[1]]['shipped']} Tons")
+                                        if 0<target[targets[1]]['remaining']<=10:
+                                            st.markdown(f"**:red[Units Remaining : {target[targets[1]]['remaining']} Units - {2*target[targets[1]]['remaining']} Tons]**")
+                                        elif target[targets[1]]['remaining']<=0:
+                                            st.markdown(f":orange[Units Remaining : {target[targets[1]]['remaining']} Units - {2*target[targets[1]]['remaining']} Tons]")
+                                        else:
+                                            st.write(f"       Units Remaining : {target[targets[1]]['remaining']} Units - {2*target[targets[1]]['remaining']} Tons")
+                                            
+                                    except:
+                                        pass
+                    
+                                with rel_col3:
+                                    try:
+                                        if targets[2] in sales_orders_completed:
+                                            st.markdown(f"**:orange[Sales Order Item : {targets[2]} - COMPLETED]**")
+                                        else:
+                                            st.markdown(f"**:blue[Sales Order Item] : {targets[2]}**")
+                                        st.write(f"        Total Quantity : {target[targets[2]]['total']} Units - {2*target[targets[2]]['total']} Tons")
+                                        st.write(f"        Ocean Bill Of Lading : {target[targets[2]]['ocean_bill_of_lading']}")
+                                        st.write(f"        Batch : {target[targets[2]]['batch']} WIRES : {target[targets[2]]['unitized']}")
+                                        st.write(f"        Units Shipped : {target[targets[2]]['shipped']} Units - {2*target[targets[2]]['shipped']} Tons")
+                                        if 0<target[targets[2]]['remaining']<=10:
+                                            st.markdown(f"**:red[Units Remaining : {target[targets[2]]['remaining']} Units - {2*target[targets[2]]['remaining']} Tons]**")
+                                        elif target[targets[2]]['remaining']<=0:
+                                            st.markdown(f":orange[Units Remaining : {target[targets[2]]['remaining']} Units - {2*target[targets[2]]['remaining']} Tons]")
+                                        else:
+                                            st.write(f"       Units Remaining : {target[targets[2]]['remaining']} Units - {2*target[targets[2]]['remaining']} Tons")
+                                        
+                                        
+                                    except:
+                                        pass
                 
-                            with rel_col3:
-                                try:
-                                
-                                    st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
-                                    if targets[2] in sales_orders_completed:
-                                        st.markdown(f"**:orange[Sales Order Item : {targets[2]} - COMPLETED]**")
-                                    else:
-                                        st.markdown(f"**:blue[Sales Order Item] : {targets[2]}**")
-                                    st.markdown(f"**:blue[Destination : {target['destination']}]**")
-                                    st.write(f"        Total Quantity : {target[targets[2]]['total']} Units - {2*target[targets[2]]['total']} Metric Tons")
-                                    st.write(f"        Ocean Bill Of Lading : {target[targets[2]]['ocean_bill_of_lading']}")
-                                    st.write(f"        Batch : {target[targets[2]]['batch']} WIRES : {target[targets[2]]['unitized']}")
-                                    st.write(f"        Units Shipped : {target[targets[2]]['shipped']} Units - {2*target[targets[2]]['shipped']} Metric Tons")
-                                    if 0<target[targets[2]]['remaining']<=10:
-                                        st.markdown(f"**:red[Units Remaining : {target[targets[2]]['remaining']} Units - {2*target[targets[2]]['remaining']} Metric Tons]**")
-                                    elif target[targets[2]]['remaining']<=0:
-                                        st.markdown(f":orange[Units Remaining : {target[targets[2]]['remaining']} Units - {2*target[targets[2]]['remaining']} Metric Tons]")
-                                    else:
-                                        st.write(f"       Units Remaining : {target[targets[2]]['remaining']} Units - {2*target[targets[2]]['remaining']} Metric Tons")
-                                    
-                                    
-                                except:
-                                    pass
-            
-                            with rel_col4:
-                                try:
-                                
-                                    st.markdown(f"**:blue[Release Order Number] : {requested_file}**")
-                                    if targets[3] in sales_orders_completed:
-                                        st.markdown(f"**:orange[Sales Order Item : {targets[3]} - COMPLETED]**")
-                                    else:
-                                        st.markdown(f"**:blue[Sales Order Item] : {targets[3]}**")
-                                    st.markdown(f"**:blue[Destination : {target['destination']}]**")
-                                    st.write(f"        Total Quantity : {target[targets[3]]['quantity']} Units - {2*target[targets[3]]['total']} Metric Tons")
-                                    st.write(f"        Ocean Bill Of Lading : {target[targets[3]]['ocean_bill_of_lading']}")
-                                    st.write(f"        Batch : {target[targets[3]]['batch']} WIRES : {target[targets[3]]['unitized']}")
-                                    st.write(f"        Units Shipped : {target[targets[3]]['shipped']} Units - {2*target[targets[3]]['shipped']} Metric Tons")
-                                    if 0<target[targets[3]]['remaining']<=10:
-                                        st.markdown(f"**:red[Units Remaining : {target[targets[3]]['remaining']} Units - {2*target[targets[3]]['remaining']} Metric Tons]**")
-                                    elif target[targets[3]]['remaining']<=0:
-                                        st.markdown(f":orange[Units Remaining : {target[targets[3]]['remaining']} Units - {2*target[targets[3]]['remaining']} Metric Tons]")
-                                    else:
-                                        st.write(f"       Units Remaining : {target[targets[3]]['remaining']} Units - {2*target[targets[3]]['remaining']} Metric Tons")
-                                    
-                                    
-                                except:
-                                    pass
+                                with rel_col4:
+                                    try:
+                                        if targets[3] in sales_orders_completed:
+                                            st.markdown(f"**:orange[Sales Order Item : {targets[3]} - COMPLETED]**")
+                                        else:
+                                            st.markdown(f"**:blue[Sales Order Item] : {targets[3]}**")
+                                        st.write(f"        Total Quantity : {target[targets[3]]['total']} Units - {2*target[targets[3]]['total']} Tons")
+                                        st.write(f"        Ocean Bill Of Lading : {target[targets[3]]['ocean_bill_of_lading']}")
+                                        st.write(f"        Batch : {target[targets[3]]['batch']} WIRES : {target[targets[3]]['unitized']}")
+                                        st.write(f"        Units Shipped : {target[targets[3]]['shipped']} Units - {2*target[targets[2]]['shipped']} Tons")
+                                        if 0<target[targets[3]]['remaining']<=10:
+                                            st.markdown(f"**:red[Units Remaining : {target[targets[3]]['remaining']} Units - {2*target[targets[3]]['remaining']} Tons]**")
+                                        elif target[targets[3]]['remaining']<=0:
+                                            st.markdown(f":orange[Units Remaining : {target[targets[3]]['remaining']} Units - {2*target[targets[3]]['remaining']} Tons]")
+                                        else:
+                                            st.write(f"       Units Remaining : {target[targets[3]]['remaining']} Units - {2*target[targets[3]]['remaining']} Tons")
+                                        
+                                        
+                                    except:
+                                        pass
                             
                   
-                            
-                            hangisi=st.selectbox("**:green[SELECT SALES ORDER ITEM TO DISPATCH]**",([i for i in ["001","002","003","004","005"] if i not in sales_orders_completed]))
-                            dol1,dol2,dol3,dol4=st.columns([2,2,2,2])
-                            with dol1:
-                               
-                                if st.button("DISPATCH TO WAREHOUSE",key="lala"):
-                                    try:
-                                        last=list(dispatch[requested_file].keys())[-1]
-                                     
-                                        dispatch[requested_file][hangisi]={"release_order":requested_file,"sales_order":hangisi,"destination":destination}
-                                    except:
-                                        dispatch[requested_file]={}
-                                        dispatch[requested_file][hangisi]={"release_order":requested_file,"sales_order":hangisi,"destination":destination}
-            
-                                    
-                                    json_data = json.dumps(dispatch)
-                                    storage_client = storage.Client()
-                                    bucket = storage_client.bucket(target_bucket)
-                                    blob = bucket.blob(rf"dispatched.json")
-                                    blob.upload_from_string(json_data)
-                                    st.markdown(f"**DISPATCHED Release Order Number {requested_file} Item No : {hangisi} to Warehouse**")
-                            
-                                           
-                            with dol2:  
-                                if st.button("CLEAR DISPATCH QUEUE!"):
-                                    dispatch={}
-                                    json_data = json.dumps(dispatch)
-                                    storage_client = storage.Client()
-                                    bucket = storage_client.bucket(target_bucket)
-                                    blob = bucket.blob(rf"dispatched.json")
-                                    blob.upload_from_string(json_data)
-                                    st.markdown(f"**CLEARED ALL DISPATCHES**")   
-                            with dol3:
-                                
-                                try:
-                                    item=st.selectbox("CHOOSE ITEM",dispatch.keys())
-                                    if st.button("CLEAR DISPATCH ITEM"):                                       
-                                        del dispatch[item]
+                            with st.container(border=True):
+                                dol1,dol2,dol3,dol4=st.columns([2,2,2,2])
+                                with dol1:
+                                    hangisi=st.selectbox("**:green[SELECT SALES ORDER ITEM TO DISPATCH]**",([i for i in targets if i not in sales_orders_completed]))
+                                    if st.button("DISPATCH TO WAREHOUSE",key="lala"):
+                                        try:
+                                            last=list(dispatch[requested_file].keys())[-1]
+                                         
+                                            dispatch[requested_file][hangisi]={"release_order":requested_file,"sales_order":hangisi,"destination":destination}
+                                        except:
+                                            dispatch[requested_file]={}
+                                            dispatch[requested_file][hangisi]={"release_order":requested_file,"sales_order":hangisi,"destination":destination}
+                
+                                        
                                         json_data = json.dumps(dispatch)
                                         storage_client = storage.Client()
                                         bucket = storage_client.bucket(target_bucket)
                                         blob = bucket.blob(rf"dispatched.json")
                                         blob.upload_from_string(json_data)
-                                        st.markdown(f"**CLEARED DISPATCH ITEM {item}**")   
+                                        st.markdown(f"**DISPATCHED Release Order Number {requested_file} Item No : {hangisi} to Warehouse**")
+                                
+                                               
+                                with dol2:  
+                                    try:
+                                        item=st.selectbox("CHOOSE ITEM",dispatch.keys())
+                                        if st.button("CLEAR DISPATCH ITEM"):                                       
+                                            del dispatch[item]
+                                            json_data = json.dumps(dispatch)
+                                            storage_client = storage.Client()
+                                            bucket = storage_client.bucket(target_bucket)
+                                            blob = bucket.blob(rf"dispatched.json")
+                                            blob.upload_from_string(json_data)
+                                            st.markdown(f"**CLEARED DISPATCH ITEM {item}**")   
+                                    except:
+                                        pass
+                                    
+                                with dol3:
+                                    if st.button("CLEAR DISPATCH QUEUE!"):
+                                        dispatch={}
+                                        json_data = json.dumps(dispatch)
+                                        storage_client = storage.Client()
+                                        bucket = storage_client.bucket(target_bucket)
+                                        blob = bucket.blob(rf"dispatched.json")
+                                        blob.upload_from_string(json_data)
+                                        st.markdown(f"**CLEARED ALL DISPATCHES**")   
+                                    
+                            with st.container(border=True):
+                                
+                                st.markdown("**CURRENT DISPATCH QUEUE**")
+                                try:
+                                    for dispatched_release in dispatch.keys():
+                                        for sales in dispatch[dispatched_release].keys():
+                                            st.markdown(f'**Release Order = {dispatched_release}, Sales Item : {sales}, Destination : {dispatch[dispatched_release][sales]["destination"]} .**')
                                 except:
-                                    pass
-                            st.markdown("**CURRENT DISPATCH QUEUE**")
-                            try:
-                                for dispatched_release in dispatch.keys():
-                                    for sales in dispatch[dispatched_release].keys():
-                                        st.markdown(f'**Release Order = {dispatched_release}, Sales Item : {sales}, Destination : {dispatch[dispatched_release][sales]["destination"]} .**')
-                            except:
-                                st.write("NO DISPATCH ITEMS")
+                                    st.write("NO DISPATCH ITEMS")
                         
                         else:
                             st.write("NO RELEASE ORDERS IN DATABASE")
@@ -826,7 +828,7 @@ if authentication_status:
                         completed_release_order_dest_map={}
                         for i in completed:
                             for sale in [s for s in release_order_database[i] if s in ["001","002","003","004","005"]]:
-                                completed_release_order_dest_map[i]=[sale,release_order_database[i]["destination"],
+                                completed_release_order_dest_map[f"{i}-{sale}"]=[sale,release_order_database[i]["destination"],
                                                                      release_order_database[i][sale]["ocean_bill_of_lading"],
                                                                      release_order_database[i][sale]["grade"],
                                                                      release_order_database[i][sale]["vessel"],
@@ -1770,6 +1772,15 @@ if authentication_status:
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"dispatched.json")
                                 blob.upload_from_string(json_data)       
+                            def check_complete(data,ro):
+                                complete=True
+                                for i in data[ro]:
+                                    if i in ["001","002","003","004","005"]:
+                                        if data[ro][i]['remaining']>0:
+                                            complete=False
+                                return complete
+                            if check_complete(release_order_database,current_release_order):
+                                release_order_database[current_release_order]['complete']=True
                             
                             json_data = json.dumps(release_order_database)
                             storage_client = storage.Client()
@@ -1796,8 +1807,8 @@ if authentication_status:
                             body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                             #st.write(body)           
                             sender = "warehouseoly@gmail.com"
-                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                            recipients = ["afsiny@portolympia.com"]
+                            recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                            #recipients = ["afsiny@portolympia.com"]
                             password = "xjvxkmzbpotzeuuv"
                     
                   
@@ -1947,17 +1958,17 @@ if authentication_status:
             with edi_bank:
                 edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
                 requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
-                try:
-                    requested_edi=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}")
-                    st.text_area("EDI",requested_edi,height=400)
-                    st.download_button(
-                        label="DOWNLOAD EDI",
-                        data=requested_edi,
-                        file_name=f'{requested_edi_file}',
-                        mime='text/csv')
-
-                except:
-                    st.write("NO EDI FILES IN DIRECTORY")
+                
+                display_edi=st.toggle("DISPLAY EDI")
+                if display_edi:
+                    data=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}")
+                    st.text_area("EDI",data,height=400)                                
+               
+                st.download_button(
+                    label="DOWNLOAD EDI",
+                    data=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}"),
+                    file_name=f'{requested_edi_file}',
+                    mime='text/csv')
                 
 
                 
@@ -1969,7 +1980,7 @@ if authentication_status:
                     st.title("CURRENTLY UNDER MAINTENANCE, CHECK BACK LATER")
                                
                 else:
-                    daily,inventory,unregistered=st.tabs(["DAILY SHIPMENT REPORT","INVENTORY","UNREGISTERED LOTS FOUND"])
+                    inventory,daily,unregistered=st.tabs(["INVENTORY","DAILY SHIPMENT REPORT","UNREGISTERED LOTS FOUND"])
                     
                     with daily:
                         
@@ -2128,29 +2139,31 @@ if authentication_status:
                 sales_group=["001","002","003","004","005"]
                 for ro in raw_ro:
                     for sale in [i for i in raw_ro[ro] if i in sales_group]:
-                        status_dict[ro]={"Release Order #":ro,"Sales Order #":sale,
+                        status_dict[f"{ro}-{sale}"]={"Release Order #":ro,"Sales Order #":sale,
                                             "Destination":raw_ro[ro]['destination'],
                                             "Ocean BOL":raw_ro[ro][sale]['ocean_bill_of_lading'],
                                             "Total":raw_ro[ro][sale]['total'],
                                             "Shipped":raw_ro[ro][sale]['shipped'],
                                             "Remaining":raw_ro[ro][sale]['remaining']}
                 status_frame=pd.DataFrame(status_dict).T.set_index("Release Order #",drop=True)
-                active_frame=status_frame[status_frame["Remaining"]>0]
+                active_frame_=status_frame[status_frame["Remaining"]>0]
                 status_frame.loc["Total"]=status_frame[["Total","Shipped","Remaining"]].sum()
+                active_frame=active_frame_.copy()
+                active_frame.loc["Total"]=active_frame[["Total","Shipped","Remaining"]].sum()
                 
-                st.markdown(status_frame.to_html(render_links=True),unsafe_allow_html=True)
+                st.markdown(active_frame.to_html(render_links=True),unsafe_allow_html=True)
 
                 
                 release_orders = status_frame.index[:-1]
                 release_orders = pd.Categorical(release_orders)
-                active_order_names = [f"{i} to {raw_ro[i]['destination']}" for i in active_frame.index]
-                destinations=[raw_ro[i]['destination'] for i in active_frame.index]
+                active_order_names = [f"{i} to {raw_ro[i]['destination']}" for i in active_frame_.index]
+                destinations=[raw_ro[i]['destination'] for i in active_frame_.index]
                 active_orders=[str(i) for i in active_frame.index]
                
                 fig = go.Figure()
                 fig.add_trace(go.Bar(x=active_orders, y=active_frame["Total"], name='Total', marker_color='lightgray'))
                 fig.add_trace(go.Bar(x=active_orders, y=active_frame["Shipped"], name='Shipped', marker_color='blue', opacity=0.7))
-                remaining_data = [remaining if remaining > 0 else None for remaining in status_frame["Remaining"][:-1]]
+                remaining_data = [remaining if remaining > 0 else None for remaining in active_frame_["Remaining"]]
                 fig.add_trace(go.Scatter(x=active_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
                 
                 #annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(active_orders, active_frame["Total"], destinations)]
@@ -2935,7 +2948,15 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"dispatched.json")
                             blob.upload_from_string(json_data)       
-                        
+                        def check_complete(data,ro):
+                            complete=True
+                            for i in data[ro]:
+                                if i in ["001","002","003","004","005"]:
+                                    if data[ro][i]['remaining']>0:
+                                        complete=False
+                            return complete
+                        if check_complete(release_order_database,current_release_order):
+                            release_order_database[current_release_order]['complete']=True
                         json_data = json.dumps(release_order_database)
                         storage_client = storage.Client()
                         bucket = storage_client.bucket(target_bucket)
@@ -3050,9 +3071,3 @@ elif authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:
     st.warning('Please enter your username and password')
-    
-    
-    
-    
-        
-     

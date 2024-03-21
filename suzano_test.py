@@ -300,7 +300,7 @@ def edit_release_order_data(data,release_order_number,destination,po_number,sale
     data[release_order_number][sales_order_item]["unitized"]= unitized
     data[release_order_number][sales_order_item]["total"]= total
     data[release_order_number][sales_order_item]["shipped"]= shipped
-    data[release_order_number][sales_order_item]["remaining"]= total
+    data[release_order_number][sales_order_item]["remaining"]= remaining
     
     
        

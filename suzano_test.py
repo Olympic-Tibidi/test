@@ -2138,7 +2138,10 @@ if authentication_status:
             carrier_list=map['carriers']
             mill_info=map["mill_info"]
             
-            bill_mapping=gcp_download_new(target_bucket,"bill_mapping.json")   ###### DOWNLOADS
+            bill_mapping=gcp_download(target_bucket,"bill_mapping.json")
+            bill_mapping=gjson.loads(bill_mapping)
+            
+            ###### DOWNLOADS
             mf_numbers_for_load=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")  ###### DOWNLOADS
             mf_numbers_for_load=json.loads(mf_numbers_for_load)
 

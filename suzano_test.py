@@ -2577,6 +2577,8 @@ if authentication_status:
                                                 blob.upload_from_string(updated_bill)
 
                                                 alien_units=gcp_download_new(target_bucket,rf"alien_units.json")
+                                                if vessel not in alien_units:
+                                                    alien_units[vessel]={}
                                                 alien_units[vessel][x]={}
                                                 alien_units[vessel][x]={"Ocean_Bill_Of_Lading":ocean_bill_of_lading,"Batch":batch,"Grade":grade,
                                                                         "Date_Found":datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y,%m-%d %H:%M:%S")}

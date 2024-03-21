@@ -482,9 +482,68 @@ if authentication_status:
             conn = st.connection('gcs', type=FilesConnection)
             a = conn.read(f"new_suzano/map.json", ttl=600)
             #st.write(a)
-            admin_tab1,admin_tab2,admin_tab3=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S"])
-            
+            admin_tab1,admin_tab2,admin_tab3,admin_tab4=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","AUDIT"])
+
+            with admin_tab4:
+                if st.button("RUN RECORD AUDIT"):
                     
+                    dfb=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                    dfb=json.loads(dfb)
+                    dfb=pd.DataFrame.from_dict(dfb).T[1:]
+                    suz=gcp_download(target_bucket,rf"suzano_report.json")
+                    suz=json.loads(suz)
+                    raw_ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                    raw_ro=json.loads(raw_ro)
+                    def dict_compare(d1, d2):
+                        d1_keys = set(d1.keys())
+                        d2_keys = set(d2.keys())
+                        shared_keys = d1_keys.intersection(d2_keys)
+                        added = d1_keys - d2_keys
+                        removed = d2_keys - d1_keys
+                        modified = {o : (d1[o], d2[o]) for o in shared_keys if d1[o] != d2[o]}
+                        same = set(o for o in shared_keys if d1[o] == d2[o])
+                        return added, removed, modified, same
+                    
+                    def extract_bol_shipped(data,bol):
+                        qt=0
+                        sales_group=["001","002","003","004","005"]
+                        for ro in data:
+                            for sale in data[ro]:
+                                if sale in sales_group and data[ro][sale]['ocean_bill_of_lading']==bol:
+                                    qt+=data[ro][sale]['shipped']
+                        return qt
+                    def compare_dict(a, b):
+                        # Compared two dictionaries..
+                        # Posts things that are not equal..
+                        res_compare = []
+                        for k in set(list(a.keys()) + list(b.keys())):
+                            if isinstance(a[k], dict):
+                                z0 = compare_dict(a[k], b[k])
+                            else:
+                                z0 = a[k] == b[k]
+                    
+                            z0_bool = np.all(z0)
+                            res_compare.append(z0_bool)
+                            if not z0_bool:
+                                st.markdown(f"{k} - Suzano Report :{a[k]} Units  BOL Report : {b[k]}")
+                        return np.all(res_compare)
+               
+                    suz_frame=pd.DataFrame(suz).T
+                    suz_t=suz_frame.groupby("Ocean BOL#")["Quantity"].sum().to_dict()
+                    df_t=dfb.groupby("ocean_bill_of_lading")["quantity"].sum().to_dict()
+                    #corrections due to shipment MF01769573 and 1150344 on 12-15 between Kirkenes and Juventas mixed loads.
+                    suz_t['GSSWKIR6013E']=suz_t['GSSWKIR6013E']+7
+                    suz_t['GSSWKIR6013D']=suz_t['GSSWKIR6013D']+9
+                    suz_t['GSSWJUV8556C']=suz_t['GSSWJUV8556C']-9
+                    suz_t['GSSWJUV8556A']=suz_t['GSSWJUV8556A']-7
+                    
+                    rel_t={i:extract_bol_shipped(raw_ro,i) for i in suz_t}
+                    if compare_dict(suz_t,df_t):
+                        st.markdown("All Checks Complete !")
+                        st.markdown("Suzano Report and BOL Database Matches")       
+                        st.write(f"{len(suz_frame)} Shipments")
+                        st.write(suz_t)
+                        st.write(df_t)
             with admin_tab2:   #### BILL OF LADINGS
                 bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 admin_bill_of_ladings=json.loads(bill_data)
@@ -551,9 +610,9 @@ if authentication_status:
                 carrier_list=map['carriers']
                 mill_info=map["mill_info"]
                       
-                release_order_tab1,release_order_tab2,release_order_tab3=st.tabs(["CREATE RELEASE ORDER","RELEASE ORDER DATABASE","RELEASE ORDER STATUS"])
+                release_order_tab1,release_order_tab2,release_order_tab3=st.tabs(["RELEASE ORDER DATABASE","CREATE RELEASE ORDER","RELEASE ORDER STATUS"])
                 
-                with release_order_tab1:   ###CREATE RELEASE ORDER
+                with release_order_tab2:   ###CREATE RELEASE ORDER
                    
                     add=st.checkbox("CHECK TO ADD TO EXISTING RELEASE ORDER",disabled=False)
                     edit=st.checkbox("CHECK TO EDIT EXISTING RELEASE ORDER")
@@ -645,7 +704,7 @@ if authentication_status:
                         
              
                         
-                with release_order_tab2:  ##   RELEASE ORDER DATABASE ##
+                with release_order_tab1:  ##   RELEASE ORDER DATABASE ##
                     
      
                     rls_tab1,rls_tab2,rls_tab3=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS","ENTER MF NUMBERS"])
@@ -886,81 +945,65 @@ if authentication_status:
                                 blob.upload_from_string(mf_data)
                             st.write(mf_numbers)
                 with release_order_tab3:  ### RELEASE ORDER STATUS
-                    maintenance=True
-                    if not maintenance:
-                        inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                        inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
-                        ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                        raw_ro = json.loads(ro)
-                        grouped_df = inv_bill_of_ladings.groupby(['release_order','sales_order','destination'])[['quantity']].agg(sum)
-                        info=grouped_df.T.to_dict()
-                        for rel_ord in raw_ro:
-                            for sales in raw_ro[rel_ord]:
-                                try:
-                                    found_key = next((key for key in info.keys() if rel_ord in key and sales in key), None)
-                                    qt=info[found_key]['quantity']
-                                except:
-                                    qt=0
-                                info[rel_ord,sales,raw_ro[rel_ord][sales]['destination']]={'total':raw_ro[rel_ord][sales]['total'],
-                                                        'shipped':qt,'remaining':raw_ro[rel_ord][sales]['remaining']}
-                                                    
-                        new=pd.DataFrame(info).T
-                        new=new.reset_index()
-                        #new.groupby('level_1')['remaining'].sum()
-                        new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
-                        new.index=[i for i in new.index]
-                        #new.columns=["Release Order #","Sales Order #","Destination","Total","Shipped","Remaining"]
-                        new.index=[i+1 for i in new.index]
-                        new.loc["Total"]=new[["Total","Shipped","Remaining"]].sum()
-                        release_orders = [str(key[0]) for key in info.keys()]
-                        release_orders=[str(i) for i in release_orders]
-                        release_orders = pd.Categorical(release_orders)
-                        
-                        total_quantities = [item['total'] for item in info.values()]
-                        shipped_quantities = [item['shipped'] for item in info.values()]
-                        remaining_quantities = [item['remaining'] for item in info.values()]
-                        destinations = [key[2] for key in info.keys()]
-                        # Calculate the percentage of shipped quantities
-                        #percentage_shipped = [shipped / total * 100 for shipped, total in zip(shipped_quantities, total_quantities)]
-                        
-                        # Create a Plotly bar chart
-                        fig = go.Figure()
-                        
-                        # Add bars for total quantities
-                        fig.add_trace(go.Bar(x=release_orders, y=total_quantities, name='Total', marker_color='lightgray'))
-                        
-                        # Add filled bars for shipped quantities
-                        fig.add_trace(go.Bar(x=release_orders, y=shipped_quantities, name='Shipped', marker_color='blue', opacity=0.7))
-                        
-                        # Add remaining quantities as separate scatter points
-                        #fig.add_trace(go.Scatter(x=release_orders, y=remaining_quantities, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
-                        
-                        remaining_data = [remaining if remaining > 0 else None for remaining in remaining_quantities]
-                        fig.add_trace(go.Scatter(x=release_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
-                        
-                        # Add destinations as annotations
-                        annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(release_orders, total_quantities, destinations)]
-                        #fig.update_layout(annotations=annotations)
-                        
-                        # Update layout
-                        fig.update_layout(title='Shipment Status',
-                                          xaxis_title='Release Orders',
-                                          yaxis_title='Quantities',
-                                          barmode='overlay',
-                                          xaxis=dict(tickangle=-90, type='category'))
-                        relcol1,relcol2=st.columns([5,5])
-                        with relcol1:
-                            st.dataframe(new)
-                        with relcol2:
-                            st.plotly_chart(fig)
+                    raw_ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                    raw_ro = json.loads(raw_ro)
+                    status_dict={}
+                    sales_group=["001","002","003","004","005"]
+                    for ro in raw_ro:
+                        for sale in [i for i in raw_ro[ro] if i in sales_group]:
+                            status_dict[f"{ro}-{sale}"]={"Release Order #":ro,"Sales Order #":sale,
+                                                "Destination":raw_ro[ro]['destination'],
+                                                "Ocean BOL":raw_ro[ro][sale]['ocean_bill_of_lading'],
+                                                "Total":raw_ro[ro][sale]['total'],
+                                                "Shipped":raw_ro[ro][sale]['shipped'],
+                                                "Remaining":raw_ro[ro][sale]['remaining']}
+                    status_frame=pd.DataFrame(status_dict).T.set_index("Release Order #",drop=True)
+                    active_frame_=status_frame[status_frame["Remaining"]>0]
+                    status_frame.loc["Total"]=status_frame[["Total","Shipped","Remaining"]].sum()
+                    active_frame=active_frame_.copy()
+                    active_frame.loc["Total"]=active_frame[["Total","Shipped","Remaining"]].sum()
+                    
+                    st.markdown(active_frame.to_html(render_links=True),unsafe_allow_html=True)
+    
+                    
+                    release_orders = status_frame.index[:-1]
+                    release_orders = pd.Categorical(release_orders)
+                    active_order_names = [f"{i} to {raw_ro[i]['destination']}" for i in active_frame_.index]
+                    destinations=[raw_ro[i]['destination'] for i in active_frame_.index]
+                    active_orders=[str(i) for i in active_frame.index]
+                   
+                    fig = go.Figure()
+                    fig.add_trace(go.Bar(x=active_orders, y=active_frame["Total"], name='Total', marker_color='lightgray'))
+                    fig.add_trace(go.Bar(x=active_orders, y=active_frame["Shipped"], name='Shipped', marker_color='blue', opacity=0.7))
+                    remaining_data = [remaining if remaining > 0 else None for remaining in active_frame_["Remaining"]]
+                    fig.add_trace(go.Scatter(x=active_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
+                    
+                    #annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(active_orders, active_frame["Total"], destinations)]
+                    #fig.update_layout(annotations=annotations)
+    
+                    # fig.add_annotation(x="3172296", y=800, text="destination",
+                    #                        showarrow=True, arrowhead=4, ax=0, ay=-30)
+                    
+                    fig.update_layout(title='ACTIVE RELEASE ORDERS',
+                                      xaxis_title='Release Orders',
+                                      yaxis_title='Quantities',
+                                      barmode='overlay',
+                                      width=1300,
+                                      height=700,
+                                      xaxis=dict(tickangle=-90, type='category'))
+                    
+                    st.plotly_chart(fig)
+                    
+                    
+                    duration=st.toggle("Duration Report")
+                    if duration:
                         
                         temp_dict={}
+                            
                         for rel_ord in raw_ro:
-                            
-                            
-                            for sales in raw_ro[rel_ord]:
+                            for sales in [i for i in raw_ro[rel_ord] if i in ["001","002","003","004","005"]]:
                                 temp_dict[rel_ord,sales]={}
-                                dest=raw_ro[rel_ord][sales]['destination']
+                                dest=raw_ro[rel_ord]['destination']
                                 vessel=raw_ro[rel_ord][sales]['vessel']
                                 total=raw_ro[rel_ord][sales]['total']
                                 remaining=raw_ro[rel_ord][sales]['remaining']
@@ -2986,8 +3029,8 @@ if authentication_status:
                         body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                         #st.write(body)           
                         sender = "warehouseoly@gmail.com"
-                        recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                        #recipients = ["afsiny@portolympia.com"]
+                        #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                        recipients = ["afsiny@portolympia.com"]
                         password = "xjvxkmzbpotzeuuv"
                 
               

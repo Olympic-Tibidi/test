@@ -1146,7 +1146,7 @@ if authentication_status:
                            
           
             double_load=False
-            mixed_load_toggle=st.toggle("MIXED LOAD TRUCK")
+            mixed_load_toggle=st.checkbox("MIXED LOAD TRUCK")
             
             if len(dispatched.keys())>0 and not no_dispatch:
                 menu_destinations={}

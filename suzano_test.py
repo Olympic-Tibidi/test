@@ -1146,7 +1146,7 @@ if authentication_status:
                            
           
             double_load=False
-            mixed_load_toggle=st.checkbox("MIXED LOAD TRUCK")
+            mixed_load_toggle=st.toggle("MIXED LOAD TRUCK")
             
             if len(dispatched.keys())>0 and not no_dispatch:
                 menu_destinations={}
@@ -1164,7 +1164,7 @@ if authentication_status:
                 if mixed_load_toggle:
                     if 'mixed_order1_' not in st.session_state:
                         st.session_state.mixed_order1_ = None
-                    if 'work_order_' not in st.session_state:
+                    if 'mixed_order2_' not in st.session_state:
                         st.session_state.mixed_order2_ = None
                     mixed_col1,mixed_col2=st.columns(2)
                     with mixed_col1:

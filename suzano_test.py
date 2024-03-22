@@ -1171,7 +1171,8 @@ if authentication_status:
                         mixed_order1_=st.selectbox("**SELECT FIRST ORDER TO WORK**",liste,index=0 if st.session_state.mixed_order1_ else 0,key="23234dsdwa")
                     with mixed_col2:
                         mixed_order2_=st.selectbox("**SELECT SECOND ORDER TO WORK**",liste,index=0 if st.session_state.mixed_order2_ else 0,key="reewq")
-                work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=0 if st.session_state.work_order_ else 0) 
+                if not mixed_load_toggle:
+                    work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=0 if st.session_state.work_order_ else 0) 
                 st.session_state.work_order_=work_order_
                 work_order=work_order_.split(" ")[0]
                 order=["001","002","003","004","005","006"]

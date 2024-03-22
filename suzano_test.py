@@ -1168,9 +1168,9 @@ if authentication_status:
                         st.session_state.mixed_order2_ = None
                     mixed_col1,mixed_col2=st.columns(2)
                     with mixed_col1:
-                        mixed_order1_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=0 if st.session_state.mixed_order1_ else 0)
+                        mixed_order1_=st.selectbox("**SELECT FIRST ORDER TO WORK**",liste,index=0 if st.session_state.mixed_order1_ else 0)
                     with mixed_col2:
-                        mixed_order2_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=0 if st.session_state.mixed_order2_ else 0)
+                        mixed_order2_=st.selectbox("**SELECT SECOND ORDER TO WORK**",liste,index=0 if st.session_state.mixed_order2_ else 0)
                 work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=0 if st.session_state.work_order_ else 0) 
                 st.session_state.work_order_=work_order_
                 work_order=work_order_.split(" ")[0]

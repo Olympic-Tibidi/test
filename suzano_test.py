@@ -1169,29 +1169,34 @@ if authentication_status:
                     mixed_col1,mixed_col2=st.columns(2)
                     with mixed_col1:
                         mixed_order1_=st.selectbox("**SELECT FIRST ORDER TO WORK**",liste,index=0 if st.session_state.mixed_order1_ else 0,key="23234dsdwa")
+                        st.session_state.mixed_order1_=mixed_order1_
+                        work_order=mixed_order1_.split(" ")[0]
                     with mixed_col2:
                         mixed_order2_=st.selectbox("**SELECT SECOND ORDER TO WORK**",liste,index=0 if st.session_state.mixed_order2_ else 0,key="reewq")
+                        st.session_state.mixed_order2_=mixed_order2_
+                    
+                    work_order=mixed_order1_.split(" ")[0]
+                    current_release_order=work_order
+                    first_sales_order=mixed_order1_.split(" ")[1][1:]
+                    second_sales_order=mixed_order2_.split(" ")[1][1:]
+                    vessel1=release_order_database[current_release_order][first_sales_order]["vessel"]
+                    vessel2=release_order_database[current_release_order][second_sales_order]["vessel"]
+                    destination=release_order_database[current_release_order]['destination']
+            
                 if not mixed_load_toggle:
                     work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=0 if st.session_state.work_order_ else 0) 
-                st.session_state.work_order_=work_order_
-                work_order=work_order_.split(" ")[0]
-                order=["001","002","003","004","005","006"]
-                
-                current_release_order=work_order
-                current_sales_order=work_order_.split(" ")[1][1:]
-                vessel=release_order_database[current_release_order][current_sales_order]["vessel"]
-                destination=release_order_database[current_release_order]['destination']
-                
-                
-                
-      
-                try:
-                    next_release_order=dispatched['002']['release_order']    #############################  CHECK HERE ######################## FOR MIXED LOAD
-                    next_sales_order=dispatched['002']['sales_order']
+                    st.session_state.work_order_=work_order_
+                    work_order=work_order_.split(" ")[0]
+                    order=["001","002","003","004","005","006"]
+                    current_release_order=work_order
+                    current_sales_order=work_order_.split(" ")[1][1:]
+                    vessel=release_order_database[current_release_order][current_sales_order]["vessel"]
+                    destination=release_order_database[current_release_order]['destination']
+              
                     
-                except:
-                    
-                    pass
+                
+            
+              
                 
 
                 
@@ -1877,8 +1882,8 @@ if authentication_status:
                             body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                             #st.write(body)           
                             sender = "warehouseoly@gmail.com"
-                            recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                            #recipients = ["afsiny@portolympia.com"]
+                            #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                            recipients = ["afsiny@portolympia.com"]
                             password = "xjvxkmzbpotzeuuv"
                     
                   

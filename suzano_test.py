@@ -756,7 +756,7 @@ if authentication_status:
                                 schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]+=1
                             except:
                                 pass
-                        
+                        schedule_frame["Left"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
                         a=st.data_editor(schedule_frame)
                         
                         if st.button("UPDATE TABLE"):

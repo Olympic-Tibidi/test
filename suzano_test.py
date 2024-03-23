@@ -1204,6 +1204,7 @@ if authentication_status:
                 loadout,schedule=st.tabs(["LOADOUT","SCHEDULE"])
 
                 with schedule:
+                    now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
                     schedule_=gcp_download(target_bucket,rf"schedule.json")
                     schedule=json.loads(schedule_)
                     sch_bill_of_ladings=pd.DataFrame.from_dict(bill_of_ladings).T[1:]

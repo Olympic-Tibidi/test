@@ -1201,7 +1201,7 @@ if authentication_status:
             double_load=False
             
             if len(dispatched.keys())>0 and not no_dispatch:
-                loadout,schedule=st.tabs("LOADOUT","SCHEDULE")
+                loadout,schedule=st.tabs(["LOADOUT","SCHEDULE"])
 
                 with schedule:
                     schedule_=gcp_download(target_bucket,rf"schedule.json")

@@ -1225,7 +1225,7 @@ if authentication_status:
                             pass
                     schedule_frame["Left"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
                     schedule_frame.set_index("Destination",drop=True,inplace=True)
-                    schedule_frame.loc["Total"]=schedule_frame["Scheduled","Loaded","Left"].sum()
+                    schedule_frame.loc["Total"]=schedule_frame.sum(numeric_only=True)
                     st.table(schedule_frame)
                 
                 

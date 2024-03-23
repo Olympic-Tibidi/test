@@ -1224,7 +1224,7 @@ if authentication_status:
                         except:
                             pass
                     schedule_frame["Left"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
-                    a=st.data_editor(schedule_frame)
+                    st.table(schedule_frame)
                 
                 
                 with loadout:

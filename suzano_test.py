@@ -738,10 +738,10 @@ if authentication_status:
 
 
                     with rls_tab4:  #####  SCHEDULE
-                        bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                        admin_bill_of_ladings=json.loads(bill_data)
-                        admin_bill_of_ladings=pd.DataFrame.from_dict(admin_bill_of_ladings).T[1:]
-                        admin_bill_of_ladings["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in admin_bill_of_ladings["issued"]]
+                        # bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                        # admin_bill_of_ladings=json.loads(bill_data)
+                        # admin_bill_of_ladings=pd.DataFrame.from_dict(admin_bill_of_ladings).T[1:]
+                        # admin_bill_of_ladings["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in admin_bill_of_ladings["issued"]]
                         display_df=admin_bill_of_ladings[admin_bill_of_ladings["St_Date"]==now.date()]
                         st.write(display_df)
                         

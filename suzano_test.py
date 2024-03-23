@@ -744,15 +744,26 @@ if authentication_status:
                         # admin_bill_of_ladings["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in admin_bill_of_ladings["issued"]]
                         display_df=admin_bill_of_ladings[admin_bill_of_ladings["St_Date"]==now.date()]
                         st.write(display_df)
+                        liste=[]
+                        for term in display_df.index:
+                            t=(display_df.loc[term,'release_order'],display_df.loc[term,'sales_order'],display_df.loc[term,'destination'])
+                            liste.append(t)
                         
-                        schedule_frame=pd.DataFrame(schedule)
-                        a=st.data_editor(schedule_frame.T)
-                        a_=json.dumps(a.T.to_dict())
+                        schedule_frame=pd.DataFrame(schedule).T
+                        for i in liste:
+                            try:
+                                schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]=0
+                                schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]+=1
+                            except:
+                                pass
+                        
+                        a=st.data_editor(schedule_frame)
+                        
                         if st.button("UPDATE TABLE"):
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"schedule.json")
-                            blob.upload_from_string(a_)
+                            blob.upload_from_string(a_=json.dumps(a.T.to_dict()))
                             st.success(f"**UPDATED SCHEDULE**")   
 
 

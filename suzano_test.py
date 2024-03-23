@@ -1204,7 +1204,7 @@ if authentication_status:
                 loadout,schedule=st.tabs(["LOADOUT","SCHEDULE"])
 
                 with schedule:
-                    st.header("TODAYS ACTION/SCHEDULE")
+                    st.subheader("TODAYS ACTION/SCHEDULE")
                     now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
                     schedule_=gcp_download(target_bucket,rf"schedule.json")
                     schedule=json.loads(schedule_)

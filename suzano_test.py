@@ -763,7 +763,7 @@ if authentication_status:
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"schedule.json")
-                            blob.upload_from_string(a_=json.dumps(a.T.to_dict()))
+                            blob.upload_from_string(json.dumps(a.T.to_dict()))
                             st.success(f"**UPDATED SCHEDULE**")   
 
 

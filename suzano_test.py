@@ -484,7 +484,8 @@ if authentication_status:
             #st.write(a)
             admin_tab1,admin_tab2,admin_tab3,admin_tab4=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","AUDIT"])
 
-            with admin_tab4:
+            with admin_tab4:   ###   AUDIT
+                st.markdown(f"**:red[Discrepancy]**")
                 if st.button("RUN RECORD AUDIT"):
                     
                     dfb=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
@@ -492,6 +493,7 @@ if authentication_status:
                     dfb=pd.DataFrame.from_dict(dfb).T[1:]
                     suz=gcp_download(target_bucket,rf"suzano_report.json")
                     suz=json.loads(suz)
+                    suz_frame=pd.DataFrame(suz).T
                     raw_ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                     raw_ro=json.loads(raw_ro)
                     def dict_compare(d1, d2):
@@ -525,10 +527,19 @@ if authentication_status:
                             z0_bool = np.all(z0)
                             res_compare.append(z0_bool)
                             if not z0_bool:
-                                st.markdown(f"{k} - Suzano Report :{a[k]} Units  BOL Report : {b[k]}")
+                                if a==rel_t:
+                                    st.markdown(f"**:red[Discrepancy]**")
+                                    st.markdown(f"**{k} - Inventory :{a[k]} Units Shipped - BOL Report : {b[k]} Units Shipped**")
+                                    
+                                else:
+                                    st.markdown(f"**:red[Discrepancy]**")
+                                    st.markdown(f"**{k} - Suzano Report :{a[k]} Units Shipped - BOL Report : {b[k]} Units Shipped**")
+                                    diff = dfb[~dfb.index.isin([str(i) for i in suz_frame['Shipment ID #']]+['11502400', '11503345', 'MF01769573*', '11503871'])].index.to_list()
+                                    for i in diff:
+                                        st.markdown(f"**...Shipment {i} to {dfb.loc[i,'destination']} is in BOL but not Suzano Report**") 
                         return np.all(res_compare)
                
-                    suz_frame=pd.DataFrame(suz).T
+                    
                     suz_t=suz_frame.groupby("Ocean BOL#")["Quantity"].sum().to_dict()
                     df_t=dfb.groupby("ocean_bill_of_lading")["quantity"].sum().to_dict()
                     #corrections due to shipment MF01769573 and 1150344 on 12-15 between Kirkenes and Juventas mixed loads.
@@ -614,11 +625,14 @@ if authentication_status:
             
                           
             with admin_tab1:
-                map=gcp_download_new(target_bucket,rf"map.json")
+                map=gcp_download(target_bucket,rf"map.json")
+                map=json.loads(map)
                 release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                 release_order_database=json.loads(release_order_database)
                 dispatch=gcp_download(target_bucket,rf"dispatched.json")
                 dispatch=json.loads(dispatch)
+                schedule_=gcp_download(target_bucket,rf"schedule.json")
+                schedule=json.loads(schedule_)
                 carrier_list=map['carriers']
                 mill_info=map["mill_info"]
                       
@@ -719,8 +733,26 @@ if authentication_status:
                 with release_order_tab1:  ##   RELEASE ORDER DATABASE ##
                     
      
-                    rls_tab1,rls_tab2,rls_tab3=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS","ENTER MF NUMBERS"])
-                                            
+                    rls_tab1,rls_tab2,rls_tab3,rls_tab4=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS","ENTER MF NUMBERS","SCHEDULE"])
+
+
+
+                    with rls_tab4:  #####  SCHEDULE
+                        
+                        display_df=admin_bill_of_ladings[admin_bill_of_ladings["St_Date"]==now.date()]
+                        st.write(display_df)
+                        schedule_frame=pd.DataFrame(schedule)
+                        a=st.data_editor(schedule_frame.T)
+                        a_=json.dumps(a.T.to_dict())
+                        if st.button("UPDATE TABLE"):
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"schedule.json")
+                            blob.upload_from_string(a_)
+                            st.success(f"**UPDATED SCHEDULE**")   
+
+
+                        
                     with rls_tab1:
                         
                         destinations_of_release_orders=[f"{i} to {release_order_database[i]['destination']}" for i in release_order_database if release_order_database[i]["complete"]!=True]
@@ -859,9 +891,15 @@ if authentication_status:
                                                
                                 with dol2:  
                                     try:
-                                        item=st.selectbox("CHOOSE ITEM",dispatch.keys())
-                                        if st.button("CLEAR DISPATCH ITEM"):                                       
-                                            del dispatch[item]
+                                        liste=[]
+                                        for i in dispatch.keys():
+                                            for k in dispatch[i]:
+                                                liste.append(f"{i}-{k}")
+                                        item=st.selectbox("CHOOSE ITEM",liste)
+                                        undispatch_rel=item.split("-")[0]
+                                        undispatch_sal=item.split("-")[1]
+                                        if st.button("UN-DISPATCH ITEM"):                                       
+                                            del dispatch[undispatch_rel][undispatch_sal]
                                             json_data = json.dumps(dispatch)
                                             storage_client = storage.Client()
                                             bucket = storage_client.bucket(target_bucket)
@@ -1146,7 +1184,6 @@ if authentication_status:
                            
           
             double_load=False
-            mixed_load_toggle=st.toggle("MIXED LOAD TRUCK")
             
             if len(dispatched.keys())>0 and not no_dispatch:
                 menu_destinations={}
@@ -1161,42 +1198,27 @@ if authentication_status:
                     st.session_state.work_order_ = None
                     
                 liste=[f"{i} to {menu_destinations[i]}" for i in menu_destinations.keys()]
-                if mixed_load_toggle:
-                    if 'mixed_order1_' not in st.session_state:
-                        st.session_state.mixed_order1_ = None
-                    if 'mixed_order2_' not in st.session_state:
-                        st.session_state.mixed_order2_ = None
-                    mixed_col1,mixed_col2=st.columns(2)
-                    with mixed_col1:
-                        mixed_order1_=st.selectbox("**SELECT FIRST ORDER TO WORK**",liste,index=0 if st.session_state.mixed_order1_ else 0,key="23234dsdwa")
-                        st.session_state.mixed_order1_=mixed_order1_
-                        work_order=mixed_order1_.split(" ")[0]
-                    with mixed_col2:
-                        mixed_order2_=st.selectbox("**SELECT SECOND ORDER TO WORK**",liste,index=0 if st.session_state.mixed_order2_ else 0,key="reewq")
-                        st.session_state.mixed_order2_=mixed_order2_
-                    
-                    work_order=mixed_order1_.split(" ")[0]
-                    current_release_order=work_order
-                    first_sales_order=mixed_order1_.split(" ")[1][1:]
-                    second_sales_order=mixed_order2_.split(" ")[1][1:]
-                    vessel1=release_order_database[current_release_order][first_sales_order]["vessel"]
-                    vessel2=release_order_database[current_release_order][second_sales_order]["vessel"]
-                    destination=release_order_database[current_release_order]['destination']
             
-                if not mixed_load_toggle:
-                    work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=0 if st.session_state.work_order_ else 0) 
-                    st.session_state.work_order_=work_order_
-                    work_order=work_order_.split(" ")[0]
-                    order=["001","002","003","004","005","006"]
-                    current_release_order=work_order
-                    current_sales_order=work_order_.split(" ")[1][1:]
-                    vessel=release_order_database[current_release_order][current_sales_order]["vessel"]
-                    destination=release_order_database[current_release_order]['destination']
-              
-                    
+                work_order_=st.selectbox("**SELECT RELEASE ORDER/SALES ORDER TO WORK**",liste,index=0 if st.session_state.work_order_ else 0) 
+                st.session_state.work_order_=work_order_
+                work_order=work_order_.split(" ")[0]
+                order=["001","002","003","004","005","006"]
                 
-            
-              
+                current_release_order=work_order
+                current_sales_order=work_order_.split(" ")[1][1:]
+                vessel=release_order_database[current_release_order][current_sales_order]["vessel"]
+                destination=release_order_database[current_release_order]['destination']
+                
+                
+                
+      
+                try:
+                    next_release_order=dispatched['002']['release_order']    #############################  CHECK HERE ######################## FOR MIXED LOAD
+                    next_sales_order=dispatched['002']['sales_order']
+                    
+                except:
+                    
+                    pass
                 
 
                 
@@ -1295,7 +1317,9 @@ if authentication_status:
                     placeholder = st.empty()
                     with placeholder.container():
                         vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
-                    
+                        manual_bill=st.toggle("Toggle for Manual BOL")
+                        if manual_bill:
+                            manual_bill_of_lading_number=st.textbox("ENTER BOL",key="eirufs")
                         mf=True
                         load_mf_number_issued=False
                         if destination=="CLEARWATER-Lewiston,ID":
@@ -1773,6 +1797,8 @@ if authentication_status:
                                 bill_of_lading_number,bill_of_ladings=gen_bill_of_lading()
                                 if load_mf_number_issued:
                                     bill_of_lading_number=st.session_state.load_mf_number
+                                if manual_bill:
+                                    bill_of_lading_number=manual_bill_of_lading_number
                                 edi_name= f'{bill_of_lading_number}.txt'
                                 bill_of_ladings[str(bill_of_lading_number)]={"vessel":vessel,"release_order":release_order_number,"destination":destination,"sales_order":current_sales_order,
                                                                              "ocean_bill_of_lading":ocean_bill_of_lading,"grade":wrap,"carrier_id":carrier_code,"vehicle":vehicle_id,
@@ -3066,8 +3092,8 @@ if authentication_status:
                         body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                         #st.write(body)           
                         sender = "warehouseoly@gmail.com"
-                        #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                        recipients = ["afsiny@portolympia.com"]
+                        recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                        #recipients = ["afsiny@portolympia.com"]
                         password = "xjvxkmzbpotzeuuv"
                 
               
@@ -3151,3 +3177,9 @@ elif authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:
     st.warning('Please enter your username and password')
+    
+    
+    
+    
+        
+     

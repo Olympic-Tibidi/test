@@ -751,7 +751,6 @@ if authentication_status:
                         schedule_frame["Loaded"]=0
                         for i in liste:
                             st.write(i)
-                            schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]=0
                             schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]+=1
                          
                         schedule_frame["Left"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]

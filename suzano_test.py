@@ -740,7 +740,7 @@ if authentication_status:
                         schedule_=gcp_download(target_bucket,rf"schedule.json")
                         schedule=json.loads(schedule_)
                         display_df=admin_bill_of_ladings[admin_bill_of_ladings["St_Date"]==now.date()]
-                        st.write(display_df)
+                        #st.write(display_df)
                         liste=[]
                         for term in display_df.index:
                             t=(display_df.loc[term,'release_order'],display_df.loc[term,'sales_order'],display_df.loc[term,'destination'])

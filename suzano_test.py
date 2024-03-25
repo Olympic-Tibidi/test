@@ -64,7 +64,7 @@ st.set_page_config(layout="wide")
 #os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "client_secrets.json"
 #os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = st.secrets['private_key']
 
-target_bucket="new_suzano_spare"
+target_bucket="new_suzano"
 utc_difference=7
 
 def check_password():
@@ -485,7 +485,6 @@ if authentication_status:
             admin_tab1,admin_tab2,admin_tab3,admin_tab4=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","AUDIT"])
 
             with admin_tab4:   ###   AUDIT
-                st.markdown(f"**:red[Discrepancy]**")
                 if st.button("RUN RECORD AUDIT"):
                     
                     dfb=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
@@ -553,18 +552,19 @@ if authentication_status:
                     with aud_col1:
                         
                         if compare_dict(suz_t,df_t):
-                            st.markdown("All Checks Complete !")
-                            st.markdown("Suzano Report and BOL Database Matches")       
+                            st.markdown("**:blue[All Checks Complete !]**")
+                            st.markdown("**:blue[SUZANO REPORT match BILL OF LADINGS]**")       
                             st.write(f"{len(suz_frame)} Shipments")
-                            st.write(suz_t)
-                            st.write(df_t)
+                            st.balloons()
+                           
 
                     with aud_col2:
                         
                         if compare_dict(rel_t,df_t):
-                            st.markdown("All Checks Complete !")
-                            st.markdown("Release Order Database and BOL Database Matches")       
+                            st.markdown("**:blue[All Checks Complete !]**")
+                            st.markdown("**:blue[INVENTORY match BILL OF LADINGS]**")       
                             st.write(f"{len(suz_frame)} Shipments")
+                            st.balloons()
                             
                             
             with admin_tab2:   #### BILL OF LADINGS
@@ -740,21 +740,19 @@ if authentication_status:
                         schedule_=gcp_download(target_bucket,rf"schedule.json")
                         schedule=json.loads(schedule_)
                         display_df=admin_bill_of_ladings[admin_bill_of_ladings["St_Date"]==now.date()]
-                        #st.write(display_df)
+                        st.write(display_df)
                         liste=[]
                         for term in display_df.index:
                             t=(display_df.loc[term,'release_order'],display_df.loc[term,'sales_order'],display_df.loc[term,'destination'])
                             liste.append(t)
                         
                         schedule_frame=pd.DataFrame(schedule).T
-                        #schedule_frame=schedule_frame.iloc[:-1]
                         schedule_frame["Loaded"]=0
                         for i in liste:
-                            st.write(i)
                             schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]+=1
-                         
-                        schedule_frame["Left"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
-                        schedule_frame.loc["Total",["Scheduled","Loaded","Left"]]=schedule_frame[["Scheduled","Loaded","Left"]].sum()
+                     
+                        schedule_frame["Remaining"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
+                        schedule_frame.loc["Total",["Scheduled","Loaded","Remaining"]]=schedule_frame[["Scheduled","Loaded","Remaining"]].sum()
                         schedule_frame=schedule_frame.fillna("")
                         a=st.data_editor(schedule_frame)
                         a_=a.iloc[:-1]
@@ -1220,17 +1218,20 @@ if authentication_status:
                     
                     schedule_frame=pd.DataFrame(schedule).T
                     #schedule_frame=schedule_frame.iloc[:-1]
+                    schedule_frame["Loaded"]=0
                     for i in liste:
-                        try:
-                            schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]=0
-                            schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]+=1
-                        except:
-                            pass
-                    schedule_frame["Left"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
-                    schedule_frame.loc["Total",["Scheduled","Loaded","Left"]]=schedule_frame[["Scheduled","Loaded","Left"]].sum()
+                        schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]+=1
+                    yeni=[]
+                    for i in schedule_frame.index:
+                        if i!="Containers":
+                            yeni.append(release_order_database[schedule_frame.loc[i,"Release Order"]][schedule_frame.loc[i,"Sales Order"]]['unitized'])
+                    new_index=[f"{i}-{j}" for i,j in zip(schedule_frame.index,yeni)]
+                    schedule_frame.index=new_index+["Containers"]
+                    schedule_frame["Remaining"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
+                    schedule_frame.loc["Total",["Scheduled","Loaded","Remaining"]]=schedule_frame[["Scheduled","Loaded","Remaining"]].sum()
                     schedule_frame=schedule_frame.fillna("")
                     schedule_frame["Loaded"]=schedule_frame["Loaded"].astype('Int64')
-                    schedule_frame["Left"]=schedule_frame["Left"].astype('Int64')
+                    schedule_frame["Remaining"]=schedule_frame["Remaining"].astype('Int64')
                     st.table(schedule_frame)
                 
                 with loadout:
@@ -1957,8 +1958,8 @@ if authentication_status:
                                 body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                                 #st.write(body)           
                                 sender = "warehouseoly@gmail.com"
-                                #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                                recipients = ["afsiny@portolympia.com"]
+                                recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                #recipients = ["afsiny@portolympia.com"]
                                 password = "xjvxkmzbpotzeuuv"
                         
                       
@@ -2436,17 +2437,20 @@ if authentication_status:
                 
                 schedule_frame=pd.DataFrame(schedule).T
                 #schedule_frame=schedule_frame.iloc[:-1]
+                schedule_frame["Loaded"]=0
                 for i in liste:
-                    try:
-                        schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]=0
-                        schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]+=1
-                    except:
-                        pass
-                schedule_frame["Left"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
-                schedule_frame.loc["Total",["Scheduled","Loaded","Left"]]=schedule_frame[["Scheduled","Loaded","Left"]].sum()
+                    schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]+=1
+                yeni=[]
+                for i in schedule_frame.index:
+                    if i!="Containers":
+                        yeni.append(release_order_database[schedule_frame.loc[i,"Release Order"]][schedule_frame.loc[i,"Sales Order"]]['unitized'])
+                new_index=[f"{i}-{j}" for i,j in zip(schedule_frame.index,yeni)]
+                schedule_frame.index=new_index+["Containers"]
+                schedule_frame["Remaining"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
+                schedule_frame.loc["Total",["Scheduled","Loaded","Remaining"]]=schedule_frame[["Scheduled","Loaded","Remaining"]].sum()
                 schedule_frame=schedule_frame.fillna("")
                 schedule_frame["Loaded"]=schedule_frame["Loaded"].astype('Int64')
-                schedule_frame["Left"]=schedule_frame["Left"].astype('Int64')
+                schedule_frame["Remaining"]=schedule_frame["Remaining"].astype('Int64')
                 st.table(schedule_frame)
             
             with loadout:
@@ -3258,3 +3262,9 @@ elif authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:
     st.warning('Please enter your username and password')
+    
+    
+    
+    
+        
+     

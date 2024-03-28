@@ -2056,70 +2056,69 @@ if authentication_status:
                 def convert_df(df):
                     # IMPORTANT: Cache the conversion to prevent computation on every rerun
                     return df.to_csv().encode('utf-8')
-                try:
-                    now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
-                    suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
-                    suzano_report=json.loads(suzano_report_)
-                    suzano_report=pd.DataFrame(suzano_report).T
-                    suzano_report=suzano_report[["Date Shipped","Vehicle", "Shipment ID #", "Consignee","Consignee City","Consignee State","Release #","Carrier","ETA","Ocean BOL#","Batch#","Warehouse","Vessel","Voyage #","Grade","Quantity","Metric Ton", "ADMT","Mode of Transportation"]]
-                    suzano_report["Shipment ID #"]=[str(i) for i in suzano_report["Shipment ID #"]]
-                    suzano_report["Batch#"]=[str(i) for i in suzano_report["Batch#"]]
-                    daily_suzano=suzano_report.copy()
-                    daily_suzano["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suzano_report["Date Shipped"]]
-                    daily_suzano_=daily_suzano[daily_suzano["Date"]==now.date()]
-                    
-                    choose = st.radio(
-                                    "Select Daily or Accumulative Report",
-                                    ["DAILY", "ACCUMULATIVE", "FIND BY DATE","FIND DATE RANGE"])
-                    if choose=="DAILY":
-                        daily_suzano_=daily_suzano_.reset_index(drop=True)
-                        daily_suzano_.index=[i+1 for i in daily_suzano_.index]
-                        daily_suzano_.loc["TOTAL"]=daily_suzano_[["Quantity","Metric Ton","ADMT"]].sum()
-                        st.dataframe(daily_suzano_)
-                        csv=convert_df(daily_suzano_)
-                        file_name=f'OLYMPIA_DAILY_REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
-                    elif choose=="FIND BY DATE":
-                        required_date=st.date_input("CHOOSE DATE",key="dssar")
-                        filtered_suzano=daily_suzano[daily_suzano["Date"]==required_date]
-                        filtered_suzano=filtered_suzano.reset_index(drop=True)
-                        filtered_suzano.index=[i+1 for i in filtered_suzano.index]
-                        filtered_suzano.loc["TOTAL"]=filtered_suzano[["Quantity","Metric Ton","ADMT"]].sum()
-                        st.dataframe(filtered_suzano)
-                        csv=convert_df(filtered_suzano)
-                        file_name=f'OLYMPIA_SHIPMENT_REPORT-{datetime.datetime.strftime(required_date,"%m-%d,%Y")}.csv'
-
-                    elif choose=="FIND DATE RANGE":
-                        datecol1,datecol2,datecol3=st.columns(3,3,4)
-                        with datecol1:
-                            tarih1=st.date_input("FROM",key="dsssaar")
-                        with datecol2:
-                            tarih2=st.date_input("TO",key="dssdar")
-                            
-                        range_suzano=daily_suzano[(daily_suzano["Date"]>tarih1)&(daily_suzano["Date"]<tarih2)]
-                        range_suzano=range_suzano.reset_index(drop=True)
-                        range_suzano.index=[i+1 for i in range_suzano.index]
-                        range_suzano.loc["TOTAL"]=range_suzano[["Quantity","Metric Ton","ADMT"]].sum()
-                        st.dataframe(range_suzano)
-                        csv=convert_df(range_suzano)
-                        file_name=f'OLYMPIA_SHIPMENT_REPORT-daterange.csv'
-                    
-                    else:
-                        st.dataframe(suzano_report)
-                        csv=convert_df(suzano_report)
-                        file_name=f'OLYMPIA_ALL_SHIPMENTS to {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
-                    
-                    
-                    
-                   
-                    
                 
-                    st.download_button(
-                        label="DOWNLOAD REPORT AS CSV",
-                        data=csv,
-                        file_name=file_name,
-                        mime='text/csv')
-                except:
-                    st.write("NO REPORTS RECORDED")
+                now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
+                suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
+                suzano_report=json.loads(suzano_report_)
+                suzano_report=pd.DataFrame(suzano_report).T
+                suzano_report=suzano_report[["Date Shipped","Vehicle", "Shipment ID #", "Consignee","Consignee City","Consignee State","Release #","Carrier","ETA","Ocean BOL#","Batch#","Warehouse","Vessel","Voyage #","Grade","Quantity","Metric Ton", "ADMT","Mode of Transportation"]]
+                suzano_report["Shipment ID #"]=[str(i) for i in suzano_report["Shipment ID #"]]
+                suzano_report["Batch#"]=[str(i) for i in suzano_report["Batch#"]]
+                daily_suzano=suzano_report.copy()
+                daily_suzano["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suzano_report["Date Shipped"]]
+                daily_suzano_=daily_suzano[daily_suzano["Date"]==now.date()]
+                
+                choose = st.radio(
+                                "Select Daily or Accumulative Report",
+                                ["DAILY", "ACCUMULATIVE", "FIND BY DATE","FIND DATE RANGE"])
+                if choose=="DAILY":
+                    daily_suzano_=daily_suzano_.reset_index(drop=True)
+                    daily_suzano_.index=[i+1 for i in daily_suzano_.index]
+                    daily_suzano_.loc["TOTAL"]=daily_suzano_[["Quantity","Metric Ton","ADMT"]].sum()
+                    st.dataframe(daily_suzano_)
+                    csv=convert_df(daily_suzano_)
+                    file_name=f'OLYMPIA_DAILY_REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
+                elif choose=="FIND BY DATE":
+                    required_date=st.date_input("CHOOSE DATE",key="dssar")
+                    filtered_suzano=daily_suzano[daily_suzano["Date"]==required_date]
+                    filtered_suzano=filtered_suzano.reset_index(drop=True)
+                    filtered_suzano.index=[i+1 for i in filtered_suzano.index]
+                    filtered_suzano.loc["TOTAL"]=filtered_suzano[["Quantity","Metric Ton","ADMT"]].sum()
+                    st.dataframe(filtered_suzano)
+                    csv=convert_df(filtered_suzano)
+                    file_name=f'OLYMPIA_SHIPMENT_REPORT-{datetime.datetime.strftime(required_date,"%m-%d,%Y")}.csv'
+
+                elif choose=="FIND DATE RANGE":
+                    datecol1,datecol2,datecol3=st.columns(3,3,4)
+                    with datecol1:
+                        tarih1=st.date_input("FROM",key="dsssaar")
+                    with datecol2:
+                        tarih2=st.date_input("TO",key="dssdar")
+                        
+                    range_suzano=daily_suzano[(daily_suzano["Date"]>tarih1)&(daily_suzano["Date"]<tarih2)]
+                    range_suzano=range_suzano.reset_index(drop=True)
+                    range_suzano.index=[i+1 for i in range_suzano.index]
+                    range_suzano.loc["TOTAL"]=range_suzano[["Quantity","Metric Ton","ADMT"]].sum()
+                    st.dataframe(range_suzano)
+                    csv=convert_df(range_suzano)
+                    file_name=f'OLYMPIA_SHIPMENT_REPORT-daterange.csv'
+                
+                else:
+                    st.dataframe(suzano_report)
+                    csv=convert_df(suzano_report)
+                    file_name=f'OLYMPIA_ALL_SHIPMENTS to {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
+                
+                
+                
+               
+                
+            
+                st.download_button(
+                    label="DOWNLOAD REPORT AS CSV",
+                    data=csv,
+                    file_name=file_name,
+                    mime='text/csv')
+                
                 
 
             with edi_bank:

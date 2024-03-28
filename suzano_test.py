@@ -2016,8 +2016,8 @@ if authentication_status:
                                     subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
                                     body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
                                     sender = "warehouseoly@gmail.com"
-                                    recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                                    #recipients = ["afsiny@portolympia.com"]
+                                    #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                    recipients = ["afsiny@portolympia.com"]
                                     password = "xjvxkmzbpotzeuuv"
                                     send_email(subject, body, sender, recipients, password)
                                 
@@ -2070,7 +2070,7 @@ if authentication_status:
                     
                     choose = st.radio(
                                     "Select Daily or Accumulative Report",
-                                    ["DAILY", "ACCUMULATIVE", "FIND BY DATE"])
+                                    ["DAILY", "ACCUMULATIVE", "FIND BY DATE","FIND DATE RANGE"])
                     if choose=="DAILY":
                         daily_suzano_=daily_suzano_.reset_index(drop=True)
                         daily_suzano_.index=[i+1 for i in daily_suzano_.index]
@@ -2087,6 +2087,13 @@ if authentication_status:
                         st.dataframe(filtered_suzano)
                         csv=convert_df(filtered_suzano)
                         file_name=f'OLYMPIA_SHIPMENT_REPORT-{datetime.datetime.strftime(required_date,"%m-%d,%Y")}.csv'
+
+                    elif choose=="FIND BY DATE RANGE":
+                        datecol1,datecol2,datecol3=st.columns(3,3,4)
+                        with datecol1:
+                            tarih1=st.date_input("FROM",key="dsssaar")
+                        with datecol2:
+                            tarih2=st.date_input("TO",key="dssdar")
                     else:
                         st.dataframe(suzano_report)
                         csv=convert_df(suzano_report)

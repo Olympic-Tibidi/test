@@ -1009,8 +1009,8 @@ if authentication_status:
                                 st.success(f"MF numbers entered to {release_order_number_mf} successfully!")
                             if st.button("REMOVE MF NUMBERS",key="ioerssu" ):
                                 for i in input_mf_numbers:
-                                    if i in mf_numbers[release_order_number_mf]:
-                                        mf_numbers[release_order_number_mf].remove(i)
+                                    if i in mf_numbers[release_order_number_mf][shipment_date]:
+                                        mf_numbers[release_order_number_mf][shipment_date].remove(i)
                                 mf_data=json.dumps(mf_numbers)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
@@ -1984,7 +1984,8 @@ if authentication_status:
                                 time.sleep(0.1)                            
                                 success_container5.success(f"Uploaded EDI File",icon="✅")
                                 if load_mf_number_issued:
-                                    mf_numbers_for_load[release_order_number].remove(load_mf_number)
+                                    shipment_date=datetime.datetime.strftime(file_date,"%b-%d,%Y")
+                                    mf_numbers_for_load[release_order_number][shipment_date].remove(load_mf_number)
                                     mf_numbers_for_load=json.dumps(mf_numbers_for_load)
                                     storage_client = storage.Client()
                                     bucket = storage_client.bucket(target_bucket)

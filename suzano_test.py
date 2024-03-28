@@ -2088,12 +2088,21 @@ if authentication_status:
                         csv=convert_df(filtered_suzano)
                         file_name=f'OLYMPIA_SHIPMENT_REPORT-{datetime.datetime.strftime(required_date,"%m-%d,%Y")}.csv'
 
-                    elif choose=="FIND BY DATE RANGE":
+                    elif choose=="FIND DATE RANGE":
                         datecol1,datecol2,datecol3=st.columns(3,3,4)
                         with datecol1:
                             tarih1=st.date_input("FROM",key="dsssaar")
                         with datecol2:
                             tarih2=st.date_input("TO",key="dssdar")
+                            
+                        range_suzano=daily_suzano[(daily_suzano["Date"]>=tarih1)&(daily_suzano["Date"]<=tarih2)]
+                        range_suzano=range_suzano.reset_index(drop=True)
+                        range_suzano.index=[i+1 for i in range_suzano.index]
+                        range_suzano.loc["TOTAL"]=range_suzano[["Quantity","Metric Ton","ADMT"]].sum()
+                        st.dataframe(range_suzano)
+                        csv=convert_df(range_suzano)
+                        file_name=f'OLYMPIA_SHIPMENT_REPORT-daterange.csv'
+                    
                     else:
                         st.dataframe(suzano_report)
                         csv=convert_df(suzano_report)

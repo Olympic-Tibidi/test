@@ -982,6 +982,7 @@ if authentication_status:
                             st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
                         else:
                             shipment_date=st.date_input("Shipment Date",key="dsa")
+                            shipment_date=datetime.datetime.strftime(shipment_date,"%M-%d,%Y")
                             release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",destinations_of_release_orders,key="tatata")
                             release_order_number_mf=release_order_number_mf.split(" ")[0]
                             input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")

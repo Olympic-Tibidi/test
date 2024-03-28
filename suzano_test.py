@@ -2103,7 +2103,7 @@ if authentication_status:
                     ro_suzano=daily_suzano[daily_suzano["Release #"]=="report_ro"]
                     ro_suzano=ro_suzano.reset_index(drop=True)
                     ro_suzano.index=[i+1 for i in ro_suzano.index]
-                    st.dataframe(ro_suzano_)
+                    st.dataframe(suzano_report.head())
                     csv=convert_df(ro_suzano)
                     file_name=f'OLYMPIA_SHIPMENT_REPORT-ReleaseOrder-{report_ro}.csv'
 

@@ -2099,10 +2099,11 @@ if authentication_status:
 
                 elif choose=="BY RELEASE ORDER":
                     report_ro=st.selectbox("SELECT RELEASE ORDER",([i for i in raw_ro]),key="sdgerw")
+                    ro_suzano_=daily_suzano[daily_suzano["Release #"]=="report_ro"]
                     ro_suzano=daily_suzano[daily_suzano["Release #"]=="report_ro"]
                     ro_suzano=ro_suzano.reset_index(drop=True)
                     ro_suzano.index=[i+1 for i in ro_suzano.index]
-                    st.dataframe(ro_suzano)
+                    st.dataframe(ro_suzano_)
                     csv=convert_df(ro_suzano)
                     file_name=f'OLYMPIA_SHIPMENT_REPORT-ReleaseOrder-{report_ro}.csv'
 

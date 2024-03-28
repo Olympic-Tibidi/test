@@ -2079,7 +2079,7 @@ if authentication_status:
                 
                 choose = st.radio(
                                 "Select Daily or Accumulative Report",
-                                ["DAILY", "ACCUMULATIVE", "FIND BY DATE","FIND DATE RANGE","BY RELEASE ORDER"])
+                                ["DAILY", "ACCUMULATIVE", "FIND BY DATE","FIND DATE RANGE","BY RELEASE ORDER","BY BATCH"])
                 if choose=="DAILY":
                     daily_suzano_=daily_suzano_.reset_index(drop=True)
                     daily_suzano_.index=[i+1 for i in daily_suzano_.index]
@@ -2098,7 +2098,20 @@ if authentication_status:
                     file_name=f'OLYMPIA_SHIPMENT_REPORT-{datetime.datetime.strftime(required_date,"%m-%d,%Y")}.csv'
 
                 elif choose=="BY RELEASE ORDER":
-                    report_ro=st.selectbox("SELECT RELEASE ORDER",([i for i in raw_ro]))
+                    report_ro=st.selectbox("SELECT RELEASE ORDER",([i for i in raw_ro]),key="sdgerw")
+                    ro_suzano=daily_suzano[daily_suzano["Release #"]=="report_ro"]
+                    ro_suzano=ro_suzano.reset_index(drop=True)
+                    ro_suzano.index=[i+1 for i in ro_suzano.index]
+                    st.dataframe(ro_suzano)
+                    csv=convert_df(ro_suzano)
+
+                elif choose=="BY BATCH":
+                    report_batch=st.selectbox("SELECT RELEASE ORDER",([i for i in raw_ro]),key="sddgerw")
+                    batch_suzano=daily_suzano[daily_suzano["Batch#"]=="report_batch"]
+                    batch_suzano=batch_suzano.reset_index(drop=True)
+                    batch_suzano.index=[i+1 for i in batch_suzano.index]
+                    st.dataframe(batch_suzano)
+                    csv=convert_df(batch_suzano)
 
                 elif choose=="FIND DATE RANGE":
                     datecol1,datecol2,datecol3=st.columns([3,3,4])

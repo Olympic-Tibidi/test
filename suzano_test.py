@@ -2104,6 +2104,7 @@ if authentication_status:
                     ro_suzano.index=[i+1 for i in ro_suzano.index]
                     st.dataframe(ro_suzano)
                     csv=convert_df(ro_suzano)
+                    file_name=f'OLYMPIA_SHIPMENT_REPORT-ReleaseOrder-{report_ro}.csv'
 
                 elif choose=="BY BATCH":
                     report_batch=st.selectbox("SELECT RELEASE ORDER",([i for i in raw_ro]),key="sddgerw")
@@ -2112,6 +2113,7 @@ if authentication_status:
                     batch_suzano.index=[i+1 for i in batch_suzano.index]
                     st.dataframe(batch_suzano)
                     csv=convert_df(batch_suzano)
+                    file_name=f'OLYMPIA_SHIPMENT_REPORT-Batch-{report_batch}.csv'
 
                 elif choose=="FIND DATE RANGE":
                     datecol1,datecol2,datecol3=st.columns([3,3,4])

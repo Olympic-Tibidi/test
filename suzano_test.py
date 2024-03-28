@@ -2170,7 +2170,7 @@ if authentication_status:
                     storage_client = storage.Client()
                 
                     # Get the current date
-                    today = datetime.utcnow().date()
+                    today = datetime.datetime.now().date()
                 
                     # Get the list of blobs in the specified folder
                     blobs = storage_client.list_blobs(bucket_name, prefix=folder_name)

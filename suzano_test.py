@@ -2108,7 +2108,7 @@ if authentication_status:
                     file_name=f'OLYMPIA_SHIPMENT_REPORT-ReleaseOrder-{report_ro}.csv'
 
                 elif choose=="BY BATCH":
-                    report_batch=st.selectbox("SELECT RELEASE ORDER",([i for i in raw_ro]),key="sddgerw")
+                    report_batch=st.selectbox("SELECT RELEASE ORDER",(daily_suzano["Batch#"].unique()),key="sddgerw")
                     batch_suzano=daily_suzano[daily_suzano["Batch#"]==report_batch]
                     batch_suzano=batch_suzano.reset_index(drop=True)
                     batch_suzano.index=[i+1 for i in batch_suzano.index]

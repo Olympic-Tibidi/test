@@ -2079,7 +2079,7 @@ if authentication_status:
                 
                 choose = st.radio(
                                 "Select Daily or Accumulative Report",
-                                ["DAILY", "ACCUMULATIVE", "FIND BY DATE","FIND DATE RANGE"])
+                                ["DAILY", "ACCUMULATIVE", "FIND BY DATE","FIND DATE RANGE","BY RELEASE ORDER"])
                 if choose=="DAILY":
                     daily_suzano_=daily_suzano_.reset_index(drop=True)
                     daily_suzano_.index=[i+1 for i in daily_suzano_.index]
@@ -2096,6 +2096,9 @@ if authentication_status:
                     st.dataframe(filtered_suzano)
                     csv=convert_df(filtered_suzano)
                     file_name=f'OLYMPIA_SHIPMENT_REPORT-{datetime.datetime.strftime(required_date,"%m-%d,%Y")}.csv'
+
+                elif choose=="BY RELEASE ORDER":
+                    report_ro=st.selectbox("SELECT RELEASE ORDER",([i for i in raw_ro]))
 
                 elif choose=="FIND DATE RANGE":
                     datecol1,datecol2,datecol3=st.columns([3,3,4])

@@ -1000,7 +1000,7 @@ if authentication_status:
                                     else:
                                         mf_numbers[release_order_number_mf][shipment_date]+=input_mf_numbers
                                         
-                                mf_numbers[release_order_number_mf][shipment_date]=list(set(mf_numbers[release_order_number_mf]))
+                                mf_numbers[release_order_number_mf][shipment_date]=list(set(mf_numbers[release_order_number_mf][shipment_date]))
                                 mf_data=json.dumps(mf_numbers)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)

@@ -961,11 +961,12 @@ if authentication_status:
                         
                         st.write(pd.DataFrame(completed_release_order_dest_map).T)
                    
-                    with rls_tab3:
+                    with rls_tab3:   ###    MF NUMBERS   ###
                         
                         mf_numbers=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                         mf_numbers=json.loads(mf_numbers)
-                        def check_home(ro):
+                        
+                        def check_home(ro): ### from release order database find ones that are GP and not complete
                             destination=release_order_database[ro]['destination']
                             if destination not in ["GP-Clatskanie,OR","GP-Halsey,OR"]:
                                 return False 
@@ -980,7 +981,7 @@ if authentication_status:
                         if len(destinations_of_release_orders)==0:
                             st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
                         else:
-                            
+                            shipment_date=st.date_input("Shipment Date",key="dsa")
                             release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",destinations_of_release_orders,key="tatata")
                             release_order_number_mf=release_order_number_mf.split(" ")[0]
                             input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
@@ -990,8 +991,14 @@ if authentication_status:
                            
                             if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
                                 if release_order_number_mf not in mf_numbers.keys():   
-                                    mf_numbers[release_order_number_mf]=[]
-                                mf_numbers[release_order_number_mf]+=input_mf_numbers
+                                    mf_numbers[release_order_number_mf]={}
+                                    mf_numbers[release_order_number_mf][shipment_date]=input_mf_numbers
+                                else:
+                                    if shipment_date not in mf_numbers[release_order_number_mf]:
+                                        mf_numbers[release_order_number_mf][shipment_date]=input_mf_numbers
+                                    else:
+                                        mf_numbers[release_order_number_mf][shipment_date]+=input_mf_numbers
+                                        
                                 mf_numbers[release_order_number_mf]=list(set(mf_numbers[release_order_number_mf]))
                                 mf_data=json.dumps(mf_numbers)
                                 storage_client = storage.Client()

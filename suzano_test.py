@@ -2192,7 +2192,7 @@ if authentication_status:
 
                                
                 # Filter out .txt files
-                txt_files = [file for file in files if file.endswith('.txt')]
+                
                 
                 
                 for i in today_uploaded_files:

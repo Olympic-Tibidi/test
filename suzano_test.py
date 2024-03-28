@@ -2197,7 +2197,7 @@ if authentication_status:
                 
                 for i in today_uploaded_files[:2]:
                     
-                    lines=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}")
+                    lines=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}").splitlines()
                     st.write(lines)
                     # Step 2: Process the contents
                     data = []

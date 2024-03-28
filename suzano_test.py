@@ -2095,7 +2095,7 @@ if authentication_status:
                         with datecol2:
                             tarih2=st.date_input("TO",key="dssdar")
                             
-                        range_suzano=daily_suzano[(daily_suzano["Date"]>=tarih1)&(daily_suzano["Date"]<=tarih2)]
+                        range_suzano=daily_suzano[(daily_suzano["Date"]>tarih1)&(daily_suzano["Date"]<tarih2)]
                         range_suzano=range_suzano.reset_index(drop=True)
                         range_suzano.index=[i+1 for i in range_suzano.index]
                         range_suzano.loc["TOTAL"]=range_suzano[["Quantity","Metric Ton","ADMT"]].sum()

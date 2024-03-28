@@ -2089,7 +2089,7 @@ if authentication_status:
                     file_name=f'OLYMPIA_SHIPMENT_REPORT-{datetime.datetime.strftime(required_date,"%m-%d,%Y")}.csv'
 
                 elif choose=="FIND DATE RANGE":
-                    datecol1,datecol2,datecol3=st.columns(3,3,4)
+                    datecol1,datecol2,datecol3=st.columns([3,3,4])
                     with datecol1:
                         tarih1=st.date_input("FROM",key="dsssaar")
                     with datecol2:

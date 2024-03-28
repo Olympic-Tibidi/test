@@ -2102,6 +2102,7 @@ if authentication_status:
                     ro_suzano=daily_suzano[daily_suzano["Release #"]==report_ro]
                     ro_suzano=ro_suzano.reset_index(drop=True)
                     ro_suzano.index=[i+1 for i in ro_suzano.index]
+                    ro_suzano.loc["TOTAL"]=ro_suzano[["Quantity","Metric Ton","ADMT"]].sum()
                     st.dataframe(ro_suzano)
                     csv=convert_df(ro_suzano)
                     file_name=f'OLYMPIA_SHIPMENT_REPORT-ReleaseOrder-{report_ro}.csv'
@@ -2111,6 +2112,7 @@ if authentication_status:
                     batch_suzano=daily_suzano[daily_suzano["Batch#"]==report_batch]
                     batch_suzano=batch_suzano.reset_index(drop=True)
                     batch_suzano.index=[i+1 for i in batch_suzano.index]
+                    batch_suzano.loc["TOTAL"]=batch_suzano[["Quantity","Metric Ton","ADMT"]].sum()
                     st.dataframe(batch_suzano)
                     csv=convert_df(batch_suzano)
                     file_name=f'OLYMPIA_SHIPMENT_REPORT-Batch-{report_batch}.csv'

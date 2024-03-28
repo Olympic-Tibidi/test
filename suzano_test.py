@@ -1422,7 +1422,7 @@ if authentication_status:
                                  carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=19)
                                  if carrier_code=="123456-KBX":
                                    if release_order_number in mf_numbers_for_load.keys():
-                                       mf_liste=[i for i in mf_numbers_for_load[release_order_number]]
+                                       mf_liste=[i for i in mf_numbers_for_load[release_order_number][datetime.datetime.strftime(file_date,"%b-%d,%Y)]]
                                        if len(mf_liste)>0:
                                            load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
                                            mf=True

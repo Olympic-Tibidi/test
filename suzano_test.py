@@ -2197,6 +2197,7 @@ if authentication_status:
                     
                     
                     for i in today_uploaded_files[:2]:
+                        st.write(i)
                         
                         lines=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}").splitlines()
                         today_uploaded_files = list_files_uploaded_today(target_bucket, "EDIS/")

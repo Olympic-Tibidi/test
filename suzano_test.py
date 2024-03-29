@@ -2165,95 +2165,98 @@ if authentication_status:
                     file_name=f'{requested_edi_file}',
                     mime='text/csv')
                 
-                def list_files_uploaded_today(bucket_name, folder_name):
-                    # Initialize Google Cloud Storage client
-                    storage_client = storage.Client()
-                
-                    # Get the current date
-                    today = datetime.datetime.now().date()
-                
-                    # Get the list of blobs in the specified folder
-                    blobs = storage_client.list_blobs(bucket_name, prefix=folder_name)
-                
-                    # Extract filenames uploaded today only
-                    filenames = []
-                    for blob in blobs:
-                        # Check if blob's last modification date is today
-                        if blob.updated.date() == today:
-                            # Extract only the filenames without the folder path
-                            filename = blob.name.split("/")[-1]
-                            filenames.append(filename)
-                
-                    return filenames
-                today_uploaded_files = list_files_uploaded_today(target_bucket, "EDIS/")
-                st.write(today_uploaded_files)
-                base=[]
-
-
-                               
-                # Filter out .txt files
-                
-                
-                
-                for i in today_uploaded_files[:2]:
+                if st.button("EDI AUDIT")"
+                    def list_files_uploaded_today(bucket_name, folder_name):
+                        # Initialize Google Cloud Storage client
+                        storage_client = storage.Client()
                     
-                    lines=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}").splitlines()
-                    st.write(lines)
-                    # Step 2: Process the contents
-                    data = []
-                    count=1
-                    line_count=0
-                    dev_count=0
-                    line_tonnage=0
-                    unit_count=0
-                    for line in lines:
-                        if line.startswith("1HDR"):
-                            prefix, data = line.split(':') 
-                            assert prefix=="1HDR" , "Prefix does not match the expected value '1HDR'"
-                            date_str = data[:8]  # YYYYMMDD
-                            time_str = data[8:14]  # HHMMSS
-                            terminal_code = data[14:18]  # 4 letters
-                            datetime_obj = datetime.datetime.strptime(date_str + time_str, '%Y%m%d%H%M%S')
-                            line_count+=1
-                        elif line.startswith("2DTD"):
-                            prefix, data = line.split(':') 
-                            release_order = data[:10].strip() 
-                            sales_item = data[10:16].strip() 
-                            date=data[16:24].strip()
-                            date = datetime.datetime.strptime(date, '%Y%m%d').date()
-                            transport_type=data[24:26].strip()
-                            transport_sequential=data[26:30].strip()
-                            vehicle_id=data[30:50].strip()
-                            total_tonnage=int(data[50:66].strip())
-                            carrier_code=data[105:115].strip()
-                            bill_of_lading=data[115:165].strip()
-                            eta_date=data[165:].strip()
-                            eta_date = datetime.datetime.strptime(eta_date, '%Y%m%d').date()
-                            line_count+=1
-                        elif line.startswith("2DEV"):
-                            prefix, data = line.split(':')
-                            line_release_order=data[:10]
-                            line_sales_item=data[10:16].strip()
-                            line_date=data[16:24].strip()
-                            line_date = datetime.datetime.strptime(line_date, '%Y%m%d').date()
-                            transport_type=data[24:26].strip()
-                            lot_number=data[26:36].strip()
-                            line_weight=int(data[51:56].strip())
-                            line_unit_count=line_weight/2000
-                            line_tonnage+=line_weight
-                            unit_count+=line_unit_count
-                            dev_count+=1
-                            line_count+=1
-                
-                        elif line.startswith("9TRL"):
-                            prefix, data = line.split(':')
-                            edi_line_count=int(data[:4])
-                            line_count+=1
-                            assert edi_line_count==line_count,f"no, line_count is {line_count}"
-                            assert line_tonnage==total_tonnage
-                    base.append({'Date Shipped':datetime_obj, 'Vehicle':vehicle_id, 'Shipment ID #':bill_of_lading, 'Release #':release_order,
-                     'Carrier':carrier_code, 'Quantity':unit_count, 'Metric Ton':total_tonnage/1000})
-                    st.write(base)
+                        # Get the current date
+                        today = datetime.datetime.now().date()
+                    
+                        # Get the list of blobs in the specified folder
+                        blobs = storage_client.list_blobs(bucket_name, prefix=folder_name)
+                    
+                        # Extract filenames uploaded today only
+                        filenames = []
+                        for blob in blobs:
+                            # Check if blob's last modification date is today
+                            if blob.updated.date() == today:
+                                # Extract only the filenames without the folder path
+                                filename = blob.name.split("/")[-1]
+                                filenames.append(filename)
+                    
+                        return filenames
+                    today_uploaded_files = list_files_uploaded_today(target_bucket, "EDIS/")
+                    #st.write(today_uploaded_files)
+                    base=[]
+    
+    
+                                   
+                    # Filter out .txt files
+                    
+                    
+                    
+                    for i in today_uploaded_files[:2]:
+                        
+                        lines=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}").splitlines()
+                        today_uploaded_files = list_files_uploaded_today(target_bucket, "EDIS/")
+                        #st.write(today_uploaded_files)
+                        base=[]
+                        # Step 2: Process the contents
+                        data = []
+                        count=1
+                        line_count=0
+                        dev_count=0
+                        line_tonnage=0
+                        unit_count=0
+                        for line in lines:
+                            if line.startswith("1HDR"):
+                                prefix, data = line.split(':') 
+                                assert prefix=="1HDR" , "Prefix does not match the expected value '1HDR'"
+                                date_str = data[:8]  # YYYYMMDD
+                                time_str = data[8:14]  # HHMMSS
+                                terminal_code = data[14:18]  # 4 letters
+                                datetime_obj = datetime.datetime.strptime(date_str + time_str, '%Y%m%d%H%M%S')
+                                line_count+=1
+                            elif line.startswith("2DTD"):
+                                prefix, data = line.split(':') 
+                                release_order = data[:10].strip() 
+                                sales_item = data[10:16].strip() 
+                                date=data[16:24].strip()
+                                date = datetime.datetime.strptime(date, '%Y%m%d').date()
+                                transport_type=data[24:26].strip()
+                                transport_sequential=data[26:30].strip()
+                                vehicle_id=data[30:50].strip()
+                                total_tonnage=int(data[50:66].strip())
+                                carrier_code=data[105:115].strip()
+                                bill_of_lading=data[115:165].strip()
+                                eta_date=data[165:].strip()
+                                eta_date = datetime.datetime.strptime(eta_date, '%Y%m%d').date()
+                                line_count+=1
+                            elif line.startswith("2DEV"):
+                                prefix, data = line.split(':')
+                                line_release_order=data[:10]
+                                line_sales_item=data[10:16].strip()
+                                line_date=data[16:24].strip()
+                                line_date = datetime.datetime.strptime(line_date, '%Y%m%d').date()
+                                transport_type=data[24:26].strip()
+                                lot_number=data[26:36].strip()
+                                line_weight=int(data[51:56].strip())
+                                line_unit_count=line_weight/2000
+                                line_tonnage+=line_weight
+                                unit_count+=line_unit_count
+                                dev_count+=1
+                                line_count+=1
+                    
+                            elif line.startswith("9TRL"):
+                                prefix, data = line.split(':')
+                                edi_line_count=int(data[:4])
+                                line_count+=1
+                                assert edi_line_count==line_count,f"no, line_count is {line_count}"
+                                assert line_tonnage==total_tonnage
+                        base.append({'Date Shipped':datetime_obj, 'Vehicle':vehicle_id, 'Shipment ID #':bill_of_lading, 'Release #':release_order,
+                         'Carrier':carrier_code, 'Quantity':unit_count, 'Metric Ton':total_tonnage/1000})
+                        st.write(base)
 
 
 

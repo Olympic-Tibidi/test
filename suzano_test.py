@@ -2165,7 +2165,7 @@ if authentication_status:
                     file_name=f'{requested_edi_file}',
                     mime='text/csv')
                 
-                if st.button("EDI AUDIT")"
+                if st.button("EDI AUDIT"):
                     def list_files_uploaded_today(bucket_name, folder_name):
                         # Initialize Google Cloud Storage client
                         storage_client = storage.Client()

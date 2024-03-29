@@ -565,7 +565,139 @@ if authentication_status:
                             st.markdown("**:blue[INVENTORY match BILL OF LADINGS]**")       
                             st.write(f"{len(suz_frame)} Shipments")
                             st.balloons()
+                edi_audit=st.toggle("AUDIT TODAYS EDIs AND REPORTS")
+                if edi_audit:
+                    
+                    with st.spinner("Wait for it"):
+                        guilty=None
+                        def list_files_uploaded_today(bucket_name, folder_name):
+                        # Initialize Google Cloud Storage client
+                            storage_client = storage.Client()
+                        
+                            # Get the current date
+                            today = (datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date()
+                            # Get the list of blobs in the specified folder
+                            blobs = storage_client.list_blobs(bucket_name, prefix=folder_name)
+                        
+                            # Extract filenames uploaded today only
+                            filenames = []
+                            for blob in blobs:
+                                # Check if blob's last modification date is today
+                                if blob.updated.date() == today:
+                                    # Extract only the filenames without the folder path
+                                    filename = blob.name.split("/")[-1]
+                                    filenames.append(filename)
+                                time.sleep(0.001)
+                        
+                            return filenames
+                        today_uploaded_files = list_files_uploaded_today(target_bucket,rf"EDIS/")
+                        st.markdown(f"**# of EDIs Uploaded : {len(today_uploaded_files)}**")
+                        st.markdown(f"EDIs Uploaded Today : {today_uploaded_files}")
+                       
+                        
+                        base=[]
+                        for i in today_uploaded_files:
                             
+                            lines=gcp_download(target_bucket, rf"EDIS/{i}").splitlines()
+                            
+                            
+                            # Step 2: Process the contents
+                            data = []
+                            count=1
+                            line_count=0
+                            dev_count=0
+                            line_tonnage=0
+                            unit_count=0
+                            for line in lines:
+                                if line.startswith("1HDR"):
+                                    prefix, data = line.split(':') 
+                                    assert prefix=="1HDR" , "Prefix does not match the expected value '1HDR'"
+                                    date_str = data[:8]  # YYYYMMDD
+                                    time_str = data[8:14]  # HHMMSS
+                                    terminal_code = data[14:18]  # 4 letters
+                                    datetime_obj = datetime.datetime.strptime(date_str + time_str, '%Y%m%d%H%M%S')
+                                    line_count+=1
+                                elif line.startswith("2DTD"):
+                                    prefix, data = line.split(':') 
+                                    release_order = data[:10].strip() 
+                                    sales_item = data[10:16].strip() 
+                                    date=data[16:24].strip()
+                                    date = datetime.datetime.strptime(date, '%Y%m%d').date()
+                                    transport_type=data[24:26].strip()
+                                    transport_sequential=data[26:30].strip()
+                                    vehicle_id=data[30:50].strip()
+                                    total_tonnage=int(data[50:66].strip())
+                                    carrier_code=data[105:115].strip()
+                                    bill_of_lading=data[115:165].strip()
+                                    eta_date=data[165:].strip()
+                                    eta_date = datetime.datetime.strptime(eta_date, '%Y%m%d').date()
+                                    line_count+=1
+                                elif line.startswith("2DEV"):
+                                    prefix, data = line.split(':')
+                                    line_release_order=data[:10]
+                                    line_sales_item=data[10:16].strip()
+                                    line_date=data[16:24].strip()
+                                    line_date = datetime.datetime.strptime(line_date, '%Y%m%d').date()
+                                    transport_type=data[24:26].strip()
+                                    lot_number=data[26:36].strip()
+                                    line_weight=int(data[51:56].strip())
+                                    line_unit_count=line_weight/2000
+                                    line_tonnage+=line_weight
+                                    unit_count+=line_unit_count
+                                    dev_count+=1
+                                    line_count+=1
+                        
+                                elif line.startswith("9TRL"):
+                                    prefix, data = line.split(':')
+                                    edi_line_count=int(data[:4])
+                                    line_count+=1
+                                    assert edi_line_count==line_count,f"no, line_count is {line_count}"
+                                    assert line_tonnage==total_tonnage
+                            base.append({'Date Shipped':datetime_obj, 'Vehicle':vehicle_id, 'Shipment ID #':bill_of_lading, 'Release #':release_order,
+                                             'Carrier':carrier_code, 'Quantity':unit_count, 'Metric Ton':total_tonnage/1000})
+                        
+                        edis=pd.DataFrame(base)
+                        edis=edis.sort_values(by="Date Shipped")
+                        edis.set_index("Shipment ID #",drop=True,inplace=True)
+                        
+                        suz=gcp_download(target_bucket,rf"suzano_report.json")
+                        suz=json.loads(suz)
+                        suz_frame=pd.DataFrame(suz).T
+                        suz_frame["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suz_frame["Date Shipped"]]
+                        suz_frame_daily=suz_frame[suz_frame.Date==(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date()]
+                        suz_frame_daily=suz_frame_daily[['Date Shipped', 'Vehicle', 'Shipment ID #', 'Release #', 'Carrier',
+                                      'Quantity', 'Metric Ton',]]
+                        suz_frame_daily.set_index("Shipment ID #",drop=True,inplace=True)
+                        # suz_frame_daily.loc["MF01799999"]={"Date Shipped":"2024-03-28 12:26:58","Vehicle":"3423C",
+                        #                                            "Shipment ID #":"MF01799420","Release #":"3172295",
+                        #                                        "Carrier":"123456","Quantity":14.0,"Metric Ton":28.0}
+                        more=None
+                        if len(edis)!=len(suz_frame_daily):
+                            diff=abs(len(edis)-len(suz_frame_daily))
+                            if len(edis)<len(suz_frame_daily):
+                                more=suz_frame_daily.copy()
+                                guilty="edis"
+                                for i in range(diff):
+                                    edis.loc[len(edis)]=None
+                            else:
+                                more=edis.copy()
+                                guilty="suz_frame_daily"
+                        
+                        
+                        difference = (edis.index!=suz_frame_daily.index)
+                        
+                        
+                        
+                        if guilty=="edis":
+                            more=more[difference]
+                            st.markdown("**:red[Following Shipment from Suzano Report is Missing an EDI]**")
+                            st.write(more)
+                        elif guilty=="suz_frame_daily":
+                            more=more[difference]
+                            st.markdown("**:red[Following EDI is Missing in Suzano Report]**")
+                            st.write(more)
+                        else:
+                            st.success("All EDIs and Suzano Report Entries are accounted for!! ")  
                             
             with admin_tab2:   #### BILL OF LADINGS
                 bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
@@ -616,7 +748,11 @@ if authentication_status:
                     data=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}"),
                     file_name=f'{requested_edi_file}',
                     mime='text/csv')
-
+               
+                
+                
+                
+                    
               
                   
             
@@ -961,12 +1097,11 @@ if authentication_status:
                         
                         st.write(pd.DataFrame(completed_release_order_dest_map).T)
                    
-                    with rls_tab3:   ###    MF NUMBERS   ###
+                    with rls_tab3:
                         
                         mf_numbers=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                         mf_numbers=json.loads(mf_numbers)
-                        
-                        def check_home(ro): ### from release order database find ones that are GP and not complete
+                        def check_home(ro):
                             destination=release_order_database[ro]['destination']
                             if destination not in ["GP-Clatskanie,OR","GP-Halsey,OR"]:
                                 return False 
@@ -981,8 +1116,7 @@ if authentication_status:
                         if len(destinations_of_release_orders)==0:
                             st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
                         else:
-                            shipment_date=st.date_input("Shipment Date",key="dsa")
-                            shipment_date=datetime.datetime.strftime(shipment_date,"%b-%d,%Y")
+                            
                             release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",destinations_of_release_orders,key="tatata")
                             release_order_number_mf=release_order_number_mf.split(" ")[0]
                             input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
@@ -992,15 +1126,9 @@ if authentication_status:
                            
                             if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
                                 if release_order_number_mf not in mf_numbers.keys():   
-                                    mf_numbers[release_order_number_mf]={}
-                                    mf_numbers[release_order_number_mf][shipment_date]=input_mf_numbers
-                                else:
-                                    if shipment_date not in mf_numbers[release_order_number_mf]:
-                                        mf_numbers[release_order_number_mf][shipment_date]=input_mf_numbers
-                                    else:
-                                        mf_numbers[release_order_number_mf][shipment_date]+=input_mf_numbers
-                                        
-                                mf_numbers[release_order_number_mf][shipment_date]=list(set(mf_numbers[release_order_number_mf][shipment_date]))
+                                    mf_numbers[release_order_number_mf]=[]
+                                mf_numbers[release_order_number_mf]+=input_mf_numbers
+                                mf_numbers[release_order_number_mf]=list(set(mf_numbers[release_order_number_mf]))
                                 mf_data=json.dumps(mf_numbers)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
@@ -1009,8 +1137,8 @@ if authentication_status:
                                 st.success(f"MF numbers entered to {release_order_number_mf} successfully!")
                             if st.button("REMOVE MF NUMBERS",key="ioerssu" ):
                                 for i in input_mf_numbers:
-                                    if i in mf_numbers[release_order_number_mf][shipment_date]:
-                                        mf_numbers[release_order_number_mf][shipment_date].remove(i)
+                                    if i in mf_numbers[release_order_number_mf]:
+                                        mf_numbers[release_order_number_mf].remove(i)
                                 mf_data=json.dumps(mf_numbers)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
@@ -1422,7 +1550,7 @@ if authentication_status:
                                  carrier_code=st.text_input("Carrier Code",info[current_release_order][current_sales_order]["carrier_code"],disabled=True,key=19)
                                  if carrier_code=="123456-KBX":
                                    if release_order_number in mf_numbers_for_load.keys():
-                                       mf_liste=[i for i in mf_numbers_for_load[release_order_number][datetime.datetime.strftime(file_date,"%b-%d,%Y")]]
+                                       mf_liste=[i for i in mf_numbers_for_load[release_order_number]]
                                        if len(mf_liste)>0:
                                            load_mf_number=st.selectbox("MF NUMBER",mf_liste,disabled=False,key=14551)
                                            mf=True
@@ -1984,8 +2112,7 @@ if authentication_status:
                                 time.sleep(0.1)                            
                                 success_container5.success(f"Uploaded EDI File",icon="✅")
                                 if load_mf_number_issued:
-                                    shipment_date=datetime.datetime.strftime(file_date,"%b-%d,%Y")
-                                    mf_numbers_for_load[release_order_number][shipment_date].remove(load_mf_number)
+                                    mf_numbers_for_load[release_order_number].remove(load_mf_number)
                                     mf_numbers_for_load=json.dumps(mf_numbers_for_load)
                                     storage_client = storage.Client()
                                     bucket = storage_client.bucket(target_bucket)
@@ -2025,8 +2152,8 @@ if authentication_status:
                                     subject=f"UNREGISTERED UNITS SHIPPED TO {destination} on RELEASE ORDER {current_release_order}"
                                     body=f"{len([i for i in this_shipment_aliens])} unregistered units were shipped on {vehicle_id} to {destination} on {current_release_order}.<br>{[i for i in this_shipment_aliens]}"
                                     sender = "warehouseoly@gmail.com"
-                                    #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                                    recipients = ["afsiny@portolympia.com"]
+                                    recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                    #recipients = ["afsiny@portolympia.com"]
                                     password = "xjvxkmzbpotzeuuv"
                                     send_email(subject, body, sender, recipients, password)
                                 
@@ -2108,7 +2235,7 @@ if authentication_status:
                     file_name=f'OLYMPIA_SHIPMENT_REPORT-ReleaseOrder-{report_ro}.csv'
 
                 elif choose=="BY BATCH":
-                    report_batch=st.selectbox("SELECT RELEASE ORDER",(daily_suzano["Batch#"].unique()),key="sddgerw")
+                    report_batch=st.selectbox("SELECT BATCH",(daily_suzano["Batch#"].unique()),key="sddgerw")
                     batch_suzano=daily_suzano[daily_suzano["Batch#"]==report_batch]
                     batch_suzano=batch_suzano.reset_index(drop=True)
                     batch_suzano.index=[i+1 for i in batch_suzano.index]
@@ -2148,7 +2275,6 @@ if authentication_status:
                     file_name=file_name,
                     mime='text/csv')
                 
-                
 
             with edi_bank:
                 edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
@@ -2165,105 +2291,30 @@ if authentication_status:
                     file_name=f'{requested_edi_file}',
                     mime='text/csv')
                 
-                if st.button("EDI AUDIT"):
-                    def list_files_uploaded_today(bucket_name, folder_name):
-                        # Initialize Google Cloud Storage client
-                        storage_client = storage.Client()
-                    
-                        # Get the current date
-                        today = datetime.datetime.now().date()
-                    
-                        # Get the list of blobs in the specified folder
-                        blobs = storage_client.list_blobs(bucket_name, prefix=folder_name)
-                    
-                        # Extract filenames uploaded today only
-                        filenames = []
-                        for blob in blobs:
-                            # Check if blob's last modification date is today
-                            if blob.updated.date() == today:
-                                # Extract only the filenames without the folder path
-                                filename = blob.name.split("/")[-1]
-                                filenames.append(filename)
-                    
-                        return filenames
-                    today_uploaded_files = list_files_uploaded_today(target_bucket, "EDIS/")
-                    #st.write(today_uploaded_files)
-                    base=[]
-    
-    
-                                   
-                    # Filter out .txt files
-                    
-                    
-                    
-                    for i in today_uploaded_files[:2]:
-                        st.write(i)
-                        
-                        lines=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}").splitlines()
-                        today_uploaded_files = list_files_uploaded_today(target_bucket, "EDIS/")
-                        #st.write(today_uploaded_files)
-                        base=[]
-                        # Step 2: Process the contents
-                        data = []
-                        count=1
-                        line_count=0
-                        dev_count=0
-                        line_tonnage=0
-                        unit_count=0
-                        for line in lines:
-                            if line.startswith("1HDR"):
-                                prefix, data = line.split(':') 
-                                assert prefix=="1HDR" , "Prefix does not match the expected value '1HDR'"
-                                date_str = data[:8]  # YYYYMMDD
-                                time_str = data[8:14]  # HHMMSS
-                                terminal_code = data[14:18]  # 4 letters
-                                datetime_obj = datetime.datetime.strptime(date_str + time_str, '%Y%m%d%H%M%S')
-                                line_count+=1
-                            elif line.startswith("2DTD"):
-                                prefix, data = line.split(':') 
-                                release_order = data[:10].strip() 
-                                sales_item = data[10:16].strip() 
-                                date=data[16:24].strip()
-                                date = datetime.datetime.strptime(date, '%Y%m%d').date()
-                                transport_type=data[24:26].strip()
-                                transport_sequential=data[26:30].strip()
-                                vehicle_id=data[30:50].strip()
-                                total_tonnage=int(data[50:66].strip())
-                                carrier_code=data[105:115].strip()
-                                bill_of_lading=data[115:165].strip()
-                                eta_date=data[165:].strip()
-                                eta_date = datetime.datetime.strptime(eta_date, '%Y%m%d').date()
-                                line_count+=1
-                            elif line.startswith("2DEV"):
-                                prefix, data = line.split(':')
-                                line_release_order=data[:10]
-                                line_sales_item=data[10:16].strip()
-                                line_date=data[16:24].strip()
-                                line_date = datetime.datetime.strptime(line_date, '%Y%m%d').date()
-                                transport_type=data[24:26].strip()
-                                lot_number=data[26:36].strip()
-                                line_weight=int(data[51:56].strip())
-                                line_unit_count=line_weight/2000
-                                line_tonnage+=line_weight
-                                unit_count+=line_unit_count
-                                dev_count+=1
-                                line_count+=1
-                    
-                            elif line.startswith("9TRL"):
-                                prefix, data = line.split(':')
-                                edi_line_count=int(data[:4])
-                                line_count+=1
-                                assert edi_line_count==line_count,f"no, line_count is {line_count}"
-                                assert line_tonnage==total_tonnage
-                        base.append({'Date Shipped':datetime_obj, 'Vehicle':vehicle_id, 'Shipment ID #':bill_of_lading, 'Release #':release_order,
-                         'Carrier':carrier_code, 'Quantity':unit_count, 'Metric Ton':total_tonnage/1000})
-                        st.write(base)
+                def list_files_uploaded_today(bucket_name, folder_name):
+                    # Initialize Google Cloud Storage client
+                    storage_client = storage.Client()
+                
+                    # Get the current date
+                    today = datetime.datetime.now().date()
+                
+                    # Get the list of blobs in the specified folder
+                    blobs = storage_client.list_blobs(bucket_name, prefix=folder_name)
+                
+                    # Extract filenames uploaded today only
+                    filenames = []
+                    for blob in blobs:
+                        # Check if blob's last modification date is today
+                        if blob.updated.date() == today:
+                            # Extract only the filenames without the folder path
+                            filename = blob.name.split("/")[-1]
+                            filenames.append(filename)
+                
+                    return filenames
+                today_uploaded_files = list_files_uploaded_today(target_bucket, "EDIS/")
+                st.write(today_uploaded_files)
 
-
-
-
-
-            
+                
             with main_inventory:
                 
                 maintenance=False
@@ -2539,7 +2590,8 @@ if authentication_status:
         map=gcp_download_new(target_bucket,rf"map.json")
         release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
         release_order_database=json.loads(release_order_database)
-        dispatched=gcp_download_new(target_bucket,rf"dispatched.json")
+        dispatched=gcp_download(target_bucket,rf"dispatched.json")
+        dispatched=json.loads(dispatched)
         carrier_list=map['carriers']
         mill_info=map["mill_info"]
         
@@ -3411,54 +3463,88 @@ if authentication_status:
             def convert_df(df):
                 # IMPORTANT: Cache the conversion to prevent computation on every rerun
                 return df.to_csv().encode('utf-8')
-            try:
-                now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
-                suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
-                suzano_report=json.loads(suzano_report_)
-                suzano_report=pd.DataFrame(suzano_report).T
-                suzano_report=suzano_report[["Date Shipped","Vehicle", "Shipment ID #", "Consignee","Consignee City","Consignee State","Release #","Carrier","ETA","Ocean BOL#","Batch#","Warehouse","Vessel","Voyage #","Grade","Quantity","Metric Ton", "ADMT","Mode of Transportation"]]
-                suzano_report["Shipment ID #"]=[str(i) for i in suzano_report["Shipment ID #"]]
-                suzano_report["Batch#"]=[str(i) for i in suzano_report["Batch#"]]
-                daily_suzano=suzano_report.copy()
-                daily_suzano["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suzano_report["Date Shipped"]]
-                daily_suzano_=daily_suzano[daily_suzano["Date"]==now.date()]
                 
-                choose = st.radio(
-                                "Select Daily or Accumulative Report",
-                                ["DAILY", "ACCUMULATIVE", "FIND BY DATE"])
-                if choose=="DAILY":
-                    daily_suzano_=daily_suzano_.reset_index(drop=True)
-                    daily_suzano_.index=[i+1 for i in daily_suzano_.index]
-                    daily_suzano_.loc["TOTAL"]=daily_suzano_[["Quantity","Metric Ton","ADMT"]].sum()
-                    st.dataframe(daily_suzano_)
-                    csv=convert_df(daily_suzano_)
-                    file_name=f'OLYMPIA_DAILY_REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
-                elif choose=="FIND BY DATE":
-                    required_date=st.date_input("CHOOSE DATE",key="dssar")
-                    filtered_suzano=daily_suzano[daily_suzano["Date"]==required_date]
-                    filtered_suzano=filtered_suzano.reset_index(drop=True)
-                    filtered_suzano.index=[i+1 for i in filtered_suzano.index]
-                    filtered_suzano.loc["TOTAL"]=filtered_suzano[["Quantity","Metric Ton","ADMT"]].sum()
-                    st.dataframe(filtered_suzano)
-                    csv=convert_df(filtered_suzano)
-                    file_name=f'OLYMPIA_SHIPMENT_REPORT-{datetime.datetime.strftime(required_date,"%m-%d,%Y")}.csv'
-                else:
-                    st.dataframe(suzano_report)
-                    csv=convert_df(suzano_report)
-                    file_name=f'OLYMPIA_ALL_SHIPMENTS to {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
-                
-                
-                
-               
-                
+            now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
+            suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
+            suzano_report=json.loads(suzano_report_)
+            suzano_report=pd.DataFrame(suzano_report).T
+            suzano_report=suzano_report[["Date Shipped","Vehicle", "Shipment ID #", "Consignee","Consignee City","Consignee State","Release #","Carrier","ETA","Ocean BOL#","Batch#","Warehouse","Vessel","Voyage #","Grade","Quantity","Metric Ton", "ADMT","Mode of Transportation"]]
+            suzano_report["Shipment ID #"]=[str(i) for i in suzano_report["Shipment ID #"]]
+            suzano_report["Batch#"]=[str(i) for i in suzano_report["Batch#"]]
+            daily_suzano=suzano_report.copy()
+            daily_suzano["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suzano_report["Date Shipped"]]
+            daily_suzano_=daily_suzano[daily_suzano["Date"]==now.date()]
             
-                st.download_button(
-                    label="DOWNLOAD REPORT AS CSV",
-                    data=csv,
-                    file_name=file_name,
-                    mime='text/csv')
-            except:
-                st.write("NO REPORTS RECORDED")
+            choose = st.radio(
+                            "Select Daily or Accumulative Report",
+                            ["DAILY", "ACCUMULATIVE", "FIND BY DATE","FIND DATE RANGE","BY RELEASE ORDER","BY BATCH"])
+            if choose=="DAILY":
+                daily_suzano_=daily_suzano_.reset_index(drop=True)
+                daily_suzano_.index=[i+1 for i in daily_suzano_.index]
+                daily_suzano_.loc["TOTAL"]=daily_suzano_[["Quantity","Metric Ton","ADMT"]].sum()
+                st.dataframe(daily_suzano_)
+                csv=convert_df(daily_suzano_)
+                file_name=f'OLYMPIA_DAILY_REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
+            elif choose=="FIND BY DATE":
+                required_date=st.date_input("CHOOSE DATE",key="dssar")
+                filtered_suzano=daily_suzano[daily_suzano["Date"]==required_date]
+                filtered_suzano=filtered_suzano.reset_index(drop=True)
+                filtered_suzano.index=[i+1 for i in filtered_suzano.index]
+                filtered_suzano.loc["TOTAL"]=filtered_suzano[["Quantity","Metric Ton","ADMT"]].sum()
+                st.dataframe(filtered_suzano)
+                csv=convert_df(filtered_suzano)
+                file_name=f'OLYMPIA_SHIPMENT_REPORT-{datetime.datetime.strftime(required_date,"%m-%d,%Y")}.csv'
+
+            elif choose=="BY RELEASE ORDER":
+                report_ro=st.selectbox("SELECT RELEASE ORDER",([i for i in raw_ro]),key="sdgerw")
+                ro_suzano=daily_suzano[daily_suzano["Release #"]==report_ro]
+                ro_suzano=ro_suzano.reset_index(drop=True)
+                ro_suzano.index=[i+1 for i in ro_suzano.index]
+                ro_suzano.loc["TOTAL"]=ro_suzano[["Quantity","Metric Ton","ADMT"]].sum()
+                st.dataframe(ro_suzano)
+                csv=convert_df(ro_suzano)
+                file_name=f'OLYMPIA_SHIPMENT_REPORT-ReleaseOrder-{report_ro}.csv'
+
+            elif choose=="BY BATCH":
+                report_batch=st.selectbox("SELECT BATCH",(daily_suzano["Batch#"].unique()),key="sddgerw")
+                batch_suzano=daily_suzano[daily_suzano["Batch#"]==report_batch]
+                batch_suzano=batch_suzano.reset_index(drop=True)
+                batch_suzano.index=[i+1 for i in batch_suzano.index]
+                batch_suzano.loc["TOTAL"]=batch_suzano[["Quantity","Metric Ton","ADMT"]].sum()
+                st.dataframe(batch_suzano)
+                csv=convert_df(batch_suzano)
+                file_name=f'OLYMPIA_SHIPMENT_REPORT-Batch-{report_batch}.csv'
+
+            elif choose=="FIND DATE RANGE":
+                datecol1,datecol2,datecol3=st.columns([3,3,4])
+                with datecol1:
+                    tarih1=st.date_input("FROM",key="dsssaar")
+                with datecol2:
+                    tarih2=st.date_input("TO",key="dssdar")
+                    
+                range_suzano=daily_suzano[(daily_suzano["Date"]>=tarih1)&(daily_suzano["Date"]<=tarih2)]
+                range_suzano=range_suzano.reset_index(drop=True)
+                range_suzano.index=[i+1 for i in range_suzano.index]
+                range_suzano.loc["TOTAL"]=range_suzano[["Quantity","Metric Ton","ADMT"]].sum()
+                st.dataframe(range_suzano)
+                csv=convert_df(range_suzano)
+                file_name=f'OLYMPIA_SHIPMENT_REPORT-daterange.csv'
+            
+            else:
+                st.dataframe(suzano_report)
+                csv=convert_df(suzano_report)
+                file_name=f'OLYMPIA_ALL_SHIPMENTS to {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
+            
+            
+            
+           
+            
+        
+            st.download_button(
+                label="DOWNLOAD REPORT AS CSV",
+                data=csv,
+                file_name=file_name,
+                mime='text/csv')
             
 
         with edi_bank:
@@ -3750,9 +3836,3 @@ elif authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:
     st.warning('Please enter your username and password')
-    
-    
-    
-    
-        
-     

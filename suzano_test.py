@@ -1339,36 +1339,37 @@ if authentication_status:
             if len(dispatched.keys())>0 and not no_dispatch:
                 loadout,schedule=st.tabs(["LOADOUT","SCHEDULE"])
                 with schedule:
-                    st.subheader("TODAYS ACTION/SCHEDULE")
-                    now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
-                    schedule_=gcp_download(target_bucket,rf"schedule.json")
-                    schedule=json.loads(schedule_)
-                    sch_bill_of_ladings=pd.DataFrame.from_dict(bill_of_ladings).T[1:]
-                    sch_bill_of_ladings["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in sch_bill_of_ladings["issued"]]
-                    display_df=sch_bill_of_ladings[sch_bill_of_ladings["St_Date"]==now.date()]
-                    st.write(display_df)
-                    liste=[]
-                    for term in display_df.index:
-                        t=(display_df.loc[term,'release_order'],display_df.loc[term,'sales_order'],display_df.loc[term,'destination'])
-                        liste.append(t)
+                    pass
+                    # st.subheader("TODAYS ACTION/SCHEDULE")
+                    # now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
+                    # schedule_=gcp_download(target_bucket,rf"schedule.json")
+                    # schedule=json.loads(schedule_)
+                    # sch_bill_of_ladings=pd.DataFrame.from_dict(bill_of_ladings).T[1:]
+                    # sch_bill_of_ladings["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in sch_bill_of_ladings["issued"]]
+                    # display_df=sch_bill_of_ladings[sch_bill_of_ladings["St_Date"]==now.date()]
+                    # st.write(display_df)
+                    # liste=[]
+                    # for term in display_df.index:
+                    #     t=(display_df.loc[term,'release_order'],display_df.loc[term,'sales_order'],display_df.loc[term,'destination'])
+                    #     liste.append(t)
                     
-                    schedule_frame=pd.DataFrame(schedule).T
-                    #schedule_frame=schedule_frame.iloc[:-1]
-                    schedule_frame["Loaded"]=0
-                    for i in liste:
-                        schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]+=1
-                    yeni=[]
-                    for i in schedule_frame.index:
-                        if i!="Containers":
-                            yeni.append(release_order_database[schedule_frame.loc[i,"Release Order"]][schedule_frame.loc[i,"Sales Order"]]['unitized'])
-                    new_index=[f"{i}-{j}" for i,j in zip(schedule_frame.index,yeni)]
-                    schedule_frame.index=new_index+["Containers"]
-                    schedule_frame["Remaining"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
-                    schedule_frame.loc["Total",["Scheduled","Loaded","Remaining"]]=schedule_frame[["Scheduled","Loaded","Remaining"]].sum()
-                    schedule_frame=schedule_frame.fillna("")
-                    schedule_frame["Loaded"]=schedule_frame["Loaded"].astype('Int64')
-                    schedule_frame["Remaining"]=schedule_frame["Remaining"].astype('Int64')
-                    st.table(schedule_frame)
+                    # schedule_frame=pd.DataFrame(schedule).T
+                    # #schedule_frame=schedule_frame.iloc[:-1]
+                    # schedule_frame["Loaded"]=0
+                    # for i in liste:
+                    #     schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]+=1
+                    # yeni=[]
+                    # for i in schedule_frame.index:
+                    #     if i!="Containers":
+                    #         yeni.append(release_order_database[schedule_frame.loc[i,"Release Order"]][schedule_frame.loc[i,"Sales Order"]]['unitized'])
+                    # new_index=[f"{i}-{j}" for i,j in zip(schedule_frame.index,yeni)]
+                    # schedule_frame.index=new_index+["Containers"]
+                    # schedule_frame["Remaining"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
+                    # schedule_frame.loc["Total",["Scheduled","Loaded","Remaining"]]=schedule_frame[["Scheduled","Loaded","Remaining"]].sum()
+                    # schedule_frame=schedule_frame.fillna("")
+                    # schedule_frame["Loaded"]=schedule_frame["Loaded"].astype('Int64')
+                    # schedule_frame["Remaining"]=schedule_frame["Remaining"].astype('Int64')
+                    # st.table(schedule_frame)
                 
                 with loadout:
                     
@@ -2094,8 +2095,8 @@ if authentication_status:
                                 body = f"EDI for Below attached.{newline}Release Order Number : {current_release_order} - Sales Order Number:{current_sales_order}{newline} Destination : {destination} Ocean Bill Of Lading : {ocean_bill_of_lading}{newline}Terminal Bill of Lading: {terminal_bill_of_lading} - Grade : {wrap} {newline}{2*quantity} tons {unitized} cargo were loaded to vehicle : {vehicle_id} with Carried ID : {carrier_code} {newline}Truck loading completed at {a_} {b_}"
                                 #st.write(body)           
                                 sender = "warehouseoly@gmail.com"
-                                #recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
-                                recipients = ["afsiny@portolympia.com"]
+                                recipients = ["alexandras@portolympia.com","conleyb@portolympia.com", "afsiny@portolympia.com"]
+                                #recipients = ["afsiny@portolympia.com"]
                                 password = "xjvxkmzbpotzeuuv"
                         
                       
@@ -2291,29 +2292,7 @@ if authentication_status:
                     file_name=f'{requested_edi_file}',
                     mime='text/csv')
                 
-                def list_files_uploaded_today(bucket_name, folder_name):
-                    # Initialize Google Cloud Storage client
-                    storage_client = storage.Client()
                 
-                    # Get the current date
-                    today = datetime.datetime.now().date()
-                
-                    # Get the list of blobs in the specified folder
-                    blobs = storage_client.list_blobs(bucket_name, prefix=folder_name)
-                
-                    # Extract filenames uploaded today only
-                    filenames = []
-                    for blob in blobs:
-                        # Check if blob's last modification date is today
-                        if blob.updated.date() == today:
-                            # Extract only the filenames without the folder path
-                            filename = blob.name.split("/")[-1]
-                            filenames.append(filename)
-                
-                    return filenames
-                today_uploaded_files = list_files_uploaded_today(target_bucket, "EDIS/")
-                st.write(today_uploaded_files)
-
                 
             with main_inventory:
                 
@@ -2327,7 +2306,7 @@ if authentication_status:
                     
                     with daily:
                         
-                        amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000,"LYSEFJORD-2308":10000,"LAGUNA-3142":370}
+                        amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000,"LYSEFJORD-2308":10000,"LAGUNA-3142":453}
                         inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308","LYSEFJORD-2308","LAGUNA-3142"])
                         kf=inv_bill_of_ladings.iloc[1:].copy()
                         kf['issued'] = pd.to_datetime(kf['issued'])
@@ -2380,7 +2359,7 @@ if authentication_status:
                          'GSSWJUV8556C': [6475.0,5],
                          'GSSWKIR6013D': [8350.0,2],
                          'GSSWKIR6013E': [850.0,2],
-                         'GSSWLAG3142E': [417.0,0],
+                         'GSSWLAG3142E': [453.0,0],
                          'GSSWLYS10628A': [1500.0,0],
                          'GSSWLYS10628B': [8500.0,0],}
                         def extract_qt(data,ro,bol):
@@ -2402,8 +2381,8 @@ if authentication_status:
                                 a,b,c=extract_qt(raw_ro,ro,k)
                                 
                                 final[k]["Allocated to ROs"]+=a
-                                final[k]["Shipped"]+=b
-                                #final[k]["Remaining"]+=c
+                            final[k]["Shipped"]=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[['quantity']].sum().loc[k,'quantity']
+                            
                             final[k]["Remaining in Warehouse"]=final[k]["Fit To Ship"]-final[k]["Shipped"]
                             final[k]["Remaining on ROs"]=final[k]["Allocated to ROs"]-final[k]["Shipped"]
                             final[k]["Remaining After ROs"]=final[k]["Fit To Ship"]-final[k]["Allocated to ROs"]
@@ -2614,37 +2593,39 @@ if authentication_status:
         
         if len(dispatched.keys())>0 and not no_dispatch:
             loadout,schedule=st.tabs(["LOADOUT","SCHEDULE"])
+            
             with schedule:
-                st.subheader("TODAYS ACTION/SCHEDULE")
-                now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
-                schedule_=gcp_download(target_bucket,rf"schedule.json")
-                schedule=json.loads(schedule_)
-                sch_bill_of_ladings=pd.DataFrame.from_dict(bill_of_ladings).T[1:]
-                sch_bill_of_ladings["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in sch_bill_of_ladings["issued"]]
-                display_df=sch_bill_of_ladings[sch_bill_of_ladings["St_Date"]==now.date()]
-                st.write(display_df)
-                liste=[]
-                for term in display_df.index:
-                    t=(display_df.loc[term,'release_order'],display_df.loc[term,'sales_order'],display_df.loc[term,'destination'])
-                    liste.append(t)
+                pass
+                # st.subheader("TODAYS ACTION/SCHEDULE")
+                # now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
+                # schedule_=gcp_download(target_bucket,rf"schedule.json")
+                # schedule=json.loads(schedule_)
+                # sch_bill_of_ladings=pd.DataFrame.from_dict(bill_of_ladings).T[1:]
+                # sch_bill_of_ladings["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in sch_bill_of_ladings["issued"]]
+                # display_df=sch_bill_of_ladings[sch_bill_of_ladings["St_Date"]==now.date()]
+                # st.write(display_df)
+                # liste=[]
+                # for term in display_df.index:
+                #     t=(display_df.loc[term,'release_order'],display_df.loc[term,'sales_order'],display_df.loc[term,'destination'])
+                #     liste.append(t)
                 
-                schedule_frame=pd.DataFrame(schedule).T
-                #schedule_frame=schedule_frame.iloc[:-1]
-                schedule_frame["Loaded"]=0
-                for i in liste:
-                    schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]+=1
-                yeni=[]
-                for i in schedule_frame.index:
-                    if i!="Containers":
-                        yeni.append(release_order_database[schedule_frame.loc[i,"Release Order"]][schedule_frame.loc[i,"Sales Order"]]['unitized'])
-                new_index=[f"{i}-{j}" for i,j in zip(schedule_frame.index,yeni)]
-                schedule_frame.index=new_index+["Containers"]
-                schedule_frame["Remaining"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
-                schedule_frame.loc["Total",["Scheduled","Loaded","Remaining"]]=schedule_frame[["Scheduled","Loaded","Remaining"]].sum()
-                schedule_frame=schedule_frame.fillna("")
-                schedule_frame["Loaded"]=schedule_frame["Loaded"].astype('Int64')
-                schedule_frame["Remaining"]=schedule_frame["Remaining"].astype('Int64')
-                st.table(schedule_frame)
+                # schedule_frame=pd.DataFrame(schedule).T
+                # #schedule_frame=schedule_frame.iloc[:-1]
+                # schedule_frame["Loaded"]=0
+                # for i in liste:
+                #     schedule_frame.loc[(schedule_frame['Release Order']==i[0])&(schedule_frame['Sales Order']==i[1]),"Loaded"]+=1
+                # yeni=[]
+                # for i in schedule_frame.index:
+                #     if i!="Containers":
+                #         yeni.append(release_order_database[schedule_frame.loc[i,"Release Order"]][schedule_frame.loc[i,"Sales Order"]]['unitized'])
+                # new_index=[f"{i}-{j}" for i,j in zip(schedule_frame.index,yeni)]
+                # schedule_frame.index=new_index+["Containers"]
+                # schedule_frame["Remaining"]=schedule_frame["Scheduled"]-schedule_frame["Loaded"]
+                # schedule_frame.loc["Total",["Scheduled","Loaded","Remaining"]]=schedule_frame[["Scheduled","Loaded","Remaining"]].sum()
+                # schedule_frame=schedule_frame.fillna("")
+                # schedule_frame["Loaded"]=schedule_frame["Loaded"].astype('Int64')
+                # schedule_frame["Remaining"]=schedule_frame["Remaining"].astype('Int64')
+                # st.table(schedule_frame)
             
             with loadout:
                 
@@ -3576,7 +3557,7 @@ if authentication_status:
                 
                 with daily:
                     
-                    amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000,"LYSEFJORD-2308":10000,"LAGUNA-3142":370}
+                    amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000,"LYSEFJORD-2308":10000,"LAGUNA-3142":453}
                     inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308","LYSEFJORD-2308","LAGUNA-3142"])
                     kf=inv_bill_of_ladings.iloc[1:].copy()
                     kf['issued'] = pd.to_datetime(kf['issued'])
@@ -3629,7 +3610,7 @@ if authentication_status:
                      'GSSWJUV8556C': [6475.0,5],
                      'GSSWKIR6013D': [8350.0,2],
                      'GSSWKIR6013E': [850.0,2],
-                     'GSSWLAG3142E': [417.0,0],
+                     'GSSWLAG3142E': [453.0,0],
                      'GSSWLYS10628A': [1500.0,0],
                      'GSSWLYS10628B': [8500.0,0],}
                     def extract_qt(data,ro,bol):
@@ -3651,7 +3632,7 @@ if authentication_status:
                             a,b,c=extract_qt(raw_ro,ro,k)
                             
                             final[k]["Allocated to ROs"]+=a
-                            final[k]["Shipped"]+=b
+                        final[k]["Shipped"]=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[['quantity']].sum().loc[k,'quantity']
                             #final[k]["Remaining"]+=c
                         final[k]["Remaining in Warehouse"]=final[k]["Fit To Ship"]-final[k]["Shipped"]
                         final[k]["Remaining on ROs"]=final[k]["Allocated to ROs"]-final[k]["Shipped"]

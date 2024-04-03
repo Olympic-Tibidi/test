@@ -495,7 +495,7 @@ if authentication_status:
                   line-height: 200px;
                   border: 2px solid #333;
                   border-radius: 50%;
-                  animation: spin 0.9s linear;
+                  animation: spin 0.1s linear;
                 }
                 
                 @keyframes spin {
@@ -514,17 +514,17 @@ if authentication_status:
                 var numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
                 var index = 0;
                 var spins = 0;
-                var maxSpins = 1000; // Change this to set the maximum number of spins
+                var maxSpins = 100; // Number of iterations
                 var interval = setInterval(function() {
                   document.getElementById("numberSpinner").innerText = numbers[index];
-                  index++;
+                  index = (index + 1) % numbers.length;
                   spins++;
-                  if (index >= numbers.length || spins >= maxSpins) {
+                  if (spins >= maxSpins) {
                     clearInterval(interval);
                     var randomNumber = Math.floor(Math.random() * numbers.length); // Generate random index
                     document.getElementById("numberSpinner").innerText = numbers[randomNumber];
                   }
-                }, 100);
+                }, 30); // Delay in milliseconds (0.03 seconds)
                 </script>
                 </body>
                 </html>

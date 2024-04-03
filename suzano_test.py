@@ -478,57 +478,55 @@ if authentication_status:
         st.markdown(custom_style, unsafe_allow_html=True)
         if select=='GAME':
             html_code = """
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Number Spinner</title>
-                <style>
-                .number-spinner {
-                  font-size: 48px;
-                  font-weight: bold;
-                  text-align: center;
-                  margin: 50px auto;
-                  width: 200px;
-                  height: 200px;
-                  line-height: 200px;
-                  border: 2px solid #333;
-                  border-radius: 50%;
-                  animation: spin 0.1s linear;
-                }
-                
-                @keyframes spin {
-                  0% {
-                    transform: rotate(0deg);
-                  }
-                  100% {
-                    transform: rotate(360deg);
-                  }
-                }
-                </style>
-                </head>
-                <body>
-                <div id="numberSpinner" class="number-spinner">0</div>
-                <script>
-                var numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-                var index = 0;
-                var spins = 0;
-                var maxSpins = 100; // Number of iterations
-                var interval = setInterval(function() {
-                  document.getElementById("numberSpinner").innerText = numbers[index];
-                  index = (index + 1) % numbers.length;
-                  spins++;
-                  if (spins >= maxSpins) {
-                    clearInterval(interval);
-                    var randomNumber = Math.floor(Math.random() * numbers.length); // Generate random index
-                    document.getElementById("numberSpinner").innerText = numbers[randomNumber];
-                  }
-                }, 30); // Delay in milliseconds (0.03 seconds)
-                </script>
-                </body>
-                </html>
-                """
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Number Spinner</title>
+                    <style>
+                    .number-spinner {
+                      font-size: 48px;
+                      font-weight: bold;
+                      text-align: center;
+                      margin: 50px auto;
+                      width: 200px;
+                      height: 200px;
+                      line-height: 200px;
+                      border: 2px solid #333;
+                      border-radius: 50%;
+                      animation: spin 0.1s linear;
+                    }
+                    
+                    @keyframes spin {
+                      0% {
+                        transform: rotate(0deg);
+                      }
+                      100% {
+                        transform: rotate(360deg);
+                      }
+                    }
+                    </style>
+                    </head>
+                    <body>
+                    <div id="numberSpinner" class="number-spinner">0</div>
+                    <script>
+                    var numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+                    var index = 0;
+                    var spins = 0;
+                    var maxSpins = 100; // Number of iterations
+                    var interval = setInterval(function() {
+                      document.getElementById("numberSpinner").innerText = numbers[index];
+                      index = Math.floor(Math.random() * numbers.length); // Update index randomly
+                      spins++;
+                      if (spins >= maxSpins) {
+                        clearInterval(interval);
+                      }
+                    }, 100); // Delay in milliseconds (0.03 seconds)
+                    </script>
+                    </body>
+                    </html>
+                    """
             
             st.title("Number Spinner")
             st.markdown(html_code, unsafe_allow_html=True)

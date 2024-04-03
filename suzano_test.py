@@ -477,21 +477,41 @@ if authentication_status:
                 """
         st.markdown(custom_style, unsafe_allow_html=True)
         if select=='GAME':
-            number_placeholder = st.empty()
-
-            # Initial display
-            number_placeholder.markdown("<h1 style='text-align: center;'>0</h1>", unsafe_allow_html=True)
-            
-            # Update the number in a loop
-            for _ in range(50):  # Update 50 times
-                # Generate a random number and update the placeholder
-                random_number = random.randint(1, 10)
-                number_placeholder.markdown(f"<h1 style='text-align: center;'>{random_number}</h1>", unsafe_allow_html=True)
-                time.sleep(0.1)  # Delay between updates
-            
-            # Final number
-            final_number = random.randint(1, 10)
-            number_placeholder.markdown(f"<h1 style='text-align: center;'>{final_number}</h1>", unsafe_allow_html=True)
+            g1,g2,g3,g4,g5,g6=st.columns([1,1,1,1,1,1])
+            if st.button("HIT",key="sdsdsaa"):
+                
+                with g1:
+                    number_placeholder = st.empty()
+        
+                    # Initial display
+                    number_placeholder.markdown("<h1 style='text-align: center;'>0</h1>", unsafe_allow_html=True)
+                    
+                    # Update the number in a loop
+                    for _ in range(50):  # Update 50 times
+                        # Generate a random number and update the placeholder
+                        random_number = random.randint(1, 10)
+                        number_placeholder.markdown(f"<h1 style='text-align: center;'>{random_number}</h1>", unsafe_allow_html=True)
+                        time.sleep(0.1)  # Delay between updates
+                    
+                    # Final number
+                    final_number = random.randint(1, 10)
+                    number_placeholder.markdown(f"<h1 style='text-align: center;'>{final_number}</h1>", unsafe_allow_html=True)
+                 with g2:
+                    number_placeholder = st.empty()
+        
+                    # Initial display
+                    number_placeholder.markdown("<h1 style='text-align: center;'>0</h1>", unsafe_allow_html=True)
+                    
+                    # Update the number in a loop
+                    for _ in range(50):  # Update 50 times
+                        # Generate a random number and update the placeholder
+                        random_number = random.randint(1, 10)
+                        number_placeholder.markdown(f"<h1 style='text-align: center;'>{random_number}</h1>", unsafe_allow_html=True)
+                        time.sleep(0.1)  # Delay between updates
+                    
+                    # Final number
+                    final_number = random.randint(1, 10)
+                    number_placeholder.markdown(f"<h1 style='text-align: center;'>{final_number}</h1>", unsafe_allow_html=True)
         if select=="ADMIN" :
 
             conn = st.connection('gcs', type=FilesConnection)

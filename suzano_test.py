@@ -496,7 +496,7 @@ if authentication_status:
                     # Final number
                     final_number = random.randint(1, 10)
                     number_placeholder.markdown(f"<h1 style='text-align: center;'>{final_number}</h1>", unsafe_allow_html=True)
-                 with g2:
+                with g2:
                     number_placeholder = st.empty()
         
                     # Initial display

@@ -451,7 +451,7 @@ authenticator = stauth.Authenticate(
     config['preauthorized']
 )
 
-name, authentication_status, username = authenticator.login(fields={'PORT OF OLYMPIA TOS LOGIN','main'})
+name, authentication_status, username = authenticator.login(fields={'PORT OF OLYMPIA TOS LOGIN', 'main'})
 
 
 if authentication_status:
@@ -464,7 +464,7 @@ if authentication_status:
         
         
         select=st.sidebar.radio("SELECT FUNCTION",
-            ('ADMIN', 'LOADOUT', 'INVENTORY','GAME'))
+            ('ADMIN', 'LOADOUT', 'INVENTORY'))
         custom_style = """
                     <style>
                         .custom-container {
@@ -476,81 +476,7 @@ if authentication_status:
                     </style>
                 """
         st.markdown(custom_style, unsafe_allow_html=True)
-        if select=='GAME':
-            if st.button("FDSA",key="sasasaasd"):
-                
-                html_content = """
-                <div id="uniqueCircleContainer">
-                    <style>
-                    #uniqueCircleContainer .container {
-                      display: flex;
-                      gap: 10px;
-                    }
-                
-                    #uniqueCircleContainer .circle {
-                      width: 100px;
-                      height: 100px;
-                      border-radius: 50%;
-                      background-color: lightblue;
-                      border: 2px solid #333;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      font-size: 2em;
-                      font-weight: bold;
-                      color: black;
-                    }
-                    </style>
-                
-                    <div class="container">
-                      <div class="circle" id="numberCircle1">0</div>
-                      <div class="circle" id="numberCircle2">0</div>
-                      <div class="circle" id="numberCircle3">0</div>
-                      <div class="circle" id="numberCircle4">0</div>
-                      <div class="circle" id="numberCircle5">0</div>
-                      <div class="circle" id="numberCircle6">0</div>
-                      <div class="circle" id="numberCircle7">0</div>
-                      <div class="circle" id="numberCircle8">0</div>
-                    </div>
-                </div>
-                
-                <script>
-                (function() {
-                  function updateNumber(circleId, values, maxCount) {
-                    let count = 0;
-                    const intervalId = setInterval(function() {
-                      if (count < maxCount) {
-                        const randomNumber = values instanceof Array ? values[Math.floor(Math.random() * values.length)] : Math.floor(Math.random() * 10) + 1;
-                        document.getElementById(circleId).textContent = randomNumber;
-                        count++;
-                      } else {
-                        clearInterval(intervalId);
-                        if (values instanceof Array) {
-                          const finalNumber = values[Math.floor(Math.random() * values.length)];
-                          document.getElementById(circleId).textContent = finalNumber;
-                        } else {
-                          const finalNumber = Math.floor(Math.random() * 10) + 1;
-                          document.getElementById(circleId).textContent = finalNumber;
-                        }
-                      }
-                    }, 100);
-                  }
-                
-                  // Update all circles with numbers from 1 to 10
-                  for (let i = 1; i <= 8; i++) {
-                    updateNumber(`numberCircle${i}`, 10, 50);
-                  }
-                
-                  // Update 7th circle with numbers from 25 to 75
-                  updateNumber("numberCircle7", [25, 50, 75], 50);
-                
-                  // Update 8th circle with numbers from 100 to 999
-                  updateNumber("numberCircle8", Array.from({length: 900}, (_, i) => i + 100), 50);
-                })();
-                </script>
-                """
-                
-                st.markdown(html_content, unsafe_allow_html=True)
+              
         if select=="ADMIN" :
 
             conn = st.connection('gcs', type=FilesConnection)
@@ -629,7 +555,6 @@ if authentication_status:
                             st.markdown("**:blue[All Checks Complete !]**")
                             st.markdown("**:blue[SUZANO REPORT match BILL OF LADINGS]**")       
                             st.write(f"{len(suz_frame)} Shipments")
-                            st.balloons()
                            
 
                     with aud_col2:
@@ -638,7 +563,6 @@ if authentication_status:
                             st.markdown("**:blue[All Checks Complete !]**")
                             st.markdown("**:blue[INVENTORY match BILL OF LADINGS]**")       
                             st.write(f"{len(suz_frame)} Shipments")
-                            st.balloons()
                 edi_audit=st.toggle("AUDIT TODAYS EDIs AND REPORTS")
                 if edi_audit:
                     
@@ -803,11 +727,87 @@ if authentication_status:
                         st.write("DATA TOO LARGE, DOWNLOAD INSTEAD")
                         file_name=f'OLYMPIA_ALL_BILL_OF_LADINGS to {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
                     csv=convert_df(display_df)
-                    st.download_button(
-                        label="DOWNLOAD BILL OF LADINGS",
-                        data=csv,
-                        file_name=file_name,
-                        mime='text/csv')
+                    bilo1,bilo2,_=st.columns([4,4,2])
+                    with bilo1:
+                        st.download_button(
+                            label="DOWNLOAD BILL OF LADINGS",
+                            data=csv,
+                            file_name=file_name,
+                            mime='text/csv')
+                    with bilo2:
+                        if display_df.shape[0]>0:
+                            entry=st.selectbox("SELECT SHIPMENT TO CREATE THE EDI", [i for i in display_df.index])
+                            entry=display_df.loc[entry].to_dict()
+                            terminal_bill_of_lading=entry["edi_no"].split(".")[0]
+                            def make_edi(entry):
+                                loads={}
+                                for load in entry['loads']:
+                                    load_=load[:-3]
+                                    if load_ not in loads:
+                                        loads[load_]=0
+                                        loads[load_]=entry["loads"][load]
+                                    else:
+                                        loads[load_]+=entry["loads"][load]
+                                double_load=False
+                                terminal_bill_of_lading=entry["edi_no"].split(".")[0]
+                                a=datetime.datetime.strptime(entry["issued"], '%Y-%m-%d %H:%M:%S').strftime('%Y%m%d')#%H%M%S')
+                                b=datetime.datetime.strptime(entry["issued"], '%Y-%m-%d %H:%M:%S').strftime('%H%M%S')
+                                
+                                line1="1HDR:"+a+b+"OLYM"
+                                tsn="01" 
+                                tt="0001"
+                                # if double_load:
+                                #     line21="2DTD:"+entry["release_order"]+" "*(10-len(current_release_order))+"000"+current_sales_order+a+tsn+tt+vehicle_id+" "*(20-len(vehicle_id))+str(first_quantity*2000)+" "*(16-len(str(first_quantity*2000)))+"USD"+" "*36+carrier_code+" "*(10-len(carrier_code))+terminal_bill_of_lading+" "*(50-len(terminal_bill_of_lading))+c
+                                #     line22="2DTD:"+entry["release_order"]+" "*(10-len(next_release_order))+"000"+next_sales_order+a+tsn+tt+vehicle_id+" "*(20-len(vehicle_id))+str(second_quantity*2000)+" "*(16-len(str(second_quantity*2000)))+"USD"+" "*36+carrier_code+" "*(10-len(carrier_code))+terminal_bill_of_lading+" "*(50-len(terminal_bill_of_lading))+c
+                                line2="2DTD:"+entry["release_order"]+" "*(10-len(entry["release_order"]))+"000"+entry["sales_order"]+a+tsn+tt+entry["vehicle"]+" "*(20-len(entry["vehicle"]))+str(int(entry["quantity"]*2000))+" "*(16-len(str(int(entry["quantity"]*2000))))+"USD"+" "*36+entry["carrier_id"]+" "*(10-len(str(entry["quantity"])))+terminal_bill_of_lading+" "*(50-len(terminal_bill_of_lading))+a
+                            
+                                loadls=[]
+                                bale_loadls=[]
+                                if double_load:
+                                    for i in first_textsplit:
+                                        loadls.append("2DEV:"+current_release_order+" "*(10-len(current_release_order))+"000"+current_sales_order+a+tsn+i[:load_digit]+" "*(10-len(i[:load_digit]))+"0"*16+str(2000))
+                                    for k in second_textsplit:
+                                        loadls.append("2DEV:"+next_release_order+" "*(10-len(next_release_order))+"000"+next_sales_order+a+tsn+k[:load_digit]+" "*(10-len(k[:load_digit]))+"0"*16+str(2000))
+                                else:
+                                    for k in loads:
+                            
+                                        loadls.append("2DEV:"+entry["release_order"]+" "*(10-len(entry["release_order"]))+"000"+entry["sales_order"]+a+tsn+k+" "*(10-len(k))+"0"*(20-len(str(int(loads[k]*2000))))+str(int(loads[k]*2000)))
+                            
+                            
+                                if double_load:
+                                    number_of_lines=len(first_textsplit)+len(second_textsplit)+4
+                                else:
+                                    number_of_lines=len(loadls)+3
+                                end_initial="0"*(4-len(str(number_of_lines)))
+                                end=f"9TRL:{end_initial}{number_of_lines}"
+                            
+                                with open(f'{terminal_bill_of_lading}.txt', 'w') as f:
+                                    f.write(line1)
+                                    f.write('\n')
+                                    if double_load:
+                                        f.write(line21)
+                                        f.write('\n')
+                                        f.write(line22)
+                                    else:
+                                        f.write(line2)
+                                    f.write('\n')
+                            
+                                    for i in loadls:
+                            
+                                        f.write(i)
+                                        f.write('\n')
+                            
+                                    f.write(end)
+                                with open(f'{terminal_bill_of_lading}.txt', 'r') as f:
+                                    file_content=f.read()
+                                file_name=f'{terminal_bill_of_lading}.txt'
+                                return file_content,file_name
+                            file_content,file_name=make_edi(entry)
+                            st.download_button(
+                                label="CREATE EDI FOR THIS SHIPMENT",
+                                data=file_content,
+                                file_name=file_name,
+                                mime='text/csv',key="53432")
             with admin_tab3:
                 edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
                 requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
@@ -909,10 +909,10 @@ if authentication_status:
                         quantity=st.number_input("Quantity of Units", min_value=1, max_value=5000, value=1, step=1,  key=None, help=None, on_change=None, disabled=False, label_visibility="visible")
                         tonnage=2*quantity
                         carrier_code=st.selectbox("Carrier Code",[f"{key}-{item}" for key,item in carrier_list.items()])            
-               
+                    fsc_verified=st.checkbox(f"**VERIFY RELEASE ORDER FSC CERTIFICATE CODE MATCHES BATCH {batch} STATEMENT : FSC  CERTIFIED PRODUCTS FSC MIX CREDIT SCS-COC-009938**")
                     create_release_order=st.button("SUBMIT")
                     
-                    if create_release_order:
+                    if create_release_order and fsc_verified:
                         
                         if add: 
                             temp=add_release_order_data(release_order_database,release_order_number,sales_order_item_add,vessel_add,batch_add,ocean_bill_of_lading_add,grade_add,dryness_add,carrier_code_add,unitized_add,quantity_add,shipped_add,remaining_add)
@@ -965,7 +965,8 @@ if authentication_status:
                         scheduled=pd.DataFrame(scheduled)
                         dfb["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in dfb["issued"]]
                         dfb=dfb[dfb["St_Date"]==datetime.datetime.now().date()]
-                        for i in scheduled.index:
+                        for i in scheduled.index:      #### find loads from bill of ladings
+                            scheduled.loc[i,"Scheduled"]=schedule[scheduled.loc[i,'Destination']]['Scheduled']
                             rol=scheduled.loc[i,"Release Order"]
                             sale=scheduled.loc[i,"Sales Item"]
                             yuk=dfb[(dfb['release_order']==rol)&(dfb['sales_order']==sale)].shape[0]
@@ -983,9 +984,6 @@ if authentication_status:
                             blob.upload_from_string(a_)
                             st.success(f"**UPDATED SCHEDULE**")   
                             st.rerun()
-
-
-                    
 
 
                         
@@ -2446,9 +2444,9 @@ if authentication_status:
                         inventory={'GSSWJUV8556A': [3500.0,1],
                          'GSSWJUV8556B': [25.0,0],
                          'GSSWJUV8556C': [6475.0,5],
-                         'GSSWKIR6013D': [8350.0,2],
-                         'GSSWKIR6013E': [850.0,2],
-                         'GSSWLAG3142E': [453.0,0],
+                         'GSSWKIR6013D': [8350.0,1],
+                         'GSSWKIR6013E': [850.0,1],
+                         'GSSWLAG3142E': [572.0,0],
                          'GSSWLYS10628A': [1500.0,0],
                          'GSSWLYS10628B': [8500.0,0],}
                         def extract_qt(data,ro,bol):
@@ -3698,13 +3696,13 @@ if authentication_status:
                                     bols[ocean_bill_of_lading].append(key)
                     
                     inventory={'GSSWJUV8556A': [3500.0,1],
-                     'GSSWJUV8556B': [25.0,0],
-                     'GSSWJUV8556C': [6475.0,5],
-                     'GSSWKIR6013D': [8350.0,2],
-                     'GSSWKIR6013E': [850.0,2],
-                     'GSSWLAG3142E': [453.0,0],
-                     'GSSWLYS10628A': [1500.0,0],
-                     'GSSWLYS10628B': [8500.0,0],}
+                         'GSSWJUV8556B': [25.0,0],
+                         'GSSWJUV8556C': [6475.0,5],
+                         'GSSWKIR6013D': [8350.0,1],
+                         'GSSWKIR6013E': [850.0,1],
+                         'GSSWLAG3142E': [572.0,0],
+                         'GSSWLYS10628A': [1500.0,0],
+                         'GSSWLYS10628B': [8500.0,0],}
                     def extract_qt(data,ro,bol):
                         sales_group=["001","002","003","004","005"]
                         for item in data[ro]:
@@ -3909,3 +3907,9 @@ elif authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:
     st.warning('Please enter your username and password')
+    
+    
+    
+    
+        
+     

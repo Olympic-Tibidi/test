@@ -495,7 +495,7 @@ if authentication_status:
                   line-height: 200px;
                   border: 2px solid #333;
                   border-radius: 50%;
-                  animation: spin 0.1s linear;
+                  animation: spin 0.9s linear;
                 }
                 
                 @keyframes spin {

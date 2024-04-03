@@ -477,54 +477,54 @@ if authentication_status:
                 """
         st.markdown(custom_style, unsafe_allow_html=True)
         if select=='GAME':
-                        html_code = """
-                        <!DOCTYPE html>
-                        <html lang="en">
-                        <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>Number Spinner</title>
-                        <style>
-                        .number-spinner {
-                          font-size: 48px;
-                          font-weight: bold;
-                          text-align: center;
-                          margin: 50px auto;
-                          width: 200px;
-                          height: 200px;
-                          line-height: 200px;
-                          border: 2px solid #333;
-                          border-radius: 50%;
-                          animation: spin 2s linear infinite;
-                        }
-                        
-                        @keyframes spin {
-                          from {
-                            transform: rotate(0deg);
-                          }
-                          to {
-                            transform: rotate(360deg);
-                          }
-                        }
-                        </style>
-                        </head>
-                        <body>
-                        <div id="numberSpinner" class="number-spinner">0</div>
-                        <script>
-                        function stopSpinner() {
-                          clearInterval(interval);
-                        }
-                        
-                        var interval = setInterval(function() {
-                          var randomNumber = Math.floor(Math.random() * 100) + 1; // Generate random number between 1 and 100
-                          document.getElementById("numberSpinner").innerText = randomNumber;
-                        }, 100);
-                        
-                        setTimeout(stopSpinner, 3000); // Stop spinner after 3 seconds
-                        </script>
-                        </body>
-                        </html>
-                        """
+            html_code = """
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Number Spinner</title>
+            <style>
+            .number-spinner {
+              font-size: 48px;
+              font-weight: bold;
+              text-align: center;
+              margin: 50px auto;
+              width: 200px;
+              height: 200px;
+              line-height: 200px;
+              border: 2px solid #333;
+              border-radius: 50%;
+              animation: spin 2s linear infinite;
+            }
+            
+            @keyframes spin {
+              from {
+                transform: rotate(0deg);
+              }
+              to {
+                transform: rotate(360deg);
+              }
+            }
+            </style>
+            </head>
+            <body>
+            <div id="numberSpinner" class="number-spinner">0</div>
+            <script>
+            function stopSpinner() {
+              clearInterval(interval);
+            }
+            
+            var interval = setInterval(function() {
+              var randomNumber = Math.floor(Math.random() * 100) + 1; // Generate random number between 1 and 100
+              document.getElementById("numberSpinner").innerText = randomNumber;
+            }, 100);
+            
+            setTimeout(stopSpinner, 3000); // Stop spinner after 3 seconds
+            </script>
+            </body>
+            </html>
+            """
             
             st.title("Number Spinner")
             st.markdown(html_code, unsafe_allow_html=True)

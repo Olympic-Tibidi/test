@@ -477,59 +477,52 @@ if authentication_status:
                 """
         st.markdown(custom_style, unsafe_allow_html=True)
         if select=='GAME':
-            html_code = """
-                    <!DOCTYPE html>
-                    <html lang="en">
-                    <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Number Spinner</title>
-                    <style>
-                    .number-spinner {
-                      font-size: 48px;
-                      font-weight: bold;
-                      text-align: center;
-                      margin: 50px auto;
-                      width: 200px;
-                      height: 200px;
-                      line-height: 200px;
-                      border: 2px solid #333;
-                      border-radius: 50%;
-                      animation: spin 0.1s linear;
-                    }
-                    
-                    @keyframes spin {
-                      0% {
-                        transform: rotate(0deg);
-                      }
-                      100% {
-                        transform: rotate(360deg);
-                      }
-                    }
-                    </style>
-                    </head>
-                    <body>
-                    <div id="numberSpinner" class="number-spinner">0</div>
-                    <script>
-                    var numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-                    var index = 0;
-                    var spins = 0;
-                    var maxSpins = 100; // Number of iterations
-                    var interval = setInterval(function() {
-                      document.getElementById("numberSpinner").innerText = numbers[index];
-                      index = Math.floor(Math.random() * numbers.length); // Update index randomly
-                      spins++;
-                      if (spins >= maxSpins) {
-                        clearInterval(interval);
-                      }
-                    }, 100); // Delay in milliseconds (0.03 seconds)
-                    </script>
-                    </body>
-                    </html>
-                    """
+            html_content = """
+            <div class="circle" id="numberCircle">0</div>
             
-            st.title("Number Spinner")
-            st.markdown(html_code, unsafe_allow_html=True)
+            <script>
+              let count = 0;
+              const maxCount = 50; // Update this for more or fewer changes
+            
+              function updateNumber() {
+                if (count < maxCount) {
+                  const randomNumber = Math.floor(Math.random() * 10) + 1;
+                  document.getElementById('numberCircle').textContent = randomNumber;
+                  count++;
+                } else {
+                  clearInterval(intervalId); // Stop updating after maxCount
+                  const finalNumber = Math.floor(Math.random() * 10) + 1;
+                  document.getElementById('numberCircle').textContent = finalNumber; // Show final number
+                }
+              }
+            
+              // Update number every 100 milliseconds
+              const intervalId = setInterval(updateNumber, 100);
+            </script>
+            """
+            
+            # Use custom CSS to style the circle
+            circle_style = """
+            <style>
+            .circle {
+              width: 100px;
+              height: 100px;
+              border-radius: 50%;
+              border: 2px solid #333;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 2em;
+              margin: 20px auto;
+            }
+            </style>
+            """
+            
+            # Combine the style and HTML content
+            full_content = circle_style + html_content
+            
+            # Display the content in Streamlit
+            st.markdown(full_content, unsafe_allow_html=True)
         if select=="ADMIN" :
 
             conn = st.connection('gcs', type=FilesConnection)

@@ -549,7 +549,7 @@ if authentication_status:
                 })();
                 </script>
                 """
-                st.markdown("sfdssfd")
+                
                 st.markdown(html_content, unsafe_allow_html=True)
         if select=="ADMIN" :
 

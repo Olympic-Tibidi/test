@@ -477,41 +477,78 @@ if authentication_status:
                 """
         st.markdown(custom_style, unsafe_allow_html=True)
         if select=='GAME':
-            g1,g2,g3,g4,g5,g6=st.columns([1,1,1,1,1,1])
-            if st.button("HIT",key="sdsdsaa"):
-                
-                with g1:
-                    number_placeholder = st.empty()
-        
-                    # Initial display
-                    number_placeholder.markdown("<h1 style='text-align: center;'>0</h1>", unsafe_allow_html=True)
-                    
-                    # Update the number in a loop
-                    for _ in range(50):  # Update 50 times
-                        # Generate a random number and update the placeholder
-                        random_number = random.randint(1, 10)
-                        number_placeholder.markdown(f"<h1 style='text-align: center;'>{random_number}</h1>", unsafe_allow_html=True)
-                        time.sleep(0.1)  # Delay between updates
-                    
-                    # Final number
-                    final_number = random.randint(1, 10)
-                    number_placeholder.markdown(f"<h1 style='text-align: center;'>{final_number}</h1>", unsafe_allow_html=True)
-                with g2:
-                    number_placeholder = st.empty()
-        
-                    # Initial display
-                    number_placeholder.markdown("<h1 style='text-align: center;'>0</h1>", unsafe_allow_html=True)
-                    
-                    # Update the number in a loop
-                    for _ in range(50):  # Update 50 times
-                        # Generate a random number and update the placeholder
-                        random_number = random.randint(1, 10)
-                        number_placeholder.markdown(f"<h1 style='text-align: center;'>{random_number}</h1>", unsafe_allow_html=True)
-                        time.sleep(0.1)  # Delay between updates
-                    
-                    # Final number
-                    final_number = random.randint(1, 10)
-                    number_placeholder.markdown(f"<h1 style='text-align: center;'>{final_number}</h1>", unsafe_allow_html=True)
+            html_content = """
+            <div id="uniqueCircleContainer">
+                <style>
+                #uniqueCircleContainer .container {
+                  display: flex;
+                  gap: 10px;
+                }
+            
+                #uniqueCircleContainer .circle {
+                  width: 100px;
+                  height: 100px;
+                  border-radius: 50%;
+                  background-color: lightblue;
+                  border: 2px solid #333;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 2em;
+                  font-weight: bold;
+                  color: black;
+                }
+                </style>
+            
+                <div class="container">
+                  <div class="circle" id="numberCircle1">0</div>
+                  <div class="circle" id="numberCircle2">0</div>
+                  <div class="circle" id="numberCircle3">0</div>
+                  <div class="circle" id="numberCircle4">0</div>
+                  <div class="circle" id="numberCircle5">0</div>
+                  <div class="circle" id="numberCircle6">0</div>
+                  <div class="circle" id="numberCircle7">0</div>
+                  <div class="circle" id="numberCircle8">0</div>
+                </div>
+            </div>
+            
+            <script>
+            (function() {
+              function updateNumber(circleId, values, maxCount) {
+                let count = 0;
+                const intervalId = setInterval(function() {
+                  if (count < maxCount) {
+                    const randomNumber = values instanceof Array ? values[Math.floor(Math.random() * values.length)] : Math.floor(Math.random() * 10) + 1;
+                    document.getElementById(circleId).textContent = randomNumber;
+                    count++;
+                  } else {
+                    clearInterval(intervalId);
+                    if (values instanceof Array) {
+                      const finalNumber = values[Math.floor(Math.random() * values.length)];
+                      document.getElementById(circleId).textContent = finalNumber;
+                    } else {
+                      const finalNumber = Math.floor(Math.random() * 10) + 1;
+                      document.getElementById(circleId).textContent = finalNumber;
+                    }
+                  }
+                }, 100);
+              }
+            
+              // Update all circles with numbers from 1 to 10
+              for (let i = 1; i <= 8; i++) {
+                updateNumber(`numberCircle${i}`, 10, 50);
+              }
+            
+              // Update 7th circle with numbers from 25 to 75
+              updateNumber("numberCircle7", [25, 50, 75], 50);
+            
+              // Update 8th circle with numbers from 100 to 999
+              updateNumber("numberCircle8", Array.from({length: 900}, (_, i) => i + 100), 50);
+            })();
+            </script>
+            """
+            
+            st.markdown(html_content, unsafe_allow_html=True)
         if select=="ADMIN" :
 
             conn = st.connection('gcs', type=FilesConnection)

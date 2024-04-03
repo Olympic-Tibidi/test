@@ -477,78 +477,80 @@ if authentication_status:
                 """
         st.markdown(custom_style, unsafe_allow_html=True)
         if select=='GAME':
-            html_content = """
-            <div id="uniqueCircleContainer">
-                <style>
-                #uniqueCircleContainer .container {
-                  display: flex;
-                  gap: 10px;
-                }
-            
-                #uniqueCircleContainer .circle {
-                  width: 100px;
-                  height: 100px;
-                  border-radius: 50%;
-                  background-color: lightblue;
-                  border: 2px solid #333;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  font-size: 2em;
-                  font-weight: bold;
-                  color: black;
-                }
-                </style>
-            
-                <div class="container">
-                  <div class="circle" id="numberCircle1">0</div>
-                  <div class="circle" id="numberCircle2">0</div>
-                  <div class="circle" id="numberCircle3">0</div>
-                  <div class="circle" id="numberCircle4">0</div>
-                  <div class="circle" id="numberCircle5">0</div>
-                  <div class="circle" id="numberCircle6">0</div>
-                  <div class="circle" id="numberCircle7">0</div>
-                  <div class="circle" id="numberCircle8">0</div>
-                </div>
-            </div>
-            
-            <script>
-            (function() {
-              function updateNumber(circleId, values, maxCount) {
-                let count = 0;
-                const intervalId = setInterval(function() {
-                  if (count < maxCount) {
-                    const randomNumber = values instanceof Array ? values[Math.floor(Math.random() * values.length)] : Math.floor(Math.random() * 10) + 1;
-                    document.getElementById(circleId).textContent = randomNumber;
-                    count++;
-                  } else {
-                    clearInterval(intervalId);
-                    if (values instanceof Array) {
-                      const finalNumber = values[Math.floor(Math.random() * values.length)];
-                      document.getElementById(circleId).textContent = finalNumber;
-                    } else {
-                      const finalNumber = Math.floor(Math.random() * 10) + 1;
-                      document.getElementById(circleId).textContent = finalNumber;
+            if st.button("FDSA",key="sasasaasd"):
+                
+                html_content = """
+                <div id="uniqueCircleContainer">
+                    <style>
+                    #uniqueCircleContainer .container {
+                      display: flex;
+                      gap: 10px;
                     }
+                
+                    #uniqueCircleContainer .circle {
+                      width: 100px;
+                      height: 100px;
+                      border-radius: 50%;
+                      background-color: lightblue;
+                      border: 2px solid #333;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 2em;
+                      font-weight: bold;
+                      color: black;
+                    }
+                    </style>
+                
+                    <div class="container">
+                      <div class="circle" id="numberCircle1">0</div>
+                      <div class="circle" id="numberCircle2">0</div>
+                      <div class="circle" id="numberCircle3">0</div>
+                      <div class="circle" id="numberCircle4">0</div>
+                      <div class="circle" id="numberCircle5">0</div>
+                      <div class="circle" id="numberCircle6">0</div>
+                      <div class="circle" id="numberCircle7">0</div>
+                      <div class="circle" id="numberCircle8">0</div>
+                    </div>
+                </div>
+                
+                <script>
+                (function() {
+                  function updateNumber(circleId, values, maxCount) {
+                    let count = 0;
+                    const intervalId = setInterval(function() {
+                      if (count < maxCount) {
+                        const randomNumber = values instanceof Array ? values[Math.floor(Math.random() * values.length)] : Math.floor(Math.random() * 10) + 1;
+                        document.getElementById(circleId).textContent = randomNumber;
+                        count++;
+                      } else {
+                        clearInterval(intervalId);
+                        if (values instanceof Array) {
+                          const finalNumber = values[Math.floor(Math.random() * values.length)];
+                          document.getElementById(circleId).textContent = finalNumber;
+                        } else {
+                          const finalNumber = Math.floor(Math.random() * 10) + 1;
+                          document.getElementById(circleId).textContent = finalNumber;
+                        }
+                      }
+                    }, 100);
                   }
-                }, 100);
-              }
-            
-              // Update all circles with numbers from 1 to 10
-              for (let i = 1; i <= 8; i++) {
-                updateNumber(`numberCircle${i}`, 10, 50);
-              }
-            
-              // Update 7th circle with numbers from 25 to 75
-              updateNumber("numberCircle7", [25, 50, 75], 50);
-            
-              // Update 8th circle with numbers from 100 to 999
-              updateNumber("numberCircle8", Array.from({length: 900}, (_, i) => i + 100), 50);
-            })();
-            </script>
-            """
-            
-            st.markdown(html_content, unsafe_allow_html=True)
+                
+                  // Update all circles with numbers from 1 to 10
+                  for (let i = 1; i <= 8; i++) {
+                    updateNumber(`numberCircle${i}`, 10, 50);
+                  }
+                
+                  // Update 7th circle with numbers from 25 to 75
+                  updateNumber("numberCircle7", [25, 50, 75], 50);
+                
+                  // Update 8th circle with numbers from 100 to 999
+                  updateNumber("numberCircle8", Array.from({length: 900}, (_, i) => i + 100), 50);
+                })();
+                </script>
+                """
+                
+                st.markdown(html_content, unsafe_allow_html=True)
         if select=="ADMIN" :
 
             conn = st.connection('gcs', type=FilesConnection)

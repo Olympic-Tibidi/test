@@ -464,7 +464,7 @@ if authentication_status:
         
         
         select=st.sidebar.radio("SELECT FUNCTION",
-            ('ADMIN', 'LOADOUT', 'INVENTORY','LABOR))
+            ('ADMIN', 'LOADOUT', 'INVENTORY','LABOR'))
         custom_style = """
                     <style>
                         .custom-container {

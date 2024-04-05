@@ -912,7 +912,7 @@ if authentication_status:
                             blob = bucket.blob(rf"labor_templates/{filename}.csv")
                             blob.upload_from_string(temp, content_type="text/csv")
                     with down_col2:
-                        mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
+                        mt_jobs_=gcp_download(target_bucket,rf"LABOR/mt_jobs.json")
                         mt_jobs=json.loads(mt_jobs_)
                         #st.write(st.session_state.scores.T.to_dict())
                         job_no=st.selectbox("SELECT JOB NO",[i for i in mt_jobs["2023"]])

@@ -19,6 +19,7 @@ import io
 from io import StringIO
 from io import BytesIO
 import time
+from PIL import Image
 import random
 import base64
 import streamlit_authenticator as stauth

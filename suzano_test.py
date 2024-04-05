@@ -481,9 +481,9 @@ if authentication_status:
             secondary=True
             
             if secondary:
-                pma_rates=gcp_download(target_bucket,rf"pma_dues.json")
+                pma_rates=gcp_download(target_bucket,rf"LABOR/pma_dues.json")
                 pma_rates=json.loads(pma_rates)
-                assessment_rates=gcp_download(target_bucket,rf"occ_codes2023.json")
+                assessment_rates=gcp_download(target_bucket,rf"LABOR/occ_codes2023.json")
                 assessment_rates=json.loads(assessment_rates)
                 lab_tab1,lab_tab2,lab_tab3,lab_tab4=st.tabs(["LABOR TEMPLATE", "JOBS","RATES","LOOKUP"])
 
@@ -501,7 +501,7 @@ if authentication_status:
                                     total_sum += dfs_sum(v, key)
                         
                             return total_sum
-                        mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
+                        mt_jobs_=gcp_download(target_bucket,rf"LABOR/mt_jobs.json")
                         mt_jobs=json.loads(mt_jobs_)
                         c1,c2,c3=st.columns([2,2,6])
                         with c1:
@@ -608,7 +608,7 @@ if authentication_status:
                             
                         if st.button("RECORD JOB"):
                             year="2023"
-                            mt_jobs_=gcp_download(target_bucket,rf"mt_jobs.json")
+                            mt_jobs_=gcp_download(target_bucket,rf"LABOR/mt_jobs.json")
                             mt_jobs=json.loads(mt_jobs_)
                             if year not in mt_jobs:
                                 mt_jobs[year]={}

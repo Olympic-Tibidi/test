@@ -491,7 +491,7 @@ if authentication_status:
                     if st.checkbox("UPLOAD LEDGER CSV",key="fsdsw"):
                         led_col1,led_col2,led_col3,led_col4=st.columns([3,2,2,2])
                         with led_col1:
-                            
+                            year=st.selectbox("SELECT YEAR TO UPLOAD",["2024","2023","2022"])
                             m30 = st.file_uploader("**Upload Ledger 030 csv**", type=["csv"],key="34wss")
                             m32= st.file_uploader("**Upload Ledger 032 csv**", type=["csv"],key="34ws2ss")
                             m36 = st.file_uploader("**Upload Ledger 036 csv**", type=["csv"],key="34wsas")
@@ -575,7 +575,7 @@ if authentication_status:
                                         depreciation.reset_index().to_feather(temp_file_path)
                                         storage_client = storage.Client()
                                         bucket = storage_client.bucket(target_bucket)
-                                        blob = bucket.blob(rf"FIN/main2023-30.ftr")
+                                        blob = bucket.blob(rf"FIN/str(year)-30.ftr")
                                         blob.upload_from_filename(temp_file_path)
                                     if k==m32:
                                         
@@ -613,10 +613,10 @@ if authentication_status:
                                 store.reset_index().to_feather(temp_file_path)
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"FIN/main2023.ftr")
+                                blob = bucket.blob(rf"FIN/main{str(year)}.ftr")
                                 blob.upload_from_filename(temp_file_path)
                                 with led_col2:
-                                    st.success("**SUCCESS. 2023 Ledger has been updated!", icon="✅")     
+                                    st.success(f"**SUCCESS. {year} Ledger has been updated!", icon="✅")     
                 
                     
                 with ttab1:

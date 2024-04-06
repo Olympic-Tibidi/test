@@ -697,7 +697,7 @@ if authentication_status:
                 
                     with fintab1: 
                         
-                        year=st.selectbox("Select Year",["2023","2022","2021","2020","2019","2018", "2017","2016"])
+                        year=st.selectbox("Select Year",["2024","2023","2022","2021","2020","2019","2018", "2017","2016"])
                         
                         ### LETS PUT YEAR in st.session state to use later.
                         if year not in st.session_state:

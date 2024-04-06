@@ -1325,7 +1325,7 @@ if authentication_status:
                     #             overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
                     #             #print(overall)
                     #             revs
-                    with fintab4:
+                    #with fintab4:
                     #     ear=st.selectbox("Select Year",["2023","2022","2021"],key="yeartab2")
                 
                     #     ledgers=gcp_download_x(target_bucket,rf"FIN/main{ear}.ftr")

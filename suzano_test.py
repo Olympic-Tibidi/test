@@ -33,7 +33,7 @@ import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime as dt
-
+from docx import Document
 import pickle
 import yaml
 from yaml.loader import SafeLoader
@@ -2421,19 +2421,31 @@ if authentication_status:
                                 file_name=file_name,
                                 mime='text/csv',key="53432")
             with admin_tab3:
-                edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
-                requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
+                def read_word_file(file_path):
+                    doc = Document(file_path)
+                    full_text = []
+                    for para in doc.paragraphs:
+                        full_text.append(para.text)
+                    return '\n'.join(full_text)
+                st.title('Word File Viewer')
+                    uploaded_file = st.file_uploader("Upload a Word file", type=['docx'])
+                    if uploaded_file is not None:
+                        file_contents = read_word_file(uploaded_file)
+                        st.markdown(file_contents)
                 
-                display_edi=st.toggle("DISPLAY EDI")
-                if display_edi:
-                    data=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}")
-                    st.text_area("EDI",data,height=400)                                
+                # edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
+                # requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])
+                
+                # display_edi=st.toggle("DISPLAY EDI")
+                # if display_edi:
+                #     data=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}")
+                #     st.text_area("EDI",data,height=400)                                
                
-                st.download_button(
-                    label="DOWNLOAD EDI",
-                    data=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}"),
-                    file_name=f'{requested_edi_file}',
-                    mime='text/csv')
+                # st.download_button(
+                #     label="DOWNLOAD EDI",
+                #     data=gcp_download(target_bucket, rf"EDIS/{requested_edi_file}"),
+                #     file_name=f'{requested_edi_file}',
+                #     mime='text/csv')
                
                 
                 

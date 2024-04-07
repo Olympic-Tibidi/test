@@ -19,3 +19,4 @@ reportlab
 pypdfium2
 streamlit_profiler
 google-cloud-documentai
+docx

@@ -2428,10 +2428,10 @@ if authentication_status:
                         full_text.append(para.text)
                     return '\n'.join(full_text)
                 st.title('Word File Viewer')
-                    uploaded_file = st.file_uploader("Upload a Word file", type=['docx'])
-                    if uploaded_file is not None:
-                        file_contents = read_word_file(uploaded_file)
-                        st.markdown(file_contents)
+                uploaded_file = st.file_uploader("Upload a Word file", type=['docx'])
+                if uploaded_file is not None:
+                    file_contents = read_word_file(uploaded_file)
+                    st.markdown(file_contents)
                 
                 # edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
                 # requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])

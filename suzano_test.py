@@ -1891,7 +1891,7 @@ if authentication_status:
                         
                             # Number input for OT
                             st.session_state.ot = st.number_input(
-                                "OT", step=1, value=0, min_value=0
+                                "OT", step=0.5, value=0, min_value=0
                             )
                             
                             # Form submit button

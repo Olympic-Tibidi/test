@@ -1405,18 +1405,18 @@ if authentication_status:
                                 except:
                                     st.write("NO RESULTS")
                             st.write(jobs)
-                                print(f'{vendor_code} {vendor_name}')
-                                filtered=[]
-                                for i in for_search_ledger.index:
-                                    #st.write(i)
-                                    result=re.findall(fr'{string_}',for_search_ledger.loc[i,"Job_No"],re.IGNORECASE)
-                                    #st.write(result)
-                                    #st.write(for_search_ledger.loc[i,"Description"])
-                #                     if string_ in for_search_ledger.loc[i,"Description"]:
-                #                         st.write("ysy")
-                                    if len(result)>0:
-                                        filtered.append(i)
-                                        temp=for_search_ledger.loc[filtered]
+                #                 print(f'{vendor_code} {vendor_name}')
+                #                 filtered=[]
+                #                 for i in for_search_ledger.index:
+                #                     #st.write(i)
+                #                     result=re.findall(fr'{string_}',for_search_ledger.loc[i,"Job_No"],re.IGNORECASE)
+                #                     #st.write(result)
+                #                     #st.write(for_search_ledger.loc[i,"Description"])
+                # #                     if string_ in for_search_ledger.loc[i,"Description"]:
+                # #                         st.write("ysy")
+                #                     if len(result)>0:
+                #                         filtered.append(i)
+                #                         temp=for_search_ledger.loc[filtered]
                                 
                         #st.write(final)
                     with fintab5:

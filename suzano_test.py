@@ -1358,7 +1358,7 @@ if authentication_status:
                             
                             
                             
-                            match = re.match(pattern, tata[1500])
+                            #match = re.match(pattern, tata[1500])
                        
                 
                             string_=st.selectbox("Select Vendor",vendors.keys(),key="vendor")

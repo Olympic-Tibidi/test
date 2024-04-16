@@ -1377,17 +1377,18 @@ if authentication_status:
                                     st.write("NO RESULTS")
                         with job:
                             
-                                jobs=[]
-                                pattern = r"\b\d+\b"
-                                # Loop over the strings and print the vendor codes and names
-                                for s in ledgers["Job_No"].values.tolist():
-                                    
-                                    try:
-                                        match = re.match(pattern, s)
-                                    except:
-                                        pass
-                                    if match:
-                                        jobs.append(s)
+                        
+                            jobs=[]
+                            pattern = r"\b\d+\b"
+                            # Loop over the strings and print the vendor codes and names
+                            for s in ledgers["Job_No"].values.tolist():
+                                
+                                try:
+                                    match = re.match(pattern, s)
+                                except:
+                                    pass
+                                if match:
+                                    jobs.append(s)
                                     
                             
                             jobs=ledgers["Job_No"].unique().tolist()

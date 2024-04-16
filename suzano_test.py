@@ -1377,18 +1377,18 @@ if authentication_status:
                                     st.write("NO RESULTS")
                         with job:
                             
-                    #                 jobs=[]
-                    #                 pattern = r"\b\d+\b"
-                    #                 # Loop over the strings and print the vendor codes and names
-                    #                 for s in ledgers["Job_No"].values.tolist():
-                    #                     
-                    #                     try:
-                    #                         match = re.match(pattern, s)
-                    #                     except:
-                    #                         pass
-                    #                     if match:
-                    #                         jobs.append(s)
-                    #                 
+                                jobs=[]
+                                pattern = r"\b\d+\b"
+                                # Loop over the strings and print the vendor codes and names
+                                for s in ledgers["Job_No"].values.tolist():
+                                    
+                                    try:
+                                        match = re.match(pattern, s)
+                                    except:
+                                        pass
+                                    if match:
+                                        jobs.append(s)
+                                    
                             
                             jobs=ledgers["Job_No"].unique().tolist()
                             string_=st.selectbox("Select Job",jobs,key="job")
@@ -1403,19 +1403,19 @@ if authentication_status:
                                     st.markdown(total,unsafe_allow_html=True)
                                 except:
                                     st.write("NO RESULTS")
-                            #st.write(jobs)
-                                    #print(f'{vendor_code} {vendor_name}')
-                    #                 filtered=[]
-                    #                 for i in for_search_ledger.index:
-                    #                     #st.write(i)
-                    #                     result=re.findall(fr'{string_}',for_search_ledger.loc[i,"Job_No"],re.IGNORECASE)
-                    #                     #st.write(result)
-                    #                     #st.write(for_search_ledger.loc[i,"Description"])
-                    # #                     if string_ in for_search_ledger.loc[i,"Description"]:
-                    # #                         st.write("ysy")
-                    #                     if len(result)>0:
-                    #                         filtered.append(i)
-                    #                         temp=for_search_ledger.loc[filtered]
+                            st.write(jobs)
+                                    print(f'{vendor_code} {vendor_name}')
+                                    filtered=[]
+                                    for i in for_search_ledger.index:
+                                        #st.write(i)
+                                        result=re.findall(fr'{string_}',for_search_ledger.loc[i,"Job_No"],re.IGNORECASE)
+                                        #st.write(result)
+                                        #st.write(for_search_ledger.loc[i,"Description"])
+                    #                     if string_ in for_search_ledger.loc[i,"Description"]:
+                    #                         st.write("ysy")
+                                        if len(result)>0:
+                                            filtered.append(i)
+                                            temp=for_search_ledger.loc[filtered]
                                 
                         #st.write(final)
                     with fintab5:

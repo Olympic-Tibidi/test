@@ -1325,99 +1325,99 @@ if authentication_status:
                     #             overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
                     #             #print(overall)
                     #             revs
-                    #with fintab4:
-                    #     ear=st.selectbox("Select Year",["2023","2022","2021"],key="yeartab2")
+                    with fintab4:
+                        ear=st.selectbox("Select Year",["2024","2023","2022","2021"],key="yeartab2")
                 
-                    #     ledgers=gcp_download_x(target_bucket,rf"FIN/main{ear}.ftr")
-                    #     ledgers=pd.read_feather(io.BytesIO(ledgers))
-                    #     ledgers["Account"]=ledgers["Account"].astype("str")
-                    #     ledgers.set_index("index",drop=True,inplace=True)
-                    #     #st.write(ledgers)
+                        ledgers=gcp_download_x(target_bucket,rf"FIN/main{ear}.ftr")
+                        ledgers=pd.read_feather(io.BytesIO(ledgers))
+                        ledgers["Account"]=ledgers["Account"].astype("str")
+                        ledgers.set_index("index",drop=True,inplace=True)
+                        #st.write(ledgers)
         
-                    #     for_search_ledger=ledgers.fillna("")
+                        for_search_ledger=ledgers.fillna("")
                         
-                    #     vendor,job=st.tabs(["SEARCH BY VENDOR","SEARCH BY JOB"])
-                    #     with vendor:
+                        vendor,job=st.tabs(["SEARCH BY VENDOR","SEARCH BY JOB"])
+                        with vendor:
                             
-                    #         pattern = r'^([A-Z&]{3}\d{3})\s+(.+)$'
-                    #         vendors={}
-                    #         tata=[]
-                    #         # Loop over the strings and print the vendor codes and names
-                    #         for s in ledgers["Description"].values.tolist():
-                    #             s=str(s)
-                    #             tata.append(s)
-                    #             try:
-                    #                 match = re.match(pattern, s)
-                    #                 if match:
-                    #                     vendor_code = match.group(1)
-                    #                     vendor_name = match.group(2)
-                    #                     vendors[vendor_name]=vendor_code
-                    #                     #print(f'{vendor_code} {vendor_name}')
-                    #             except:
-                    #                 pass
+                            pattern = r'^([A-Z&]{3}\d{3})\s+(.+)$'
+                            vendors={}
+                            tata=[]
+                            # Loop over the strings and print the vendor codes and names
+                            for s in ledgers["Description"].values.tolist():
+                                s=str(s)
+                                tata.append(s)
+                                try:
+                                    match = re.match(pattern, s)
+                                    if match:
+                                        vendor_code = match.group(1)
+                                        vendor_name = match.group(2)
+                                        vendors[vendor_name]=vendor_code
+                                        #print(f'{vendor_code} {vendor_name}')
+                                except:
+                                    pass
                             
                             
                             
-                    #         match = re.match(pattern, tata[1500])
+                            match = re.match(pattern, tata[1500])
                        
                 
-                    #         string_=st.selectbox("Select Vendor",vendors.keys(),key="vendor")
+                            string_=st.selectbox("Select Vendor",vendors.keys(),key="vendor")
                        
                             
-                    #         if string_:
-                    #             st.subheader(f"{vendors[string_]} - {string_} {ear} Expenses")
-                    #             temp=ledgers[ledgers["Description"].str.contains(string_).fillna(False)]
+                            if string_:
+                                st.subheader(f"{vendors[string_]} - {string_} {ear} Expenses")
+                                temp=ledgers[ledgers["Description"].str.contains(string_).fillna(False)]
                                 
-                    #             total='${:,.1f}'.format(temp.Net.sum())
-                    #             total=f"<b>TOTAL = {total}</b>"
-                    #             try:
-                    #                 st.table(temp)
-                    #                 st.markdown(total,unsafe_allow_html=True)
-                    #             except:
-                    #                 st.write("NO RESULTS")
-                    #     with job:
+                                total='${:,.1f}'.format(temp.Net.sum())
+                                total=f"<b>TOTAL = {total}</b>"
+                                try:
+                                    st.table(temp)
+                                    st.markdown(total,unsafe_allow_html=True)
+                                except:
+                                    st.write("NO RESULTS")
+                        with job:
                             
-                    # #                 jobs=[]
-                    # #                 pattern = r"\b\d+\b"
-                    # #                 # Loop over the strings and print the vendor codes and names
-                    # #                 for s in ledgers["Job_No"].values.tolist():
-                    # #                     
-                    # #                     try:
-                    # #                         match = re.match(pattern, s)
-                    # #                     except:
-                    # #                         pass
-                    # #                     if match:
-                    # #                         jobs.append(s)
-                    # #                 
+                    #                 jobs=[]
+                    #                 pattern = r"\b\d+\b"
+                    #                 # Loop over the strings and print the vendor codes and names
+                    #                 for s in ledgers["Job_No"].values.tolist():
+                    #                     
+                    #                     try:
+                    #                         match = re.match(pattern, s)
+                    #                     except:
+                    #                         pass
+                    #                     if match:
+                    #                         jobs.append(s)
+                    #                 
                             
-                    #         jobs=ledgers["Job_No"].unique().tolist()
-                    #         string_=st.selectbox("Select Job",jobs,key="job")
-                    #         if string_:
-                    #             st.subheader(f"{string_} {ear} Records")
-                    #             temp=ledgers[ledgers["Job_No"].str.contains(string_).fillna(False)]
+                            jobs=ledgers["Job_No"].unique().tolist()
+                            string_=st.selectbox("Select Job",jobs,key="job")
+                            if string_:
+                                st.subheader(f"{string_} {ear} Records")
+                                temp=ledgers[ledgers["Job_No"].str.contains(string_).fillna(False)]
                                 
-                    #             total='${:,.1f}'.format(temp.Net.sum())
-                    #             total=f"<b>TOTAL = {total}</b>"
-                    #             try:
-                    #                 st.table(temp)
-                    #                 st.markdown(total,unsafe_allow_html=True)
-                    #             except:
-                    #                 st.write("NO RESULTS")
-                    #         #st.write(jobs)
-                    #                 #print(f'{vendor_code} {vendor_name}')
-                    # #                 filtered=[]
-                    # #                 for i in for_search_ledger.index:
-                    # #                     #st.write(i)
-                    # #                     result=re.findall(fr'{string_}',for_search_ledger.loc[i,"Job_No"],re.IGNORECASE)
-                    # #                     #st.write(result)
-                    # #                     #st.write(for_search_ledger.loc[i,"Description"])
-                    # # #                     if string_ in for_search_ledger.loc[i,"Description"]:
-                    # # #                         st.write("ysy")
-                    # #                     if len(result)>0:
-                    # #                         filtered.append(i)
-                    # #                         temp=for_search_ledger.loc[filtered]
+                                total='${:,.1f}'.format(temp.Net.sum())
+                                total=f"<b>TOTAL = {total}</b>"
+                                try:
+                                    st.table(temp)
+                                    st.markdown(total,unsafe_allow_html=True)
+                                except:
+                                    st.write("NO RESULTS")
+                            #st.write(jobs)
+                                    #print(f'{vendor_code} {vendor_name}')
+                    #                 filtered=[]
+                    #                 for i in for_search_ledger.index:
+                    #                     #st.write(i)
+                    #                     result=re.findall(fr'{string_}',for_search_ledger.loc[i,"Job_No"],re.IGNORECASE)
+                    #                     #st.write(result)
+                    #                     #st.write(for_search_ledger.loc[i,"Description"])
+                    # #                     if string_ in for_search_ledger.loc[i,"Description"]:
+                    # #                         st.write("ysy")
+                    #                     if len(result)>0:
+                    #                         filtered.append(i)
+                    #                         temp=for_search_ledger.loc[filtered]
                                 
-                    #     #st.write(final)
+                        #st.write(final)
                     with fintab5:
                         year=st.selectbox("SELECT YEAR",["2023","2022","2021","2020","2019","2018","2017"],key="depreciation")
                         terminal_depreciation=gcp_download_x(target_bucket,rf"FIN/main{year}-30.ftr")

@@ -480,7 +480,7 @@ if authentication_status:
         
         if select=="FINANCE":
             hadi=False
-            fin_password=st.sidebar.text_input("Enter Password",key="sas")
+            fin_password=st.sidebar.text_input("Enter Password",type="password",key="sas")
             if fin_password=="marineterm98501!":
                 hadi=True
             if hadi:

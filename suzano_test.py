@@ -497,7 +497,7 @@ if authentication_status:
                             m36 = st.file_uploader("**Upload Ledger 036 csv**", type=["csv"],key="34wsas")
                             m40 = st.file_uploader("**Upload Ledger 040 csv**", type=["csv"],key="34wsss")
                             ledgers=[m30,m32,m36,m40]
-                            file_names=["030-2023","032-2023","036-2023","040-2023"]
+                            file_names=[f"030-{year}",f"032-{year}",f"036-{year}",f"040-{year}"]
                             if m30 and m32 and m36 and m40:
                                                         
                                 for k,file in zip(ledgers,file_names):

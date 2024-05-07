@@ -2095,8 +2095,38 @@ if authentication_status:
             conn = st.connection('gcs', type=FilesConnection)
             a = conn.read(f"new_suzano/map.json", ttl=600)
             #st.write(a)
-            admin_tab1,admin_tab2,admin_tab3,admin_tab4=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","AUDIT"])
+            admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","AUDIT","SHIPPING FILE"])
 
+            with admin_tab5:
+
+                
+                uploaded_file = st.file_uploader("UPLOAD SHIPPING CSV FILE", type=['csv', 'txt'])
+
+                if uploaded_file is not None:
+                    # Check the file's extension to perform appropriate operation
+                    if uploaded_file.name.endswith('.csv'):
+                        # Assuming file is in CSV format and displays it as a DataFrame
+                        df = pd.read_csv(uploaded_file)
+                        words_to_filter = ['NO', 'SPECIAL', 'MARKS']
+                        cols_to_drop = [col for col in temp.columns if any(temp[col].astype(str).str.contains(word).any() for word in words_to_filter)]
+                        temp.drop(columns=cols_to_drop, inplace=True)
+                        temp.columns=[i for i in range(len(temp.columns))]
+                        
+                        df=pd.DataFrame(list(zip([i[5:] for i in temp[0]],
+                                                 [i for i in temp[1]],
+                                                 [int(float(i))/2000 for i in temp[5].str[13:18][:-1]],
+                                                 [i for i in temp[5].str[28:][:-1]],
+                                              [i for i in temp[5].str[20:28][:-1]])),columns=["Lot","Grade","Lot Qty","Ocean_Bol","Batch"])
+                        df["DryWeight"]=[float(i)/1000 for i in temp[6][:-1]]
+                        df["ADMT"]=[float(i)/0.9/100000 for i in temp[6][:-1]]*df["Lot Qty"]*2
+                        df["Lot Qty"]=df["Lot Qty"].astype(int)
+                        df.groupby(["Ocean_Bol","Batch","Grade"])[["Lot Qty"]].sum()
+                        st.write(df)
+                    elif uploaded_file.name.endswith('.txt'):
+                        # Assuming file is in text format and displays its content
+                        content = uploaded_file.read()  # read the content of the file
+                        st.text(content.decode("utf-8"))  # assuming the file is enco
+            
             with admin_tab4:   ###   AUDIT
                 if st.button("RUN RECORD AUDIT"):
                     

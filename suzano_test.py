@@ -2120,8 +2120,14 @@ if authentication_status:
                         df["DryWeight"]=[float(i)/1000 for i in temp[6][:-1]]
                         df["ADMT"]=[float(i)/0.9/100000 for i in temp[6][:-1]]*df["Lot Qty"]*2
                         df["Lot Qty"]=df["Lot Qty"].astype(int)
-                        df.groupby(["Ocean_Bol","Batch","Grade"])[["Lot Qty"]].sum()
-                        st.write(df)
+                        grouped=df.groupby(["Ocean_Bol","Batch","Grade"])[["Lot Qty"]].sum()
+                        a1,a2=st.columns([5,5])
+                        with a1:
+                            st.write(grouped)
+                        with a2:
+                            st.write(df)
+                            
+                            
                     elif uploaded_file.name.endswith('.txt'):
                         # Assuming file is in text format and displays its content
                         content = uploaded_file.read()  # read the content of the file

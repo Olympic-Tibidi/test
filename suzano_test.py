@@ -2106,7 +2106,7 @@ if authentication_status:
                     # Check the file's extension to perform appropriate operation
                     if uploaded_file.name.endswith('.csv'):
                         # Assuming file is in CSV format and displays it as a DataFrame
-                        df = pd.read_csv(uploaded_file)
+                        temp = pd.read_csv(uploaded_file)
                         words_to_filter = ['NO', 'SPECIAL', 'MARKS']
                         cols_to_drop = [col for col in temp.columns if any(temp[col].astype(str).str.contains(word).any() for word in words_to_filter)]
                         temp.drop(columns=cols_to_drop, inplace=True)

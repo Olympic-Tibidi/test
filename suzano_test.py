@@ -44,7 +44,7 @@ import plotly.graph_objects as go         #to create interactive charts
 import zipfile
 import requests
 from bs4 import BeautifulSoup
-
+import csv
 
 import re
 import tempfile

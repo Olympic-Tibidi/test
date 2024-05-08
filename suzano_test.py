@@ -1542,7 +1542,7 @@ if authentication_status:
                                 total='${:,.1f}'.format(temp.Net.sum())
                                 total=f"<b>TOTAL = {total}</b>"
                                 try:
-                                    st.table(temp)
+                                    st.write(temp)
                                     st.markdown(total,unsafe_allow_html=True)
                                 except:
                                     st.write("NO RESULTS")

@@ -1532,7 +1532,7 @@ if authentication_status:
                             #match = re.match(pattern, tata[1500])
                        
                 
-                            string_=st.selectbox("Select Vendor",vendors.keys(),key="vendor")
+                            string_=st.selectbox("Select Vendor",vendors.keys(),key="vendoeer")
                        
                             
                             if string_:
@@ -1563,7 +1563,7 @@ if authentication_status:
                                     
                             
                             jobs=ledgers["Job_No"].unique().tolist()
-                            string_=st.selectbox("Select Job",jobs,key="job")
+                            string_=st.selectbox("Select Job",jobs,key="jssob")
                             if string_:
                                 st.subheader(f"{string_} {ear} Records")
                                 temp=ledgers[ledgers["Job_No"].str.contains(string_).fillna(False)]

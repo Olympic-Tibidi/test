@@ -1504,7 +1504,7 @@ if authentication_status:
                         ledgers=gcp_download_x(target_bucket,rf"FIN/all_ledgers.ftr")
                         ledgers=pd.read_feather(io.BytesIO(ledgers))
                         ledgers["Account"]=ledgers["Account"].astype("str")
-                        ledgers.set_index("index",drop=True,inplace=True)
+                        #ledgers.set_index("index",drop=True,inplace=True)
                         for_search_ledger=ledgers.fillna("")
                         
                         vendor,job=st.tabs(["SEARCH BY VENDOR","SEARCH BY JOB"])

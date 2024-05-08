@@ -666,8 +666,8 @@ if authentication_status:
                     original_title = f'<p style="font-family:Arial;font-weight: bold; color:Black; font-size: 20px;">{tt}</p>'
                     st.markdown(original_title, unsafe_allow_html=True)
                 
-                    fintab1,fintab2,fintab3,fintab4,fintab5=st.tabs(["LEDGERS-MONTHLY","YEAR NET","BUDGET",
-                                                                     "SEARCH BY CUSTOMER/VENDOR STRING","DEPRECIATION"])
+                    fintab1,fintab2,fintab3,fintab4,fintab5,fintab6=st.tabs(["LEDGERS-MONTHLY","YEAR NET","BUDGET",
+                                                                     "SEARCH BY CUSTOMER/VENDOR STRING","DEPRECIATION","ALL LEDGERS"])
                 
                     #### LOAD BUDGET CODES, has information on 2022 and 2023 budget by account number
                 
@@ -1500,6 +1500,97 @@ if authentication_status:
                         
                         a=a.style.set_properties(**{'text-align': 'left'}).set_table_styles(styles).applymap(highlight_total, subset=pd.IndexSlice["TOTAL", ["Credit","Monthly"]])
                         st.table(a)    
+                    with fintab6:
+                        ledgers=gcp_download_x(target_bucket,rf"FIN/all_ledgers.ftr")
+                        ledgers=pd.read_feather(io.BytesIO(ledgers))
+                        ledgers["Account"]=ledgers["Account"].astype("str")
+                        ledgers.set_index("index",drop=True,inplace=True)
+                        for_search_ledger=ledgers.fillna("")
+                        
+                        vendor,job=st.tabs(["SEARCH BY VENDOR","SEARCH BY JOB"])
+                        with vendor:
+                            
+                            pattern = r'^([A-Z&]{3}\d{3})\s+(.+)$'
+                            vendors={}
+                            tata=[]
+                            # Loop over the strings and print the vendor codes and names
+                            for s in ledgers["Description"].values.tolist():
+                                s=str(s)
+                                tata.append(s)
+                                try:
+                                    match = re.match(pattern, s)
+                                    if match:
+                                        vendor_code = match.group(1)
+                                        vendor_name = match.group(2)
+                                        vendors[vendor_name]=vendor_code
+                                        #print(f'{vendor_code} {vendor_name}')
+                                except:
+                                    pass
+                            
+                            
+                            
+                            #match = re.match(pattern, tata[1500])
+                       
+                
+                            string_=st.selectbox("Select Vendor",vendors.keys(),key="vendor")
+                       
+                            
+                            if string_:
+                                st.subheader(f"{vendors[string_]} - {string_} {ear} Expenses")
+                                temp=ledgers[ledgers["Description"].str.contains(string_).fillna(False)]
+                                
+                                total='${:,.1f}'.format(temp.Net.sum())
+                                total=f"<b>TOTAL = {total}</b>"
+                                try:
+                                    st.table(temp)
+                                    st.markdown(total,unsafe_allow_html=True)
+                                except:
+                                    st.write("NO RESULTS")
+                        with job:
+                            
+                        
+                            jobs=[]
+                            pattern = r"\b\d+\b"
+                            # Loop over the strings and print the vendor codes and names
+                            for s in ledgers["Job_No"].values.tolist():
+                                
+                                try:
+                                    match = re.match(pattern, s)
+                                except:
+                                    pass
+                                if match:
+                                    jobs.append(s)
+                                    
+                            
+                            jobs=ledgers["Job_No"].unique().tolist()
+                            string_=st.selectbox("Select Job",jobs,key="job")
+                            if string_:
+                                st.subheader(f"{string_} {ear} Records")
+                                temp=ledgers[ledgers["Job_No"].str.contains(string_).fillna(False)]
+                                
+                                total='${:,.1f}'.format(temp.Net.sum())
+                                total=f"<b>TOTAL = {total}</b>"
+                                try:
+                                    st.table(temp)
+                                    st.markdown(total,unsafe_allow_html=True)
+                                except:
+                                    st.write("NO RESULTS")
+                            st.write(jobs)
+                #                 print(f'{vendor_code} {vendor_name}')
+                #                 filtered=[]
+                #                 for i in for_search_ledger.index:
+                #                     #st.write(i)
+                #                     result=re.findall(fr'{string_}',for_search_ledger.loc[i,"Job_No"],re.IGNORECASE)
+                #                     #st.write(result)
+                #                     #st.write(for_search_ledger.loc[i,"Description"])
+                # #                     if string_ in for_search_ledger.loc[i,"Description"]:
+                # #                         st.write("ysy")
+                #                     if len(result)>0:
+                #                         filtered.append(i)
+                #                         temp=for_search_ledger.loc[filtered]
+                                
+                        #st.write(final)
+        
             
             
               

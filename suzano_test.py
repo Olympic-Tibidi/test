@@ -1270,52 +1270,53 @@ if authentication_status:
                         if agree:
                             st.image(resim)
                         
-                        temp=gcp_download_x(target_bucket,rf"FIN/main2022.ftr")
+                        temp=gcp_download_x(target_bucket,rf"FIN/Budget_2025.ftr")
                         temp=pd.read_feather(io.BytesIO(temp)) 
-                        temp2023=gcp_download_x(target_bucket,rf"FIN/main2023.ftr")
-                        temp2023=pd.read_feather(io.BytesIO(temp2023))
+                        #temp2023=gcp_download_x(target_bucket,rf"FIN/main2023.ftr")
+                        #temp2023=pd.read_feather(io.BytesIO(temp2023))
                         temp["Account"]=temp["Account"].astype("str")
                         temp.set_index("index",drop=True,inplace=True)
                         temp.Account=[str(i)+"-"+str(j) for i,j in zip(temp.Account,temp.Sub_Cat)]
-                        temp2023["Account"]=temp2023["Account"].astype("str")
-                        temp2023.set_index("index",drop=True,inplace=True)
-                        temp2023.Account=[str(i)+"-"+str(j) for i,j in zip(temp2023.Account,temp2023.Sub_Cat)]
+                        st.write(temp)
+                        #temp2023["Account"]=temp2023["Account"].astype("str")
+                        #temp2023.set_index("index",drop=True,inplace=True)
+                        #temp2023.Account=[str(i)+"-"+str(j) for i,j in zip(temp2023.Account,temp2023.Sub_Cat)]
                         
-                        temp1=budget_codes.copy()
-                        temp1.drop(columns=["2021 Final"],inplace=True)
-                        temp1.insert(5,"2022 Actual",[temp[temp["Account"]==i]["Net"].sum() for i in temp1.Account])
-                        temp1.insert(6,"2022 Monthly",[round(temp[temp["Account"]==i]["Net"].sum()/12,1) for i in temp1.Account])
-                        months=int(temp2023.Date.max().month)-1
-                        st.write(months)
+                        # temp1=budget_codes.copy()
+                        # temp1.drop(columns=["2021 Final"],inplace=True)
+                        # temp1.insert(5,"2022 Actual",[temp[temp["Account"]==i]["Net"].sum() for i in temp1.Account])
+                        # temp1.insert(6,"2022 Monthly",[round(temp[temp["Account"]==i]["Net"].sum()/12,1) for i in temp1.Account])
+                        # months=int(temp2023.Date.max().month)-1
+                        # st.write(months)
                         
                         #months=5
-                        temp1["2023 Monthly Budgeted"]=[round(i/12,2) for i in temp1["2023 Adopted"]]
-                        temp1["2023 Monthly"]=[round(temp2023[temp2023["Account"]==i]["Net"].sum()/months,1) for i in temp1.Account]
-                        x=gcp_download_x(target_bucket,rf"FIN/2024annual-try.pkl")
-                        x=io.BytesIO(x)
-                        temp1["2024 PROPOSED"]= pd.read_pickle(x)["2024 PROPOSED"]
-                        temp1["2024 Monthly"]=[round(i/12,1) for i in temp1["2024 PROPOSED"]]
-                        temp1=st.experimental_data_editor(temp1)
-                        if st.button("SAVE 2024 BUDGET EDITS"):
+                        # temp1["2023 Monthly Budgeted"]=[round(i/12,2) for i in temp1["2023 Adopted"]]
+                        # temp1["2023 Monthly"]=[round(temp2023[temp2023["Account"]==i]["Net"].sum()/months,1) for i in temp1.Account]
+                        # x=gcp_download_x(target_bucket,rf"FIN/2024annual-try.pkl")
+                        # x=io.BytesIO(x)
+                        # temp1["2024 PROPOSED"]= pd.read_pickle(x)["2024 PROPOSED"]
+                        # temp1["2024 Monthly"]=[round(i/12,1) for i in temp1["2024 PROPOSED"]]
+                        # temp1=st.experimental_data_editor(temp1)
+                        # if st.button("SAVE 2024 BUDGET EDITS"):
                             
-                            temp1["2024 PROPOSED"].to_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual.pkl')
-                            temp1.to_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')
-                            temp1.to_excel(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.xlsx')
-                            temp1 = pd.read_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')
-                        b1,b2,b3,b4= st.columns([2,2,2,6])
+                        #     temp1["2024 PROPOSED"].to_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual.pkl')
+                        #     temp1.to_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')
+                        #     temp1.to_excel(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.xlsx')
+                        #     temp1 = pd.read_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')
+                        # b1,b2,b3,b4= st.columns([2,2,2,6])
                         
-                        with b1:
-                            sankey=temp1.groupby(["Group"])[["2022 Adopted"]].sum()
+                        # with b1:
+                        #     sankey=temp1.groupby(["Group"])[["2022 Adopted"]].sum()
                             
-                            st.write(sankey)
-                        with b2:
-                            sankey=temp1.groupby(["Group"])[["2022 Actual"]].sum()
+                        #     st.write(sankey)
+                        # with b2:
+                        #     sankey=temp1.groupby(["Group"])[["2022 Actual"]].sum()
                             
-                            st.write(sankey)
-                        with b3:
-                            sankey=temp1.groupby(["Group"])[["2023 Adopted"]].sum()
+                        #     st.write(sankey)
+                        # with b3:
+                        #     sankey=temp1.groupby(["Group"])[["2023 Adopted"]].sum()
                             
-                            st.write(sankey)
+                        #     st.write(sankey)
                     #             revs=[temp.loc[("Revenue",i)].values[0] for i in labels[:5]]
                     # 
                     #             ops=[abs(temp.loc[("Operating Expenses",i)].values[0]) for i in labels[7:13]]

@@ -500,7 +500,7 @@ if authentication_status:
             local_model_path = 'temp_model.keras'
 
             model = download_model(target_bucket, 'mygatemodel.keras', local_model_path)
-            st.title('Image Prediction')
+            st.title('SOUTH GATE OPEN/CLOSE DETECTION')
 
             # Assuming you have a function `prepare_image` to process images
             uploaded_file = st.file_uploader("Upload an image", type="jpg")

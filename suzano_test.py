@@ -55,6 +55,9 @@ import calendar
 from google.cloud import documentai
 from google.oauth2 import service_account
 from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
+
+
 credentials = service_account.Credentials.from_service_account_info(st.secrets["gcs_connections"])
 
 client = documentai.DocumentProcessorServiceClient(credentials=credentials)

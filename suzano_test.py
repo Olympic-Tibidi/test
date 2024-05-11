@@ -54,7 +54,7 @@ from pandas.tseries.offsets import BDay
 import calendar
 from google.cloud import documentai
 from google.oauth2 import service_account
-
+from tensorflow.keras.models import load_model
 credentials = service_account.Credentials.from_service_account_info(st.secrets["gcs_connections"])
 
 client = documentai.DocumentProcessorServiceClient(credentials=credentials)
@@ -171,6 +171,21 @@ def gcp_csv_to_df(bucket_name, source_file_name):
     df = pd.read_csv(io.BytesIO(data),index_col=None)
     print(f'Pulled down file from bucket {bucket_name}, file name: {source_file_name}')
     return df
+
+def download_model(bucket_name, source_blob_name, destination_file_name):
+    """Downloads a model from the bucket."""
+    # Initialize a storage client
+    storage_client = storage.Client()
+    # Get the bucket
+    bucket = storage_client.bucket(bucket_name)
+    # Construct a blob
+    blob = bucket.blob(source_blob_name)
+    # Download the blob to a temporary local file
+    blob.download_to_filename(destination_file_name)
+    print(f"Downloaded storage object {source_blob_name} from bucket {bucket_name} to local file {destination_file_name}.")
+    # Load the model
+    model = load_model(destination_file_name)
+    return model
 
 
 def upload_cs_file(bucket_name, source_file_name, destination_file_name): 
@@ -465,7 +480,7 @@ if authentication_status:
         
         
         select=st.sidebar.radio("SELECT FUNCTION",
-            ('ADMIN', 'LOADOUT', 'INVENTORY','LABOR','FINANCE'))
+            ('ADMIN', 'LOADOUT', 'INVENTORY','LABOR','FINANCE',"GATE CONV.NETWORK"))
         custom_style = """
                     <style>
                         .custom-container {
@@ -477,6 +492,21 @@ if authentication_status:
                     </style>
                 """
         st.markdown(custom_style, unsafe_allow_html=True)
+        
+        if select=="GATE CONV.NETWORK":
+            local_model_path = 'temp_model.keras'
+
+            model = download_model(target_bucket, 'mygatemodel.keras', local_model_path)
+            st.title('Image Prediction')
+
+            # Assuming you have a function `prepare_image` to process images
+            uploaded_file = st.file_uploader("Upload an image", type="jpg")
+            if uploaded_file is not None:
+                # Process the image file
+                image = prepare_image(uploaded_file)
+                # Predict using your model
+                prediction = model.predict(image)
+                st.write("Prediction:", prediction)            
         
         if select=="FINANCE":
             hadi=False

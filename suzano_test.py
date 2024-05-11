@@ -503,9 +503,13 @@ if authentication_status:
             uploaded_file = st.file_uploader("Upload an image", type="jpg")
             if uploaded_file is not None:
                 # Process the image file
-                image = prepare_image(uploaded_file)
+                test_image = image.load_img(uploaded_file, target_size=(150, 150))
+                test_image = image.img_to_array(test_image)
+                test_image = np.expand_dims(test_image, axis=0)
+                test_image = test_image * 1./255  # Remember to scale the image as we did for training data
+
                 # Predict using your model
-                prediction = model.predict(image)
+                prediction = model.predict(test_image)
                 st.write("Prediction:", prediction)            
         
         if select=="FINANCE":

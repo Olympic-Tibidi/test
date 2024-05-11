@@ -513,7 +513,8 @@ if authentication_status:
 
                 # Predict using your model
                 prediction = model.predict(test_image)
-                st.write("Prediction:", prediction)            
+                st.write("Prediction:", prediction)           
+                st.markdown("**The gate is", ("open" if prediction[0][0] > 0.5 else "closed**")
         
         if select=="FINANCE":
             hadi=False

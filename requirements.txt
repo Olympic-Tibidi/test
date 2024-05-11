@@ -20,3 +20,6 @@ pypdfium2
 streamlit_profiler
 google-cloud-documentai
 python-docx
+opencv-python
+tensorflow==2.9.1  # Adjust according to the version you are using
+pillow  # Used for image handling in Python

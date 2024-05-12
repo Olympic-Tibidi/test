@@ -521,7 +521,7 @@ if authentication_status:
             uploaded_file = st.file_uploader("Upload an image", type="jpg")
             if uploaded_file is not None:
                 # Process the image file
-                img = image.load_img(file_path, color_mode='rgb')
+                img = image.load_img(uploaded_file, color_mode='rgb')
                 img_array = image.img_to_array(img)
             
                 # Apply custom preprocessing function

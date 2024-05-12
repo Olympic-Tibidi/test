@@ -20,6 +20,6 @@ pypdfium2
 streamlit_profiler
 google-cloud-documentai
 python-docx
-opencv-python
+opencv-python-headless==4.5.2.52
 tensorflow
 pillow

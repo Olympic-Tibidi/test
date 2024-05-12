@@ -4,7 +4,7 @@ from streamlit_profiler import Profiler
 from st_files_connection import FilesConnection
 
 import streamlit.components.v1 as components
-#import cv2
+import cv2
 import numpy as np
 #from st_files_connection import FilesConnection
 import gcsfs

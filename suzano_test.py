@@ -513,7 +513,10 @@ if authentication_status:
                              1: 'both_open',
                              2: 'inbound_closed_outbound_open',
                              3: 'inbound_open_outbound_closed'}
-
+            index_to_class={0: {'inbound':0,'outbound':0},
+                         1:  {'inbound':1,'outbound':1},
+                         2:  {'inbound':0,'outbound':1},
+                         3:  {'inbound':1,'outbound':0}}
             model = download_model(target_bucket, 'mygatemodel2.keras', local_model_path)
             st.title('SOUTH GATE OPEN/CLOSE DETECTION')
 
@@ -533,7 +536,20 @@ if authentication_status:
                 # Predict using your model
                 prediction = model.predict(test_image)
                 predicted_class = np.argmax(prediction, axis=1)
-                st.markdown(f"**Predicted Class: {index_to_class[predicted_class[0]]}**")   
+                gate1,gate2=st.columns([5,5])
+                with gate1:
+                    st.subheader("INBOUND")
+                    if index_to_class[predicted_class[0]]['inbound']==0:
+                        st.write("closed")
+                    else:
+                        st.write("open")
+                with gate2:
+                    st.subheader("OUTBOUND")
+                    if index_to_class[predicted_class[0]]['outbound']==0:
+                        st.write("closed")
+                    else:
+                        st.write("open")
+                #st.markdown(f"**Predicted Class: {index_to_class[predicted_class[0]]}**")   
                 # if prediction[0][0] > 0.5:
                 #     st.markdown("**The gate is OPEN**")
                 # else:

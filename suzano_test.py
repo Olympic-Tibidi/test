@@ -497,27 +497,46 @@ if authentication_status:
         st.markdown(custom_style, unsafe_allow_html=True)
         
         if select=="GATE CONV.NETWORK":
+            def custom_preprocessing_function(img):
+                # Crop the image first to ensure the gate is included
+                cropped_img = img[:,round(img.shape[1]*0.4):]
+            
+                # Now apply any further transformations you want
+                # For example, manually apply rescaling and a mild zoom if necessary
+                # Note: You might need additional libraries or write more complex transformations manually
+            
+                # Resize the cropped image to the desired input size of the model
+                resized_img = cv2.resize(cropped_img, (150, 150))
+                return resized_img
             local_model_path = 'temp_model.keras'
+            index_to_class={0: 'both_closed',
+                             1: 'both_open',
+                             2: 'inbound_closed_outbound_open',
+                             3: 'inbound_open_outbound_closed'}
 
-            model = download_model(target_bucket, 'mygatemodel.keras', local_model_path)
+            model = download_model(target_bucket, 'mygatemodel2.keras', local_model_path)
             st.title('SOUTH GATE OPEN/CLOSE DETECTION')
 
             # Assuming you have a function `prepare_image` to process images
             uploaded_file = st.file_uploader("Upload an image", type="jpg")
             if uploaded_file is not None:
                 # Process the image file
-                test_image = image.load_img(uploaded_file, target_size=(150, 150))
-                test_image = image.img_to_array(test_image)
-                test_image = np.expand_dims(test_image, axis=0)
-                test_image = test_image * 1./255  # Remember to scale the image as we did for training data
+                img = image.load_img(file_path, color_mode='rgb')
+                img_array = image.img_to_array(img)
+            
+                # Apply custom preprocessing function
+                img_array = custom_preprocessing_function(img_array)
+            
+                # Expand dimensions to match the batch shape and rescale pixel values
+                test_image = np.expand_dims(img_array, axis=0) / 255.0
 
                 # Predict using your model
                 prediction = model.predict(test_image)
-                st.write("Prediction:", prediction)   
-                if prediction[0][0] > 0.5:
-                    st.markdown("**The gate is OPEN**")
-                else:
-                    st.markdown("**The gate is CLOSED**")
+                st.markdown(f"**Predicted Class: {index_to_class[predicted_class[0]]}**")   
+                # if prediction[0][0] > 0.5:
+                #     st.markdown("**The gate is OPEN**")
+                # else:
+                #     st.markdown("**The gate is CLOSED**")
         
         if select=="FINANCE":
             hadi=False

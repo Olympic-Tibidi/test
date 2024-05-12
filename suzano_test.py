@@ -174,7 +174,7 @@ def gcp_csv_to_df(bucket_name, source_file_name):
     df = pd.read_csv(io.BytesIO(data),index_col=None)
     print(f'Pulled down file from bucket {bucket_name}, file name: {source_file_name}')
     return df
-
+@st.cache(allow_output_mutation=True)
 def download_model(bucket_name, source_blob_name, destination_file_name):
     """Downloads a model from the bucket."""
     # Initialize a storage client

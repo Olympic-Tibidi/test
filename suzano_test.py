@@ -538,23 +538,48 @@ if authentication_status:
                 prediction = model.predict(test_image)
                 predicted_class = np.argmax(prediction, axis=1)
                 gate1,gate2=st.columns([5,5])
+                def gate_status_html(gate_name, status):
+                    """
+                    Generate HTML content to display gate status with styled backgrounds.
+                
+                    :param gate_name: The name of the gate (e.g., 'INBOUND' or 'OUTBOUND')
+                    :param status: The status of the gate, 0 for closed, non-zero for open.
+                    :return: A string containing HTML content.
+                    """
+                    # Determine background color and text based on status
+                    if status == 0:
+                        background_color = "#FF6347"  # Tomato red for closed gates
+                        text = "CLOSED"
+                    else:
+                        background_color = "#32CD32"  # Lime Green for open gates
+                        text = "OPEN"
+                
+                    # HTML content with styling
+                    html_str = f"""
+                    <div style='background-color: {background_color}; padding: 10px; border-radius: 8px;'>
+                        <h4 style='color: white; text-align: center; font-weight: bold;'>{gate_name}</h4>
+                        <p style='color: white; text-align: center; font-size: 24px; font-weight: bold;'>{text}</p>
+                    </div>
+                    """
+                    return html_str
+
+                # Example usage in Streamlit:
                 with gate1:
                     st.subheader("INBOUND")
-                    if index_to_class[predicted_class[0]]['inbound']==0:
-                        st.write("closed")
-                    else:
-                        st.write("open")
+                    inbound_status = index_to_class[predicted_class[0]]['inbound']
+                    inbound_html = gate_status_html("INBOUND", inbound_status)
+                    st.markdown(inbound_html, unsafe_allow_html=True)
+                
                 with gate2:
                     st.subheader("OUTBOUND")
-                    if index_to_class[predicted_class[0]]['outbound']==0:
-                        st.write("closed")
-                    else:
-                        st.write("open")
-                #st.markdown(f"**Predicted Class: {index_to_class[predicted_class[0]]}**")   
-                # if prediction[0][0] > 0.5:
-                #     st.markdown("**The gate is OPEN**")
-                # else:
-                #     st.markdown("**The gate is CLOSED**")
+                    outbound_status = index_to_class[predicted_class[0]]['outbound']
+                    outbound_html = gate_status_html("OUTBOUND", outbound_status)
+                    st.markdown(outbound_html, unsafe_allow_html=True)
+                                #st.markdown(f"**Predicted Class: {index_to_class[predicted_class[0]]}**")   
+                                # if prediction[0][0] > 0.5:
+                                #     st.markdown("**The gate is OPEN**")
+                                # else:
+                                #     st.markdown("**The gate is CLOSED**")
         
         if select=="FINANCE":
             hadi=False

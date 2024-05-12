@@ -532,6 +532,7 @@ if authentication_status:
 
                 # Predict using your model
                 prediction = model.predict(test_image)
+                predicted_class = np.argmax(prediction, axis=1)
                 st.markdown(f"**Predicted Class: {index_to_class[predicted_class[0]]}**")   
                 # if prediction[0][0] > 0.5:
                 #     st.markdown("**The gate is OPEN**")

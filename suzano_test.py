@@ -495,6 +495,7 @@ if authentication_status:
                     </style>
                 """
         st.markdown(custom_style, unsafe_allow_html=True)
+        local_model_path = 'temp_model.keras'
         model = download_model(target_bucket, 'mygatemodel2.keras', local_model_path)
         if select=="GATE CONV.NETWORK":
             def custom_preprocessing_function(img):
@@ -508,7 +509,7 @@ if authentication_status:
                 # Resize the cropped image to the desired input size of the model
                 resized_img = cv2.resize(cropped_img, (150, 150))
                 return resized_img
-            local_model_path = 'temp_model.keras'
+            #local_model_path = 'temp_model.keras'
             index_to_class={0: 'both_closed',
                              1: 'both_open',
                              2: 'inbound_closed_outbound_open',

@@ -495,7 +495,7 @@ if authentication_status:
                     </style>
                 """
         st.markdown(custom_style, unsafe_allow_html=True)
-        
+        model = download_model(target_bucket, 'mygatemodel2.keras', local_model_path)
         if select=="GATE CONV.NETWORK":
             def custom_preprocessing_function(img):
                 # Crop the image first to ensure the gate is included
@@ -517,7 +517,7 @@ if authentication_status:
                          1:  {'inbound':1,'outbound':1},
                          2:  {'inbound':0,'outbound':1},
                          3:  {'inbound':1,'outbound':0}}
-            model = download_model(target_bucket, 'mygatemodel2.keras', local_model_path)
+            #model = download_model(target_bucket, 'mygatemodel2.keras', local_model_path)
             st.title('SOUTH GATE OPEN/CLOSE DETECTION')
 
             # Assuming you have a function `prepare_image` to process images

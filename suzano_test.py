@@ -500,14 +500,14 @@ if authentication_status:
         if select=="GATE CONV.NETWORK":
             def custom_preprocessing_function(img):
                 # Crop the image first to ensure the gate is included
-                cropped_img = img[:,round(img.shape[1]*0.4):]
+                #cropped_img = img[:,round(img.shape[1]*0.4):]
             
                 # Now apply any further transformations you want
                 # For example, manually apply rescaling and a mild zoom if necessary
                 # Note: You might need additional libraries or write more complex transformations manually
             
                 # Resize the cropped image to the desired input size of the model
-                resized_img = cv2.resize(cropped_img, (150, 150))
+                resized_img = cv2.resize(img, (150, 150))
                 return resized_img
             #local_model_path = 'temp_model.keras'
             index_to_class={0: 'both_closed',

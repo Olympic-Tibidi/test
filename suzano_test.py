@@ -1952,7 +1952,7 @@ if authentication_status:
                     pma_rates_=pd.DataFrame(pma_rates).T
                     occ_codes=pd.DataFrame(assessment_rates).T
                     occ_codes=occ_codes.rename_axis('Occ_Code')
-                    shortened_occ_codes=occ_codes.loc[["0036","0037","0055","0092","0101","0103","0115","0129","0213","0215"]]
+                    shortened_occ_codes=occ_codes.loc[["0036","0037","0055","0092","0101","0103","0115","0129","0213","0215","0277","0278"]]
                     shortened_occ_codes=shortened_occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
                     occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
                     

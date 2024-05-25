@@ -2128,8 +2128,8 @@ if authentication_status:
                        
                    
                         display=pd.DataFrame(st.session_state.scores)
-                        display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]].sum()
-                        display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]]
+                        display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]].sum()
+                        display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]]
                         display.rename(columns={"SIU":f"%{st.session_state.siu} SIU"},inplace=True)
                         eq_display=pd.DataFrame(st.session_state.eq_scores)
                         eq_display.loc["TOTAL FOR SHIFT"]=eq_display[[ "Quantity","Hours","TOTAL COST","Mark UP","EQUIPMENT INVOICE"]].sum()

@@ -1960,7 +1960,8 @@ if authentication_status:
                     
                     if "scores" not in st.session_state:
                         st.session_state.scores = pd.DataFrame(
-                            {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"TOTAL COST":[],"Ind Ins":[],"SIU":[],"Mark UP":[],"INVOICE":[]})
+                            {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],
+                             "TOTAL COST":[],"Ind Ins":[],"SIU":[],"Mark UP":[],"INVOICE":[]})
                     if "eq_scores" not in st.session_state:
                         st.session_state.eq_scores = pd.DataFrame(
                             {"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
@@ -2129,6 +2130,7 @@ if authentication_status:
                        
                    
                         display=pd.DataFrame(st.session_state.scores)
+                        st.dataframe(display)
                         display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]].sum()
                         display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]]
                         display.rename(columns={"SIU":f"%{st.session_state.siu} SIU"},inplace=True)

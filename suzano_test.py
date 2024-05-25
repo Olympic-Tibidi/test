@@ -2010,10 +2010,11 @@ if authentication_status:
                         siu_choice=wage_cost*st.session_state.siu/100
                         ind_ins=total_hours*1.5
                         with_siu=total_cost+siu_choice
-                        markup=with_siu*st.session_state.markup/100   ##+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
+                        #markup=with_siu*st.session_state.markup/100   ##+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
+                        markup=total_cost*st.session_state.markup/100
                         if foreman:
-                            markup=with_siu*st.session_state.f_markup/100  ###+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
-                        invoice=total_cost+markup
+                            markup=total_cost*st.session_state.f_markup/100  ###+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
+                        invoice=total_cost+siu_choice+ind_ins+markup
                         
                         
                         new_score = pd.DataFrame(

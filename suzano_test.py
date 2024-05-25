@@ -1854,7 +1854,7 @@ if authentication_status:
                         a=pd.DataFrame(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location]).T
                         if by_choice=="LABOR":
                             try:
-                                a.loc["TOTAL FOR SHIFT"]=a[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","SIU","Mark UP","INVOICE"]].sum()
+                                a.loc["TOTAL FOR SHIFT"]=a[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]].sum()
                             except:
                                 pass
                         else:
@@ -1960,7 +1960,7 @@ if authentication_status:
                     
                     if "scores" not in st.session_state:
                         st.session_state.scores = pd.DataFrame(
-                            {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]})
+                            {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],"TOTAL COST":[],"Ind Ins":[],"SIU":[],"Mark UP":[],"INVOICE":[]})
                     if "eq_scores" not in st.session_state:
                         st.session_state.eq_scores = pd.DataFrame(
                             {"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})

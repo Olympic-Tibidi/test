@@ -2130,7 +2130,6 @@ if authentication_status:
                        
                    
                         display=pd.DataFrame(st.session_state.scores)
-                        st.dataframe(display)
                         display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]].sum()
                         display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]]
                         display.rename(columns={"SIU":f"%{st.session_state.siu} SIU"},inplace=True)

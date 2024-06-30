@@ -810,7 +810,7 @@ if authentication_status:
                                 mime='text/csv',key="53432")
                     
                     with bilo3:
-                        to_reverse=st.selectbox("SELECT SHIPMENT TO VOID", [i for i in display_df.index if len(display_df)>0 else None])
+                        to_reverse=st.selectbox("SELECT SHIPMENT TO VOID", [i if len(display_df)>0 else None for i in display_df.index ])
                         st.write(to_reverse)
                         if to_reverse!=None:
                             to_reverse_data=display_df.loc[to_reverse].to_dict()

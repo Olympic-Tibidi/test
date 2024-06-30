@@ -727,7 +727,7 @@ if authentication_status:
                         st.write("DATA TOO LARGE, DOWNLOAD INSTEAD")
                         file_name=f'OLYMPIA_ALL_BILL_OF_LADINGS to {datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%m-%d,%Y")}.csv'
                     csv=convert_df(display_df)
-                    bilo1,bilo2,_=st.columns([4,4,2])
+                    bilo1,bilo2,bilo3=st.columns([3,3,3])
                     with bilo1:
                         st.download_button(
                             label="DOWNLOAD BILL OF LADINGS",
@@ -808,6 +808,10 @@ if authentication_status:
                                 data=file_content,
                                 file_name=file_name,
                                 mime='text/csv',key="53432")
+                    with bilo3:
+                        to_reverse=st.selectbox("SELECT SHIPMENT TO VOID", [i for i in display_df.index])
+                        st.write(to_reverse)
+            
             with admin_tab3:
                 edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
                 requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])

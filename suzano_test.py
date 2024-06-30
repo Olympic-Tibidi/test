@@ -808,9 +808,13 @@ if authentication_status:
                                 data=file_content,
                                 file_name=file_name,
                                 mime='text/csv',key="53432")
+                    
                     with bilo3:
                         to_reverse=st.selectbox("SELECT SHIPMENT TO VOID", [i for i in display_df.index])
                         st.write(to_reverse)
+                        to_reverse_data=display_df.loc[entry].to_dict()
+                        st.write(to_reverse_data)
+                        
             
             with admin_tab3:
                 edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")

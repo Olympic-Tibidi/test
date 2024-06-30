@@ -819,9 +819,9 @@ if authentication_status:
                             if to_reverse!=None:
                                 to_reverse_data=display_df.loc[to_reverse].to_dict()
                                 st.write(to_reverse_data)
-                                ro_to_reverse=to_reverse_data[to_reverse]['release_order']
-                                so_to_reverse=to_reverse_data[to_reverse]['sales_order']
-                                qty_to_reverse=to_reverse_data[to_reverse]['quantity']
+                                ro_to_reverse=to_reverse_data['release_order']
+                                so_to_reverse=to_reverse_data['sales_order']
+                                qty_to_reverse=to_reverse_data['quantity']
                             st.write(release_order_database[ro_to_reverse][so_to_reverse])
                         
             

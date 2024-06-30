@@ -813,7 +813,7 @@ if authentication_status:
                     with bilo3:
                         to_reverse=st.selectbox("SELECT SHIPMENT TO VOID", [i if len(display_df)>0 else None for i in display_df.index ])
                         
-                        with st.button("VOID SHIPMENT"):
+                        if st.button("VOID SHIPMENT"):
                             
                             if to_reverse!=None:
                                 to_reverse_data=display_df.loc[to_reverse].to_dict()

@@ -823,8 +823,9 @@ if authentication_status:
                                 so_to_reverse=to_reverse_data['sales_order']
                                 qty_to_reverse=to_reverse_data['quantity']
                             st.write(release_order_database[ro_to_reverse][so_to_reverse])
-                        
-            
+                            release_order_database[ro_to_reverse][so_to_reverse]['shipped']-=qty_to_reverse
+                            release_order_database[ro_to_reverse][so_to_reverse]['remaining']+=qty_to_reverse
+                            st.write(release_order_database[ro_to_reverse][so_to_reverse])
             with admin_tab3:
                 edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
                 requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])

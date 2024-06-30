@@ -700,9 +700,8 @@ if authentication_status:
             with admin_tab2:   #### BILL OF LADINGS
                 bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                 admin_bill_of_ladings=json.loads(bill_data)
-                admin_bill_of_ladings=pd.DataFrame.from_dict(admin_bill_of_ladings).T[1:]
-                admin_bill_of_ladings["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in admin_bill_of_ladings["issued"]]
-                
+                release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                release_order_database=json.loads(release_order_database)
                 def convert_df(df):
                     # IMPORTANT: Cache the conversion to prevent computation on every rerun
                     return df.to_csv().encode('utf-8')
@@ -811,10 +810,16 @@ if authentication_status:
                     
                     with bilo3:
                         to_reverse=st.selectbox("SELECT SHIPMENT TO VOID", [i if len(display_df)>0 else None for i in display_df.index ])
-                        st.write(to_reverse)
-                        if to_reverse!=None:
-                            to_reverse_data=display_df.loc[to_reverse].to_dict()
-                            st.write(to_reverse_data)
+                        
+                        with st.button("VOID SHIPMENT"):
+                            
+                            if to_reverse!=None:
+                                to_reverse_data=display_df.loc[to_reverse].to_dict()
+                                st.write(to_reverse_data)
+                                ro_to_reverse=to_reverse_data[to_reverse]['release_order']
+                                so_to_reverse=to_reverse_data[to_reverse]['sales_order']
+                                qty_to_reverse=to_reverse_data[to_reverse]['quantity']
+                            st.write(release_order_database[ro_to_reverse][so_to_reverse])
                         
             
             with admin_tab3:

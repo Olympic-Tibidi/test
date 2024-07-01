@@ -818,14 +818,27 @@ if authentication_status:
                             
                             if to_reverse!=None:
                                 to_reverse_data=display_df.loc[to_reverse].to_dict()
-                                st.write(to_reverse_data)
                                 ro_to_reverse=to_reverse_data['release_order']
                                 so_to_reverse=to_reverse_data['sales_order']
                                 qty_to_reverse=to_reverse_data['quantity']
-                            st.write(release_order_database[ro_to_reverse][so_to_reverse])
                             release_order_database[ro_to_reverse][so_to_reverse]['shipped']-=qty_to_reverse
                             release_order_database[ro_to_reverse][so_to_reverse]['remaining']+=qty_to_reverse
-                            st.write(release_order_database[ro_to_reverse][so_to_reverse])
+                            
+                            
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
+                            blob.upload_from_string(json.dumps(release_order_database))
+                            st.success(f"Release order {release_order_number} updated with reversal!")
+
+                            del bill_data[to_reverse]
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"terminal_bill_of_ladings.json")
+                            blob.upload_from_string(json.dumps(bill_data))
+                            st.success(f"Terminal Bill of Ladings updated with reversal!")
+
+            
             with admin_tab3:
                 edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")
                 requested_edi_file=st.selectbox("SELECT EDI",edi_files[1:])

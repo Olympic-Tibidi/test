@@ -857,7 +857,9 @@ if authentication_status:
                             st.success(f"Terminal Bill of Ladings updated with reversal!")
 
                             suz_index=next(key for key, value in suzano_report.items() if value['Shipment ID #'] == to_reverse)
-                            del suz[suz_index]
+                            del suzano_report[suz_index]
+                            suzano_report = {i + 1: v for i, (k, v) in enumerate(suzano_report.items())}
+                            
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"suzano_report.json")

@@ -831,11 +831,11 @@ if authentication_status:
                             blob.upload_from_string(json.dumps(release_order_database))
                             st.success(f"Release order {ro_to_reverse} updated with reversal!")
 
-                            del bill_data[to_reverse]
+                            del bill_data_reverse[to_reverse]
                             storage_client = storage.Client()
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"terminal_bill_of_ladings.json")
-                            blob.upload_from_string(json.dumps(bill_data))
+                            blob.upload_from_string(json.dumps(bill_data_reverse))
                             st.success(f"Terminal Bill of Ladings updated with reversal!")
 
             

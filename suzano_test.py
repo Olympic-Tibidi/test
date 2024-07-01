@@ -899,6 +899,10 @@ if authentication_status:
                     if st.button("DISPLAY LOADS"):     
                         st.write([key for key in display_df.loc[to_print_loads]['loads']])
 
+                    if st.button("DISPLAY VOIDED SHIPMENTS"):     
+                        st.write(voided_shipments)
+
+
                     
             
             with admin_tab3:

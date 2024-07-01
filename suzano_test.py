@@ -839,7 +839,8 @@ if authentication_status:
                             to_reverse=st.selectbox("SELECT SHIPMENT TO VOID", [i if len(display_df)>0 else None for i in display_df.index ])
                             
                             if st.button("VOID SHIPMENT"):
-                                
+                                voided_shipments[to_reverse]={}
+                                voided_shipments[to_reverse]=display_df.loc[to_reverse].to_dict()
                                 if to_reverse!=None:
                                     to_reverse_data=display_df.loc[to_reverse].to_dict()
                                     ro_to_reverse=to_reverse_data['release_order']
@@ -871,6 +872,12 @@ if authentication_status:
                                 blob = bucket.blob(rf"suzano_report.json")
                                 blob.upload_from_string(json.dumps(suzano_report))
                                 st.success(f"Suzano Report updated with reversal!")
+
+                                storage_client = storage.Client()
+                                bucket = storage_client.bucket(target_bucket)
+                                blob = bucket.blob(rf"voided_shipments.json")
+                                blob.upload_from_string(json.dumps(voided_shipments))
+                                st.success(f"Void recorded in voided shipments!")
     
                                 if to_reverse[0]=="M":
                                     mf_numbers=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")

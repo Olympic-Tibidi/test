@@ -779,7 +779,7 @@ if authentication_status:
                                 # if double_load:
                                 #     line21="2DTD:"+entry["release_order"]+" "*(10-len(current_release_order))+"000"+current_sales_order+a+tsn+tt+vehicle_id+" "*(20-len(vehicle_id))+str(first_quantity*2000)+" "*(16-len(str(first_quantity*2000)))+"USD"+" "*36+carrier_code+" "*(10-len(carrier_code))+terminal_bill_of_lading+" "*(50-len(terminal_bill_of_lading))+c
                                 #     line22="2DTD:"+entry["release_order"]+" "*(10-len(next_release_order))+"000"+next_sales_order+a+tsn+tt+vehicle_id+" "*(20-len(vehicle_id))+str(second_quantity*2000)+" "*(16-len(str(second_quantity*2000)))+"USD"+" "*36+carrier_code+" "*(10-len(carrier_code))+terminal_bill_of_lading+" "*(50-len(terminal_bill_of_lading))+c
-                                line2="2DTD:"+entry["release_order"]+" "*(10-len(entry["release_order"]))+"000"+entry["sales_order"]+a+tsn+tt+entry["vehicle"]+" "*(20-len(entry["vehicle"]))+str(int(entry["quantity"]*2000))+" "*(16-len(str(int(entry["quantity"]*2000))))+"USD"+" "*36+entry["carrier_id"]+" "*(10-len(str(entry["quantity"])))+terminal_bill_of_lading+" "*(50-len(terminal_bill_of_lading))+a
+                                line2="2DTD:"+entry["release_order"]+" "*(10-len(entry["release_order"]))+"000"+entry["sales_order"]+a+tsn+tt+entry["vehicle"]+" "*(20-len(entry["vehicle"]))+str(int(entry["quantity"]*2000))+" "*(16-len(str(int(entry["quantity"]*2000))))+"USD"+" "*36+entry["carrier_id"]+" "*(10-len(str(entry["carrier_id"])))+terminal_bill_of_lading+" "*(50-len(terminal_bill_of_lading))+a
                             
                                 loadls=[]
                                 bale_loadls=[]

@@ -234,6 +234,22 @@ def list_files_in_subfolder(bucket_name, folder_name):
     filenames = [blob.name.split('/')[-1] for blob in blobs]
 
     return filenames
+
+def delete_file_from_gcs(target_bucket, file_path):
+    # Initialize the storage client
+    storage_client = storage.Client()
+
+    # Access the specified bucket
+    bucket = storage_client.bucket(target_bucket)
+
+    # Get the blob (file) reference
+    blob = bucket.blob(file_path)
+
+    # Delete the blob (file)
+    blob.delete()
+
+    print(f"File {file_path} deleted from {target_bucket}.")
+
 def store_release_order_data(data,release_order_number,destination,po_number,sales_order_item,vessel,batch,ocean_bill_of_lading,grade,dryness,carrier_code,unitized,total):
        
     # Create a dictionary to store the release order data
@@ -847,7 +863,11 @@ if authentication_status:
                                 blob = bucket.blob(rf"release_orders/mf_numbers.json")
                                 blob.upload_from_string(json.dumps(mf_numbers))
                                 st.success(f"MF Numbers entered back into RO {ro_to_reverse}!")
-                                
+                            try:
+                                delete_file_from_gcs(target_bucket, f'EDIS/{to_reverse}.txt')
+                                st.success(f"Deleted EDI {to_reverse}.txt!")
+                            except:
+                                st.write("NO Edis found for this shipment")
 
             
             with admin_tab3:

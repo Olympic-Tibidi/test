@@ -882,6 +882,10 @@ if authentication_status:
                                     st.success(f"Deleted EDI {to_reverse}.txt!")
                                 except:
                                     st.write("NO Edis found for this shipment")
+                    to_print_loads=st.selectbox("SELECT SHIPMENT TO DISPLAY LOADS", [i if len(display_df)>0 else None for i in display_df.index ])
+                            
+                    if st.button("DISPLAY LOADS"):     
+                        st.write([key for key in display_df.loc[to_print_loads]['loads']])
 
                     
             

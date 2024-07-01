@@ -721,6 +721,8 @@ if authentication_status:
                 admin_bill_of_ladings["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in admin_bill_of_ladings["issued"]]
                 release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
                 release_order_database=json.loads(release_order_database)
+                suzano_report=gcp_download(target_bucket,rf"suzano_report.json")
+                suzano_report=json.loads(suzano_report)
                 def convert_df(df):
                     # IMPORTANT: Cache the conversion to prevent computation on every rerun
                     return df.to_csv().encode('utf-8')
@@ -854,6 +856,14 @@ if authentication_status:
                             blob.upload_from_string(json.dumps(bill_data_reverse))
                             st.success(f"Terminal Bill of Ladings updated with reversal!")
 
+                            suz_index=next(key for key, value in suzano_report.items() if value['Shipment ID #'] == to_reverse)
+                            del suz[suz_index]
+                            storage_client = storage.Client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"suzano_report.json")
+                            blob.upload_from_string(json.dumps(suzano_report))
+                            st.success(f"Suzano Report updated with reversal!")
+
                             if to_reverse[0]=="M":
                                 mf_numbers=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                                 mf_numbers=json.loads(mf_numbers)
@@ -869,6 +879,7 @@ if authentication_status:
                             except:
                                 st.write("NO Edis found for this shipment")
 
+                    
             
             with admin_tab3:
                 edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")

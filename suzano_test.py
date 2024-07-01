@@ -715,7 +715,6 @@ if authentication_status:
                             
             with admin_tab2:   #### BILL OF LADINGS
                 bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                
                 bill_data_reverse=json.loads(bill_data)
                 admin_bill_of_ladings=pd.DataFrame.from_dict(bill_data_reverse).T[1:]
                 admin_bill_of_ladings["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in admin_bill_of_ladings["issued"]]
@@ -723,6 +722,11 @@ if authentication_status:
                 release_order_database=json.loads(release_order_database)
                 suzano_report=gcp_download(target_bucket,rf"suzano_report.json")
                 suzano_report=json.loads(suzano_report)
+                try:
+                    voided_shipments=gcp_download(target_bucket,rf"voided_shipments.json")
+                    voided_shipments=json.loads(voided_shipments)
+                except:
+                    voided_shipments={}
                 def convert_df(df):
                     # IMPORTANT: Cache the conversion to prevent computation on every rerun
                     return df.to_csv().encode('utf-8')

@@ -838,6 +838,17 @@ if authentication_status:
                             blob.upload_from_string(json.dumps(bill_data_reverse))
                             st.success(f"Terminal Bill of Ladings updated with reversal!")
 
+                            if to_reverse[0]=="M":
+                                mf_numbers=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
+                                mf_numbers=json.loads(mf_numbers)
+                                mf_numbers[ro_to_reverse].append(to_reverse)
+                                storage_client = storage.Client()
+                                bucket = storage_client.bucket(target_bucket)
+                                blob = bucket.blob(rf"release_orders/mf_numbers.json")
+                                blob.upload_from_string(json.dumps(mf_numbers))
+                                st.success(f"MF Numbers entered back into RO {ro_to_reverse}!")
+                                
+
             
             with admin_tab3:
                 edi_files=list_files_in_subfolder(target_bucket, rf"EDIS/")

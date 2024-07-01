@@ -874,6 +874,7 @@ if authentication_status:
                                 blob.upload_from_string(json.dumps(suzano_report))
                                 st.success(f"Suzano Report updated with reversal!")
 
+                                del voided_shipments[to_reverse]['St_Date"]
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"voided_shipments.json")

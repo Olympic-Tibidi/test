@@ -829,7 +829,7 @@ if authentication_status:
                             bucket = storage_client.bucket(target_bucket)
                             blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                             blob.upload_from_string(json.dumps(release_order_database))
-                            st.success(f"Release order {release_order_number} updated with reversal!")
+                            st.success(f"Release order {ro_to_reverse} updated with reversal!")
 
                             del bill_data[to_reverse]
                             storage_client = storage.Client()

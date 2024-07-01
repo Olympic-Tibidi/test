@@ -841,6 +841,7 @@ if authentication_status:
                             if st.button("VOID SHIPMENT"):
                                 voided_shipments[to_reverse]={}
                                 voided_shipments[to_reverse]=display_df.loc[to_reverse].to_dict()
+                                st.write(voided_shipments)
                                 if to_reverse!=None:
                                     to_reverse_data=display_df.loc[to_reverse].to_dict()
                                     ro_to_reverse=to_reverse_data['release_order']

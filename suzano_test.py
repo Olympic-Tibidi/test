@@ -830,56 +830,58 @@ if authentication_status:
                                 mime='text/csv',key="53432")
                     
                     with bilo3:
-                        to_reverse=st.selectbox("SELECT SHIPMENT TO VOID", [i if len(display_df)>0 else None for i in display_df.index ])
-                        
-                        if st.button("VOID SHIPMENT"):
+                        if display_df.shape[0]>0:
                             
-                            if to_reverse!=None:
-                                to_reverse_data=display_df.loc[to_reverse].to_dict()
-                                ro_to_reverse=to_reverse_data['release_order']
-                                so_to_reverse=to_reverse_data['sales_order']
-                                qty_to_reverse=to_reverse_data['quantity']
-                            release_order_database[ro_to_reverse][so_to_reverse]['shipped']-=qty_to_reverse
-                            release_order_database[ro_to_reverse][so_to_reverse]['remaining']+=qty_to_reverse
+                            to_reverse=st.selectbox("SELECT SHIPMENT TO VOID", [i if len(display_df)>0 else None for i in display_df.index ])
                             
-                            
-                            storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
-                            blob.upload_from_string(json.dumps(release_order_database))
-                            st.success(f"Release order {ro_to_reverse} updated with reversal!")
-
-                            del bill_data_reverse[to_reverse]
-                            storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"terminal_bill_of_ladings.json")
-                            blob.upload_from_string(json.dumps(bill_data_reverse))
-                            st.success(f"Terminal Bill of Ladings updated with reversal!")
-
-                            suz_index=next(key for key, value in suzano_report.items() if value['Shipment ID #'] == to_reverse)
-                            del suzano_report[suz_index]
-                            suzano_report = {i + 1: v for i, (k, v) in enumerate(suzano_report.items())}
-                            
-                            storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"suzano_report.json")
-                            blob.upload_from_string(json.dumps(suzano_report))
-                            st.success(f"Suzano Report updated with reversal!")
-
-                            if to_reverse[0]=="M":
-                                mf_numbers=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
-                                mf_numbers=json.loads(mf_numbers)
-                                mf_numbers[ro_to_reverse].append(to_reverse)
+                            if st.button("VOID SHIPMENT"):
+                                
+                                if to_reverse!=None:
+                                    to_reverse_data=display_df.loc[to_reverse].to_dict()
+                                    ro_to_reverse=to_reverse_data['release_order']
+                                    so_to_reverse=to_reverse_data['sales_order']
+                                    qty_to_reverse=to_reverse_data['quantity']
+                                release_order_database[ro_to_reverse][so_to_reverse]['shipped']-=qty_to_reverse
+                                release_order_database[ro_to_reverse][so_to_reverse]['remaining']+=qty_to_reverse
+                                
+                                
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"release_orders/mf_numbers.json")
-                                blob.upload_from_string(json.dumps(mf_numbers))
-                                st.success(f"MF Numbers entered back into RO {ro_to_reverse}!")
-                            try:
-                                delete_file_from_gcs(target_bucket, f'EDIS/{to_reverse}.txt')
-                                st.success(f"Deleted EDI {to_reverse}.txt!")
-                            except:
-                                st.write("NO Edis found for this shipment")
+                                blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
+                                blob.upload_from_string(json.dumps(release_order_database))
+                                st.success(f"Release order {ro_to_reverse} updated with reversal!")
+    
+                                del bill_data_reverse[to_reverse]
+                                storage_client = storage.Client()
+                                bucket = storage_client.bucket(target_bucket)
+                                blob = bucket.blob(rf"terminal_bill_of_ladings.json")
+                                blob.upload_from_string(json.dumps(bill_data_reverse))
+                                st.success(f"Terminal Bill of Ladings updated with reversal!")
+    
+                                suz_index=next(key for key, value in suzano_report.items() if value['Shipment ID #'] == to_reverse)
+                                del suzano_report[suz_index]
+                                suzano_report = {i + 1: v for i, (k, v) in enumerate(suzano_report.items())}
+                                
+                                storage_client = storage.Client()
+                                bucket = storage_client.bucket(target_bucket)
+                                blob = bucket.blob(rf"suzano_report.json")
+                                blob.upload_from_string(json.dumps(suzano_report))
+                                st.success(f"Suzano Report updated with reversal!")
+    
+                                if to_reverse[0]=="M":
+                                    mf_numbers=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
+                                    mf_numbers=json.loads(mf_numbers)
+                                    mf_numbers[ro_to_reverse].append(to_reverse)
+                                    storage_client = storage.Client()
+                                    bucket = storage_client.bucket(target_bucket)
+                                    blob = bucket.blob(rf"release_orders/mf_numbers.json")
+                                    blob.upload_from_string(json.dumps(mf_numbers))
+                                    st.success(f"MF Numbers entered back into RO {ro_to_reverse}!")
+                                try:
+                                    delete_file_from_gcs(target_bucket, f'EDIS/{to_reverse}.txt')
+                                    st.success(f"Deleted EDI {to_reverse}.txt!")
+                                except:
+                                    st.write("NO Edis found for this shipment")
 
                     
             

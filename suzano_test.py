@@ -2312,11 +2312,12 @@ if authentication_status:
                     #with open(uploaded_shipping_file, 'r') as infile:
                     for line in uploaded_shipping_file:
                         # Split the line into components based on space or another delimiter
+                        line = line.decode('utf-8')
                         components = line.strip()  # Change split argument if using another delimiter
-                        st.write(parse_edi_line(line))
+                        #st.write(parse_edi_line(line))
                         #st.write(components)
                         if components[0]=="2":
-                            st.write(components)
+                            #st.write(components)
                             data=parse_edi_line(components)
                             tons+=data['quantity']
                             if data['ocean_bill_of_lading'] not in bols:

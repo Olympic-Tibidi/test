@@ -2278,8 +2278,61 @@ if authentication_status:
             conn = st.connection('gcs', type=FilesConnection)
             a = conn.read(f"new_suzano/map.json", ttl=600)
             #st.write(a)
-            admin_tab1,admin_tab2,admin_tab3,admin_tab4=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","AUDIT"])
+            admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","AUDIT","VESSEL/MILL/CARRIER ENTRY"])
 
+            with admin_tab5:   ###   Vessel Entry
+                uploaded_shipping_file = st.file_uploader("Upload the Shipping EDI txt file", type="txt")
+                if uploaded_shipping_file:
+                    def parse_edi_line(edi_line):
+                        fields = {
+                            'type': (0, 4),
+                            'lot_number': (5, 15),
+                            'grade': (15, 24),
+                            'remarks': (24, 71),
+                            'vessel_name': (61, 91),
+                            'voyage_number': (91, 101),
+                            'date': (101, 109),
+                            'quantity': (109, 116),
+                            'batch': (116, 129),
+                            'ocean_bill_of_lading': (129, 179),
+                            'admt': (179, 195)
+                        }
+                        
+                        # Extract fields using slicing
+                        parsed_data = {}
+                        for field, (start, end) in fields.items():
+                            if field=='quantity':
+                                parsed_data[field] = int(edi_line[start:end].strip())
+                            else:
+                                parsed_data[field] = edi_line[start:end].strip()
+                    
+                        return parsed_data
+                tons=0
+                bols={}
+                with open(uploaded_shipping_file, 'r') as infile:
+                    for line in infile:
+                        # Split the line into components based on space or another delimiter
+                        components = line.strip()  # Change split argument if using another delimiter
+                        if components.startswith("2"):
+                            data=parse_edi_line(line)
+                            tons+=data['quantity']
+                            if data['ocean_bill_of_lading'] not in bols:
+                                bols[data['ocean_bill_of_lading']]={}
+                                bols[data['ocean_bill_of_lading']]['grade']=None
+                                bols[data['ocean_bill_of_lading']]['grade']=data['grade']
+                                bols[data['ocean_bill_of_lading']]['batch']=data['batch'].lstrip('0')
+                                bols[data['ocean_bill_of_lading']]['qty']=0
+                                bols[data['ocean_bill_of_lading']]['qty']+=data['quantity']/2
+                                bols[data['ocean_bill_of_lading']]['lots']=[]
+                                bols[data['ocean_bill_of_lading']]['admt']=float(data['admt'].lstrip("0"))/1000
+                                bols[data['ocean_bill_of_lading']]['lots'].append(data['lot_number'])
+                            else:
+                                bols[data['ocean_bill_of_lading']]['qty']+=data['quantity']/2
+                                bols[data['ocean_bill_of_lading']]['lots'].append(data['lot_number'])
+                st.write(bols)
+
+
+            
             with admin_tab4:   ###   AUDIT
                 if st.button("RUN RECORD AUDIT"):
                     

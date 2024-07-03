@@ -2333,7 +2333,9 @@ if authentication_status:
                             else:
                                 bols[data['ocean_bill_of_lading']]['qty']+=data['quantity']/2
                                 bols[data['ocean_bill_of_lading']]['lots'].append(data['lot_number'])
-                    st.write(bols)
+                    bols_df=pd.DataFrame(bols).T
+                    bols_df.columns=[["GRADE","BATCH","QUANTITY","DRYNESS","LOTS"]]
+                    st.write(bols_df)
 
 
             

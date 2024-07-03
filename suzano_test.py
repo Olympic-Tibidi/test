@@ -2315,7 +2315,7 @@ if authentication_status:
                         components = line.strip()  # Change split argument if using another delimiter
                         #st.write(components)
                         if components[0]=="2":
-                            data=parse_edi_line(line)
+                            data=parse_edi_line(components)
                             tons+=data['quantity']
                             if data['ocean_bill_of_lading'] not in bols:
                                 bols[data['ocean_bill_of_lading']]={}

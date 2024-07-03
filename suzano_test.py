@@ -2313,7 +2313,7 @@ if authentication_status:
                     for line in uploaded_shipping_file:
                         # Split the line into components based on space or another delimiter
                         components = line.strip()  # Change split argument if using another delimiter
-                        st.write(components)
+                        #st.write(components)
                         if components[0]=="2":
                             data=parse_edi_line(line)
                             tons+=data['quantity']

@@ -2327,8 +2327,8 @@ if authentication_status:
                                 bols[data['ocean_bill_of_lading']]['batch']=data['batch'].lstrip('0')
                                 bols[data['ocean_bill_of_lading']]['qty']=0
                                 bols[data['ocean_bill_of_lading']]['qty']+=data['quantity']/2
-                                bols[data['ocean_bill_of_lading']]['lots']=[]
                                 bols[data['ocean_bill_of_lading']]['admt']=float(data['admt'].lstrip("0"))/1000
+                                bols[data['ocean_bill_of_lading']]['lots']=[]
                                 bols[data['ocean_bill_of_lading']]['lots'].append(data['lot_number'])
                             else:
                                 bols[data['ocean_bill_of_lading']]['qty']+=data['quantity']/2

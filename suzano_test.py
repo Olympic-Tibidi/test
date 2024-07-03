@@ -2307,29 +2307,29 @@ if authentication_status:
                                 parsed_data[field] = edi_line[start:end].strip()
                     
                         return parsed_data
-                tons=0
-                bols={}
-                with open(uploaded_shipping_file, 'r') as infile:
-                    for line in infile:
-                        # Split the line into components based on space or another delimiter
-                        components = line.strip()  # Change split argument if using another delimiter
-                        if components.startswith("2"):
-                            data=parse_edi_line(line)
-                            tons+=data['quantity']
-                            if data['ocean_bill_of_lading'] not in bols:
-                                bols[data['ocean_bill_of_lading']]={}
-                                bols[data['ocean_bill_of_lading']]['grade']=None
-                                bols[data['ocean_bill_of_lading']]['grade']=data['grade']
-                                bols[data['ocean_bill_of_lading']]['batch']=data['batch'].lstrip('0')
-                                bols[data['ocean_bill_of_lading']]['qty']=0
-                                bols[data['ocean_bill_of_lading']]['qty']+=data['quantity']/2
-                                bols[data['ocean_bill_of_lading']]['lots']=[]
-                                bols[data['ocean_bill_of_lading']]['admt']=float(data['admt'].lstrip("0"))/1000
-                                bols[data['ocean_bill_of_lading']]['lots'].append(data['lot_number'])
-                            else:
-                                bols[data['ocean_bill_of_lading']]['qty']+=data['quantity']/2
-                                bols[data['ocean_bill_of_lading']]['lots'].append(data['lot_number'])
-                st.write(bols)
+                    tons=0
+                    bols={}
+                    with open(uploaded_shipping_file, 'r') as infile:
+                        for line in infile:
+                            # Split the line into components based on space or another delimiter
+                            components = line.strip()  # Change split argument if using another delimiter
+                            if components.startswith("2"):
+                                data=parse_edi_line(line)
+                                tons+=data['quantity']
+                                if data['ocean_bill_of_lading'] not in bols:
+                                    bols[data['ocean_bill_of_lading']]={}
+                                    bols[data['ocean_bill_of_lading']]['grade']=None
+                                    bols[data['ocean_bill_of_lading']]['grade']=data['grade']
+                                    bols[data['ocean_bill_of_lading']]['batch']=data['batch'].lstrip('0')
+                                    bols[data['ocean_bill_of_lading']]['qty']=0
+                                    bols[data['ocean_bill_of_lading']]['qty']+=data['quantity']/2
+                                    bols[data['ocean_bill_of_lading']]['lots']=[]
+                                    bols[data['ocean_bill_of_lading']]['admt']=float(data['admt'].lstrip("0"))/1000
+                                    bols[data['ocean_bill_of_lading']]['lots'].append(data['lot_number'])
+                                else:
+                                    bols[data['ocean_bill_of_lading']]['qty']+=data['quantity']/2
+                                    bols[data['ocean_bill_of_lading']]['lots'].append(data['lot_number'])
+                    st.write(bols)
 
 
             

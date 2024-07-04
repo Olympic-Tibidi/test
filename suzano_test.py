@@ -2822,7 +2822,7 @@ if authentication_status:
                         po_number_edit=st.text_input("PO No",release_order_database[release_order_number]["po_number"],disabled=False)
                         destination_edit=st.text_input("Destination",release_order_database[release_order_number]["destination"],disabled=False)
                         sales_order_item_edit=st.selectbox("Sales Order Item",[i for i in release_order_database[release_order_number] if i in ["001","002","003","004","005"]] ,disabled=False)
-                        vessel_edit=vessel=st.selectbox("SELECT VESSEL",[i for i in map['batch_mapping'],key="poFpoa")
+                        vessel_edit=vessel=st.selectbox("SELECT VESSEL",[i for i in map['batch_mapping']],key="poFpoa")
                         ocean_bill_of_lading_edit=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel_edit].keys(),key="trdfeerw") 
                         grade_edit=st.text_input("Grade",release_order_database[release_order_number][sales_order_item_edit]["grade"],disabled=True)
                         batch_edit=st.text_input("Batch No",release_order_database[release_order_number][sales_order_item_edit]["batch"],disabled=True)

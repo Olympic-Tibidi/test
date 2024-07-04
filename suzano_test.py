@@ -4501,9 +4501,11 @@ if authentication_status:
                             bol_to_edit=st.selectbox("EDIT INVENTORY",[i for i in temp.index])
                             dinv1,dinv2=st.columns([2,2])
                             with dinv1:
-                                st.write(f"{bol_to_edit}")
+                                st.write(f"DAMAGED : ")
+                                st.write(f"TOTAL : ")
                             with dinv2:
-                                st.number_input(label_visibility='hidden')
+                                damaged_edit=st.number_input(label_visibility='hidden')
+                                total_edit=st.number_input(label_visibility='hidden',key="dsd")
                                         
 
 

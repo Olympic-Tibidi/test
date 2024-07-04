@@ -4503,7 +4503,7 @@ if authentication_status:
                             with dinv1:
                                 st.write(f"{bol_to_edit}")
                             with dinv2:
-                                st.number_input(label_visibility='collapsed')
+                                st.number_input(label_visibility='hidden')
                                         
 
 

@@ -4491,15 +4491,19 @@ if authentication_status:
                         
                         tempo=temp*2
 
-                        inv_col1,inv_col2=st.columns([8,2])
+                        inv_col1,inv_col2=st.columns([7,3])
                         with inv_col1:
                             st.subheader("By Ocean BOL,UNITS")
                             st.dataframe(temp)
                             st.subheader("By Ocean BOL,TONS")
                             st.dataframe(tempo)        
                         with inv_col2:
-                            st.selectbox("EDIT IN?VENTORY",[i for i in temp.index])
-                            
+                            bol_to_edit=st.selectbox("EDIT INVENTORY",[i for i in temp.index])
+                            dinv1,dinv2=st.columns([2,2])
+                            with dinv1:
+                                st.write(f"{bol_to_edit}")
+                            with dinv2:
+                                st.number_input(label_visibility='collapsed')
                                         
 
 

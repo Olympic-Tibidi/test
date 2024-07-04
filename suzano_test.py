@@ -4447,16 +4447,7 @@ if authentication_status:
                                             bols[ocean_bill_of_lading] = []
                                         bols[ocean_bill_of_lading].append(key)
                         
-                        inventory={'GSSWJUV8556A': [3500.0,1],
-                         'GSSWJUV8556B': [25.0,0],
-                         'GSSWJUV8556C': [6475.0,6],
-                         'GSSWKIR6013D': [8350.0,1],
-                         'GSSWKIR6013E': [850.0,1],
-                         'GSSWLAG3142E': [750.0,0],
-                         'GSSWLYS10628A': [1500.0,14],
-                         'GSSWLYS10628B': [8500.0,0],
-                         'SFCRIQIOLM555000': [842.0,0],
-                         'SFCRIQIOLM555001': [8969.0,0]}
+                        inventory={}
                         for ship in map['batch_mapping']:
                             for bill in map['batch_mapping'][ship]:
                                 inventory.update(bill=[map['batch_mapping'][ship][bill]['total'],map['batch_mapping'][ship][bill]['damaged']])

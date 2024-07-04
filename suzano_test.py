@@ -2336,6 +2336,22 @@ if authentication_status:
                     bols_df=pd.DataFrame(bols).T
                     bols_df.columns=[["GRADE","BATCH","QUANTITY","DRYNESS","LOTS"]]
                     st.write(bols_df)
+                    with st.button("REGISTER VESSEL AND LOTS"):
+                        map_vessel=gcp_download(target_bucket,rf"map.json")
+                        map_vessel=json.loads(map_vessel)
+                        map_vessel['batch_mapping'][vessel]={i:{'batch':bols[i]['batch'],'dryness':bols[i]['admt'],
+                                      'grade':bols[i]['grade'][:3]} for i in bols}
+
+                        for i in bols:
+                            map_vessel['bol_mapping'][i]={'batch':bols[i]['batch'],'dryness':bols[i]['admt'],
+                                                              'grade':bols[i]['grade'][:3],
+                                                        'FSC':"FSC Certified Products. FSC Mix Credit IMA—COC-001470"} 
+                        st.write(map_vessel)
+if vessel not in bill_mapping:
+    bill_mapping[vessel]={}
+for bill,item in bols.items():
+    for i in item['lots']:
+        bill_mapping[vessel][i]={'Batch':bols[bill]['batch'],'Ocean_bl':bill}
 
 
             

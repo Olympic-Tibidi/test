@@ -4499,14 +4499,21 @@ if authentication_status:
                             st.dataframe(tempo)        
                         with inv_col2:
                             bol_to_edit=st.selectbox("EDIT INVENTORY",[i for i in temp.index])
-                            dinv1,dinv2=st.columns([2,2])
+                            dinv1,dinv2,_=st.columns([2,2,6])
                             with dinv1:
                                 st.write(f"DAMAGED : ")
                                 st.write(f"TOTAL : ")
                             with dinv2:
                                 damaged_edit=st.number_input("lala",label_visibility='collapsed')
                                 total_edit=st.number_input("tata",label_visibility='collapsed',key="dsd")
-                                        
+                            if st.button("SUBMIT CHANGE",key="t2ds"):
+                                map['bol_mapping']['total']=total_edit
+                                map['bol_mapping']['damaged']=damaged_edit
+                                storage_client = storage.Client()
+                                bucket = storage_client.bucket(target_bucket)
+                                blob = bucket.blob(rf"map.json")
+                                blob.upload_from_string(json.dumps(map))
+                                st.success(f"Updated Inventory Database",icon="✅")
 
 
 

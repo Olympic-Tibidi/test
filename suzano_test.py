@@ -2336,7 +2336,7 @@ if authentication_status:
                     bols_df=pd.DataFrame(bols).T
                     bols_df.columns=[["GRADE","BATCH","QUANTITY","DRYNESS","LOTS"]]
                     st.write(bols_df)
-                    with st.button("REGISTER VESSEL AND LOTS",key="ddsaa"):
+                    if st.button("REGISTER VESSEL AND LOTS",key="ddsaa"):
                         map_vessel=gcp_download(target_bucket,rf"map.json")
                         map_vessel=json.loads(map_vessel)
                         map_vessel['batch_mapping'][vessel]={i:{'batch':bols[i]['batch'],'dryness':bols[i]['admt'],

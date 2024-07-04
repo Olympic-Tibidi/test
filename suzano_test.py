@@ -2279,8 +2279,9 @@ if authentication_status:
             a = conn.read(f"new_suzano/map.json", ttl=600)
             #st.write(a)
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","AUDIT","VESSEL/MILL/CARRIER ENTRY"])
-
+            
             with admin_tab5:   ###   Vessel Entry
+                vessel=st.text_input("ENTER VESSEL NAME/VOY",ley="dsd1eqx")
                 uploaded_shipping_file = st.file_uploader("Upload the Shipping EDI txt file", type="txt")
                 if uploaded_shipping_file:
                     def parse_edi_line(edi_line):

@@ -2347,11 +2347,13 @@ if authentication_status:
                                                               'grade':bols[i]['grade'][:3],
                                                         'FSC':"FSC Certified Products. FSC Mix Credit IMA—COC-001470"} 
                         st.write(map_vessel)
-if vessel not in bill_mapping:
-    bill_mapping[vessel]={}
-for bill,item in bols.items():
-    for i in item['lots']:
-        bill_mapping[vessel][i]={'Batch':bols[bill]['batch'],'Ocean_bl':bill}
+                        bill_mapping_vessel=gcp_download(target_bucket,rf"bill_mapping.json")
+                        bill_mapping_vessel=json.loads(bill_mapping_vessel)
+                        if vessel not in bill_mapping_vessel:
+                            bill_mapping_vessel[vessel]={}
+                        for bill,item in bols.items():
+                            for i in item['lots']:
+                                bill_mapping_vessel[vessel][i]={'Batch':bols[bill]['batch'],'Ocean_bl':bill}
 
 
             

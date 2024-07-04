@@ -4450,7 +4450,7 @@ if authentication_status:
                         inventory={}
                         for ship in map['batch_mapping']:
                             for bill in map['batch_mapping'][ship]:
-                                inventory.update(bill=[map['batch_mapping'][ship][bill]['total'],map['batch_mapping'][ship][bill]['damaged']])
+                                inventory[bill]=[map['batch_mapping'][ship][bill]['total'],map['batch_mapping'][ship][bill]['damaged']]
                             
                         def extract_qt(data,ro,bol):
                             totals=[0,0,0]

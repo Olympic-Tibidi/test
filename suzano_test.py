@@ -2358,7 +2358,7 @@ if authentication_status:
                         storage_client = storage.Client()
                         bucket = storage_client.bucket(target_bucket)
                         blob = bucket.blob(rf"map.json")
-                        blob.upload_from_string(json.dumps(map_json))
+                        blob.upload_from_string(json.dumps(map_vessel))
                         storage_client = storage.Client()
                         bucket = storage_client.bucket(target_bucket)
                         blob = bucket.blob(rf"bill_mapping.json")

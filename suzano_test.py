@@ -4268,7 +4268,9 @@ if authentication_status:
                         
         if select=="INVENTORY" :
 
-            map=gcp_download_new(target_bucket,rf"map.json")
+            #map=gcp_download_new(target_bucket,rf"map.json")
+            map=gcp_download(target_bucket,rf"map.json")
+            map=json.loads(map)
             mill_info=map["mill_info"]
             inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
             inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
@@ -4398,7 +4400,7 @@ if authentication_status:
                     with daily:
                         
                         amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000,"LYSEFJORD-2308":10000,"LAGUNA-3142":453,"FRONTIER-55VC":9811}
-                        inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308","LYSEFJORD-2308","LAGUNA-3142","FRONTIER-55VC"])
+                        inv_vessel=st.selectbox("Select Vessel",[i for i in map['batch_mapping']])
                         kf=inv_bill_of_ladings.iloc[1:].copy()
                         kf['issued'] = pd.to_datetime(kf['issued'])
                         kf=kf[kf["vessel"]==inv_vessel]
@@ -4455,6 +4457,10 @@ if authentication_status:
                          'GSSWLYS10628B': [8500.0,0],
                          'SFCRIQIOLM555000': [842.0,0],
                          'SFCRIQIOLM555001': [8969.0,0]}
+                        for ship in map['batch_mapping']:
+                            for bill in map['batch_mapping'][ship]:
+                                inventory.update(bill:[map['batch_mapping'][ship][bill]['total'],map['batch_mapping'][ship][bill]['damaged']])
+                            
                         def extract_qt(data,ro,bol):
                             totals=[0,0,0]
                             sales_group=["001","002","003","004","005"]
@@ -4465,6 +4471,7 @@ if authentication_status:
                                         totals[1]+=data[ro][item]['shipped']
                                         totals[2]+=data[ro][item]['remaining']
                             return totals
+                        
                         final={}
                         for k in inventory.keys():
                             final[k]={"Total":0,"Damaged":0,"Fit To Ship":0,"Allocated to ROs":0,"Shipped":0,

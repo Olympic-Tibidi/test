@@ -4491,13 +4491,21 @@ if authentication_status:
                         
                         tempo=temp*2
 
-                        #inv_col1,inv_col2=st.columns([2,2])
-                       # with inv_col1:
-                        st.subheader("By Ocean BOL,UNITS")
-                        st.dataframe(temp)
-                        #with inv_col2:
-                        st.subheader("By Ocean BOL,TONS")
-                        st.dataframe(tempo)               
+                        inv_col1,inv_col2=st.columns([8,2])
+                        with inv_col1:
+                            st.subheader("By Ocean BOL,UNITS")
+                            st.dataframe(temp)
+                            st.subheader("By Ocean BOL,TONS")
+                            st.dataframe(tempo)        
+                        with inv_col2:
+                            st.selectbox("EDIT IN?VENTORY",[i for i in temp.index])
+                            
+                                        
+
+
+
+
+                            
                     with unregistered:
                         alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
                         alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142","LYSEFJORD-2308","FRONTIER-55VC"])

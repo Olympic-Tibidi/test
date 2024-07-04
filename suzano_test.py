@@ -2347,7 +2347,7 @@ if authentication_status:
                             map_vessel['bol_mapping'][i]={'batch':bols[i]['batch'],'dryness':bols[i]['admt'],
                                                               'grade':bols[i]['grade'][:3],
                                                         'FSC':"FSC Certified Products. FSC Mix Credit IMA—COC-001470"} 
-                        st.write(map_vessel)
+                        #st.write(map_vessel)
                         bill_mapping_vessel=gcp_download(target_bucket,rf"bill_mapping.json")
                         bill_mapping_vessel=json.loads(bill_mapping_vessel)
                         if vessel not in bill_mapping_vessel:
@@ -2355,8 +2355,16 @@ if authentication_status:
                         for bill,item in bols.items():
                             for i in item['lots']:
                                 bill_mapping_vessel[vessel][i]={'Batch':bols[bill]['batch'],'Ocean_bl':bill}
-
-
+                        storage_client = storage.Client()
+                        bucket = storage_client.bucket(target_bucket)
+                        blob = bucket.blob(rf"map.json")
+                        blob.upload_from_string(json.dumps(map_json))
+                        storage_client = storage.Client()
+                        bucket = storage_client.bucket(target_bucket)
+                        blob = bucket.blob(rf"bill_mapping.json")
+                        blob.upload_from_string(json.dumps(bill_mapping_vessel))
+                        st.success(f"Vessel and BOL data is registered")
+                
             
             with admin_tab4:   ###   AUDIT
                 if st.button("RUN RECORD AUDIT"):
@@ -2814,7 +2822,7 @@ if authentication_status:
                         po_number_edit=st.text_input("PO No",release_order_database[release_order_number]["po_number"],disabled=False)
                         destination_edit=st.text_input("Destination",release_order_database[release_order_number]["destination"],disabled=False)
                         sales_order_item_edit=st.selectbox("Sales Order Item",[i for i in release_order_database[release_order_number] if i in ["001","002","003","004","005"]] ,disabled=False)
-                        vessel_edit=vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142","LYSEFJORD-2308","FRONTIER-55VC"],key="poFpoa")
+                        vessel_edit=vessel=st.selectbox("SELECT VESSEL",[i for i in map['batch_mapping'],key="poFpoa")
                         ocean_bill_of_lading_edit=st.selectbox("Ocean Bill Of Lading",batch_mapping[vessel_edit].keys(),key="trdfeerw") 
                         grade_edit=st.text_input("Grade",release_order_database[release_order_number][sales_order_item_edit]["grade"],disabled=True)
                         batch_edit=st.text_input("Batch No",release_order_database[release_order_number][sales_order_item_edit]["batch"],disabled=True)

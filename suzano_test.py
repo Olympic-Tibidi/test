@@ -4504,8 +4504,8 @@ if authentication_status:
                                 st.write(f"DAMAGED : ")
                                 st.write(f"TOTAL : ")
                             with dinv2:
-                                damaged_edit=st.number_input(label_visibility='hidden')
-                                total_edit=st.number_input(label_visibility='hidden',key="dsd")
+                                damaged_edit=st.number_input("lala",label_visibility='hidden')
+                                total_edit=st.number_input("tata",label_visibility='hidden',key="dsd")
                                         
 
 

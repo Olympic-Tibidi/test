@@ -4459,7 +4459,7 @@ if authentication_status:
                          'SFCRIQIOLM555001': [8969.0,0]}
                         for ship in map['batch_mapping']:
                             for bill in map['batch_mapping'][ship]:
-                                inventory.update(bill:[map['batch_mapping'][ship][bill]['total'],map['batch_mapping'][ship][bill]['damaged']])
+                                inventory.update(bill=[map['batch_mapping'][ship][bill]['total'],map['batch_mapping'][ship][bill]['damaged']])
                             
                         def extract_qt(data,ro,bol):
                             totals=[0,0,0]

@@ -4504,8 +4504,8 @@ if authentication_status:
                                 st.write(f"DAMAGED")
                                 st.write(f"TOTAL")
                             with dinv2:
-                                damaged_edit=st.number_input("lala",value=map['bol_mapping'][bol_to_edit]['damaged'],label_visibility='collapsed')
-                                total_edit=st.number_input("tata",map['bol_mapping'][bol_to_edit]['total'],label_visibility='collapsed',key="dsd")
+                                damaged_edit=st.number_input("lala",label_visibility='collapsed')
+                                total_edit=st.number_input("tata",label_visibility='collapsed',key="dsd")
                             if st.button("SUBMIT CHANGE",key="t2ds"):
                                 map['bol_mapping'][bol_to_edit]['total']=total_edit
                                 map['bol_mapping'][bol_to_edit]['damaged']=damaged_edit

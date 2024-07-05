@@ -4443,19 +4443,20 @@ if authentication_status:
                                 "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                                 "user": user,
                                 "log_type": log_type,
-                                "details": {
-                                    "ocean_bill_of_lading": bol_to_edit,
-                                    "new_total": total_edit,
-                                    "new_damaged": damaged_edit
+                                "ocean_bill_of_lading": bol_to_edit,
+                                "new_total": total_edit,
+                                "new_damaged": damaged_edit
                                 }
-                            }
+                            
                             try:
                                 inventory_log=gcp_download(target_bucket,rf"inventory_log.json")
                                 inventory_log=json.loads(inventory_log)
                             except :
-                                inventory_log = []
+                                inventory_log = {}
                         
-                            inventory_log.append(change_log)
+                            if bol_to_edit not in inventory_log:
+                                inventory_log[bol_to_edit]=[]
+                            inventory_log[bol_to_edit].append(change_log)
                         
                             return inventory_log
 
@@ -4552,9 +4553,16 @@ if authentication_status:
                                     blob = bucket.blob(rf"inventory_log.json")
                                     blob.upload_from_string(json.dumps(inventory_log))
                                     st.success(f"Logged Inventory Change",icon="✅")
-
-   
-
+                                    
+                                see_inventory_change_checkbox=st.checkbox("SEE INVENTORY EDIT LOGS")
+                                if see_inventory_change_checkbox:
+                                    try:
+                                        inventory_log=gcp_download(target_bucket,rf"inventory_log.json")
+                                        inventory_log=json.loads(inventory_log)
+                                    except :
+                                        inventory_log = []
+                                       
+                                    st.write(inventory_log[bol_to_edit])
 
 
                             

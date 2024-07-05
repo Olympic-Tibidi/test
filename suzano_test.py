@@ -4298,6 +4298,7 @@ if authentication_status:
                 daily_suzano["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suzano_report["Date Shipped"]]
                 daily_suzano_=daily_suzano[daily_suzano["Date"]==now.date()]
                 
+                
                 choose = st.radio(
                                 "Select Daily or Accumulative Report",
                                 ["DAILY", "ACCUMULATIVE", "FIND BY DATE","FIND DATE RANGE","BY RELEASE ORDER","BY BATCH"])
@@ -4437,6 +4438,31 @@ if authentication_status:
                         
                             
                     with inventory:
+                        def log_inventory_change(bol_to_edit, total_edit, damaged_edit, user, log_type):
+                            change_log = {
+                                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                "user": user,
+                                "log_type": log_type,
+                                "details": {
+                                    "ocean_bill_of_lading": bol_to_edit,
+                                    "new_total": total_edit,
+                                    "new_damaged": damaged_edit
+                                }
+                            }
+                            try:
+                                inventory_log=gcp_download(target_bucket,rf"inventory_log.json")
+                                inventory_log=json.loads(inventory_log)
+                            except :
+                                inventory_log = []
+                        
+                            inventory_log.append(change_log)
+                        
+                            return inventory_log
+
+
+
+
+                        
                         bols = {}
                         for key, value in raw_ro.items():
                             for item_key, item_value in value.items():
@@ -4517,7 +4543,17 @@ if authentication_status:
                                     blob = bucket.blob(rf"map.json")
                                     blob.upload_from_string(json.dumps(map))
                                     st.success(f"Updated Inventory Database",icon="✅")
+                                    
+                                    user="admin"
+                                    log_type="Warehouse Adjustment"
+                                    inventory_log=log_inventory_change(bol_to_edit, total_edit, damaged_edit, user, log_type)
+                                    storage_client = storage.Client()
+                                    bucket = storage_client.bucket(target_bucket)
+                                    blob = bucket.blob(rf"inventory_log.json")
+                                    blob.upload_from_string(json.dumps(inventory_log))
+                                    st.success(f"Logged Inventory Change",icon="✅")
 
+   
 
 
 

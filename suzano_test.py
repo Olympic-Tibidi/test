@@ -3597,7 +3597,7 @@ if authentication_status:
                                 vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
                                 manual_bill=st.toggle("Toggle for Manual BOL")
                                 if manual_bill:
-                                    manual_bill_of_lading_number=st.textbox("ENTER BOL",key="eirufs")
+                                    manual_bill_of_lading_number=st.text_input("ENTER BOL",key="eirufs")
                                 mf=True
                                 load_mf_number_issued=False
                                 if destination=="CLEARWATER-Lewiston,ID":

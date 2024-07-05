@@ -4450,7 +4450,6 @@ if authentication_status:
                         inventory={}
                         a=[i for i in map['bol_mapping']]
                         for bill in a:
-                            st.write(bill)
                             inventory[bill]=[map['bol_mapping'][bill]['total'],map['bol_mapping'][bill]['damaged']]
                             
                         def extract_qt(data,ro,bol):

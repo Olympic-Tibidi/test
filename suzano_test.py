@@ -5562,7 +5562,9 @@ if authentication_status:
                     ###########################       SUZANO INVENTORY BOARD    ###########################
  
     elif username == 'olysuzanodash':
-        map=gcp_download_new(target_bucket,rf"map.json")
+        #map=gcp_download_new(target_bucket,rf"map.json")
+        map=gcp_download(target_bucket,rf"map.json")
+        map=json.loads(map)
         mill_info=map["mill_info"]
         inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
         inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
@@ -5578,7 +5580,7 @@ if authentication_status:
             def convert_df(df):
                 # IMPORTANT: Cache the conversion to prevent computation on every rerun
                 return df.to_csv().encode('utf-8')
-                
+            
             now=datetime.datetime.now()-datetime.timedelta(hours=utc_difference)
             suzano_report_=gcp_download(target_bucket,rf"suzano_report.json")
             suzano_report=json.loads(suzano_report_)
@@ -5677,7 +5679,7 @@ if authentication_status:
                 file_name=f'{requested_edi_file}',
                 mime='text/csv')
             
-
+            
             
         with main_inventory:
             
@@ -5692,7 +5694,7 @@ if authentication_status:
                 with daily:
                     
                     amount_dict={"KIRKENES-2304":9200,"JUVENTAS-2308":10000,"LYSEFJORD-2308":10000,"LAGUNA-3142":453,"FRONTIER-55VC":9811}
-                    inv_vessel=st.selectbox("Select Vessel",["KIRKENES-2304","JUVENTAS-2308","LYSEFJORD-2308","LAGUNA-3142","FRONTIER-55VC"])
+                    inv_vessel=st.selectbox("Select Vessel",[i for i in map['batch_mapping']])
                     kf=inv_bill_of_ladings.iloc[1:].copy()
                     kf['issued'] = pd.to_datetime(kf['issued'])
                     kf=kf[kf["vessel"]==inv_vessel]
@@ -5739,16 +5741,11 @@ if authentication_status:
                                         bols[ocean_bill_of_lading] = []
                                     bols[ocean_bill_of_lading].append(key)
                     
-                    inventory={'GSSWJUV8556A': [3500.0,1],
-                         'GSSWJUV8556B': [25.0,0],
-                         'GSSWJUV8556C': [6475.0,6],
-                         'GSSWKIR6013D': [8350.0,1],
-                         'GSSWKIR6013E': [850.0,1],
-                         'GSSWLAG3142E': [750.0,0],
-                         'GSSWLYS10628A': [1500.0,14],
-                         'GSSWLYS10628B': [8500.0,0],
-                         'SFCRIQIOLM555000': [842.0,0],
-                         'SFCRIQIOLM555001': [8969.0,0]}
+                    inventory={}
+                    a=[i for i in map['bol_mapping']]
+                    for bill in a:
+                        inventory[bill]=[map['bol_mapping'][bill]['total'],map['bol_mapping'][bill]['damaged']]
+                        
                     def extract_qt(data,ro,bol):
                         totals=[0,0,0]
                         sales_group=["001","002","003","004","005"]
@@ -5759,6 +5756,7 @@ if authentication_status:
                                     totals[1]+=data[ro][item]['shipped']
                                     totals[2]+=data[ro][item]['remaining']
                         return totals
+                    
                     final={}
                     for k in inventory.keys():
                         final[k]={"Total":0,"Damaged":0,"Fit To Ship":0,"Allocated to ROs":0,"Shipped":0,
@@ -5769,12 +5767,13 @@ if authentication_status:
                         final[k]["Fit To Ship"]=final[k]["Total"]-final[k]["Damaged"]   
                     
                         if k in bols:
-                                
+                            
                             for ro in set(bols[k]):
                                 a,b,c=extract_qt(raw_ro,ro,k)[0],extract_qt(raw_ro,ro,k)[1],extract_qt(raw_ro,ro,k)[2]
                                 final[k]["Allocated to ROs"]+=a
                                 #final[k]["Shipped"]=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[['quantity']].sum().loc[k,'quantity']
                                 final[k]["Shipped"]+=b
+                                
                                 final[k]["Remaining in Warehouse"]=final[k]["Fit To Ship"]-final[k]["Shipped"]
                                 final[k]["Remaining on ROs"]=final[k]["Allocated to ROs"]-final[k]["Shipped"]
                                 final[k]["Remaining After ROs"]=final[k]["Fit To Ship"]-final[k]["Allocated to ROs"]
@@ -5786,172 +5785,12 @@ if authentication_status:
                     
                     tempo=temp*2
 
-                    #inv_col1,inv_col2=st.columns([2,2])
-                   # with inv_col1:
-                    st.subheader("By Ocean BOL,UNITS")
-                    st.dataframe(temp)
-                    #with inv_col2:
-                    st.subheader("By Ocean BOL,TONS")
-                    st.dataframe(tempo)                       
-                with unregistered:
-                    alien_units=json.loads(gcp_download(target_bucket,rf"alien_units.json"))
-                    alien_vessel=st.selectbox("SELECT VESSEL",["KIRKENES-2304","JUVENTAS-2308","LAGUNA-3142","LYSEFJORD-2308","FRONTIER-55VC"])
-                    alien_list=pd.DataFrame(alien_units[alien_vessel]).T
-                    alien_list.reset_index(inplace=True)
-                    alien_list.index=alien_list.index+1
-                    st.markdown(f"**{len(alien_list)} units that are not on the shipping file found on {alien_vessel}**")
-                    st.dataframe(alien_list)
-                    
-                  
-        with mill_progress:
-            
-            maintenance=True
-            if maintenance:
-                st.subheader("CURRENTLY UNDER MAINTENANCE, CHECK BACK LATER")
-            else:
-                st.subheader("WEEKLY SHIPMENTS BY MILL (IN TONS)")
-                zf=inv_bill_of_ladings.copy()
-                zf['WEEK'] = pd.to_datetime(zf['issued'])
-                zf.set_index('WEEK', inplace=True)
-                
-                def sum_quantity(x):
-                    return x.resample('W')['quantity'].sum()*2
-                resampled_quantity = zf.groupby('destination').apply(sum_quantity).unstack(level=0)
-                resampled_quantity=resampled_quantity.fillna(0)
-                resampled_quantity.loc["TOTAL"]=resampled_quantity.sum(axis=0)
-                resampled_quantity["TOTAL"]=resampled_quantity.sum(axis=1)
-                resampled_quantity=resampled_quantity.reset_index()
-                resampled_quantity["WEEK"][:-1]=[i.strftime("%Y-%m-%d") for i in resampled_quantity["WEEK"][:-1]]
-                resampled_quantity.set_index("WEEK",drop=True,inplace=True)
-                st.dataframe(resampled_quantity)
-                
-                st.download_button(
-                label="DOWNLOAD WEEKLY REPORT AS CSV",
-                data=convert_df(resampled_quantity),
-                file_name=f'WEEKLY SHIPMENT REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
-                mime='text/csv')
-
-
-               
-                zf['issued'] = pd.to_datetime(zf['issued'])                   
-               
-                weekly_tonnage = zf.groupby(['destination', pd.Grouper(key='issued', freq='W')])['quantity'].sum() * 2  # Assuming 2 tons per quantity
-                weekly_tonnage = weekly_tonnage.reset_index()                   
-              
-                weekly_tonnage = weekly_tonnage.rename(columns={'issued': 'WEEK', 'quantity': 'Tonnage'})
-              
-                fig = px.bar(weekly_tonnage, x='WEEK', y='Tonnage', color='destination',
-                             title='Weekly Shipments Tonnage per Location',
-                             labels={'Tonnage': 'Tonnage (in Tons)', 'WEEK': 'Week'})
-             
-                fig.update_layout(width=1000, height=700)  # You can adjust the width and height values as needed
-                
-                st.plotly_chart(fig)
-
-
-        with status:
-            
-            status_dict={}
-            sales_group=["001","002","003","004","005"]
-            for ro in raw_ro:
-                for sale in [i for i in raw_ro[ro] if i in sales_group]:
-                    status_dict[f"{ro}-{sale}"]={"Release Order #":ro,"Sales Order #":sale,
-                                        "Destination":raw_ro[ro]['destination'],
-                                        "Ocean BOL":raw_ro[ro][sale]['ocean_bill_of_lading'],
-                                        "Total":raw_ro[ro][sale]['total'],
-                                        "Shipped":raw_ro[ro][sale]['shipped'],
-                                        "Remaining":raw_ro[ro][sale]['remaining']}
-            status_frame=pd.DataFrame(status_dict).T.set_index("Release Order #",drop=True)
-            active_frame_=status_frame[status_frame["Remaining"]>0]
-            status_frame.loc["Total"]=status_frame[["Total","Shipped","Remaining"]].sum()
-            active_frame=active_frame_.copy()
-            active_frame.loc["Total"]=active_frame[["Total","Shipped","Remaining"]].sum()
-            st.subheader("ACTIVE RELEASE ORDERS")
-            st.markdown(active_frame.to_html(render_links=True),unsafe_allow_html=True)
-
-            
-            release_orders = status_frame.index[:-1]
-            release_orders = pd.Categorical(release_orders)
-            active_order_names = [f"{i} to {raw_ro[i]['destination']}" for i in active_frame_.index]
-            destinations=[raw_ro[i]['destination'] for i in active_frame_.index]
-            active_orders=[str(i) for i in active_frame.index]
-           
-            fig = go.Figure()
-            fig.add_trace(go.Bar(x=active_orders, y=active_frame["Total"], name='Total', marker_color='lightgray'))
-            fig.add_trace(go.Bar(x=active_orders, y=active_frame["Shipped"], name='Shipped', marker_color='blue', opacity=0.7))
-            remaining_data = [remaining if remaining > 0 else None for remaining in active_frame_["Remaining"]]
-            fig.add_trace(go.Scatter(x=active_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
-            
-            #annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(active_orders, active_frame["Total"], destinations)]
-            #fig.update_layout(annotations=annotations)
-
-            # fig.add_annotation(x="3172296", y=800, text="destination",
-            #                        showarrow=True, arrowhead=4, ax=0, ay=-30)
-            
-            fig.update_layout(title='ACTIVE RELEASE ORDERS',
-                              xaxis_title='Release Orders',
-                              yaxis_title='Quantities',
-                              barmode='overlay',
-                              width=1300,
-                              height=700,
-                              xaxis=dict(tickangle=-90, type='category'))
-            
-            st.plotly_chart(fig)
-            
-            
-            duration=st.toggle("Duration Report")
-            if duration:
-                
-                temp_dict={}
-                    
-                for rel_ord in raw_ro:
-                    for sales in [i for i in raw_ro[rel_ord] if i in ["001","002","003","004","005"]]:
-                        temp_dict[rel_ord,sales]={}
-                        dest=raw_ro[rel_ord]['destination']
-                        vessel=raw_ro[rel_ord][sales]['vessel']
-                        total=raw_ro[rel_ord][sales]['total']
-                        remaining=raw_ro[rel_ord][sales]['remaining']
-                        temp_dict[rel_ord,sales]={'destination': dest,'vessel': vessel,'total':total,'remaining':remaining}
-                temp_df=pd.DataFrame(temp_dict).T
-              
-                temp_df= temp_df.rename_axis(['release_order','sales_order'], axis=0)
-            
-                temp_df['First Shipment'] = temp_df.index.map(inv_bill_of_ladings.groupby(['release_order','sales_order'])['issued'].first())
-                
-                for i in temp_df.index:
-                    if temp_df.loc[i,'remaining']<=2:
-                        try:
-                            temp_df.loc[i,"Last Shipment"]=inv_bill_of_ladings.groupby(['release_order','sales_order']).issued.last().loc[i]
-                        except:
-                            temp_df.loc[i,"Last Shipment"]=datetime.datetime.now()
-                        temp_df.loc[i,"Duration"]=(pd.to_datetime(temp_df.loc[i,"Last Shipment"])-pd.to_datetime(temp_df.loc[i,"First Shipment"])).days+1
-                
-                temp_df['First Shipment'] = temp_df['First Shipment'].fillna(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S'))
-                temp_df['Last Shipment'] = temp_df['Last Shipment'].fillna(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S'))
-                
-                ####
-                
-                def business_days(start_date, end_date):
-                    return pd.date_range(start=start_date, end=end_date, freq=BDay())
-                temp_df['# of Shipment Days'] = temp_df.apply(lambda row: len(business_days(row['First Shipment'], row['Last Shipment'])), axis=1)
-                df_temp=inv_bill_of_ladings.copy()
-                df_temp["issued"]=[pd.to_datetime(i).date() for i in df_temp["issued"]]
-                for i in temp_df.index:
-                    try:
-                        temp_df.loc[i,"Utilized Shipment Days"]=df_temp.groupby(["release_order",'sales_order'])[["issued"]].nunique().loc[i,'issued']
-                    except:
-                        temp_df.loc[i,"Utilized Shipment Days"]=0
-                
-                temp_df['First Shipment'] = temp_df['First Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y'))
-                temp_df['Last Shipment'] = temp_df['Last Shipment'].apply(lambda x: datetime.datetime.strftime(datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S'),'%d-%b,%Y') if type(x)==str else None)
-                liste=['Duration','# of Shipment Days',"Utilized Shipment Days"]
-                for col in liste:
-                    temp_df[col] = temp_df[col].apply(lambda x: f" {int(x)} days" if not pd.isna(x) else np.nan)
-                temp_df['remaining'] = temp_df['remaining'].apply(lambda x: int(x))
-                temp_df.columns=['Destination', 'Vessel', 'Total Units', 'Remaining Units', 'First Shipment',
-                       'Last Shipment', 'Duration', '# of Calendar Shipment Days',
-                       'Utilized Calendar Shipment Days']
-                st.dataframe(temp_df)
+                    inv_col1,inv_col2=st.columns([7,3])
+                    with inv_col1:
+                        st.subheader("By Ocean BOL,UNITS")
+                        st.dataframe(temp)
+                        st.subheader("By Ocean BOL,TONS")
+                        st.dataframe(tempo)
         
   
 

@@ -2341,11 +2341,11 @@ if authentication_status:
                         map_vessel=gcp_download(target_bucket,rf"map.json")
                         map_vessel=json.loads(map_vessel)
                         map_vessel['batch_mapping'][vessel]={i:{'batch':bols[i]['batch'],'dryness':bols[i]['admt'],
-                                      'grade':bols[i]['grade'][:3]} for i in bols}
+                                      'grade':bols[i]['grade'][:3],'fit':bols[i]['qty'] ,"damaged":0,"total":bols[i]['qty']} for i in bols}
 
                         for i in bols:
                             map_vessel['bol_mapping'][i]={'batch':bols[i]['batch'],'dryness':bols[i]['admt'],
-                                                              'grade':bols[i]['grade'][:3],
+                                                              'grade':bols[i]['grade'][:3],'fit':bols[i]['qty'] ,"damaged":0,"total":bols[i]['qty'],
                                                         'FSC':"FSC Certified Products. FSC Mix Credit IMA—COC-001470"} 
                         #st.write(map_vessel)
                         bill_mapping_vessel=gcp_download(target_bucket,rf"bill_mapping.json")

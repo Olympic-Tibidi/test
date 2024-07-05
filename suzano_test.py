@@ -4448,7 +4448,8 @@ if authentication_status:
                                         bols[ocean_bill_of_lading].append(key)
                         
                         inventory={}
-                        for bill in map['bol_mapping']:
+                        a=[i for i in map['bol_mapping']]
+                        for bill in a:
                             st.write(bill)
                             inventory[bill]=[map['bol_mapping'][bill]['total'],map['bol_mapping'][bill]['damaged']]
                             

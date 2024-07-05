@@ -4448,9 +4448,8 @@ if authentication_status:
                                         bols[ocean_bill_of_lading].append(key)
                         
                         inventory={}
-                        for ship in map['batch_mapping']:
-                            for bill in map['batch_mapping'][ship]:
-                                inventory[bill]=[map['batch_mapping'][ship][bill]['total'],map['batch_mapping'][ship][bill]['damaged']]
+                        for bill in map['bol_mapping']:
+                            inventory[bill]=[map['bol_mapping'][bill]['total'],map['bol_mapping'][bill]['damaged']]
                             
                         def extract_qt(data,ro,bol):
                             totals=[0,0,0]

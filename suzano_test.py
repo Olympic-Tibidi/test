@@ -4508,8 +4508,8 @@ if authentication_status:
                                 damaged_edit=st.number_input("lala",value=map['bol_mapping'][bol_to_edit]['damaged'],label_visibility='collapsed')
                                 total_edit=st.number_input("tata",map['bol_mapping'][bol_to_edit]['total'],label_visibility='collapsed',key="dsd")
                             if st.button("SUBMIT CHANGE",key="t2ds"):
-                                map['bol_mapping']['total']=total_edit
-                                map['bol_mapping']['damaged']=damaged_edit
+                                map['bol_mapping'][bol_to_edit]['total']=total_edit
+                                map['bol_mapping'][bol_to_edit]['damaged']=damaged_edit
                                 storage_client = storage.Client()
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"map.json")

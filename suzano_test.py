@@ -3291,7 +3291,7 @@ if authentication_status:
                       
                         temp_df= temp_df.rename_axis(['release_order','sales_order'], axis=0)
                     
-                        temp_df['First Shipment'] = temp_df.index.map(inv_bill_of_ladings.groupby(['release_order','sales_order'])['issued'].first())
+                        temp_df['First Shipment'] = temp_df.index.map(dfb.groupby(['release_order','sales_order'])['issued'].first())
                         
                         for i in temp_df.index:
                             if temp_df.loc[i,'remaining']<=2:

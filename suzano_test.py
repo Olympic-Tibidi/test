@@ -3309,7 +3309,7 @@ if authentication_status:
                         def business_days(start_date, end_date):
                             return pd.date_range(start=start_date, end=end_date, freq=BDay())
                         temp_df['# of Shipment Days'] = temp_df.apply(lambda row: len(business_days(row['First Shipment'], row['Last Shipment'])), axis=1)
-                        df_temp=inv_bill_of_ladings.copy()
+                        df_temp=dfb.copy()
                         df_temp["issued"]=[pd.to_datetime(i).date() for i in df_temp["issued"]]
                         for i in temp_df.index:
                             try:

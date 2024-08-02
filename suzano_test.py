@@ -945,1334 +945,1334 @@ if authentication_status:
                             monthly=ledgers_b[ledgers_b["Account"].isin(accounts)]
                             #st.write(monthly)
                             monthly.set_index("Date",drop=True, inplace=True)
-                            #st.write(monthly)
-                            monthly_=monthly.resample("M")["Debit","Credit","Net"].sum()
-                            monthly_.index=[i.month_name() for i in monthly_.index]
-                            avg=round(monthly_.Net.sum()/monthly_.shape[0],1)
-                            total=round(monthly_.Net.sum(),1)
-                            if year=="2023":
+        #                     #st.write(monthly)
+        #                     monthly_=monthly.resample("M")["Debit","Credit","Net"].sum()
+        #                     monthly_.index=[i.month_name() for i in monthly_.index]
+        #                     avg=round(monthly_.Net.sum()/monthly_.shape[0],1)
+        #                     total=round(monthly_.Net.sum(),1)
+        #                     if year=="2023":
                                
-                                annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2023 Adopted"].values.sum()
-                                #st.write(annual_budget)
-                            elif year=="2022":
-                                annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2022 Adopted"].values.sum()
-                                annual_budget1=budget_codes[budget_codes["Account"].isin(accounts)]["2023 Adopted"].values.sum()
+        #                         annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2023 Adopted"].values.sum()
+        #                         #st.write(annual_budget)
+        #                     elif year=="2022":
+        #                         annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2022 Adopted"].values.sum()
+        #                         annual_budget1=budget_codes[budget_codes["Account"].isin(accounts)]["2023 Adopted"].values.sum()
                             
-                            else:
+        #                     else:
                                 
-                                annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2022 Adopted"].values.sum()
+        #                         annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2022 Adopted"].values.sum()
                                 
                                
-                            budgeted_monthly=annual_budget/12
-                            monthly_=monthly_.applymap(dollar_format)
-                            #st.write(annual_budget)
-                            #st.write(accounts)
-                            col1, col2,col3= st.columns([2,2,5])
+        #                     budgeted_monthly=annual_budget/12
+        #                     monthly_=monthly_.applymap(dollar_format)
+        #                     #st.write(annual_budget)
+        #                     #st.write(accounts)
+        #                     col1, col2,col3= st.columns([2,2,5])
                             
-                            with col1:
-                                st.write(monthly_)
-                            with col2:
-                                text='${:,.1f}'.format(total)
-                                st.markdown('**Average Monthly    :      ${:,.1f}**'.format(avg))
-                                st.markdown(f"**Budgeted {st.session_state.year} Monthly:  {'${:,.1f}**'.format(budgeted_monthly)}")
-                                st.markdown("##")
-                                st.markdown(f"**Budgeted {st.session_state.year} Annual:  {'${:,.1f}**'.format(annual_budget)}")
-                                st.markdown(f'**TOTAL so far in {st.session_state.year}:   {text}**')
+        #                     with col1:
+        #                         st.write(monthly_)
+        #                     with col2:
+        #                         text='${:,.1f}'.format(total)
+        #                         st.markdown('**Average Monthly    :      ${:,.1f}**'.format(avg))
+        #                         st.markdown(f"**Budgeted {st.session_state.year} Monthly:  {'${:,.1f}**'.format(budgeted_monthly)}")
+        #                         st.markdown("##")
+        #                         st.markdown(f"**Budgeted {st.session_state.year} Annual:  {'${:,.1f}**'.format(annual_budget)}")
+        #                         st.markdown(f'**TOTAL so far in {st.session_state.year}:   {text}**')
                             
                                 
-                                percent_spent = avg / budgeted_monthly * 100
+        #                         percent_spent = avg / budgeted_monthly * 100
                 
-                                #st_gauge(percent_spent, label='Monthly Budget Status', min_value=0, max_value=100)
-                            with col3:
-                                agree = st.checkbox('**CHECK FOR YTD GAUGE INSTEAD OF MONTHLY**')
+        #                         #st_gauge(percent_spent, label='Monthly Budget Status', min_value=0, max_value=100)
+        #                     with col3:
+        #                         agree = st.checkbox('**CHECK FOR YTD GAUGE INSTEAD OF MONTHLY**')
                                 
-                                if agree:
-                                    value=total
-                                    budgeted=annual_budget
-                                else:
-                                    value=avg
-                                    budgeted=budgeted_monthly
-                                gauge_text=f"MONTHLY BUDGET STATUS FOR {monthly_label}"
-                                fig = go.Figure(go.Indicator(
-                                        mode = "gauge+number+delta",
-                                        value = abs(round(value,1)),
-                                        number = { 'prefix': '$', 'font': {'size':50}},
-                                        domain = {'x': [0,1], 'y': [0, 1]},
-                                        title = {'text': gauge_text, 'font': {'size': 24}},
-                                        delta = {'position':'bottom','reference': abs(round(budgeted,1)), 'increasing': {'color': "RebeccaPurple"}},
-                                        gauge = {
-                                            'axis': {'range': [None, 1.5*abs(budgeted)], 'tickwidth': 1, 'tickcolor': "darkblue"},
-                                            'bar': {'color': "darkblue"},
-                                            'bgcolor': "white",
-                                            'borderwidth': 2,
-                                            'bordercolor': "gray",
-                                            'steps': [
-                                                {'range': [0, abs(budgeted)], 'color': 'cyan'},
-                                                {'range': [abs(budgeted),
-                                                          abs(1.5*budgeted)], 'color': 'royalblue'}],
-                                            'threshold': {
-                                                'line': {'color': "red", 'width': 4},
-                                                'thickness': 0.75,
-                                                'value': abs(budgeted*1.25)}}))
-                                fig.add_annotation(
-                                                    x=0.5,
-                                                    y=0.35,
-                                                    text="Monthly Average",
-                                                    showarrow=False,
-                                                    font=dict(
-                                                        size=16,
-                                                        color="darkblue",
-                                                        family="Arial"   )  )
-                                fig.add_annotation(
-                                                    x=0,
-                                                    y=-0.2,
-                                                    text="<b>**DARK BLUE:Running Monthly Average**<b>",
-                                                    showarrow=False,
-                                                    font=dict(
-                                                        size=12,
-                                                        color="darkblue",
-                                                        family="Arial"   )  )
-                                fig.add_annotation(
-                                                    x=0,
-                                                    y=-0.1,
-                                                    text="<b>**CYAN : MONTHLY BUDGET**<b>",
-                                                    showarrow=False,
-                                                    font=dict(
-                                                        size=12,
-                                                        color="darkblue",
-                                                        family="Arial"   )  )
-                                fig.add_annotation(
-                                                    x=0,
-                                                    y=-0.3,
-                                                    text="**<b>RED LINE : 1.5 X MONTHLY BUDGET**<b>",
-                                                    showarrow=False,
-                                                    font=dict(
-                                                        size=12,
-                                                        color="darkblue",
-                                                        family="Arial"   )  )
-                                fig.add_annotation(
-                                                    x=0.5,
-                                                    y=-0.05,
-                                                    text="From Budgeted Monthly",
-                                                    showarrow=False,
-                                                    font=dict(
-                                                        size=16,
-                                                        color="darkblue",
-                                                        family="Arial"
-                                                    )
-                                                )
-                                fig.update_layout(paper_bgcolor = "lavender",
-                                                  font = {'color': "darkblue", 'family': "Arial"})
+        #                         if agree:
+        #                             value=total
+        #                             budgeted=annual_budget
+        #                         else:
+        #                             value=avg
+        #                             budgeted=budgeted_monthly
+        #                         gauge_text=f"MONTHLY BUDGET STATUS FOR {monthly_label}"
+        #                         fig = go.Figure(go.Indicator(
+        #                                 mode = "gauge+number+delta",
+        #                                 value = abs(round(value,1)),
+        #                                 number = { 'prefix': '$', 'font': {'size':50}},
+        #                                 domain = {'x': [0,1], 'y': [0, 1]},
+        #                                 title = {'text': gauge_text, 'font': {'size': 24}},
+        #                                 delta = {'position':'bottom','reference': abs(round(budgeted,1)), 'increasing': {'color': "RebeccaPurple"}},
+        #                                 gauge = {
+        #                                     'axis': {'range': [None, 1.5*abs(budgeted)], 'tickwidth': 1, 'tickcolor': "darkblue"},
+        #                                     'bar': {'color': "darkblue"},
+        #                                     'bgcolor': "white",
+        #                                     'borderwidth': 2,
+        #                                     'bordercolor': "gray",
+        #                                     'steps': [
+        #                                         {'range': [0, abs(budgeted)], 'color': 'cyan'},
+        #                                         {'range': [abs(budgeted),
+        #                                                   abs(1.5*budgeted)], 'color': 'royalblue'}],
+        #                                     'threshold': {
+        #                                         'line': {'color': "red", 'width': 4},
+        #                                         'thickness': 0.75,
+        #                                         'value': abs(budgeted*1.25)}}))
+        #                         fig.add_annotation(
+        #                                             x=0.5,
+        #                                             y=0.35,
+        #                                             text="Monthly Average",
+        #                                             showarrow=False,
+        #                                             font=dict(
+        #                                                 size=16,
+        #                                                 color="darkblue",
+        #                                                 family="Arial"   )  )
+        #                         fig.add_annotation(
+        #                                             x=0,
+        #                                             y=-0.2,
+        #                                             text="<b>**DARK BLUE:Running Monthly Average**<b>",
+        #                                             showarrow=False,
+        #                                             font=dict(
+        #                                                 size=12,
+        #                                                 color="darkblue",
+        #                                                 family="Arial"   )  )
+        #                         fig.add_annotation(
+        #                                             x=0,
+        #                                             y=-0.1,
+        #                                             text="<b>**CYAN : MONTHLY BUDGET**<b>",
+        #                                             showarrow=False,
+        #                                             font=dict(
+        #                                                 size=12,
+        #                                                 color="darkblue",
+        #                                                 family="Arial"   )  )
+        #                         fig.add_annotation(
+        #                                             x=0,
+        #                                             y=-0.3,
+        #                                             text="**<b>RED LINE : 1.5 X MONTHLY BUDGET**<b>",
+        #                                             showarrow=False,
+        #                                             font=dict(
+        #                                                 size=12,
+        #                                                 color="darkblue",
+        #                                                 family="Arial"   )  )
+        #                         fig.add_annotation(
+        #                                             x=0.5,
+        #                                             y=-0.05,
+        #                                             text="From Budgeted Monthly",
+        #                                             showarrow=False,
+        #                                             font=dict(
+        #                                                 size=16,
+        #                                                 color="darkblue",
+        #                                                 family="Arial"
+        #                                             )
+        #                                         )
+        #                         fig.update_layout(paper_bgcolor = "lavender",
+        #                                           font = {'color': "darkblue", 'family': "Arial"})
                 
-                                st.plotly_chart(fig)
-                            col5, col6= st.columns([2,2])
-                            with col5:
+        #                         st.plotly_chart(fig)
+        #                     col5, col6= st.columns([2,2])
+        #                     with col5:
                                 
-                                st.subheader(f"Monthly Bar Graph for {st.session_state.year} - {monthly_label}")
-                                fig1 = go.Figure(data=[go.Bar(x=monthly_.index, y=monthly_.Net)])
-                                st.plotly_chart(fig1)
-                            with col6:
-                                st.subheader(f"{monthly_label} Across Years")
-                                yillar=["2023","2022","2021","2020","2019","2018", "2017","2016"]
-                                results=[]
-                                for k in yillar:
-                                    temp=gcp_download_x(target_bucket,rf"FIN/main{k}.ftr")
-                                    temp=pd.read_feather(io.BytesIO(temp))
+        #                         st.subheader(f"Monthly Bar Graph for {st.session_state.year} - {monthly_label}")
+        #                         fig1 = go.Figure(data=[go.Bar(x=monthly_.index, y=monthly_.Net)])
+        #                         st.plotly_chart(fig1)
+        #                     with col6:
+        #                         st.subheader(f"{monthly_label} Across Years")
+        #                         yillar=["2023","2022","2021","2020","2019","2018", "2017","2016"]
+        #                         results=[]
+        #                         for k in yillar:
+        #                             temp=gcp_download_x(target_bucket,rf"FIN/main{k}.ftr")
+        #                             temp=pd.read_feather(io.BytesIO(temp))
                                     
                                 
-                                    temp.set_index("index",drop=True,inplace=True)
+        #                             temp.set_index("index",drop=True,inplace=True)
                 
-                                    ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
-                                    temp1=temp.copy()
-                                    temp1.Account=[str(i)+"-"+str(j) for i,j in zip(temp1.Account,temp1.Sub_Cat)]
-                                    result=temp1[temp1["Account"].isin(accounts)]["Net"].sum()
-                                    results.append(result)
-                                fig2 = go.Figure(data=[go.Bar(x=yillar, y=results)])
-                                st.plotly_chart(fig2)
-                            #st.write(monthly)
+        #                             ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
+        #                             temp1=temp.copy()
+        #                             temp1.Account=[str(i)+"-"+str(j) for i,j in zip(temp1.Account,temp1.Sub_Cat)]
+        #                             result=temp1[temp1["Account"].isin(accounts)]["Net"].sum()
+        #                             results.append(result)
+        #                         fig2 = go.Figure(data=[go.Bar(x=yillar, y=results)])
+        #                         st.plotly_chart(fig2)
+        #                     #st.write(monthly)
                             
-                    with fintab2:
-                        year=st.selectbox("Select Year",["2024","2023","2022","2021","2020","2019","2018", "2017","2016"],key="second")
+        #             with fintab2:
+        #                 year=st.selectbox("Select Year",["2024","2023","2022","2021","2020","2019","2018", "2017","2016"],key="second")
                         
-                        ### LETS PUT YEAR in st.session state to use later.
+        #                 ### LETS PUT YEAR in st.session state to use later.
                         
                             
-                        ### LOAD LEDGERS by year
-                        ledger_b=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
-                        ledger_b=pd.read_feather(io.BytesIO(ledger_b))
-                        ledger_b["Account"]=ledger_b["Account"].astype("str")
-                        ledger_b.set_index("index",drop=True,inplace=True)
+        #                 ### LOAD LEDGERS by year
+        #                 ledger_b=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
+        #                 ledger_b=pd.read_feather(io.BytesIO(ledger_b))
+        #                 ledger_b["Account"]=ledger_b["Account"].astype("str")
+        #                 ledger_b.set_index("index",drop=True,inplace=True)
                         
-                        ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
+        #                 ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
                         
-                        ledger_b.Account=[str(i)+"-"+str(j) for i,j in zip(ledger_b.Account,ledger_b.Sub_Cat)]
+        #                 ledger_b.Account=[str(i)+"-"+str(j) for i,j in zip(ledger_b.Account,ledger_b.Sub_Cat)]
                         
                         
-                        ins=ledger_b[ledger_b["Account"].isin(revenues_codes)].Net.sum()
-                        outs=ledger_b[ledger_b["Account"].isin(expenses)].Net.sum()
-                        outs_dep=ledger_b[ledger_b["Account"].isin(expenses_dep)].Net.sum()
-                        dep=ledger_b[ledger_b["Account"].isin(depreciation_codes)].Net.sum()
+        #                 ins=ledger_b[ledger_b["Account"].isin(revenues_codes)].Net.sum()
+        #                 outs=ledger_b[ledger_b["Account"].isin(expenses)].Net.sum()
+        #                 outs_dep=ledger_b[ledger_b["Account"].isin(expenses_dep)].Net.sum()
+        #                 dep=ledger_b[ledger_b["Account"].isin(depreciation_codes)].Net.sum()
                         
-                        a1, a2,= st.columns([2,5])
-                        with a1:
+        #                 a1, a2,= st.columns([2,5])
+        #                 with a1:
                             
-                            st.write(f"**REVENUES     :  {'${:,.1f}**'.format(ins)}")
-                            st.write(f"**EXPENSES      :  {'${:,.1f}**'.format(outs)}")
-                            if ins+outs<0:
-                                tt=f"NET BEFORE DEPRECIATION:  {'${:,.1f}'.format(ins+outs)}"
-                                original_title = f'<p style="font-family:Arial;font-weight: bold; color:Red; font-size: 15px;">{tt}</p>'
-                                st.markdown(original_title, unsafe_allow_html=True)
-                            else:
-                                st.write(f"**NET BEFORE DEPRECIATION:  {'${:,.1f}**'.format(ins+outs)}")
-                            st.write(f"**DEPRECIATION:  {'${:,.1f}**'.format(dep)}")
-                            if ins+outs+dep<0:
-                                tt=f"NET AFTER DEPRECIATION:  {'${:,.1f}'.format(ins+outs+dep)}"
-                                original_title = f'<p style="font-family:Arial;font-weight: bold; color:Red; font-size: 15px;">{tt}</p>'
-                                st.markdown(original_title, unsafe_allow_html=True)
-                            else:
-                                st.write(f"**NET AFTER DEPRECIATION:  {'${:,.1f}**'.format(ins+outs+dep)}")
+        #                     st.write(f"**REVENUES     :  {'${:,.1f}**'.format(ins)}")
+        #                     st.write(f"**EXPENSES      :  {'${:,.1f}**'.format(outs)}")
+        #                     if ins+outs<0:
+        #                         tt=f"NET BEFORE DEPRECIATION:  {'${:,.1f}'.format(ins+outs)}"
+        #                         original_title = f'<p style="font-family:Arial;font-weight: bold; color:Red; font-size: 15px;">{tt}</p>'
+        #                         st.markdown(original_title, unsafe_allow_html=True)
+        #                     else:
+        #                         st.write(f"**NET BEFORE DEPRECIATION:  {'${:,.1f}**'.format(ins+outs)}")
+        #                     st.write(f"**DEPRECIATION:  {'${:,.1f}**'.format(dep)}")
+        #                     if ins+outs+dep<0:
+        #                         tt=f"NET AFTER DEPRECIATION:  {'${:,.1f}'.format(ins+outs+dep)}"
+        #                         original_title = f'<p style="font-family:Arial;font-weight: bold; color:Red; font-size: 15px;">{tt}</p>'
+        #                         st.markdown(original_title, unsafe_allow_html=True)
+        #                     else:
+        #                         st.write(f"**NET AFTER DEPRECIATION:  {'${:,.1f}**'.format(ins+outs+dep)}")
                         
-                        with a2:
+        #                 with a2:
                             
-                        # Define the list of values and labels for the waterfall chart
-                            values = [ins,outs,ins+outs, dep,ins+outs+dep]
-                            labels = ['Revenues', 'Expenses', 'Net Before Depreciation', 'Depreciation', 'Net After Depreciation']
+        #                 # Define the list of values and labels for the waterfall chart
+        #                     values = [ins,outs,ins+outs, dep,ins+outs+dep]
+        #                     labels = ['Revenues', 'Expenses', 'Net Before Depreciation', 'Depreciation', 'Net After Depreciation']
                             
-                            # Define the colors for each bar in the waterfall chart
-                            end=ins+outs+dep
-                            #st.write(end)
-                            if end<0:
-                                #colors = ['#4CAF50', '#FFC107', '#2196F3', '#F44336', '#F44336']
-                                totals={"marker":{"color":"maroon", "line":{"color":"rgb(63, 63, 63)", "width":1}}}
-                            else:
-                                #colors=['#4CAF50', '#FFC107', '#2196F3', '#F44336', '#EF9A9A']
-                                totals={"marker":{"color":f"#2196F3", "line":{"color":"rgb(63, 63, 63)", "width":1}}}
+        #                     # Define the colors for each bar in the waterfall chart
+        #                     end=ins+outs+dep
+        #                     #st.write(end)
+        #                     if end<0:
+        #                         #colors = ['#4CAF50', '#FFC107', '#2196F3', '#F44336', '#F44336']
+        #                         totals={"marker":{"color":"maroon", "line":{"color":"rgb(63, 63, 63)", "width":1}}}
+        #                     else:
+        #                         #colors=['#4CAF50', '#FFC107', '#2196F3', '#F44336', '#EF9A9A']
+        #                         totals={"marker":{"color":f"#2196F3", "line":{"color":"rgb(63, 63, 63)", "width":1}}}
                            
                 
-                            # Define the text for each bar in the waterfall chart
-                            text = ['<b>${:,.1f}<b>'.format(value) for value in values]
-                            text_font = {'size': 14,'color':['black','red','black','red','black']}
-                            this_year=f"So Far This Year" if year=="2023" else ""
-                            # Create the trace for the waterfall chart
-                            trace = go.Waterfall(
-                                name = "Net Result",
-                                orientation = "v",
-                                measure = ['absolute', 'relative', 'total', 'relative', 'total'],
-                                x = labels,
-                                text = text,
-                                textfont=text_font,
+        #                     # Define the text for each bar in the waterfall chart
+        #                     text = ['<b>${:,.1f}<b>'.format(value) for value in values]
+        #                     text_font = {'size': 14,'color':['black','red','black','red','black']}
+        #                     this_year=f"So Far This Year" if year=="2023" else ""
+        #                     # Create the trace for the waterfall chart
+        #                     trace = go.Waterfall(
+        #                         name = "Net Result",
+        #                         orientation = "v",
+        #                         measure = ['absolute', 'relative', 'total', 'relative', 'total'],
+        #                         x = labels,
+        #                         text = text,
+        #                         textfont=text_font,
                                  
-                                y = values,
-                                connector = {"line":{"color":"rgb(63, 63, 63)"}},
-                                decreasing = {"marker":{"color":"#FFC107"}},
-                                increasing = {"marker":{"color":"#4CAF50"}},
-                                totals={"marker":{"color":f"#2196F3", "line":{"color":"rgb(63, 63, 63)", "width":1}}},
-                                cliponaxis = False,  
-                            )
+        #                         y = values,
+        #                         connector = {"line":{"color":"rgb(63, 63, 63)"}},
+        #                         decreasing = {"marker":{"color":"#FFC107"}},
+        #                         increasing = {"marker":{"color":"#4CAF50"}},
+        #                         totals={"marker":{"color":f"#2196F3", "line":{"color":"rgb(63, 63, 63)", "width":1}}},
+        #                         cliponaxis = False,  
+        #                     )
                 
-                            # Define the layout for the waterfall chart
-                    #                 layout = go.Layout(
-                    #                     title = f'MARINE TERMINAL FINANCIALS-WATERFALL-{year}',
-                    #                     xaxis = {'title': 'Components'},
-                    #                     yaxis = {'title': 'Amount ($)'},
-                    #                 )
-                    #                 layout = go.Layout(
-                    #                                     title = 'Waterfall Chart',
-                    #                                     titlefont=dict(size=24, family='Arial', color='black',),
-                    #                                     xaxis = {'title': 'Components', 'titlefont': dict(size=18, family='Arial', color='black'),
-                    #                                              'tickfont': dict(size=16, family='Arial', color='black',)},
-                    #                                     yaxis = {'title': 'Amount ($)', 'titlefont': dict(size=18, family='Arial', color='black'),
-                    #                                              'tickfont': dict(size=16, family='Arial', color='black',)},
-                    #                                 )
+        #                     # Define the layout for the waterfall chart
+        #             #                 layout = go.Layout(
+        #             #                     title = f'MARINE TERMINAL FINANCIALS-WATERFALL-{year}',
+        #             #                     xaxis = {'title': 'Components'},
+        #             #                     yaxis = {'title': 'Amount ($)'},
+        #             #                 )
+        #             #                 layout = go.Layout(
+        #             #                                     title = 'Waterfall Chart',
+        #             #                                     titlefont=dict(size=24, family='Arial', color='black',),
+        #             #                                     xaxis = {'title': 'Components', 'titlefont': dict(size=18, family='Arial', color='black'),
+        #             #                                              'tickfont': dict(size=16, family='Arial', color='black',)},
+        #             #                                     yaxis = {'title': 'Amount ($)', 'titlefont': dict(size=18, family='Arial', color='black'),
+        #             #                                              'tickfont': dict(size=16, family='Arial', color='black',)},
+        #             #                                 )
                             
-                            layout = go.Layout(
-                                        title = f'MARINE TERMINAL FINANCIALS-WATERFALL-{year}<br>{this_year}',
-                                        titlefont=dict(size=20, family='Arial', color='black',),
-                                        xaxis = { 'titlefont': dict(size=18, family='Arial', color='black'),
-                                                 'tickfont': dict(size=16, family='Arial', color='black',)},
-                                        yaxis = {'title': 'Amount ($)', 'titlefont': dict(size=18, family='Arial', color='black'),
-                                                 'tickfont': dict(size=16, family='Arial', color='black',)},
-                                        shapes = [
-                                            {'type': 'line', 'x0': -0.5, 'y0': -0, 'x1': len(labels)-0.5, 'y1': 0, 'line': {'color': 'red', 'width': 2}}
-                                        ],height=600,
-                                    )
+        #                     layout = go.Layout(
+        #                                 title = f'MARINE TERMINAL FINANCIALS-WATERFALL-{year}<br>{this_year}',
+        #                                 titlefont=dict(size=20, family='Arial', color='black',),
+        #                                 xaxis = { 'titlefont': dict(size=18, family='Arial', color='black'),
+        #                                          'tickfont': dict(size=16, family='Arial', color='black',)},
+        #                                 yaxis = {'title': 'Amount ($)', 'titlefont': dict(size=18, family='Arial', color='black'),
+        #                                          'tickfont': dict(size=16, family='Arial', color='black',)},
+        #                                 shapes = [
+        #                                     {'type': 'line', 'x0': -0.5, 'y0': -0, 'x1': len(labels)-0.5, 'y1': 0, 'line': {'color': 'red', 'width': 2}}
+        #                                 ],height=600,
+        #                             )
                 
-                            fig = go.Figure(data = trace, layout = layout)
+        #                     fig = go.Figure(data = trace, layout = layout)
                             
                 
-                            st.plotly_chart(fig)
+        #                     st.plotly_chart(fig)
                             
-                        def key_from_value(d,val):
-                            keys={}
-                            for k, v in d.items():
+        #                 def key_from_value(d,val):
+        #                     keys={}
+        #                     for k, v in d.items():
                                 
-                                if isinstance(v, dict):
-                                    get_all_keys(v,keys)
-                                else:
-                                    if d[k]==val:
-                                        return(k)
-                        def get_all_keys(d,keys):
-                            keys={}
-                            for k, v in d.items():
-                                if isinstance(v, dict):
-                                    get_all_keys(v,keys)
-                                else:
-                                    keys[k]=v
-                            return keys
-                        labels=['Vessel Operations','Labor','Tenants','Stormwater Revenue','Other Revenue',
-                               'TOTAL REVENUE',
-                               'OPERATING EXPENSES',
-                               'Operating Overhead','Terminal Operating Expense','Outside Professional Services','Labor','Vessel Operational Expenses',
-                                     'Stormwater Operating Expenses','Utilities',
-                                "MAINTENANCE EXPENSES",
-                                'Maintenance Overhead','Property Maintenance','Equipment Maintenance','Stormwater Maintenance Expenses',
-                                      'Other Maintenance Expenses',
-                                "DEPRECIATION",
-                                'Depreciation Terminal','Depreciation Grants','Depreciation Stormwater',
-                                 "G&A OVERHEAD",
-                                'Executive G&A Overhead','Marketing G&A Overhead',
-                                'Finance G&A Overhead','Engineering G&A Overhead',
-                                     'I/S G&A Overhead','Administrative G&A Overhead',
-                                "Excess Revenue",
-                                "Loss After Depreciation"]
+        #                         if isinstance(v, dict):
+        #                             get_all_keys(v,keys)
+        #                         else:
+        #                             if d[k]==val:
+        #                                 return(k)
+        #                 def get_all_keys(d,keys):
+        #                     keys={}
+        #                     for k, v in d.items():
+        #                         if isinstance(v, dict):
+        #                             get_all_keys(v,keys)
+        #                         else:
+        #                             keys[k]=v
+        #                     return keys
+        #                 labels=['Vessel Operations','Labor','Tenants','Stormwater Revenue','Other Revenue',
+        #                        'TOTAL REVENUE',
+        #                        'OPERATING EXPENSES',
+        #                        'Operating Overhead','Terminal Operating Expense','Outside Professional Services','Labor','Vessel Operational Expenses',
+        #                              'Stormwater Operating Expenses','Utilities',
+        #                         "MAINTENANCE EXPENSES",
+        #                         'Maintenance Overhead','Property Maintenance','Equipment Maintenance','Stormwater Maintenance Expenses',
+        #                               'Other Maintenance Expenses',
+        #                         "DEPRECIATION",
+        #                         'Depreciation Terminal','Depreciation Grants','Depreciation Stormwater',
+        #                          "G&A OVERHEAD",
+        #                         'Executive G&A Overhead','Marketing G&A Overhead',
+        #                         'Finance G&A Overhead','Engineering G&A Overhead',
+        #                              'I/S G&A Overhead','Administrative G&A Overhead',
+        #                         "Excess Revenue",
+        #                         "Loss After Depreciation"]
                 
-                        keys={}
+        #                 keys={}
                         
-                        revs=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Revenues"][i],keys).keys())]["Net"].sum()) for i in labels[:5]]
+        #                 revs=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Revenues"][i],keys).keys())]["Net"].sum()) for i in labels[:5]]
                 
-                        ops=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Operating Expenses"][i],keys).keys())]["Net"].sum()) for i in labels[7:14]]
+        #                 ops=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Operating Expenses"][i],keys).keys())]["Net"].sum()) for i in labels[7:14]]
                 
-                        maint=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Maintenance Expenses"][i],keys).keys())]["Net"].sum())for i in labels[15:20]]
+        #                 maint=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Maintenance Expenses"][i],keys).keys())]["Net"].sum())for i in labels[15:20]]
                 
-                        dep=[abs(ledger_b[ledger_b["Account"]==key_from_value(budget["Depreciation"],i)]["Net"].sum()) for i in labels[21:24]]
+        #                 dep=[abs(ledger_b[ledger_b["Account"]==key_from_value(budget["Depreciation"],i)]["Net"].sum()) for i in labels[21:24]]
                 
-                        overhead=[abs(ledger_b[ledger_b["Account"]==key_from_value(budget["G & A Overhead"],i)]["Net"].sum()) for i in labels[25:31]]
-                        overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
-                        valerians=[]
-                        for i in revs:
-                            valerians.append(i)
-                        valerians.append(sum(revs))
-                        valerians.append(sum(ops))
-                        for i in ops:
-                            valerians.append(i)
-                        valerians.append(sum(maint))
-                        for i in maint:
-                            valerians.append(i)
-                        valerians.append(sum(dep))
-                        for i in dep:
-                            valerians.append(i)
+        #                 overhead=[abs(ledger_b[ledger_b["Account"]==key_from_value(budget["G & A Overhead"],i)]["Net"].sum()) for i in labels[25:31]]
+        #                 overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
+        #                 valerians=[]
+        #                 for i in revs:
+        #                     valerians.append(i)
+        #                 valerians.append(sum(revs))
+        #                 valerians.append(sum(ops))
+        #                 for i in ops:
+        #                     valerians.append(i)
+        #                 valerians.append(sum(maint))
+        #                 for i in maint:
+        #                     valerians.append(i)
+        #                 valerians.append(sum(dep))
+        #                 for i in dep:
+        #                     valerians.append(i)
                 
-                        valerians.append(sum(overhead))
-                        for i in overhead:
-                            valerians.append(i)
+        #                 valerians.append(sum(overhead))
+        #                 for i in overhead:
+        #                     valerians.append(i)
                 
-                        valerians.append(overall)
+        #                 valerians.append(overall)
                 
-                        valerians.append(overall)
+        #                 valerians.append(overall)
                 
-                        valerians=['<b>${:,.1f}<b>'.format(round(i,1)) for i in valerians]
-                        labels=[f'<b>{i}<b>' for i in labels]
-                        if overall>0:
+        #                 valerians=['<b>${:,.1f}<b>'.format(round(i,1)) for i in valerians]
+        #                 labels=[f'<b>{i}<b>' for i in labels]
+        #                 if overall>0:
                             
                           
-                            source=[0,1,2,3,4]+[5,5, 5 ,5,5]+ [6,6,6, 6, 6, 6, 6]+[14,14,14,14,14]+[20,20,20]+[24,24,24,24,24,24]
-                            target=[5,5,5,5,5]+[6,14,20,24,31]+[7,8,9,10,11,12,13]+[15,16,17,18,19]+[21,22,23]+[25,26,27,28,29,30,]
-                            values=revs+[sum(ops)]+[sum(maint)]+[sum(dep)]+[sum(overhead)]+[overall]+ops+maint+dep+overhead
-                            linkcolor=['#66CD00']*5+\
-                                  ['#FFB90F','#BF3EFF', '#A6E3D7', '#EC7063','#FFC0CB',]+\
-                                    ['#FFB90F']*7+\
-                                        ['#BF3EFF']*5+\
-                                    ['#A6E3D7']*3+\
-                                    ['#EC7063']*6
-                        else:
+        #                     source=[0,1,2,3,4]+[5,5, 5 ,5,5]+ [6,6,6, 6, 6, 6, 6]+[14,14,14,14,14]+[20,20,20]+[24,24,24,24,24,24]
+        #                     target=[5,5,5,5,5]+[6,14,20,24,31]+[7,8,9,10,11,12,13]+[15,16,17,18,19]+[21,22,23]+[25,26,27,28,29,30,]
+        #                     values=revs+[sum(ops)]+[sum(maint)]+[sum(dep)]+[sum(overhead)]+[overall]+ops+maint+dep+overhead
+        #                     linkcolor=['#66CD00']*5+\
+        #                           ['#FFB90F','#BF3EFF', '#A6E3D7', '#EC7063','#FFC0CB',]+\
+        #                             ['#FFB90F']*7+\
+        #                                 ['#BF3EFF']*5+\
+        #                             ['#A6E3D7']*3+\
+        #                             ['#EC7063']*6
+        #                 else:
                             
                            
-                            source=[0,1,2,3,4,32]+[5,5, 5 ,5,]+ [6,6,6, 6, 6, 6, 6]+[14,14,14,14,14]+[20,20,20]+[24,24,24,24,24,24]
-                            target=[5,5,5,5,5,5]+[6,14,20,24,]+[7,8,9,10,11,12,13]+[15,16,17,18,19]+[21,22,23]+[25,26,27,28,29,30,]
-                            values=revs+[abs(overall)]+[sum(ops)]+[sum(maint)]+[sum(dep)]+[sum(overhead)]+ops+maint+dep+overhead
-                            linkcolor=['#66CD00']*5+['#FFC0CB']+\
-                                  ['#FFB90F','#BF3EFF', '#A6E3D7', '#EC7063',]+\
-                                    ['#FFB90F']*7+\
-                                        ['#BF3EFF']*5+\
-                                    ['#A6E3D7']*3+\
-                                    ['#EC7063']*6
-                        #'#104E8B'
-                        title_=f'{year}-YTD' if year=="2023" else year  
-                        fig = go.Figure(data=[go.Sankey(
-                            node = dict(
-                            thickness = 10,
-                            #label = [f'<b>{i}<b>'+"-"+str(valerians[labels.index(i)]) for i in labels],
-                           # label = [str(valerians[labels.index(i)]) for i in labels],
-                            #label = [i+" - "+str(valerians[labels.index(i)]) for i in labels],
-                            label=[f'<b>{i} - {str(valerians[labels.index(i)])}</b>' for i in labels],
-                            color = [
-                                    '#808B96', 
-                                    '#EC7063', '#F7DC6F', '#48C9B0', '#AF7AC5',
-                                    '#EC7063', '#EC7063',
-                                    '#F7DC6F', '#F7DC6F',
-                                    '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0',
-                                    '#AF7AC5', '#AF7AC5', '#AF7AC5'] #"cyan"
-                                        ),
-                            link = dict(
+        #                     source=[0,1,2,3,4,32]+[5,5, 5 ,5,]+ [6,6,6, 6, 6, 6, 6]+[14,14,14,14,14]+[20,20,20]+[24,24,24,24,24,24]
+        #                     target=[5,5,5,5,5,5]+[6,14,20,24,]+[7,8,9,10,11,12,13]+[15,16,17,18,19]+[21,22,23]+[25,26,27,28,29,30,]
+        #                     values=revs+[abs(overall)]+[sum(ops)]+[sum(maint)]+[sum(dep)]+[sum(overhead)]+ops+maint+dep+overhead
+        #                     linkcolor=['#66CD00']*5+['#FFC0CB']+\
+        #                           ['#FFB90F','#BF3EFF', '#A6E3D7', '#EC7063',]+\
+        #                             ['#FFB90F']*7+\
+        #                                 ['#BF3EFF']*5+\
+        #                             ['#A6E3D7']*3+\
+        #                             ['#EC7063']*6
+        #                 #'#104E8B'
+        #                 title_=f'{year}-YTD' if year=="2023" else year  
+        #                 fig = go.Figure(data=[go.Sankey(
+        #                     node = dict(
+        #                     thickness = 10,
+        #                     #label = [f'<b>{i}<b>'+"-"+str(valerians[labels.index(i)]) for i in labels],
+        #                    # label = [str(valerians[labels.index(i)]) for i in labels],
+        #                     #label = [i+" - "+str(valerians[labels.index(i)]) for i in labels],
+        #                     label=[f'<b>{i} - {str(valerians[labels.index(i)])}</b>' for i in labels],
+        #                     color = [
+        #                             '#808B96', 
+        #                             '#EC7063', '#F7DC6F', '#48C9B0', '#AF7AC5',
+        #                             '#EC7063', '#EC7063',
+        #                             '#F7DC6F', '#F7DC6F',
+        #                             '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0',
+        #                             '#AF7AC5', '#AF7AC5', '#AF7AC5'] #"cyan"
+        #                                 ),
+        #                     link = dict(
                 
-                            # indices correspond to labels
-                            source = source,
-                            target = target,
-                            value = values,
-                            color=linkcolor
-                            )
-                        )])
-                        # fig.add_annotation(
-                        #                                         x=0.5,
-                        #                                         y=-0.05,
-                        #                                         text="From Budgeted Monthly",
-                        #                                         showarrow=False,
-                        #                                         font=dict(
-                        #                                             size=16,
-                        #                                             color="darkblue",
-                        #                                             family="Arial"
-                        #                                         )
-                        #                                     )
-                        fig.update_layout(width=1200, height=800,
-                            title=title_,hovermode = 'x',
+        #                     # indices correspond to labels
+        #                     source = source,
+        #                     target = target,
+        #                     value = values,
+        #                     color=linkcolor
+        #                     )
+        #                 )])
+        #                 # fig.add_annotation(
+        #                 #                                         x=0.5,
+        #                 #                                         y=-0.05,
+        #                 #                                         text="From Budgeted Monthly",
+        #                 #                                         showarrow=False,
+        #                 #                                         font=dict(
+        #                 #                                             size=16,
+        #                 #                                             color="darkblue",
+        #                 #                                             family="Arial"
+        #                 #                                         )
+        #                 #                                     )
+        #                 fig.update_layout(width=1200, height=800,
+        #                     title=title_,hovermode = 'x',
                                           
-                            font=dict(size = 12, color = 'black'),paper_bgcolor='#FCE6C9',margin=dict(
-                                l=50,  # Set the left margin to 50 pixels
-                                r=350,  # Set the right margin to 150 pixels
-                                t=50,  # Set the top margin to 50 pixels
-                                b=50,  # Set the bottom margin to 50 pixels
-                            ),
+        #                     font=dict(size = 12, color = 'black'),paper_bgcolor='#FCE6C9',margin=dict(
+        #                         l=50,  # Set the left margin to 50 pixels
+        #                         r=350,  # Set the right margin to 150 pixels
+        #                         t=50,  # Set the top margin to 50 pixels
+        #                         b=50,  # Set the bottom margin to 50 pixels
+        #                     ),
                                           
                 
                 
-                        )
-                        st.plotly_chart(fig)
-                    #fig.write_html(fr'c:\Users\{loc}\Desktop\OldBudget.html')
-                    #fig.show()
+        #                 )
+        #                 st.plotly_chart(fig)
+        #             #fig.write_html(fr'c:\Users\{loc}\Desktop\OldBudget.html')
+        #             #fig.show()
                 
                 
-                    with fintab3:
-                        resim=gcp_download_x(target_bucket,rf"FIN/2023Adopted.png")
-                        resim=Image.open(io.BytesIO(resim))
+        #             with fintab3:
+        #                 resim=gcp_download_x(target_bucket,rf"FIN/2023Adopted.png")
+        #                 resim=Image.open(io.BytesIO(resim))
                         
-                        agree = st.checkbox('CHECK BOX TO SEE 2023 BUDGET STRUCTURE')
+        #                 agree = st.checkbox('CHECK BOX TO SEE 2023 BUDGET STRUCTURE')
                 
-                        if agree:
-                            st.image(resim)
+        #                 if agree:
+        #                     st.image(resim)
                         
-                        temp=gcp_download_x(target_bucket,rf"FIN/Budget_2025.ftr")
-                        temp=pd.read_feather(io.BytesIO(temp)) 
-                        #temp2023=gcp_download_x(target_bucket,rf"FIN/main2023.ftr")
-                        #temp2023=pd.read_feather(io.BytesIO(temp2023))
-                        # temp["Account"]=temp["Account"].astype("str")
-                        # temp.set_index("index",drop=True,inplace=True)
-                        # temp.Account=[str(i)+"-"+str(j) for i,j in zip(temp.Account,temp.Sub_Cat)]
-                        st.write(temp)
-                        #temp2023["Account"]=temp2023["Account"].astype("str")
-                        #temp2023.set_index("index",drop=True,inplace=True)
-                        #temp2023.Account=[str(i)+"-"+str(j) for i,j in zip(temp2023.Account,temp2023.Sub_Cat)]
+        #                 temp=gcp_download_x(target_bucket,rf"FIN/Budget_2025.ftr")
+        #                 temp=pd.read_feather(io.BytesIO(temp)) 
+        #                 #temp2023=gcp_download_x(target_bucket,rf"FIN/main2023.ftr")
+        #                 #temp2023=pd.read_feather(io.BytesIO(temp2023))
+        #                 # temp["Account"]=temp["Account"].astype("str")
+        #                 # temp.set_index("index",drop=True,inplace=True)
+        #                 # temp.Account=[str(i)+"-"+str(j) for i,j in zip(temp.Account,temp.Sub_Cat)]
+        #                 st.write(temp)
+        #                 #temp2023["Account"]=temp2023["Account"].astype("str")
+        #                 #temp2023.set_index("index",drop=True,inplace=True)
+        #                 #temp2023.Account=[str(i)+"-"+str(j) for i,j in zip(temp2023.Account,temp2023.Sub_Cat)]
                         
-                        # temp1=budget_codes.copy()
-                        # temp1.drop(columns=["2021 Final"],inplace=True)
-                        # temp1.insert(5,"2022 Actual",[temp[temp["Account"]==i]["Net"].sum() for i in temp1.Account])
-                        # temp1.insert(6,"2022 Monthly",[round(temp[temp["Account"]==i]["Net"].sum()/12,1) for i in temp1.Account])
-                        # months=int(temp2023.Date.max().month)-1
-                        # st.write(months)
+        #                 # temp1=budget_codes.copy()
+        #                 # temp1.drop(columns=["2021 Final"],inplace=True)
+        #                 # temp1.insert(5,"2022 Actual",[temp[temp["Account"]==i]["Net"].sum() for i in temp1.Account])
+        #                 # temp1.insert(6,"2022 Monthly",[round(temp[temp["Account"]==i]["Net"].sum()/12,1) for i in temp1.Account])
+        #                 # months=int(temp2023.Date.max().month)-1
+        #                 # st.write(months)
                         
-                        #months=5
-                        # temp1["2023 Monthly Budgeted"]=[round(i/12,2) for i in temp1["2023 Adopted"]]
-                        # temp1["2023 Monthly"]=[round(temp2023[temp2023["Account"]==i]["Net"].sum()/months,1) for i in temp1.Account]
-                        # x=gcp_download_x(target_bucket,rf"FIN/2024annual-try.pkl")
-                        # x=io.BytesIO(x)
-                        # temp1["2024 PROPOSED"]= pd.read_pickle(x)["2024 PROPOSED"]
-                        # temp1["2024 Monthly"]=[round(i/12,1) for i in temp1["2024 PROPOSED"]]
-                        # temp1=st.experimental_data_editor(temp1)
-                        # if st.button("SAVE 2024 BUDGET EDITS"):
+        #                 #months=5
+        #                 # temp1["2023 Monthly Budgeted"]=[round(i/12,2) for i in temp1["2023 Adopted"]]
+        #                 # temp1["2023 Monthly"]=[round(temp2023[temp2023["Account"]==i]["Net"].sum()/months,1) for i in temp1.Account]
+        #                 # x=gcp_download_x(target_bucket,rf"FIN/2024annual-try.pkl")
+        #                 # x=io.BytesIO(x)
+        #                 # temp1["2024 PROPOSED"]= pd.read_pickle(x)["2024 PROPOSED"]
+        #                 # temp1["2024 Monthly"]=[round(i/12,1) for i in temp1["2024 PROPOSED"]]
+        #                 # temp1=st.experimental_data_editor(temp1)
+        #                 # if st.button("SAVE 2024 BUDGET EDITS"):
                             
-                        #     temp1["2024 PROPOSED"].to_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual.pkl')
-                        #     temp1.to_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')
-                        #     temp1.to_excel(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.xlsx')
-                        #     temp1 = pd.read_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')
-                        # b1,b2,b3,b4= st.columns([2,2,2,6])
+        #                 #     temp1["2024 PROPOSED"].to_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual.pkl')
+        #                 #     temp1.to_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')
+        #                 #     temp1.to_excel(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.xlsx')
+        #                 #     temp1 = pd.read_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')
+        #                 # b1,b2,b3,b4= st.columns([2,2,2,6])
                         
-                        # with b1:
-                        #     sankey=temp1.groupby(["Group"])[["2022 Adopted"]].sum()
+        #                 # with b1:
+        #                 #     sankey=temp1.groupby(["Group"])[["2022 Adopted"]].sum()
                             
-                        #     st.write(sankey)
-                        # with b2:
-                        #     sankey=temp1.groupby(["Group"])[["2022 Actual"]].sum()
+        #                 #     st.write(sankey)
+        #                 # with b2:
+        #                 #     sankey=temp1.groupby(["Group"])[["2022 Actual"]].sum()
                             
-                        #     st.write(sankey)
-                        # with b3:
-                        #     sankey=temp1.groupby(["Group"])[["2023 Adopted"]].sum()
+        #                 #     st.write(sankey)
+        #                 # with b3:
+        #                 #     sankey=temp1.groupby(["Group"])[["2023 Adopted"]].sum()
                             
-                        #     st.write(sankey)
-                    #             revs=[temp.loc[("Revenue",i)].values[0] for i in labels[:5]]
-                    # 
-                    #             ops=[abs(temp.loc[("Operating Expenses",i)].values[0]) for i in labels[7:13]]
-                    #             maint=[abs(temp.loc[("Maintenance Expenses",i)].values[0]) for i in labels[14:19]]
-                    #             dep=[abs(temp.loc[("Depreciation",i)].values[0]) for i in labels[20:22]]
-                    #             overhead=[abs(temp.loc[("Overhead",i)].values[0]) for i in labels[22:23]]
-                    #             overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
-                    #             #print(overall)
-                    #             revs
-                    with fintab4:
-                        ear=st.selectbox("Select Year",["2024","2023","2022","2021"],key="yeartab2")
+        #                 #     st.write(sankey)
+        #             #             revs=[temp.loc[("Revenue",i)].values[0] for i in labels[:5]]
+        #             # 
+        #             #             ops=[abs(temp.loc[("Operating Expenses",i)].values[0]) for i in labels[7:13]]
+        #             #             maint=[abs(temp.loc[("Maintenance Expenses",i)].values[0]) for i in labels[14:19]]
+        #             #             dep=[abs(temp.loc[("Depreciation",i)].values[0]) for i in labels[20:22]]
+        #             #             overhead=[abs(temp.loc[("Overhead",i)].values[0]) for i in labels[22:23]]
+        #             #             overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
+        #             #             #print(overall)
+        #             #             revs
+        #             with fintab4:
+        #                 ear=st.selectbox("Select Year",["2024","2023","2022","2021"],key="yeartab2")
                 
-                        ledgers=gcp_download_x(target_bucket,rf"FIN/main{ear}.ftr")
-                        ledgers=pd.read_feather(io.BytesIO(ledgers))
-                        ledgers["Account"]=ledgers["Account"].astype("str")
-                        ledgers.set_index("index",drop=True,inplace=True)
-                        #st.write(ledgers)
+        #                 ledgers=gcp_download_x(target_bucket,rf"FIN/main{ear}.ftr")
+        #                 ledgers=pd.read_feather(io.BytesIO(ledgers))
+        #                 ledgers["Account"]=ledgers["Account"].astype("str")
+        #                 ledgers.set_index("index",drop=True,inplace=True)
+        #                 #st.write(ledgers)
         
-                        for_search_ledger=ledgers.fillna("")
+        #                 for_search_ledger=ledgers.fillna("")
                         
-                        vendor,job=st.tabs(["SEARCH BY VENDOR","SEARCH BY JOB"])
-                        with vendor:
+        #                 vendor,job=st.tabs(["SEARCH BY VENDOR","SEARCH BY JOB"])
+        #                 with vendor:
                             
-                            pattern = r'^([A-Z&]{3}\d{3})\s+(.+)$'
-                            vendors={}
-                            tata=[]
-                            # Loop over the strings and print the vendor codes and names
-                            for s in ledgers["Description"].values.tolist():
-                                s=str(s)
-                                tata.append(s)
-                                try:
-                                    match = re.match(pattern, s)
-                                    if match:
-                                        vendor_code = match.group(1)
-                                        vendor_name = match.group(2)
-                                        vendors[vendor_name]=vendor_code
-                                        #print(f'{vendor_code} {vendor_name}')
-                                except:
-                                    pass
+        #                     pattern = r'^([A-Z&]{3}\d{3})\s+(.+)$'
+        #                     vendors={}
+        #                     tata=[]
+        #                     # Loop over the strings and print the vendor codes and names
+        #                     for s in ledgers["Description"].values.tolist():
+        #                         s=str(s)
+        #                         tata.append(s)
+        #                         try:
+        #                             match = re.match(pattern, s)
+        #                             if match:
+        #                                 vendor_code = match.group(1)
+        #                                 vendor_name = match.group(2)
+        #                                 vendors[vendor_name]=vendor_code
+        #                                 #print(f'{vendor_code} {vendor_name}')
+        #                         except:
+        #                             pass
                             
                             
                             
-                            #match = re.match(pattern, tata[1500])
+        #                     #match = re.match(pattern, tata[1500])
                        
                 
-                            string_=st.selectbox("Select Vendor",vendors.keys(),key="vendor")
+        #                     string_=st.selectbox("Select Vendor",vendors.keys(),key="vendor")
                        
                             
-                            if string_:
-                                st.subheader(f"{vendors[string_]} - {string_} {ear} Expenses")
-                                temp=ledgers[ledgers["Description"].str.contains(string_).fillna(False)]
+        #                     if string_:
+        #                         st.subheader(f"{vendors[string_]} - {string_} {ear} Expenses")
+        #                         temp=ledgers[ledgers["Description"].str.contains(string_).fillna(False)]
                                 
-                                total='${:,.1f}'.format(temp.Net.sum())
-                                total=f"<b>TOTAL = {total}</b>"
-                                try:
-                                    st.table(temp)
-                                    st.markdown(total,unsafe_allow_html=True)
-                                except:
-                                    st.write("NO RESULTS")
-                        with job:
+        #                         total='${:,.1f}'.format(temp.Net.sum())
+        #                         total=f"<b>TOTAL = {total}</b>"
+        #                         try:
+        #                             st.table(temp)
+        #                             st.markdown(total,unsafe_allow_html=True)
+        #                         except:
+        #                             st.write("NO RESULTS")
+        #                 with job:
                             
                         
-                            jobs=[]
-                            pattern = r"\b\d+\b"
-                            # Loop over the strings and print the vendor codes and names
-                            for s in ledgers["Job_No"].values.tolist():
+        #                     jobs=[]
+        #                     pattern = r"\b\d+\b"
+        #                     # Loop over the strings and print the vendor codes and names
+        #                     for s in ledgers["Job_No"].values.tolist():
                                 
-                                try:
-                                    match = re.match(pattern, s)
-                                except:
-                                    pass
-                                if match:
-                                    jobs.append(s)
+        #                         try:
+        #                             match = re.match(pattern, s)
+        #                         except:
+        #                             pass
+        #                         if match:
+        #                             jobs.append(s)
                                     
                             
-                            jobs=ledgers["Job_No"].unique().tolist()
-                            string_=st.selectbox("Select Job",jobs,key="job")
-                            if string_:
-                                st.subheader(f"{string_} {ear} Records")
-                                temp=ledgers[ledgers["Job_No"].str.contains(string_).fillna(False)]
+        #                     jobs=ledgers["Job_No"].unique().tolist()
+        #                     string_=st.selectbox("Select Job",jobs,key="job")
+        #                     if string_:
+        #                         st.subheader(f"{string_} {ear} Records")
+        #                         temp=ledgers[ledgers["Job_No"].str.contains(string_).fillna(False)]
                                 
-                                total='${:,.1f}'.format(temp.Net.sum())
-                                total=f"<b>TOTAL = {total}</b>"
-                                try:
-                                    st.table(temp)
-                                    st.markdown(total,unsafe_allow_html=True)
-                                except:
-                                    st.write("NO RESULTS")
-                            st.write(jobs)
-                #                 print(f'{vendor_code} {vendor_name}')
-                #                 filtered=[]
-                #                 for i in for_search_ledger.index:
-                #                     #st.write(i)
-                #                     result=re.findall(fr'{string_}',for_search_ledger.loc[i,"Job_No"],re.IGNORECASE)
-                #                     #st.write(result)
-                #                     #st.write(for_search_ledger.loc[i,"Description"])
-                # #                     if string_ in for_search_ledger.loc[i,"Description"]:
-                # #                         st.write("ysy")
-                #                     if len(result)>0:
-                #                         filtered.append(i)
-                #                         temp=for_search_ledger.loc[filtered]
+        #                         total='${:,.1f}'.format(temp.Net.sum())
+        #                         total=f"<b>TOTAL = {total}</b>"
+        #                         try:
+        #                             st.table(temp)
+        #                             st.markdown(total,unsafe_allow_html=True)
+        #                         except:
+        #                             st.write("NO RESULTS")
+        #                     st.write(jobs)
+        #         #                 print(f'{vendor_code} {vendor_name}')
+        #         #                 filtered=[]
+        #         #                 for i in for_search_ledger.index:
+        #         #                     #st.write(i)
+        #         #                     result=re.findall(fr'{string_}',for_search_ledger.loc[i,"Job_No"],re.IGNORECASE)
+        #         #                     #st.write(result)
+        #         #                     #st.write(for_search_ledger.loc[i,"Description"])
+        #         # #                     if string_ in for_search_ledger.loc[i,"Description"]:
+        #         # #                         st.write("ysy")
+        #         #                     if len(result)>0:
+        #         #                         filtered.append(i)
+        #         #                         temp=for_search_ledger.loc[filtered]
                                 
-                        #st.write(final)
-                    with fintab5:
-                        year=st.selectbox("SELECT YEAR",["2023","2022","2021","2020","2019","2018","2017"],key="depreciation")
-                        terminal_depreciation=gcp_download_x(target_bucket,rf"FIN/main{year}-30.ftr")
-                        terminal_depreciation=pd.read_feather(io.BytesIO(terminal_depreciation)).set_index("index",drop=True).reset_index(drop=True)
+        #                 #st.write(final)
+        #             with fintab5:
+        #                 year=st.selectbox("SELECT YEAR",["2023","2022","2021","2020","2019","2018","2017"],key="depreciation")
+        #                 terminal_depreciation=gcp_download_x(target_bucket,rf"FIN/main{year}-30.ftr")
+        #                 terminal_depreciation=pd.read_feather(io.BytesIO(terminal_depreciation)).set_index("index",drop=True).reset_index(drop=True)
                         
-                        a=terminal_depreciation[terminal_depreciation["Account"].isin( [i for i in terminal_depreciation.Account.unique().tolist() if i>1700000 and  i<2000000])]
-                        a=a.groupby(["Account"])[["Credit"]].sum()
-                        a.insert(0,"Name",[terminal_depreciation.loc[terminal_depreciation["Account"]==i,"Name"].values[0] for i in a.index])
+        #                 a=terminal_depreciation[terminal_depreciation["Account"].isin( [i for i in terminal_depreciation.Account.unique().tolist() if i>1700000 and  i<2000000])]
+        #                 a=a.groupby(["Account"])[["Credit"]].sum()
+        #                 a.insert(0,"Name",[terminal_depreciation.loc[terminal_depreciation["Account"]==i,"Name"].values[0] for i in a.index])
                         
-                        divisor=3 if year=="2023" else 12
+        #                 divisor=3 if year=="2023" else 12
                         
                         
                         
-                        th_props = [
-                              ('font-size', '16px'),
-                              ('text-align', 'center'),
-                              ('font-weight', 'bold'),
-                              ('color', '#6d6d6d'),
-                              ('background-color', '#f7ffff')
-                              ]
+        #                 th_props = [
+        #                       ('font-size', '16px'),
+        #                       ('text-align', 'center'),
+        #                       ('font-weight', 'bold'),
+        #                       ('color', '#6d6d6d'),
+        #                       ('background-color', '#f7ffff')
+        #                       ]
                                                            
-                        td_props = [
-                          ('font-size', '15px'),
-                          ('background-color', '#r9f9ff')
-                          ]
-                        def highlight_total(val):
-                            return 'font-weight: bold; font-size: 30px;'
+        #                 td_props = [
+        #                   ('font-size', '15px'),
+        #                   ('background-color', '#r9f9ff')
+        #                   ]
+        #                 def highlight_total(val):
+        #                     return 'font-weight: bold; font-size: 30px;'
                            
-                        styles = [
-                                  dict(selector="th", props=th_props),
-                                  dict(selector="td", props=td_props)
-                                  ]
+        #                 styles = [
+        #                           dict(selector="th", props=th_props),
+        #                           dict(selector="td", props=td_props)
+        #                           ]
                         
-                    #             sns.set_style("darkgrid", {"axes.facecolor": ".9"})
-                    #                      
-                    #             colors = ['#FFD700', '#32CD32', '#FF69B4', '#ADD8E6', '#FFA07A']
-                    #             
-                    #             width = st.sidebar.slider("plot width", 1, 25, 3)
-                    #             height = st.sidebar.slider("plot height", 1, 25, 1)
-                    #             selection=st.sidebar.checkbox("I agree")
-                    #             fig, ax = plt.subplots(figsize=(6,4))
-                    #             
-                    #             ax.axis('off')
-                    #             labels = [f'{name[5:]}\n${credit:,.2f}' if credit>50000 else "*" for name, credit in zip(a.index, a['Credit'])]
-                    #             
-                    #             squarify.plot(sizes=a['Credit'], label=labels, color=colors, alpha=0.8, text_kwargs={'fontsize':6, 'fontweight':'bold'})
-                    #             plt.title(f'TERMINAL DEPRECIATION - {year}', fontweight='bold', fontsize=14, y=1.08)
-                    #             small_items = a[a['Credit'] <= 50000][['Credit']]
-                    #             small_ax = fig.add_axes([0.905, 0.3, 0.1, 0.5])
-                    #             small_ax.barh(y=[i[5:] for i in small_items.index], width=small_items['Credit'], color='#808080')
-                    #             small_ax.set_xlabel('Amount')
-                    #             small_ax.yaxis.set_label_position("right")
-                    #             small_ax.yaxis.tick_right()
-                    #             #fig.set_size_inches(4, 6)
-                        labels = [f'{name[5:]}\n${credit:,.2f}' if credit>50000 else "*" for name, credit in zip(a["Name"], a['Credit'])]
-                        fig = px.treemap(a, 
-                             path=["Name"], 
-                             values='Credit',
-                                         labels={"Name":labels},
-                             color='Credit',
-                             color_continuous_scale='Blues')
+        #             #             sns.set_style("darkgrid", {"axes.facecolor": ".9"})
+        #             #                      
+        #             #             colors = ['#FFD700', '#32CD32', '#FF69B4', '#ADD8E6', '#FFA07A']
+        #             #             
+        #             #             width = st.sidebar.slider("plot width", 1, 25, 3)
+        #             #             height = st.sidebar.slider("plot height", 1, 25, 1)
+        #             #             selection=st.sidebar.checkbox("I agree")
+        #             #             fig, ax = plt.subplots(figsize=(6,4))
+        #             #             
+        #             #             ax.axis('off')
+        #             #             labels = [f'{name[5:]}\n${credit:,.2f}' if credit>50000 else "*" for name, credit in zip(a.index, a['Credit'])]
+        #             #             
+        #             #             squarify.plot(sizes=a['Credit'], label=labels, color=colors, alpha=0.8, text_kwargs={'fontsize':6, 'fontweight':'bold'})
+        #             #             plt.title(f'TERMINAL DEPRECIATION - {year}', fontweight='bold', fontsize=14, y=1.08)
+        #             #             small_items = a[a['Credit'] <= 50000][['Credit']]
+        #             #             small_ax = fig.add_axes([0.905, 0.3, 0.1, 0.5])
+        #             #             small_ax.barh(y=[i[5:] for i in small_items.index], width=small_items['Credit'], color='#808080')
+        #             #             small_ax.set_xlabel('Amount')
+        #             #             small_ax.yaxis.set_label_position("right")
+        #             #             small_ax.yaxis.tick_right()
+        #             #             #fig.set_size_inches(4, 6)
+        #                 labels = [f'{name[5:]}\n${credit:,.2f}' if credit>50000 else "*" for name, credit in zip(a["Name"], a['Credit'])]
+        #                 fig = px.treemap(a, 
+        #                      path=["Name"], 
+        #                      values='Credit',
+        #                                  labels={"Name":labels},
+        #                      color='Credit',
+        #                      color_continuous_scale='Blues')
                 
-                    # Update the layout
-                        fig.update_layout(
-                            margin=dict(t=50, l=0, r=0, b=0),
-                            font=dict(size=16),
-                            title='TERMINAL DEPRECIATION',
-                            title_font_size=24,
-                            title_font_family='Arial')
+        #             # Update the layout
+        #                 fig.update_layout(
+        #                     margin=dict(t=50, l=0, r=0, b=0),
+        #                     font=dict(size=16),
+        #                     title='TERMINAL DEPRECIATION',
+        #                     title_font_size=24,
+        #                     title_font_family='Arial')
                 
-                    # Show the plot
+        #             # Show the plot
                 
                         
-                        st.plotly_chart(fig)
-                        a.set_index("Name",drop=True,inplace=True)
-                        a.loc["TOTAL"]=a.sum()
-                        a["Monthly"]=['${:,.1f}'.format(i/divisor) for i in a["Credit"]]          
-                        a["Credit"]=['${:,.1f}'.format(i) for i in a["Credit"]]
+        #                 st.plotly_chart(fig)
+        #                 a.set_index("Name",drop=True,inplace=True)
+        #                 a.loc["TOTAL"]=a.sum()
+        #                 a["Monthly"]=['${:,.1f}'.format(i/divisor) for i in a["Credit"]]          
+        #                 a["Credit"]=['${:,.1f}'.format(i) for i in a["Credit"]]
                         
-                        a=a.style.set_properties(**{'text-align': 'left'}).set_table_styles(styles).applymap(highlight_total, subset=pd.IndexSlice["TOTAL", ["Credit","Monthly"]])
-                        st.table(a)    
-                    with fintab6:
-                        ledgers=gcp_download_x(target_bucket,rf"FIN/all_ledgers.ftr")
-                        ledgers=pd.read_feather(io.BytesIO(ledgers))
-                        ledgers["Account"]=ledgers["Account"].astype("str")
-                        #ledgers.set_index("index",drop=True,inplace=True)
-                        for_search_ledger=ledgers.fillna("")
+        #                 a=a.style.set_properties(**{'text-align': 'left'}).set_table_styles(styles).applymap(highlight_total, subset=pd.IndexSlice["TOTAL", ["Credit","Monthly"]])
+        #                 st.table(a)    
+        #             with fintab6:
+        #                 ledgers=gcp_download_x(target_bucket,rf"FIN/all_ledgers.ftr")
+        #                 ledgers=pd.read_feather(io.BytesIO(ledgers))
+        #                 ledgers["Account"]=ledgers["Account"].astype("str")
+        #                 #ledgers.set_index("index",drop=True,inplace=True)
+        #                 for_search_ledger=ledgers.fillna("")
                         
-                        vendor,job=st.tabs(["SEARCH BY VENDOR","SEARCH BY JOB"])
-                        with vendor:
+        #                 vendor,job=st.tabs(["SEARCH BY VENDOR","SEARCH BY JOB"])
+        #                 with vendor:
                             
-                            pattern = r'^([A-Z&]{3}\d{3})\s+(.+)$'
-                            vendors={}
-                            tata=[]
-                            # Loop over the strings and print the vendor codes and names
-                            for s in ledgers["Description"].values.tolist():
-                                s=str(s)
-                                tata.append(s)
-                                try:
-                                    match = re.match(pattern, s)
-                                    if match:
-                                        vendor_code = match.group(1)
-                                        vendor_name = match.group(2)
-                                        vendors[vendor_name]=vendor_code
-                                        #print(f'{vendor_code} {vendor_name}')
-                                except:
-                                    pass
+        #                     pattern = r'^([A-Z&]{3}\d{3})\s+(.+)$'
+        #                     vendors={}
+        #                     tata=[]
+        #                     # Loop over the strings and print the vendor codes and names
+        #                     for s in ledgers["Description"].values.tolist():
+        #                         s=str(s)
+        #                         tata.append(s)
+        #                         try:
+        #                             match = re.match(pattern, s)
+        #                             if match:
+        #                                 vendor_code = match.group(1)
+        #                                 vendor_name = match.group(2)
+        #                                 vendors[vendor_name]=vendor_code
+        #                                 #print(f'{vendor_code} {vendor_name}')
+        #                         except:
+        #                             pass
                             
                             
                             
-                            #match = re.match(pattern, tata[1500])
+        #                     #match = re.match(pattern, tata[1500])
                        
                 
-                            string_=st.selectbox("Select Vendor",vendors.keys(),key="vendoeer")
+        #                     string_=st.selectbox("Select Vendor",vendors.keys(),key="vendoeer")
                        
                             
-                            if string_:
-                                st.subheader(f"{vendors[string_]} - {string_} {ear} Expenses")
-                                temp=ledgers[ledgers["Description"].str.contains(string_).fillna(False)]
+        #                     if string_:
+        #                         st.subheader(f"{vendors[string_]} - {string_} {ear} Expenses")
+        #                         temp=ledgers[ledgers["Description"].str.contains(string_).fillna(False)]
                                 
-                                total='${:,.1f}'.format(temp.Net.sum())
-                                total=f"<b>TOTAL = {total}</b>"
-                                try:
-                                    st.write(temp)
-                                    st.markdown(total,unsafe_allow_html=True)
-                                except:
-                                    st.write("NO RESULTS")
-                        with job:
+        #                         total='${:,.1f}'.format(temp.Net.sum())
+        #                         total=f"<b>TOTAL = {total}</b>"
+        #                         try:
+        #                             st.write(temp)
+        #                             st.markdown(total,unsafe_allow_html=True)
+        #                         except:
+        #                             st.write("NO RESULTS")
+        #                 with job:
                             
                         
-                            jobs=[]
-                            pattern = r"\b\d+\b"
-                            # Loop over the strings and print the vendor codes and names
-                            for s in ledgers["Job_No"].values.tolist():
+        #                     jobs=[]
+        #                     pattern = r"\b\d+\b"
+        #                     # Loop over the strings and print the vendor codes and names
+        #                     for s in ledgers["Job_No"].values.tolist():
                                 
-                                try:
-                                    match = re.match(pattern, s)
-                                except:
-                                    pass
-                                if match:
-                                    jobs.append(s)
+        #                         try:
+        #                             match = re.match(pattern, s)
+        #                         except:
+        #                             pass
+        #                         if match:
+        #                             jobs.append(s)
                                     
                             
-                            jobs=ledgers["Job_No"].unique().tolist()
-                            string_=st.selectbox("Select Job",jobs,key="jssob")
-                            if string_:
-                                st.subheader(f"{string_} {ear} Records")
-                                temp=ledgers[ledgers["Job_No"].str.contains(string_).fillna(False)]
+        #                     jobs=ledgers["Job_No"].unique().tolist()
+        #                     string_=st.selectbox("Select Job",jobs,key="jssob")
+        #                     if string_:
+        #                         st.subheader(f"{string_} {ear} Records")
+        #                         temp=ledgers[ledgers["Job_No"].str.contains(string_).fillna(False)]
                                 
-                                total='${:,.1f}'.format(temp.Net.sum())
-                                total=f"<b>TOTAL = {total}</b>"
-                                try:
-                                    st.table(temp)
-                                    st.markdown(total,unsafe_allow_html=True)
-                                except:
-                                    st.write("NO RESULTS")
-                            st.write(jobs)
-                #                 print(f'{vendor_code} {vendor_name}')
-                #                 filtered=[]
-                #                 for i in for_search_ledger.index:
-                #                     #st.write(i)
-                #                     result=re.findall(fr'{string_}',for_search_ledger.loc[i,"Job_No"],re.IGNORECASE)
-                #                     #st.write(result)
-                #                     #st.write(for_search_ledger.loc[i,"Description"])
-                # #                     if string_ in for_search_ledger.loc[i,"Description"]:
-                # #                         st.write("ysy")
-                #                     if len(result)>0:
-                #                         filtered.append(i)
-                #                         temp=for_search_ledger.loc[filtered]
+        #                         total='${:,.1f}'.format(temp.Net.sum())
+        #                         total=f"<b>TOTAL = {total}</b>"
+        #                         try:
+        #                             st.table(temp)
+        #                             st.markdown(total,unsafe_allow_html=True)
+        #                         except:
+        #                             st.write("NO RESULTS")
+        #                     st.write(jobs)
+        #         #                 print(f'{vendor_code} {vendor_name}')
+        #         #                 filtered=[]
+        #         #                 for i in for_search_ledger.index:
+        #         #                     #st.write(i)
+        #         #                     result=re.findall(fr'{string_}',for_search_ledger.loc[i,"Job_No"],re.IGNORECASE)
+        #         #                     #st.write(result)
+        #         #                     #st.write(for_search_ledger.loc[i,"Description"])
+        #         # #                     if string_ in for_search_ledger.loc[i,"Description"]:
+        #         # #                         st.write("ysy")
+        #         #                     if len(result)>0:
+        #         #                         filtered.append(i)
+        #         #                         temp=for_search_ledger.loc[filtered]
                                 
-                        #st.write(final)
+        #                 #st.write(final)
         
             
             
               
-        if select=="STORAGE" :
-            maintenance=False
-            if not maintenance:
-                def calculate_balance(start_tons, daily_rate, storage_rate):
-                    balances={}
-                    tons_remaining = start_tons
-                    accumulated=0
-                    day=1
-                    while tons_remaining>daily_rate:
-                        #print(day)
-                        balances[day]={"Remaining":tons_remaining,"Charge":0,"Accumulated":0}
-                        if day % 7 < 5:  # Consider only weekdays
-                            tons_remaining-=daily_rate
-                            #print(tons_remaining)
+        # if select=="STORAGE" :
+        #     maintenance=False
+        #     if not maintenance:
+        #         def calculate_balance(start_tons, daily_rate, storage_rate):
+        #             balances={}
+        #             tons_remaining = start_tons
+        #             accumulated=0
+        #             day=1
+        #             while tons_remaining>daily_rate:
+        #                 #print(day)
+        #                 balances[day]={"Remaining":tons_remaining,"Charge":0,"Accumulated":0}
+        #                 if day % 7 < 5:  # Consider only weekdays
+        #                     tons_remaining-=daily_rate
+        #                     #print(tons_remaining)
                             
-                            balances[day]={"Remaining":tons_remaining,"Charge":0,"Accumulated":0}
+        #                     balances[day]={"Remaining":tons_remaining,"Charge":0,"Accumulated":0}
                 
-                            # If storage free days are over, start applying storage charges
-                        elif day % 7 in ([5,6]):
-                            balances[day]={"Remaining":tons_remaining,"Charge":0,"Accumulated":accumulated}
-                        if day >free_days_till:
-                            charge = round(tons_remaining*storage_rate,2)  # You can adjust the storage charge after the free days
-                            accumulated+=charge
-                            accumulated=round(accumulated,2)
-                            balances[day]={"Remaining":tons_remaining,"Charge":charge,"Accumulated":accumulated}
+        #                     # If storage free days are over, start applying storage charges
+        #                 elif day % 7 in ([5,6]):
+        #                     balances[day]={"Remaining":tons_remaining,"Charge":0,"Accumulated":accumulated}
+        #                 if day >free_days_till:
+        #                     charge = round(tons_remaining*storage_rate,2)  # You can adjust the storage charge after the free days
+        #                     accumulated+=charge
+        #                     accumulated=round(accumulated,2)
+        #                     balances[day]={"Remaining":tons_remaining,"Charge":charge,"Accumulated":accumulated}
                         
-                        day+=1
-                    return balances
+        #                 day+=1
+        #             return balances
                     
-                here1,here2,here3=st.columns([2,5,3])
+        #         here1,here2,here3=st.columns([2,5,3])
                 
-                with here1:
-                    with st.container(border=True):
-                        initial_tons =st.number_input("START TONNAGE", min_value=1000, help=None, on_change=None,step=50, disabled=False, label_visibility="visible",key="fas2aedseq")
-                        daily_rate=st.slider("DAILY SHIPMENT TONNAGE",min_value=248, max_value=544, step=10,key="fdee2a")
-                        storage_rate = st.number_input("STORAGE RATE DAILY ($)",value=0.15, help="dsds", on_change=None, disabled=False, label_visibility="visible",key="fdee2dsdseq")
-                        free_days_till = st.selectbox("FREE DAYS",[15,30,45,60])
+        #         with here1:
+        #             with st.container(border=True):
+        #                 initial_tons =st.number_input("START TONNAGE", min_value=1000, help=None, on_change=None,step=50, disabled=False, label_visibility="visible",key="fas2aedseq")
+        #                 daily_rate=st.slider("DAILY SHIPMENT TONNAGE",min_value=248, max_value=544, step=10,key="fdee2a")
+        #                 storage_rate = st.number_input("STORAGE RATE DAILY ($)",value=0.15, help="dsds", on_change=None, disabled=False, label_visibility="visible",key="fdee2dsdseq")
+        #                 free_days_till = st.selectbox("FREE DAYS",[15,30,45,60])
                 
-                with here3:
-                    with st.container(border=True):    
-                        balances = calculate_balance(initial_tons, daily_rate, storage_rate)
-                        d=pd.DataFrame(balances).T
-                        start_date = pd.to_datetime('today').date()
-                        end_date = start_date + pd.DateOffset(days=120)  # Adjust as needed
-                        date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+        #         with here3:
+        #             with st.container(border=True):    
+        #                 balances = calculate_balance(initial_tons, daily_rate, storage_rate)
+        #                 d=pd.DataFrame(balances).T
+        #                 start_date = pd.to_datetime('today').date()
+        #                 end_date = start_date + pd.DateOffset(days=120)  # Adjust as needed
+        #                 date_range = pd.date_range(start=start_date, end=end_date, freq='D')
                         
-                        d.columns=["Remaining Tonnage","Daily Charge","Accumulated Charge"]
-                        d.rename_axis("Days",inplace=True)
-                        total=round(d.loc[len(d),'Accumulated Charge'],1)
-                        st.dataframe(d)
+        #                 d.columns=["Remaining Tonnage","Daily Charge","Accumulated Charge"]
+        #                 d.rename_axis("Days",inplace=True)
+        #                 total=round(d.loc[len(d),'Accumulated Charge'],1)
+        #                 st.dataframe(d)
 
-                with here2:
-                    with st.container(border=True):     
-                        st.write(f"######  Cargo: {initial_tons} - Loadout Rate/Day: {daily_rate} Tons - Free Days : {free_days_till}" )
-                        st.write(f"##### TOTAL CHARGES:  ${total}" )
-                        st.write(f"##### DURATION OF LOADOUT:  {len(d)} Days")
-                        st.write(f"##### MONTHLY REVENUE: ${round(total/len(d)*30,1)} ")
-                        fig = px.bar(d, x=d.index, y="Accumulated Charge", title="Accumulated Charges Over Days")
+        #         with here2:
+        #             with st.container(border=True):     
+        #                 st.write(f"######  Cargo: {initial_tons} - Loadout Rate/Day: {daily_rate} Tons - Free Days : {free_days_till}" )
+        #                 st.write(f"##### TOTAL CHARGES:  ${total}" )
+        #                 st.write(f"##### DURATION OF LOADOUT:  {len(d)} Days")
+        #                 st.write(f"##### MONTHLY REVENUE: ${round(total/len(d)*30,1)} ")
+        #                 fig = px.bar(d, x=d.index, y="Accumulated Charge", title="Accumulated Charges Over Days")
     
-                        # Add a horizontal line for the monthly average charge
-                        average_charge = round(total/len(d)*30,1)
-                        fig.add_shape(
-                            dict(
-                                type="line",
-                                x0=d.index.min(),
-                                x1=d.index.max(),
-                                y0=average_charge,
-                                y1=average_charge,
-                                line=dict(color="red", dash="dash"),
-                            )
-                        )
+        #                 # Add a horizontal line for the monthly average charge
+        #                 average_charge = round(total/len(d)*30,1)
+        #                 fig.add_shape(
+        #                     dict(
+        #                         type="line",
+        #                         x0=d.index.min(),
+        #                         x1=d.index.max(),
+        #                         y0=average_charge,
+        #                         y1=average_charge,
+        #                         line=dict(color="red", dash="dash"),
+        #                     )
+        #                 )
                         
-                        # Add annotation with the average charge value
-                        fig.add_annotation(
-                            x=d.index.max()//3,
-                            y=average_charge,
-                            text=f'Monthly Average Income: <b><i>${average_charge:.2f}</b></i> ',
-                            showarrow=True,
-                            arrowhead=4,
-                            ax=-50,
-                            ay=-30,
-                            font=dict(size=16),
-                            bgcolor='rgba(255, 255, 255, 0.6)',
-                        )
+        #                 # Add annotation with the average charge value
+        #                 fig.add_annotation(
+        #                     x=d.index.max()//3,
+        #                     y=average_charge,
+        #                     text=f'Monthly Average Income: <b><i>${average_charge:.2f}</b></i> ',
+        #                     showarrow=True,
+        #                     arrowhead=4,
+        #                     ax=-50,
+        #                     ay=-30,
+        #                     font=dict(size=16),
+        #                     bgcolor='rgba(255, 255, 255, 0.6)',
+        #                 )
                         
-                        # Set layout options
-                        fig.update_layout(
-                            xaxis_title="Days",
-                            yaxis_title="Accumulated Charge",
-                            sliders=[
-                                {
-                                    "steps": [
-                                        {"args": [[{"type": "scatter", "x": d.index, "y": d["Accumulated Charge"]}], "layout"], "label": "All", "method": "animate"},
-                                    ],
-                                }
-                            ],
-                        )
-                        st.plotly_chart(fig)
+        #                 # Set layout options
+        #                 fig.update_layout(
+        #                     xaxis_title="Days",
+        #                     yaxis_title="Accumulated Charge",
+        #                     sliders=[
+        #                         {
+        #                             "steps": [
+        #                                 {"args": [[{"type": "scatter", "x": d.index, "y": d["Accumulated Charge"]}], "layout"], "label": "All", "method": "animate"},
+        #                             ],
+        #                         }
+        #                     ],
+        #                 )
+        #                 st.plotly_chart(fig)
         
         
         
-        if select=="LABOR":
-            labor_issue=False
-            secondary=True
+        # if select=="LABOR":
+        #     labor_issue=False
+        #     secondary=True
             
-            if secondary:
-                pma_rates=gcp_download(target_bucket,rf"LABOR/pma_dues.json")
-                pma_rates=json.loads(pma_rates)
-                assessment_rates=gcp_download(target_bucket,rf"LABOR/occ_codes2023.json")
-                assessment_rates=json.loads(assessment_rates)
-                lab_tab1,lab_tab2,lab_tab3,lab_tab4=st.tabs(["LABOR TEMPLATE", "JOBS","RATES","LOOKUP"])
+        #     if secondary:
+        #         pma_rates=gcp_download(target_bucket,rf"LABOR/pma_dues.json")
+        #         pma_rates=json.loads(pma_rates)
+        #         assessment_rates=gcp_download(target_bucket,rf"LABOR/occ_codes2023.json")
+        #         assessment_rates=json.loads(assessment_rates)
+        #         lab_tab1,lab_tab2,lab_tab3,lab_tab4=st.tabs(["LABOR TEMPLATE", "JOBS","RATES","LOOKUP"])
 
-                with lab_tab4:
-                    itsreadytab4=True
-                    if itsreadytab4:
+        #         with lab_tab4:
+        #             itsreadytab4=True
+        #             if itsreadytab4:
                         
-                        def dfs_sum(dictionary, key):
-                            total_sum = 0
+        #                 def dfs_sum(dictionary, key):
+        #                     total_sum = 0
                         
-                            for k, v in dictionary.items():
-                                if k == key:
-                                    total_sum += v
-                                elif isinstance(v, dict):
-                                    total_sum += dfs_sum(v, key)
+        #                     for k, v in dictionary.items():
+        #                         if k == key:
+        #                             total_sum += v
+        #                         elif isinstance(v, dict):
+        #                             total_sum += dfs_sum(v, key)
                         
-                            return total_sum
-                        mt_jobs_=gcp_download(target_bucket,rf"LABOR/mt_jobs.json")
-                        mt_jobs=json.loads(mt_jobs_)
-                        c1,c2,c3=st.columns([2,2,6])
-                        with c1:
-                            with st.container(border=True):
-                                by_year=st.selectbox("SELECT YEAR",mt_jobs.keys())
-                                by_job=st.selectbox("SELECT JOB",mt_jobs[by_year].keys())
-                                by_date=st.selectbox("SELECT DATE",mt_jobs[by_year][by_job]["RECORDS"].keys())
-                                by_shift=st.selectbox("SELECT SHIFT",mt_jobs[by_year][by_job]["RECORDS"][by_date].keys())
+        #                     return total_sum
+        #                 mt_jobs_=gcp_download(target_bucket,rf"LABOR/mt_jobs.json")
+        #                 mt_jobs=json.loads(mt_jobs_)
+        #                 c1,c2,c3=st.columns([2,2,6])
+        #                 with c1:
+        #                     with st.container(border=True):
+        #                         by_year=st.selectbox("SELECT YEAR",mt_jobs.keys())
+        #                         by_job=st.selectbox("SELECT JOB",mt_jobs[by_year].keys())
+        #                         by_date=st.selectbox("SELECT DATE",mt_jobs[by_year][by_job]["RECORDS"].keys())
+        #                         by_shift=st.selectbox("SELECT SHIFT",mt_jobs[by_year][by_job]["RECORDS"][by_date].keys())
                                 
-                        with c2:
-                            info=mt_jobs[by_year][by_job]["INFO"]
-                            st.dataframe(info)
-                        with c3:
-                            with st.container(border=True):
+        #                 with c2:
+        #                     info=mt_jobs[by_year][by_job]["INFO"]
+        #                     st.dataframe(info)
+        #                 with c3:
+        #                     with st.container(border=True):
                                 
-                                d1,d2,d3=st.columns([4,4,2])
-                                with d1:
-                                    by_choice=st.radio("SELECT INVOICE",["LABOR","EQUIPMENT","MAINTENANCE"])
-                                with d2:
-                                    by_location=st.radio("SELECT INVOICE",["DOCK","WAREHOUSE","LINES"])
-                            with st.container(border=True):
-                                e1,e2,e3=st.columns([4,4,2])
-                                with e1:
-                                    st.write(f"TOTAL {by_location}-{by_choice} COST for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'TOTAL COST'),2)}")
-                                    st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'Mark UP'),2)}")
-                                    if by_choice=="LABOR":
-                                        st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'INVOICE'),2)}")
-                                    else:
-                                        st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{by_choice} INVOICE'),2)}")
-                                with e2:
-                                    st.write(f"TOTAL {by_location}-{by_choice} COST for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'TOTAL COST') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
-                                    st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'Mark UP') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
-                                    if by_choice=="LABOR":
-                                        st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'INVOICE') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
-                                    else:
-                                        st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],f'{by_choice} INVOICE') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
-                            #st.write(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location])
-                        a=pd.DataFrame(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location]).T
-                        if by_choice=="LABOR":
-                            try:
-                                a.loc["TOTAL FOR SHIFT"]=a[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]].sum()
-                            except:
-                                pass
-                        else:
-                            try:
-                                a.loc["TOTAL FOR SHIFT"]=a[[ "Quantity","Hours","TOTAL COST","Mark UP",f"{by_choice} INVOICE"]].sum()
-                            except:
-                                pass
-                        st.write(a)
+        #                         d1,d2,d3=st.columns([4,4,2])
+        #                         with d1:
+        #                             by_choice=st.radio("SELECT INVOICE",["LABOR","EQUIPMENT","MAINTENANCE"])
+        #                         with d2:
+        #                             by_location=st.radio("SELECT INVOICE",["DOCK","WAREHOUSE","LINES"])
+        #                     with st.container(border=True):
+        #                         e1,e2,e3=st.columns([4,4,2])
+        #                         with e1:
+        #                             st.write(f"TOTAL {by_location}-{by_choice} COST for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'TOTAL COST'),2)}")
+        #                             st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'Mark UP'),2)}")
+        #                             if by_choice=="LABOR":
+        #                                 st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],'INVOICE'),2)}")
+        #                             else:
+        #                                 st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this SHIFT :  ${round(dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][by_date][by_shift][by_choice][by_location],f'{by_choice} INVOICE'),2)}")
+        #                         with e2:
+        #                             st.write(f"TOTAL {by_location}-{by_choice} COST for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'TOTAL COST') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
+        #                             st.write(f"TOTAL {by_location}-{by_choice} MARKUP for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'Mark UP') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
+        #                             if by_choice=="LABOR":
+        #                                 st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],'INVOICE') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
+        #                             else:
+        #                                 st.write(f"TOTAL {by_location}-{by_choice} INVOICE for this JOB :  ${round(sum([sum([dfs_sum(mt_jobs[by_year][by_job]['RECORDS'][date][shift][by_choice][by_location],f'{by_choice} INVOICE') for shift in mt_jobs[by_year][by_job]['RECORDS'][date]]) for date in mt_jobs[by_year][by_job]['RECORDS']]),2) }")
+        #                     #st.write(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location])
+        #                 a=pd.DataFrame(mt_jobs[by_year][by_job]["RECORDS"][by_date][by_shift][by_choice][by_location]).T
+        #                 if by_choice=="LABOR":
+        #                     try:
+        #                         a.loc["TOTAL FOR SHIFT"]=a[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]].sum()
+        #                     except:
+        #                         pass
+        #                 else:
+        #                     try:
+        #                         a.loc["TOTAL FOR SHIFT"]=a[[ "Quantity","Hours","TOTAL COST","Mark UP",f"{by_choice} INVOICE"]].sum()
+        #                     except:
+        #                         pass
+        #                 st.write(a)
                             
                            
                         
-                with lab_tab3:
-                    with st.container(border=True):
+        #         with lab_tab3:
+        #             with st.container(border=True):
                         
-                        tinker,tailor=st.columns([5,5])
-                        with tinker:
-                            select_year=st.selectbox("SELECT ILWU PERIOD",["JUL 2023","JUL 2022","JUL 2021"],key="ot1221")
-                        with tailor:
-                            select_pmayear=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"],key="ot12w21")
+        #                 tinker,tailor=st.columns([5,5])
+        #                 with tinker:
+        #                     select_year=st.selectbox("SELECT ILWU PERIOD",["JUL 2023","JUL 2022","JUL 2021"],key="ot1221")
+        #                 with tailor:
+        #                     select_pmayear=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"],key="ot12w21")
                     
-                    year=select_year.split(' ')[1]
-                    month=select_year.split(' ')[0]
-                    pma_year=select_pmayear.split(' ')[1]
-                    pma_rates_=pd.DataFrame(pma_rates).T
-                    occ_codes=pd.DataFrame(assessment_rates).T
-                    occ_codes=occ_codes.rename_axis('Occ_Code')
-                    shortened_occ_codes=occ_codes.loc[["0036","0037","0055","0065","0092","0101","0103","0115","0129","0213","0215"]]
-                    shortened_occ_codes=shortened_occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
-                    occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
-                    rates=st.checkbox("SELECT TO DISPLAY RATE TABLE FOR THE YEAR",key="iueis")
-                    if rates:
+        #             year=select_year.split(' ')[1]
+        #             month=select_year.split(' ')[0]
+        #             pma_year=select_pmayear.split(' ')[1]
+        #             pma_rates_=pd.DataFrame(pma_rates).T
+        #             occ_codes=pd.DataFrame(assessment_rates).T
+        #             occ_codes=occ_codes.rename_axis('Occ_Code')
+        #             shortened_occ_codes=occ_codes.loc[["0036","0037","0055","0065","0092","0101","0103","0115","0129","0213","0215"]]
+        #             shortened_occ_codes=shortened_occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
+        #             occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
+        #             rates=st.checkbox("SELECT TO DISPLAY RATE TABLE FOR THE YEAR",key="iueis")
+        #             if rates:
                         
-                        lan1,lan2=st.columns([2,2])
-                        with lan1:
-                            st.write(occ_codes)
-                        with lan2:
-                            st.write(pma_rates[pma_year])
-                with lab_tab2:
-                    lab_col1,lab_col2,lab_col3=st.columns([2,2,2])
-                    with lab_col1:
-                        with st.container(border=True):
+        #                 lan1,lan2=st.columns([2,2])
+        #                 with lan1:
+        #                     st.write(occ_codes)
+        #                 with lan2:
+        #                     st.write(pma_rates[pma_year])
+        #         with lab_tab2:
+        #             lab_col1,lab_col2,lab_col3=st.columns([2,2,2])
+        #             with lab_col1:
+        #                 with st.container(border=True):
                             
-                            job_vessel=st.text_input("VESSEL",disabled=False)
-                            vessel_length=st.number_input("VESSEL LENGTH",step=1,disabled=False)
-                            job_number=st.text_input("MT JOB NO",disabled=False)
-                            shipper=st.text_input("SHIPPER",disabled=False)
-                            cargo=st.text_input("CARGO",disabled=False)
-                            agent=st.selectbox("AGENT",["TALON","ACGI","NORTON LILLY"],disabled=False)
-                            stevedore=st.selectbox("STEVEDORE",["SSA","JONES"],disabled=False)
+        #                     job_vessel=st.text_input("VESSEL",disabled=False)
+        #                     vessel_length=st.number_input("VESSEL LENGTH",step=1,disabled=False)
+        #                     job_number=st.text_input("MT JOB NO",disabled=False)
+        #                     shipper=st.text_input("SHIPPER",disabled=False)
+        #                     cargo=st.text_input("CARGO",disabled=False)
+        #                     agent=st.selectbox("AGENT",["TALON","ACGI","NORTON LILLY"],disabled=False)
+        #                     stevedore=st.selectbox("STEVEDORE",["SSA","JONES"],disabled=False)
                             
-                            alongside_date=st.date_input("ALONGSIDE DATE",disabled=False,key="arr")
-                            alongside_date=datetime.datetime.strftime(alongside_date,"%Y-%m-%d")
+        #                     alongside_date=st.date_input("ALONGSIDE DATE",disabled=False,key="arr")
+        #                     alongside_date=datetime.datetime.strftime(alongside_date,"%Y-%m-%d")
                             
-                            alongside_time=st.time_input("ALONGSIDE TIME",disabled=False,key="arrt")
-                            alongside_time=alongside_time.strftime("%H:%M")
+        #                     alongside_time=st.time_input("ALONGSIDE TIME",disabled=False,key="arrt")
+        #                     alongside_time=alongside_time.strftime("%H:%M")
                             
-                            departure_date=st.date_input("DEPARTURE DATE",disabled=False,key="dep")
-                            departure_date=datetime.datetime.strftime(departure_date,"%Y-%m-%d")
+        #                     departure_date=st.date_input("DEPARTURE DATE",disabled=False,key="dep")
+        #                     departure_date=datetime.datetime.strftime(departure_date,"%Y-%m-%d")
                            
-                            departure_time=st.time_input("DEPARTURE TIME",disabled=False,key="dept")
-                            departure_time=departure_time.strftime("%H:%M")
+        #                     departure_time=st.time_input("DEPARTURE TIME",disabled=False,key="dept")
+        #                     departure_time=departure_time.strftime("%H:%M")
                             
                             
-                        if st.button("RECORD JOB"):
-                            year="2023"
-                            mt_jobs_=gcp_download(target_bucket,rf"LABOR/mt_jobs.json")
-                            mt_jobs=json.loads(mt_jobs_)
-                            if year not in mt_jobs:
-                                mt_jobs[year]={}
-                            if job_number not in mt_jobs[year]:
-                                mt_jobs[year][job_number]={"INFO":{},"RECORDS":{}}
-                            mt_jobs[year][job_number]["INFO"]={"Vessel":job_vessel,"Vessel Length":vessel_length,"Cargo":cargo,
-                                                "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
-                                                "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time}
-                            mt_jobs=json.dumps(mt_jobs)
-                            storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"mt_jobs.json")
-                            blob.upload_from_string(mt_jobs)
-                            st.success(f"RECORDED JOB NO {job_number} ! ")
-                with lab_tab1:
-                    equipment_tariff={"CRANE":908.51,"FORKLIFT":84.92,"TRACTOR":65,"KOMATSU":160,"GENIE MANLIFT":84.92,"Z135 MANLIFT":130.46}
-                    foreman=False
-                    with st.container(border=True):
+        #                 if st.button("RECORD JOB"):
+        #                     year="2023"
+        #                     mt_jobs_=gcp_download(target_bucket,rf"LABOR/mt_jobs.json")
+        #                     mt_jobs=json.loads(mt_jobs_)
+        #                     if year not in mt_jobs:
+        #                         mt_jobs[year]={}
+        #                     if job_number not in mt_jobs[year]:
+        #                         mt_jobs[year][job_number]={"INFO":{},"RECORDS":{}}
+        #                     mt_jobs[year][job_number]["INFO"]={"Vessel":job_vessel,"Vessel Length":vessel_length,"Cargo":cargo,
+        #                                         "Shipper":shipper,"Agent":agent,"Stevedore":stevedore,"Alongside Date":alongside_date,
+        #                                         "Alongside Time":alongside_time,"Departure Date":departure_date,"Departure Time":departure_time}
+        #                     mt_jobs=json.dumps(mt_jobs)
+        #                     storage_client = storage.Client()
+        #                     bucket = storage_client.bucket(target_bucket)
+        #                     blob = bucket.blob(rf"mt_jobs.json")
+        #                     blob.upload_from_string(mt_jobs)
+        #                     st.success(f"RECORDED JOB NO {job_number} ! ")
+        #         with lab_tab1:
+        #             equipment_tariff={"CRANE":908.51,"FORKLIFT":84.92,"TRACTOR":65,"KOMATSU":160,"GENIE MANLIFT":84.92,"Z135 MANLIFT":130.46}
+        #             foreman=False
+        #             with st.container(border=True):
                         
-                        tinker,tailor=st.columns([5,5])
-                        with tinker:
-                            select_year=st.selectbox("SELECT ILWU PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
-                        with tailor:
-                            select_pmayear=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
+        #                 tinker,tailor=st.columns([5,5])
+        #                 with tinker:
+        #                     select_year=st.selectbox("SELECT ILWU PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
+        #                 with tailor:
+        #                     select_pmayear=st.selectbox("SELECT PMA PERIOD",["JUL 2023","JUL 2022","JUL 2021"])
                     
-                    year=select_year.split(' ')[1]
-                    month=select_year.split(' ')[0]
-                    pma_year=select_pmayear.split(' ')[1]
-                    pma_rates_=pd.DataFrame(pma_rates).T
-                    occ_codes=pd.DataFrame(assessment_rates).T
-                    occ_codes=occ_codes.rename_axis('Occ_Code')
-                    shortened_occ_codes=occ_codes.loc[["0036","0037","0055","0065","0092","0101","0103","0115","0129","0213","0215","0277","0278"]]
-                    shortened_occ_codes=shortened_occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
-                    occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
+        #             year=select_year.split(' ')[1]
+        #             month=select_year.split(' ')[0]
+        #             pma_year=select_pmayear.split(' ')[1]
+        #             pma_rates_=pd.DataFrame(pma_rates).T
+        #             occ_codes=pd.DataFrame(assessment_rates).T
+        #             occ_codes=occ_codes.rename_axis('Occ_Code')
+        #             shortened_occ_codes=occ_codes.loc[["0036","0037","0055","0065","0092","0101","0103","0115","0129","0213","0215","0277","0278"]]
+        #             shortened_occ_codes=shortened_occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
+        #             occ_codes=occ_codes.reset_index().set_index(["DESCRIPTION","Occ_Code"],drop=True)
                     
                     
                     
-                    if "scores" not in st.session_state:
-                        st.session_state.scores = pd.DataFrame(
-                            {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],
-                             "TOTAL COST":[],"Ind Ins":[],"SIU":[],"Mark UP":[],"INVOICE":[]})
-                    if "eq_scores" not in st.session_state:
-                        st.session_state.eq_scores = pd.DataFrame(
-                            {"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
-                    if "maint_scores" not in st.session_state:
-                        st.session_state.maint_scores = pd.DataFrame(
-                            {"Quantity":[2],"Hours": [8], "TOTAL COST":[1272],"Mark UP":[381.6],"MAINTENANCE INVOICE":[1653.6]})
-                    if "maint" not in st.session_state:
-                        st.session_state.maint=False
+        #             if "scores" not in st.session_state:
+        #                 st.session_state.scores = pd.DataFrame(
+        #                     {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],"Total Wage":[],"Benefits":[],"PMA Assessments":[],
+        #                      "TOTAL COST":[],"Ind Ins":[],"SIU":[],"Mark UP":[],"INVOICE":[]})
+        #             if "eq_scores" not in st.session_state:
+        #                 st.session_state.eq_scores = pd.DataFrame(
+        #                     {"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
+        #             if "maint_scores" not in st.session_state:
+        #                 st.session_state.maint_scores = pd.DataFrame(
+        #                     {"Quantity":[2],"Hours": [8], "TOTAL COST":[1272],"Mark UP":[381.6],"MAINTENANCE INVOICE":[1653.6]})
+        #             if "maint" not in st.session_state:
+        #                 st.session_state.maint=False
                     
-                    ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
+        #             ref={"DAY":["1ST","1OT"],"NIGHT":["2ST","2OT"],"WEEKEND":["2OT","2OT"],"HOOT":["3ST","3OT"]}
                     
-                    def equip_scores():
-                        equipment=st.session_state.equipment
-                        equipment_qty=st.session_state.eqqty
-                        equipment_hrs=st.session_state.eqhrs
-                        equipment_cost=equipment_qty*equipment_hrs*equipment_tariff[equipment]
-                        equipment_markup=equipment_cost*st.session_state.markup/100
-                        eq_score=pd.DataFrame({ "Equipment": [equipment],
-                                "Quantity": [equipment_qty],
-                                "Hours": [equipment_hrs*equipment_qty],
-                                "TOTAL COST":equipment_cost,
-                                "Mark UP":[round(equipment_markup,2)],
-                                "EQUIPMENT INVOICE":[round(equipment_cost+equipment_markup,2)]})
-                        st.session_state.eq_scores = pd.concat([st.session_state.eq_scores, eq_score], ignore_index=True)
+        #             def equip_scores():
+        #                 equipment=st.session_state.equipment
+        #                 equipment_qty=st.session_state.eqqty
+        #                 equipment_hrs=st.session_state.eqhrs
+        #                 equipment_cost=equipment_qty*equipment_hrs*equipment_tariff[equipment]
+        #                 equipment_markup=equipment_cost*st.session_state.markup/100
+        #                 eq_score=pd.DataFrame({ "Equipment": [equipment],
+        #                         "Quantity": [equipment_qty],
+        #                         "Hours": [equipment_hrs*equipment_qty],
+        #                         "TOTAL COST":equipment_cost,
+        #                         "Mark UP":[round(equipment_markup,2)],
+        #                         "EQUIPMENT INVOICE":[round(equipment_cost+equipment_markup,2)]})
+        #                 st.session_state.eq_scores = pd.concat([st.session_state.eq_scores, eq_score], ignore_index=True)
                    
-                    def new_scores():
+        #             def new_scores():
                         
-                        if num_code=='0129':
-                            foreman=True
-                        else:
-                            foreman=False
+        #                 if num_code=='0129':
+        #                     foreman=True
+        #                 else:
+        #                     foreman=False
                         
-                        pension=pma_rates[pma_year]["LS_401k"]
-                        if foreman:
-                            pension=pma_rates[pma_year]["Foreman_401k"]
+        #                 pension=pma_rates[pma_year]["LS_401k"]
+        #                 if foreman:
+        #                     pension=pma_rates[pma_year]["Foreman_401k"]
                                      
                         
-                        qty=st.session_state.qty
-                        total_hours=st.session_state.hours+st.session_state.ot
-                        hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
-                        ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
-                        wage_cost=hour_cost+ot_cost
-                        benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792                 #+wage_cost*st.session_state.siu/100
+        #                 qty=st.session_state.qty
+        #                 total_hours=st.session_state.hours+st.session_state.ot
+        #                 hour_cost=st.session_state.hours*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][0]]
+        #                 ot_cost=st.session_state.ot*occ_codes.loc[st.session_state.code,ref[st.session_state.shift][1]]
+        #                 wage_cost=hour_cost+ot_cost
+        #                 benefits=wage_cost*0.062+wage_cost*0.0145+wage_cost*0.0021792                 #+wage_cost*st.session_state.siu/100
                         
-                        assessments=total_hours*pma_rates[pma_year]["Cargo_Dues"]+total_hours*pma_rates[pma_year]["Electronic_Input"]+total_hours*pma_rates[pma_year]["Benefits"]+total_hours*pension
-                        total_cost=wage_cost+benefits+assessments
-                        siu_choice=wage_cost*st.session_state.siu/100
-                        ind_ins=total_hours*1.5
-                        with_siu=total_cost+siu_choice
-                        #markup=with_siu*st.session_state.markup/100   ##+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
-                        markup=total_cost*st.session_state.markup/100
-                        if foreman:
-                            markup=total_cost*st.session_state.f_markup/100  ###+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
-                        invoice=total_cost+siu_choice+ind_ins+markup
+        #                 assessments=total_hours*pma_rates[pma_year]["Cargo_Dues"]+total_hours*pma_rates[pma_year]["Electronic_Input"]+total_hours*pma_rates[pma_year]["Benefits"]+total_hours*pension
+        #                 total_cost=wage_cost+benefits+assessments
+        #                 siu_choice=wage_cost*st.session_state.siu/100
+        #                 ind_ins=total_hours*1.5
+        #                 with_siu=total_cost+siu_choice
+        #                 #markup=with_siu*st.session_state.markup/100   ##+benefits*st.session_state.markup/100+assessments*st.session_state.markup/100
+        #                 markup=total_cost*st.session_state.markup/100
+        #                 if foreman:
+        #                     markup=total_cost*st.session_state.f_markup/100  ###+benefits*st.session_state.f_markup/100+assessments*st.session_state.f_markup/100
+        #                 invoice=total_cost+siu_choice+ind_ins+markup
                         
                         
-                        new_score = pd.DataFrame(
-                            {
-                                "Code": [st.session_state.code],
-                                "Shift": [st.session_state.shift],
-                                "Quantity": [st.session_state.qty],
-                                "Hours": [st.session_state.hours*qty],
-                                "OT": [st.session_state.ot*qty],
-                                "Hour Cost": [hour_cost*qty],
-                                "OT Cost": [ot_cost*qty],
-                                "Total Wage": [round(wage_cost*qty,2)],
-                                "Benefits":[round(benefits*qty,2)],
-                                "PMA Assessments":[round(assessments*qty,2)],
-                                "TOTAL COST":[round(total_cost*qty,2)],
-                                "Ind Ins":[round(ind_ins*qty,2)],
-                                "SIU":[round(siu_choice*qty,2)],
-                                "Mark UP":[round(markup*qty,2)],
-                                "INVOICE":[round(invoice*qty,2)]
+        #                 new_score = pd.DataFrame(
+        #                     {
+        #                         "Code": [st.session_state.code],
+        #                         "Shift": [st.session_state.shift],
+        #                         "Quantity": [st.session_state.qty],
+        #                         "Hours": [st.session_state.hours*qty],
+        #                         "OT": [st.session_state.ot*qty],
+        #                         "Hour Cost": [hour_cost*qty],
+        #                         "OT Cost": [ot_cost*qty],
+        #                         "Total Wage": [round(wage_cost*qty,2)],
+        #                         "Benefits":[round(benefits*qty,2)],
+        #                         "PMA Assessments":[round(assessments*qty,2)],
+        #                         "TOTAL COST":[round(total_cost*qty,2)],
+        #                         "Ind Ins":[round(ind_ins*qty,2)],
+        #                         "SIU":[round(siu_choice*qty,2)],
+        #                         "Mark UP":[round(markup*qty,2)],
+        #                         "INVOICE":[round(invoice*qty,2)]
                                 
-                            }
-                        )
-                        st.session_state.scores = pd.concat([st.session_state.scores, new_score], ignore_index=True)
+        #                     }
+        #                 )
+        #                 st.session_state.scores = pd.concat([st.session_state.scores, new_score], ignore_index=True)
                         
                         
                  
                     
                         
-                    # Form for adding a new score
+        #             # Form for adding a new score
                     
-                    with st.form("new_score_form"):
-                        st.write("##### LABOR")
-                        form_col1,form_col2,form_col3=st.columns([3,3,4])
-                        with form_col1:
+        #             with st.form("new_score_form"):
+        #                 st.write("##### LABOR")
+        #                 form_col1,form_col2,form_col3=st.columns([3,3,4])
+        #                 with form_col1:
                             
-                            st.session_state.siu=st.number_input("ENTER SIU (UNEMPLOYMENT) PERCENTAGE",step=1,key="kdsha")
-                            st.session_state.markup=st.number_input("ENTER MARKUP",step=1,key="wer")
-                            st.session_state.f_markup=st.number_input("ENTER FOREMAN MARKUP",step=1,key="wfder")
+        #                     st.session_state.siu=st.number_input("ENTER SIU (UNEMPLOYMENT) PERCENTAGE",step=1,key="kdsha")
+        #                     st.session_state.markup=st.number_input("ENTER MARKUP",step=1,key="wer")
+        #                     st.session_state.f_markup=st.number_input("ENTER FOREMAN MARKUP",step=1,key="wfder")
                             
-                        with form_col2:
-                            st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND DAY","WEEKEND NIGHT","HOOT"])
-                            st.session_state.shift_record=st.session_state.shift
-                            st.session_state.shift="WEEKEND" if st.session_state.shift in ["WEEKEND DAY","WEEKEND NIGHT"] else st.session_state.shift
+        #                 with form_col2:
+        #                     st.session_state.shift=st.selectbox("SELECT SHIFT",["DAY","NIGHT","WEEKEND DAY","WEEKEND NIGHT","HOOT"])
+        #                     st.session_state.shift_record=st.session_state.shift
+        #                     st.session_state.shift="WEEKEND" if st.session_state.shift in ["WEEKEND DAY","WEEKEND NIGHT"] else st.session_state.shift
                         
-                            # Dropdown for selecting Code
-                            st.session_state.code = st.selectbox(
-                                "Occupation Code", options=list(shortened_occ_codes.index)
-                            )
-                            # Number input for Quantity
-                            st.session_state.qty = st.number_input(
-                                "Quantity", step=1, value=0, min_value=0
-                        )
-                        with form_col3:
+        #                     # Dropdown for selecting Code
+        #                     st.session_state.code = st.selectbox(
+        #                         "Occupation Code", options=list(shortened_occ_codes.index)
+        #                     )
+        #                     # Number input for Quantity
+        #                     st.session_state.qty = st.number_input(
+        #                         "Quantity", step=1, value=0, min_value=0
+        #                 )
+        #                 with form_col3:
                             
-                            # Number input for Hours
-                            st.session_state.hours = st.number_input(
-                                "Hours", step=0.5, value=0.0, min_value=0.0
-                            )
+        #                     # Number input for Hours
+        #                     st.session_state.hours = st.number_input(
+        #                         "Hours", step=0.5, value=0.0, min_value=0.0
+        #                     )
                         
-                            # Number input for OT
-                            st.session_state.ot = st.number_input(
-                                "OT", step=0.5, value=0.0, min_value=0.0
-                            )
+        #                     # Number input for OT
+        #                     st.session_state.ot = st.number_input(
+        #                         "OT", step=0.5, value=0.0, min_value=0.0
+        #                     )
                             
-                            # Form submit button
-                            submitted = st.form_submit_button("Submit")
-                        # If form is submitted, add the new score
+        #                     # Form submit button
+        #                     submitted = st.form_submit_button("Submit")
+        #                 # If form is submitted, add the new score
                     
-                    if submitted:
-                        num_code=st.session_state.code[1].strip()
-                        new_scores()
-                        st.success("Rank added successfully!")
+        #             if submitted:
+        #                 num_code=st.session_state.code[1].strip()
+        #                 new_scores()
+        #                 st.success("Rank added successfully!")
                     
                     
-                    with st.form("equipment_form"):
-                        st.write("##### EQUIPMENT")
-                        eqform_col1,eqform_col2,eqform_col3=st.columns([3,3,4])
-                        with eqform_col1: 
-                            st.session_state.equipment = st.selectbox(
-                                "Equipment", options=["CRANE","FORKLIFT","TRACTOR","KOMATSU","GENIE MANLIFT","Z135 MANLIFT"],key="sds11")
-                        with eqform_col2:
-                            # Number input for Equipment Quantity
-                            st.session_state.eqqty = st.number_input(
-                                "Equipment Quantity", key="sds",step=1, value=0, min_value=0)
-                        with eqform_col3:
-                            st.session_state.eqhrs = st.number_input(
-                                "Equipment Hours",key="sdsss", step=1, value=0, min_value=0)
-                            eq_submitted = st.form_submit_button("Submit Equipment")
-                    if eq_submitted:
-                        equip_scores()
-                        st.success("Equipment added successfully!")
+        #             with st.form("equipment_form"):
+        #                 st.write("##### EQUIPMENT")
+        #                 eqform_col1,eqform_col2,eqform_col3=st.columns([3,3,4])
+        #                 with eqform_col1: 
+        #                     st.session_state.equipment = st.selectbox(
+        #                         "Equipment", options=["CRANE","FORKLIFT","TRACTOR","KOMATSU","GENIE MANLIFT","Z135 MANLIFT"],key="sds11")
+        #                 with eqform_col2:
+        #                     # Number input for Equipment Quantity
+        #                     st.session_state.eqqty = st.number_input(
+        #                         "Equipment Quantity", key="sds",step=1, value=0, min_value=0)
+        #                 with eqform_col3:
+        #                     st.session_state.eqhrs = st.number_input(
+        #                         "Equipment Hours",key="sdsss", step=1, value=0, min_value=0)
+        #                     eq_submitted = st.form_submit_button("Submit Equipment")
+        #             if eq_submitted:
+        #                 equip_scores()
+        #                 st.success("Equipment added successfully!")
                     
                         
-                    with st.container(border=True):
+        #             with st.container(border=True):
                         
-                        sub_col1,sub_col2,sub_col3=st.columns([3,3,4])
-                        with sub_col1:
-                            pass
-                        with sub_col2:
-                            template_check=st.checkbox("LOAD FROM TEMPLATE")
-                            if template_check:
-                                with sub_col3:
-                                    template_choice_valid=False
-                                    template_choice=st.selectbox("Select Recorded Template",["Pick From List"]+[i for i in list_files_in_subfolder(target_bucket, rf"labor_templates/")],
-                                                                  label_visibility="collapsed")
-                                    if template_choice!="Pick From List":
-                                        template_choice_valid=True 
-                                    if template_choice_valid:
-                                        loaded_template=gcp_csv_to_df(target_bucket,rf"labor_templates/{template_choice}")
+        #                 sub_col1,sub_col2,sub_col3=st.columns([3,3,4])
+        #                 with sub_col1:
+        #                     pass
+        #                 with sub_col2:
+        #                     template_check=st.checkbox("LOAD FROM TEMPLATE")
+        #                     if template_check:
+        #                         with sub_col3:
+        #                             template_choice_valid=False
+        #                             template_choice=st.selectbox("Select Recorded Template",["Pick From List"]+[i for i in list_files_in_subfolder(target_bucket, rf"labor_templates/")],
+        #                                                           label_visibility="collapsed")
+        #                             if template_choice!="Pick From List":
+        #                                 template_choice_valid=True 
+        #                             if template_choice_valid:
+        #                                 loaded_template=gcp_csv_to_df(target_bucket,rf"labor_templates/{template_choice}")
                                 
                                 
                        
                    
-                        display=pd.DataFrame(st.session_state.scores)
-                        display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]].sum()
-                        display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]]
-                        display.rename(columns={"SIU":f"%{st.session_state.siu} SIU"},inplace=True)
-                        eq_display=pd.DataFrame(st.session_state.eq_scores)
-                        eq_display.loc["TOTAL FOR SHIFT"]=eq_display[[ "Quantity","Hours","TOTAL COST","Mark UP","EQUIPMENT INVOICE"]].sum()
-                        if template_check and template_choice_valid:
-                            st.dataframe(loaded_template)
-                        else:
-                            st.write("##### LABOR")
-                            st.dataframe(display)
-                            part1,part2=st.columns([5,5])
-                            with part1:
-                                st.write("##### EQUIPMENT")
-                                st.dataframe(eq_display)
-                            maint1,maint2,maint3=st.columns([2,2,6])
-                            st.session_state.maint=False
-                            with maint1:
-                                st.write("##### MAINTENANCE (IF NIGHT/WEEKEND SHIFT)")
-                            with maint2:
-                                maint=st.checkbox("Check to add maint crew")
-                            if maint:
-                                st.session_state.maint=True
-                                st.dataframe(st.session_state.maint_scores)
-                            else:
-                                st.session_state.maint=False
-                            with part2:
-                                subpart1,subpart2,subpart3=st.columns([3,3,4])
-                                with subpart1:
-                                    with st.container(border=True):
-                                        st.write(f"###### COSTS")
-                                        st.write(f"###### LABOR: {round(display.loc['TOTAL FOR SHIFT','TOTAL COST'],2)}")
-                                        st.write(f"###### EQUIPMENT: {round(eq_display.loc['TOTAL FOR SHIFT','TOTAL COST'],2)}")
-                                        if st.session_state.maint:
-                                            st.write(f"###### MAINTENANCE: {round(st.session_state.maint_scores['TOTAL COST'].values[0],2)}")
-                                            st.write(f"##### TOTAL: {round(display.loc['TOTAL FOR SHIFT','TOTAL COST']+eq_display.loc['TOTAL FOR SHIFT','TOTAL COST']+st.session_state.maint_scores['TOTAL COST'].values[0],2)}")
-                                        else:
-                                            st.write(f"##### TOTAL: {round(display.loc['TOTAL FOR SHIFT','TOTAL COST']+eq_display.loc['TOTAL FOR SHIFT','TOTAL COST'],2)}")
+        #                 display=pd.DataFrame(st.session_state.scores)
+        #                 display.loc["TOTAL FOR SHIFT"]=display[["Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]].sum()
+        #                 display=display[["Code","Shift","Quantity","Hours","OT","Hour Cost","OT Cost","Total Wage","Benefits","PMA Assessments","TOTAL COST","Ind Ins","SIU","Mark UP","INVOICE"]]
+        #                 display.rename(columns={"SIU":f"%{st.session_state.siu} SIU"},inplace=True)
+        #                 eq_display=pd.DataFrame(st.session_state.eq_scores)
+        #                 eq_display.loc["TOTAL FOR SHIFT"]=eq_display[[ "Quantity","Hours","TOTAL COST","Mark UP","EQUIPMENT INVOICE"]].sum()
+        #                 if template_check and template_choice_valid:
+        #                     st.dataframe(loaded_template)
+        #                 else:
+        #                     st.write("##### LABOR")
+        #                     st.dataframe(display)
+        #                     part1,part2=st.columns([5,5])
+        #                     with part1:
+        #                         st.write("##### EQUIPMENT")
+        #                         st.dataframe(eq_display)
+        #                     maint1,maint2,maint3=st.columns([2,2,6])
+        #                     st.session_state.maint=False
+        #                     with maint1:
+        #                         st.write("##### MAINTENANCE (IF NIGHT/WEEKEND SHIFT)")
+        #                     with maint2:
+        #                         maint=st.checkbox("Check to add maint crew")
+        #                     if maint:
+        #                         st.session_state.maint=True
+        #                         st.dataframe(st.session_state.maint_scores)
+        #                     else:
+        #                         st.session_state.maint=False
+        #                     with part2:
+        #                         subpart1,subpart2,subpart3=st.columns([3,3,4])
+        #                         with subpart1:
+        #                             with st.container(border=True):
+        #                                 st.write(f"###### COSTS")
+        #                                 st.write(f"###### LABOR: {round(display.loc['TOTAL FOR SHIFT','TOTAL COST'],2)}")
+        #                                 st.write(f"###### EQUIPMENT: {round(eq_display.loc['TOTAL FOR SHIFT','TOTAL COST'],2)}")
+        #                                 if st.session_state.maint:
+        #                                     st.write(f"###### MAINTENANCE: {round(st.session_state.maint_scores['TOTAL COST'].values[0],2)}")
+        #                                     st.write(f"##### TOTAL: {round(display.loc['TOTAL FOR SHIFT','TOTAL COST']+eq_display.loc['TOTAL FOR SHIFT','TOTAL COST']+st.session_state.maint_scores['TOTAL COST'].values[0],2)}")
+        #                                 else:
+        #                                     st.write(f"##### TOTAL: {round(display.loc['TOTAL FOR SHIFT','TOTAL COST']+eq_display.loc['TOTAL FOR SHIFT','TOTAL COST'],2)}")
 
-                                with subpart2:
-                                    with st.container(border=True):
-                                        st.write(f"###### MARKUPS")
-                                        st.write(f"###### LABOR: {round(display.loc['TOTAL FOR SHIFT','Mark UP'],2)}")
-                                        st.write(f"###### EQUIPMENT: {round(eq_display.loc['TOTAL FOR SHIFT','Mark UP'],2)}")
-                                        if st.session_state.maint:
-                                            st.write(f"###### MAINTENANCE: {round(st.session_state.maint_scores['Mark UP'].values[0],2)}")
-                                            st.write(f"##### TOTAL: {round(display.loc['TOTAL FOR SHIFT','Mark UP']+eq_display.loc['TOTAL FOR SHIFT','Mark UP']+st.session_state.maint_scores['Mark UP'].values[0],2)}")
-                                        else:
-                                            st.write(f"##### TOTAL: {round(display.loc['TOTAL FOR SHIFT','Mark UP']+eq_display.loc['TOTAL FOR SHIFT','Mark UP'],2)}")
+        #                         with subpart2:
+        #                             with st.container(border=True):
+        #                                 st.write(f"###### MARKUPS")
+        #                                 st.write(f"###### LABOR: {round(display.loc['TOTAL FOR SHIFT','Mark UP'],2)}")
+        #                                 st.write(f"###### EQUIPMENT: {round(eq_display.loc['TOTAL FOR SHIFT','Mark UP'],2)}")
+        #                                 if st.session_state.maint:
+        #                                     st.write(f"###### MAINTENANCE: {round(st.session_state.maint_scores['Mark UP'].values[0],2)}")
+        #                                     st.write(f"##### TOTAL: {round(display.loc['TOTAL FOR SHIFT','Mark UP']+eq_display.loc['TOTAL FOR SHIFT','Mark UP']+st.session_state.maint_scores['Mark UP'].values[0],2)}")
+        #                                 else:
+        #                                     st.write(f"##### TOTAL: {round(display.loc['TOTAL FOR SHIFT','Mark UP']+eq_display.loc['TOTAL FOR SHIFT','Mark UP'],2)}")
 
-                                with subpart3:
-                                    with st.container(border=True):
-                                        st.write(f"###### TOTALS")
-                                        st.write(f"###### TOTAL LABOR: {round(display.loc['TOTAL FOR SHIFT','INVOICE'],2)}")
-                                        st.write(f"###### TOTAL EQUIPMENT: {round(eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE'],2)}")
-                                        if st.session_state.maint:
-                                            st.write(f"###### TOTAL MAINTENANCE: {round(st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0],2)}")
-                                            st.write(f"##### TOTAL INVOICE: {round(display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']+st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0],2)}")
-                                        else:
-                                            st.write(f"##### TOTAL INVOICE: {round(display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE'],2)}")
+        #                         with subpart3:
+        #                             with st.container(border=True):
+        #                                 st.write(f"###### TOTALS")
+        #                                 st.write(f"###### TOTAL LABOR: {round(display.loc['TOTAL FOR SHIFT','INVOICE'],2)}")
+        #                                 st.write(f"###### TOTAL EQUIPMENT: {round(eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE'],2)}")
+        #                                 if st.session_state.maint:
+        #                                     st.write(f"###### TOTAL MAINTENANCE: {round(st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0],2)}")
+        #                                     st.write(f"##### TOTAL INVOICE: {round(display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE']+st.session_state.maint_scores['MAINTENANCE INVOICE'].values[0],2)}")
+        #                                 else:
+        #                                     st.write(f"##### TOTAL INVOICE: {round(display.loc['TOTAL FOR SHIFT','INVOICE']+eq_display.loc['TOTAL FOR SHIFT','EQUIPMENT INVOICE'],2)}")
                                                 
                             
                                 
                            
-                    clear1,clear2,clear3=st.columns([2,2,4])
-                    with clear1:
-                        if st.button("CLEAR LABOR TABLE"):
-                            try:
-                                st.session_state.scores = pd.DataFrame(
-                                {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],
-                                 "Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]})
-                                st.rerun()
-                            except:
-                                pass
-                    with clear2:
-                        if st.button("CLEAR EQUIPMENT TABLE",key="54332dca"):
-                            try:
-                               st.session_state.eq_scores = pd.DataFrame({"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
-                               st.rerun()
-                            except:
-                                pass
+        #             clear1,clear2,clear3=st.columns([2,2,4])
+        #             with clear1:
+        #                 if st.button("CLEAR LABOR TABLE"):
+        #                     try:
+        #                         st.session_state.scores = pd.DataFrame(
+        #                         {"Code": [], "Shift":[],"Quantity": [], "Hours": [], "OT": [],"Hour Cost":[],"OT Cost":[],
+        #                          "Total Wage":[],"Benefits":[],"PMA Assessments":[],"SIU":[],"TOTAL COST":[],"Mark UP":[],"INVOICE":[]})
+        #                         st.rerun()
+        #                     except:
+        #                         pass
+        #             with clear2:
+        #                 if st.button("CLEAR EQUIPMENT TABLE",key="54332dca"):
+        #                     try:
+        #                        st.session_state.eq_scores = pd.DataFrame({"Equipment": [], "Quantity":[],"Hours": [], "TOTAL COST":[],"Mark UP":[],"EQUIPMENT INVOICE":[]})
+        #                        st.rerun()
+        #                     except:
+        #                         pass
                     
-                    csv=convert_df(display)
-                    file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
-                    down_col1,down_col2,down_col3,down_col4=st.columns([2,2,2,4])
-                    with down_col1:
-                        #st.write(" ")
-                        filename=st.text_input("Name the Template",key="7dr3")
-                        template=st.button("SAVE AS TEMPLATE",key="srfqw")
-                        if template:
-                            temp=display.to_csv(index=False)
-                            storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
+        #             csv=convert_df(display)
+        #             file_name=f'Gang_Cost_Report-{datetime.datetime.strftime(datetime.datetime.now(),"%m-%d,%Y")}.csv'
+        #             down_col1,down_col2,down_col3,down_col4=st.columns([2,2,2,4])
+        #             with down_col1:
+        #                 #st.write(" ")
+        #                 filename=st.text_input("Name the Template",key="7dr3")
+        #                 template=st.button("SAVE AS TEMPLATE",key="srfqw")
+        #                 if template:
+        #                     temp=display.to_csv(index=False)
+        #                     storage_client = storage.Client()
+        #                     bucket = storage_client.bucket(target_bucket)
                             
-                            # Upload CSV string to GCS
-                            blob = bucket.blob(rf"labor_templates/{filename}.csv")
-                            blob.upload_from_string(temp, content_type="text/csv")
-                    with down_col2:
-                        mt_jobs_=gcp_download(target_bucket,rf"LABOR/mt_jobs.json")
-                        mt_jobs=json.loads(mt_jobs_)
-                        #st.write(st.session_state.scores.T.to_dict())
-                        job_no=st.selectbox("SELECT JOB NO",[i for i in mt_jobs["2023"]])
-                        year="2023"
-                        work_type=st.selectbox("SELECT JOB NO",["DOCK","WAREHOUSE","LINES"])
-                        work_date=st.date_input("Work Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="work_date")
-                        record=st.button("RECORD TO JOB",key="srfqwdsd")
-                        if record:
+        #                     # Upload CSV string to GCS
+        #                     blob = bucket.blob(rf"labor_templates/{filename}.csv")
+        #                     blob.upload_from_string(temp, content_type="text/csv")
+        #             with down_col2:
+        #                 mt_jobs_=gcp_download(target_bucket,rf"LABOR/mt_jobs.json")
+        #                 mt_jobs=json.loads(mt_jobs_)
+        #                 #st.write(st.session_state.scores.T.to_dict())
+        #                 job_no=st.selectbox("SELECT JOB NO",[i for i in mt_jobs["2023"]])
+        #                 year="2023"
+        #                 work_type=st.selectbox("SELECT JOB NO",["DOCK","WAREHOUSE","LINES"])
+        #                 work_date=st.date_input("Work Date",datetime.datetime.today()-datetime.timedelta(hours=utc_difference),key="work_date")
+        #                 record=st.button("RECORD TO JOB",key="srfqwdsd")
+        #                 if record:
                             
-                            if year not in mt_jobs:
-                                mt_jobs[year]={}
-                            if job_no not in mt_jobs[year]:
-                                mt_jobs[year][job_no]={}
-                            if "RECORDS" not in mt_jobs[year][job_no]:
-                                mt_jobs[year][job_no]["RECORDS"]={}
-                            if str(work_date) not in mt_jobs[year][job_no]["RECORDS"]:
-                                mt_jobs[year][job_no]["RECORDS"][str(work_date)]={}
-                            if st.session_state.shift_record not in mt_jobs[year][job_no]["RECORDS"][str(work_date)]:
-                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]={}
-                            if "LABOR" not in mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]:
-                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]["LABOR"]={"DOCK":{},"LINES":{},"WAREHOUSE":{}}
-                            if 'EQUIPMENT' not in mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]:
-                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]["EQUIPMENT"]={"DOCK":{},"LINES":{},"WAREHOUSE":{}}
-                            if 'MAINTENANCE' not in mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]:
-                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]["MAINTENANCE"]={"DOCK":{},"LINES":{},"WAREHOUSE":{}}
-                            mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['LABOR'][work_type]=st.session_state.scores.T.to_dict()
-                            mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['EQUIPMENT'][work_type]=st.session_state.eq_scores.T.to_dict()
-                            if st.session_state.maint:
-                                mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['MAINTENANCE'][work_type]=st.session_state.maint_scores.T.to_dict()
-                            mt_jobs_=json.dumps(mt_jobs)
-                            storage_client = storage.Client()
-                            bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"mt_jobs.json")
-                            blob.upload_from_string(mt_jobs_)
-                            st.success(f"RECORDED JOB NO {job_no} ! ")
+        #                     if year not in mt_jobs:
+        #                         mt_jobs[year]={}
+        #                     if job_no not in mt_jobs[year]:
+        #                         mt_jobs[year][job_no]={}
+        #                     if "RECORDS" not in mt_jobs[year][job_no]:
+        #                         mt_jobs[year][job_no]["RECORDS"]={}
+        #                     if str(work_date) not in mt_jobs[year][job_no]["RECORDS"]:
+        #                         mt_jobs[year][job_no]["RECORDS"][str(work_date)]={}
+        #                     if st.session_state.shift_record not in mt_jobs[year][job_no]["RECORDS"][str(work_date)]:
+        #                         mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]={}
+        #                     if "LABOR" not in mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]:
+        #                         mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]["LABOR"]={"DOCK":{},"LINES":{},"WAREHOUSE":{}}
+        #                     if 'EQUIPMENT' not in mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]:
+        #                         mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]["EQUIPMENT"]={"DOCK":{},"LINES":{},"WAREHOUSE":{}}
+        #                     if 'MAINTENANCE' not in mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]:
+        #                         mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]["MAINTENANCE"]={"DOCK":{},"LINES":{},"WAREHOUSE":{}}
+        #                     mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['LABOR'][work_type]=st.session_state.scores.T.to_dict()
+        #                     mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['EQUIPMENT'][work_type]=st.session_state.eq_scores.T.to_dict()
+        #                     if st.session_state.maint:
+        #                         mt_jobs[year][job_no]["RECORDS"][str(work_date)][st.session_state.shift_record]['MAINTENANCE'][work_type]=st.session_state.maint_scores.T.to_dict()
+        #                     mt_jobs_=json.dumps(mt_jobs)
+        #                     storage_client = storage.Client()
+        #                     bucket = storage_client.bucket(target_bucket)
+        #                     blob = bucket.blob(rf"mt_jobs.json")
+        #                     blob.upload_from_string(mt_jobs_)
+        #                     st.success(f"RECORDED JOB NO {job_no} ! ")
                         
                        
                         
                                                
                     
-                    index=st.number_input("Enter Index To Delete",step=1,key="1224aa")
-                    if st.button("DELETE BY INDEX"):
-                        try:
-                            st.session_state.scores=st.session_state.scores.drop(index)
-                            st.session_state.scores.reset_index(drop=True,inplace=True)
-                        except:
-                            pass      
+        #             index=st.number_input("Enter Index To Delete",step=1,key="1224aa")
+        #             if st.button("DELETE BY INDEX"):
+        #                 try:
+        #                     st.session_state.scores=st.session_state.scores.drop(index)
+        #                     st.session_state.scores.reset_index(drop=True,inplace=True)
+        #                 except:
+        #                     pass      
         if select=="ADMIN" :
 
             # conn = st.connection('gcs', type=FilesConnection)

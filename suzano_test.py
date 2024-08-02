@@ -62,9 +62,10 @@ from google.cloud import storage
 import google.auth
 from google.cloud import bigquery
 
-credentials = service_account.Credentials.from_service_account_info(st.secrets["gcs_connections"])
+#credentials = service_account.Credentials.from_service_account_info(st.secrets["gcs_connections"])
 
-client = documentai.DocumentProcessorServiceClient(credentials=credentials)
+#client = documentai.DocumentProcessorServiceClient(credentials=credentials)
+
 credentials, _ = google.auth.default()
 credentials = google.auth.credentials.with_scopes_if_required(credentials, bigquery.Client.SCOPE)
 project_id = "newsuzano"

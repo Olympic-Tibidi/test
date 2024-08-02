@@ -2275,8 +2275,8 @@ if authentication_status:
                             pass      
         if select=="ADMIN" :
 
-            conn = st.connection('gcs', type=FilesConnection)
-            a = conn.read(f"new_suzano/map.json", ttl=600)
+            # conn = st.connection('gcs', type=FilesConnection)
+            # a = conn.read(f"new_suzano/map.json", ttl=600)
             #st.write(a)
             admin_tab1,admin_tab2,admin_tab3,admin_tab4,admin_tab5=st.tabs(["RELEASE ORDERS","BILL OF LADINGS","EDI'S","AUDIT","VESSEL/MILL/CARRIER ENTRY"])
             

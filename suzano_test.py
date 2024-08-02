@@ -60,7 +60,7 @@ from google.cloud import storage
 
 
 import google.auth
-from google.cloud import bigquery
+#from google.cloud import bigquery
 
 #credentials = service_account.Credentials.from_service_account_info(st.secrets["gcs_connections"])
 

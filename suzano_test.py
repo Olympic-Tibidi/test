@@ -56,12 +56,20 @@ from google.cloud import documentai
 from google.oauth2 import service_account
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+from google.cloud import storage
 
+
+import google.auth
+from google.cloud import bigquery
 
 credentials = service_account.Credentials.from_service_account_info(st.secrets["gcs_connections"])
 
 client = documentai.DocumentProcessorServiceClient(credentials=credentials)
-
+credentials, _ = google.auth.default()
+credentials = google.auth.credentials.with_scopes_if_required(credentials, bigquery.Client.SCOPE)
+project_id = "newsuzano"
+storage_client= storage.Client(project=project_id,credentials=credentials)
+authed_http = google.auth.transport.requests.AuthorizedSession(credentials)
 
 st.set_page_config(layout="wide")
 

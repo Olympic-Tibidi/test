@@ -155,10 +155,10 @@ def gcp_download(bucket_name, source_file_name):
     blob = bucket.blob(source_file_name)
     data = blob.download_as_text()
     return data
-def gcp_download_new(bucket_name, source_file_name):
-    conn = st.connection('gcs', type=FilesConnection)
-    a = conn.read(f"{bucket_name}/{source_file_name}", ttl=600)
-    return a
+# def gcp_download_new(bucket_name, source_file_name):
+#     conn = st.connection('gcs', type=FilesConnection)
+#     a = conn.read(f"{bucket_name}/{source_file_name}", ttl=600)
+#     return a
 def gcp_download_x(bucket_name, source_file_name):
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
@@ -496,77 +496,77 @@ if authentication_status:
                 """
         st.markdown(custom_style, unsafe_allow_html=True)
         local_model_path = 'temp_model.keras'
-        model = download_model(target_bucket, 'mygatemodel2.keras', local_model_path)
-        if select=="GATE CONV.NETWORK":
-            def custom_preprocessing_function(img):
-                # Crop the image first to ensure the gate is included
-                #cropped_img = img[:,round(img.shape[1]*0.4):]
+        #model = download_model(target_bucket, 'mygatemodel2.keras', local_model_path)
+        # if select=="GATE CONV.NETWORK":
+        #     def custom_preprocessing_function(img):
+        #         # Crop the image first to ensure the gate is included
+        #         #cropped_img = img[:,round(img.shape[1]*0.4):]
             
-                # Now apply any further transformations you want
-                # For example, manually apply rescaling and a mild zoom if necessary
-                # Note: You might need additional libraries or write more complex transformations manually
+        #         # Now apply any further transformations you want
+        #         # For example, manually apply rescaling and a mild zoom if necessary
+        #         # Note: You might need additional libraries or write more complex transformations manually
             
-                # Resize the cropped image to the desired input size of the model
-                resized_img = cv2.resize(img, (150, 150))
-                return resized_img
-            #local_model_path = 'temp_model.keras'
-            index_to_class={0: 'both_closed',
-                             1: 'both_open',
-                             2: 'inbound_closed_outbound_open',
-                             3: 'inbound_open_outbound_closed'}
-            index_to_class={0: {'inbound':0,'outbound':0},
-                         1:  {'inbound':1,'outbound':1},
-                         2:  {'inbound':0,'outbound':1},
-                         3:  {'inbound':1,'outbound':0}}
-            #model = download_model(target_bucket, 'mygatemodel2.keras', local_model_path)
-            st.title('SOUTH GATE OPEN/CLOSE DETECTION')
+        #         # Resize the cropped image to the desired input size of the model
+        #         resized_img = cv2.resize(img, (150, 150))
+        #         return resized_img
+        #     #local_model_path = 'temp_model.keras'
+        #     index_to_class={0: 'both_closed',
+        #                      1: 'both_open',
+        #                      2: 'inbound_closed_outbound_open',
+        #                      3: 'inbound_open_outbound_closed'}
+        #     index_to_class={0: {'inbound':0,'outbound':0},
+        #                  1:  {'inbound':1,'outbound':1},
+        #                  2:  {'inbound':0,'outbound':1},
+        #                  3:  {'inbound':1,'outbound':0}}
+        #     #model = download_model(target_bucket, 'mygatemodel2.keras', local_model_path)
+        #     st.title('SOUTH GATE OPEN/CLOSE DETECTION')
 
-            # Assuming you have a function `prepare_image` to process images
-            uploaded_file = st.file_uploader("Upload an image", type="jpg")
-            if uploaded_file is not None:
-                img = image.load_img(uploaded_file, color_mode='rgb')
-                img_array = image.img_to_array(img)
+        #     # Assuming you have a function `prepare_image` to process images
+        #     uploaded_file = st.file_uploader("Upload an image", type="jpg")
+        #     if uploaded_file is not None:
+        #         img = image.load_img(uploaded_file, color_mode='rgb')
+        #         img_array = image.img_to_array(img)
             
-                # Apply custom preprocessing function
-                img_array = custom_preprocessing_function(img_array)
+        #         # Apply custom preprocessing function
+        #         img_array = custom_preprocessing_function(img_array)
             
-                # Expand dimensions to match the batch shape and rescale pixel values
-                test_image = np.expand_dims(img_array, axis=0) / 255.0
+        #         # Expand dimensions to match the batch shape and rescale pixel values
+        #         test_image = np.expand_dims(img_array, axis=0) / 255.0
             
-                # Predict using your model
-                prediction = model.predict(test_image)
-                predicted_class = np.argmax(prediction, axis=1)[0]
+        #         # Predict using your model
+        #         prediction = model.predict(test_image)
+        #         predicted_class = np.argmax(prediction, axis=1)[0]
             
-                # Print debug information
-                st.write(f"Predicted Class: {predicted_class}")
-                st.write(f"Prediction Probabilities: {prediction}")
-                st.write(f"Gate Status: {index_to_class[predicted_class]}")
+        #         # Print debug information
+        #         st.write(f"Predicted Class: {predicted_class}")
+        #         st.write(f"Prediction Probabilities: {prediction}")
+        #         st.write(f"Gate Status: {index_to_class[predicted_class]}")
             
-                gate1, gate2 = st.columns([5, 5])
+        #         gate1, gate2 = st.columns([5, 5])
             
-                def gate_status_html(gate_name, status):
-                    background_color = "#32CD32" if status else "#FF6347"
-                    text = "OPEN" if status else "CLOSED"
-                    html_str = f"""
-                    <div style='background-color: {background_color}; padding: 10px; border-radius: 8px;'>
-                        <h4 style='color: white; text-align: center; font-weight: bold;'>{gate_name}</h4>
-                        <p style='color: white; text-align: center; font-size: 24px; font-weight: bold;'>{text}</p>
-                    </div>
-                    """
-                    return html_str
+        #         def gate_status_html(gate_name, status):
+        #             background_color = "#32CD32" if status else "#FF6347"
+        #             text = "OPEN" if status else "CLOSED"
+        #             html_str = f"""
+        #             <div style='background-color: {background_color}; padding: 10px; border-radius: 8px;'>
+        #                 <h4 style='color: white; text-align: center; font-weight: bold;'>{gate_name}</h4>
+        #                 <p style='color: white; text-align: center; font-size: 24px; font-weight: bold;'>{text}</p>
+        #             </div>
+        #             """
+        #             return html_str
             
-                # Display gate status in Streamlit
-                with gate1:
-                    st.subheader("INBOUND")
-                    inbound_status = index_to_class[predicted_class]['inbound']
-                    inbound_html = gate_status_html("INBOUND", inbound_status)
-                    st.markdown(inbound_html, unsafe_allow_html=True)
+        #         # Display gate status in Streamlit
+        #         with gate1:
+        #             st.subheader("INBOUND")
+        #             inbound_status = index_to_class[predicted_class]['inbound']
+        #             inbound_html = gate_status_html("INBOUND", inbound_status)
+        #             st.markdown(inbound_html, unsafe_allow_html=True)
             
-                with gate2:
-                    st.subheader("OUTBOUND")
-                    outbound_status = index_to_class[predicted_class]['outbound']
-                    outbound_html = gate_status_html("OUTBOUND", outbound_status)
-                    st.markdown(outbound_html, unsafe_allow_html=True)
+        #         with gate2:
+        #             st.subheader("OUTBOUND")
+        #             outbound_status = index_to_class[predicted_class]['outbound']
+        #             outbound_html = gate_status_html("OUTBOUND", outbound_status)
+        #             st.markdown(outbound_html, unsafe_allow_html=True)
         
         if select=="FINANCE":
             hadi=False
@@ -3389,7 +3389,7 @@ if authentication_status:
         if select=="LOADOUT" :
         
 
-            map=gcp_download_new(target_bucket,rf"map.json")
+            map=gcp_download(target_bucket,rf"map.json")
             release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
             release_order_database=json.loads(release_order_database)
             dispatched=gcp_download(target_bucket,rf"dispatched.json")
@@ -4733,7 +4733,7 @@ if authentication_status:
     ########################                                WAREHOUSE                            ####################
     
     elif username == 'warehouse':
-        map=gcp_download_new(target_bucket,rf"map.json")
+        map=gcp_download(target_bucket,rf"map.json")
         release_order_database=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
         release_order_database=json.loads(release_order_database)
         dispatched=gcp_download(target_bucket,rf"dispatched.json")

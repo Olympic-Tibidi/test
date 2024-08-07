@@ -66,11 +66,11 @@ import google.auth
 
 #client = documentai.DocumentProcessorServiceClient(credentials=credentials)
 
-credentials, _ = google.auth.default()
-credentials = google.auth.credentials.with_scopes_if_required(credentials, bigquery.Client.SCOPE)
-project_id = "newsuzano"
-storage_client= storage.Client(project=project_id,credentials=credentials)
-authed_http = google.auth.transport.requests.AuthorizedSession(credentials)
+# credentials, _ = google.auth.default()
+# credentials = google.auth.credentials.with_scopes_if_required(credentials, bigquery.Client.SCOPE)
+# project_id = "newsuzano"
+# storage_client= storage.Client(project=project_id,credentials=credentials)
+# authed_http = google.auth.transport.requests.AuthorizedSession(credentials)
 
 
 gcp_service_account_info = st.secrets["gcs_connections"]

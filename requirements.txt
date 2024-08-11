@@ -25,4 +25,4 @@ tensorflow
 pillow
 pymysql==1.0.2
 sqlalchemy==2.0.16
-google-cloud-sql-connector
+cloud-sql-python-connector[pymysql]

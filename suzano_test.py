@@ -2408,7 +2408,7 @@ if authentication_status:
                 )
 
                 with pool.connect() as db_conn:
-                    shipments_df = pd.read_sql("SELECT * FROM shipments", db_conn)
+                    shipment_df = pd.read_sql(f"SELECT * FROM shipments WHERE vehicle = 'MX5036'", db_conn)
 
                 # Display the data in Streamlit
                 st.write("Current Shipments Data")

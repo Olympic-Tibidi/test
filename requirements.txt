@@ -23,3 +23,6 @@ python-docx
 opencv-python-headless==4.5.2.52
 tensorflow
 pillow
+pymysql
+sqlalchemy
+google-cloud-sql-connector

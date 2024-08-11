@@ -57,7 +57,8 @@ from google.oauth2 import service_account
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from google.cloud import storage
-
+from google.cloud.sql.connector import Connector, IPTypes
+import sqlalchemy
 
 import google.auth
 #from google.cloud import bigquery
@@ -2386,217 +2387,244 @@ if authentication_status:
                 
             
             with admin_tab4:   ###   AUDIT
-                if st.button("RUN RECORD AUDIT"):
+                connector = Connector()
+
+                # SQLAlchemy database connection creator function
+                def getconn():
+                    conn = connector.connect(
+                        "newsuzano:us-west1:suzanosql",  # Cloud SQL Instance Connection Name
+                        "pymysql",
+                        user="suzanosql",  # Replace with your MySQL username
+                        password="suzanosqldedikya",  # Replace with your MySQL password
+                        db="Bill_Of_Ladings",  # Replace with your database name
+                        ip_type=IPTypes.PUBLIC  # IPTypes.PRIVATE for private IP
+                    )
+                    return conn
+
+                # Create SQLAlchemy connection pool
+                pool = sqlalchemy.create_engine(
+                    "mysql+pymysql://",
+                    creator=getconn,
+                )
+
+                with pool.connect() as db_conn:
+                    shipments_df = pd.read_sql("SELECT * FROM shipments", db_conn)
+
+                # Display the data in Streamlit
+                st.write("Current Shipments Data")
+                edited_df = st.dataframe(shipments_df, num_rows=20)
+
+                # if st.button("RUN RECORD AUDIT"):
                     
-                    dfb=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                    dfb=json.loads(dfb)
-                    dfb=pd.DataFrame.from_dict(dfb).T[1:]
-                    suz=gcp_download(target_bucket,rf"suzano_report.json")
-                    suz=json.loads(suz)
-                    suz_frame=pd.DataFrame(suz).T
-                    raw_ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
-                    raw_ro=json.loads(raw_ro)
-                    def dict_compare(d1, d2):
-                        d1_keys = set(d1.keys())
-                        d2_keys = set(d2.keys())
-                        shared_keys = d1_keys.intersection(d2_keys)
-                        added = d1_keys - d2_keys
-                        removed = d2_keys - d1_keys
-                        modified = {o : (d1[o], d2[o]) for o in shared_keys if d1[o] != d2[o]}
-                        same = set(o for o in shared_keys if d1[o] == d2[o])
-                        return added, removed, modified, same
+                #     dfb=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                #     dfb=json.loads(dfb)
+                #     dfb=pd.DataFrame.from_dict(dfb).T[1:]
+                #     suz=gcp_download(target_bucket,rf"suzano_report.json")
+                #     suz=json.loads(suz)
+                #     suz_frame=pd.DataFrame(suz).T
+                #     raw_ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
+                #     raw_ro=json.loads(raw_ro)
+                #     def dict_compare(d1, d2):
+                #         d1_keys = set(d1.keys())
+                #         d2_keys = set(d2.keys())
+                #         shared_keys = d1_keys.intersection(d2_keys)
+                #         added = d1_keys - d2_keys
+                #         removed = d2_keys - d1_keys
+                #         modified = {o : (d1[o], d2[o]) for o in shared_keys if d1[o] != d2[o]}
+                #         same = set(o for o in shared_keys if d1[o] == d2[o])
+                #         return added, removed, modified, same
                     
-                    def extract_bol_shipped(data,bol):
-                        qt=0
-                        sales_group=["001","002","003","004","005"]
-                        for ro in data:
-                            for sale in data[ro]:
-                                if sale in sales_group and data[ro][sale]['ocean_bill_of_lading']==bol:
-                                    qt+=data[ro][sale]['shipped']
-                        return qt
-                    def compare_dict(a, b):
-                        # Compared two dictionaries..
-                        # Posts things that are not equal..
-                        res_compare = []
-                        for k in set(list(a.keys()) + list(b.keys())):
-                            if isinstance(a[k], dict):
-                                z0 = compare_dict(a[k], b[k])
-                            else:
-                                z0 = a[k] == b[k]
+                #     def extract_bol_shipped(data,bol):
+                #         qt=0
+                #         sales_group=["001","002","003","004","005"]
+                #         for ro in data:
+                #             for sale in data[ro]:
+                #                 if sale in sales_group and data[ro][sale]['ocean_bill_of_lading']==bol:
+                #                     qt+=data[ro][sale]['shipped']
+                #         return qt
+                #     def compare_dict(a, b):
+                #         # Compared two dictionaries..
+                #         # Posts things that are not equal..
+                #         res_compare = []
+                #         for k in set(list(a.keys()) + list(b.keys())):
+                #             if isinstance(a[k], dict):
+                #                 z0 = compare_dict(a[k], b[k])
+                #             else:
+                #                 z0 = a[k] == b[k]
                     
-                            z0_bool = np.all(z0)
-                            res_compare.append(z0_bool)
-                            if not z0_bool:
-                                if a==rel_t:
-                                    st.markdown(f"**:red[Discrepancy]**")
-                                    st.markdown(f"**{k} - Inventory :{a[k]} Units Shipped - BOL Report : {b[k]} Units Shipped**")
+                #             z0_bool = np.all(z0)
+                #             res_compare.append(z0_bool)
+                #             if not z0_bool:
+                #                 if a==rel_t:
+                #                     st.markdown(f"**:red[Discrepancy]**")
+                #                     st.markdown(f"**{k} - Inventory :{a[k]} Units Shipped - BOL Report : {b[k]} Units Shipped**")
                                     
-                                else:
-                                    st.markdown(f"**:red[Discrepancy]**")
-                                    st.markdown(f"**{k} - Suzano Report :{a[k]} Units Shipped - BOL Report : {b[k]} Units Shipped**")
-                                    diff = dfb[~dfb.index.isin([str(i) for i in suz_frame['Shipment ID #']]+['11502400', '11503345', 'MF01769573*', '11503871'])].index.to_list()
-                                    for i in diff:
-                                        st.markdown(f"**...Shipment {i} to {dfb.loc[i,'destination']} is in BOL but not Suzano Report**") 
-                        return np.all(res_compare)
+                #                 else:
+                #                     st.markdown(f"**:red[Discrepancy]**")
+                #                     st.markdown(f"**{k} - Suzano Report :{a[k]} Units Shipped - BOL Report : {b[k]} Units Shipped**")
+                #                     diff = dfb[~dfb.index.isin([str(i) for i in suz_frame['Shipment ID #']]+['11502400', '11503345', 'MF01769573*', '11503871'])].index.to_list()
+                #                     for i in diff:
+                #                         st.markdown(f"**...Shipment {i} to {dfb.loc[i,'destination']} is in BOL but not Suzano Report**") 
+                #         return np.all(res_compare)
                
                     
-                    suz_t=suz_frame.groupby("Ocean BOL#")["Quantity"].sum().to_dict()
-                    df_t=dfb.groupby("ocean_bill_of_lading")["quantity"].sum().to_dict()
-                    #corrections due to shipment MF01769573 and 1150344 on 12-15 between Kirkenes and Juventas mixed loads.
-                    suz_t['GSSWKIR6013E']=suz_t['GSSWKIR6013E']+7
-                    suz_t['GSSWKIR6013D']=suz_t['GSSWKIR6013D']+9
-                    suz_t['GSSWJUV8556C']=suz_t['GSSWJUV8556C']-9
-                    suz_t['GSSWJUV8556A']=suz_t['GSSWJUV8556A']-7
+                #     suz_t=suz_frame.groupby("Ocean BOL#")["Quantity"].sum().to_dict()
+                #     df_t=dfb.groupby("ocean_bill_of_lading")["quantity"].sum().to_dict()
+                #     #corrections due to shipment MF01769573 and 1150344 on 12-15 between Kirkenes and Juventas mixed loads.
+                #     suz_t['GSSWKIR6013E']=suz_t['GSSWKIR6013E']+7
+                #     suz_t['GSSWKIR6013D']=suz_t['GSSWKIR6013D']+9
+                #     suz_t['GSSWJUV8556C']=suz_t['GSSWJUV8556C']-9
+                #     suz_t['GSSWJUV8556A']=suz_t['GSSWJUV8556A']-7
                     
-                    rel_t={i:extract_bol_shipped(raw_ro,i) for i in suz_t}
-                    aud_col1,aud_col2=st.columns(2)
-                    with aud_col1:
+                #     rel_t={i:extract_bol_shipped(raw_ro,i) for i in suz_t}
+                #     aud_col1,aud_col2=st.columns(2)
+                #     with aud_col1:
                         
-                        if compare_dict(suz_t,df_t):
-                            st.markdown("**:blue[All Checks Complete !]**")
-                            st.markdown("**:blue[SUZANO REPORT match BILL OF LADINGS]**")       
-                            st.write(f"{len(suz_frame)} Shipments")
+                #         if compare_dict(suz_t,df_t):
+                #             st.markdown("**:blue[All Checks Complete !]**")
+                #             st.markdown("**:blue[SUZANO REPORT match BILL OF LADINGS]**")       
+                #             st.write(f"{len(suz_frame)} Shipments")
                            
 
-                    with aud_col2:
+                #     with aud_col2:
                         
-                        if compare_dict(rel_t,df_t):
-                            st.markdown("**:blue[All Checks Complete !]**")
-                            st.markdown("**:blue[INVENTORY match BILL OF LADINGS]**")       
-                            st.write(f"{len(suz_frame)} Shipments")
-                edi_audit=st.toggle("AUDIT TODAYS EDIs AND REPORTS")
-                if edi_audit:
+                #         if compare_dict(rel_t,df_t):
+                #             st.markdown("**:blue[All Checks Complete !]**")
+                #             st.markdown("**:blue[INVENTORY match BILL OF LADINGS]**")       
+                #             st.write(f"{len(suz_frame)} Shipments")
+                # edi_audit=st.toggle("AUDIT TODAYS EDIs AND REPORTS")
+                # if edi_audit:
                     
-                    with st.spinner("Wait for it"):
-                        guilty=None
-                        def list_files_uploaded_today(bucket_name, folder_name):
-                        # Initialize Google Cloud Storage client
-                            storage_client = get_storage_client()
+                #     with st.spinner("Wait for it"):
+                #         guilty=None
+                #         def list_files_uploaded_today(bucket_name, folder_name):
+                #         # Initialize Google Cloud Storage client
+                #             storage_client = get_storage_client()
                         
-                            # Get the current date
-                            today = (datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date()
-                            # Get the list of blobs in the specified folder
-                            blobs = storage_client.list_blobs(bucket_name, prefix=folder_name)
+                #             # Get the current date
+                #             today = (datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date()
+                #             # Get the list of blobs in the specified folder
+                #             blobs = storage_client.list_blobs(bucket_name, prefix=folder_name)
                         
-                            # Extract filenames uploaded today only
-                            filenames = []
-                            for blob in blobs:
-                                # Check if blob's last modification date is today
-                                if blob.updated.date() == today:
-                                    # Extract only the filenames without the folder path
-                                    filename = blob.name.split("/")[-1]
-                                    filenames.append(filename)
-                                time.sleep(0.001)
+                #             # Extract filenames uploaded today only
+                #             filenames = []
+                #             for blob in blobs:
+                #                 # Check if blob's last modification date is today
+                #                 if blob.updated.date() == today:
+                #                     # Extract only the filenames without the folder path
+                #                     filename = blob.name.split("/")[-1]
+                #                     filenames.append(filename)
+                #                 time.sleep(0.001)
                         
-                            return filenames
-                        today_uploaded_files = list_files_uploaded_today(target_bucket,rf"EDIS/")
-                        st.markdown(f"**# of EDIs Uploaded : {len(today_uploaded_files)}**")
-                        st.markdown(f"EDIs Uploaded Today : {today_uploaded_files}")
+                #             return filenames
+                #         today_uploaded_files = list_files_uploaded_today(target_bucket,rf"EDIS/")
+                #         st.markdown(f"**# of EDIs Uploaded : {len(today_uploaded_files)}**")
+                #         st.markdown(f"EDIs Uploaded Today : {today_uploaded_files}")
                        
                         
-                        base=[]
-                        for i in today_uploaded_files:
+                #         base=[]
+                #         for i in today_uploaded_files:
                             
-                            lines=gcp_download(target_bucket, rf"EDIS/{i}").splitlines()
+                #             lines=gcp_download(target_bucket, rf"EDIS/{i}").splitlines()
                             
                             
-                            # Step 2: Process the contents
-                            data = []
-                            count=1
-                            line_count=0
-                            dev_count=0
-                            line_tonnage=0
-                            unit_count=0
-                            for line in lines:
-                                if line.startswith("1HDR"):
-                                    prefix, data = line.split(':') 
-                                    assert prefix=="1HDR" , "Prefix does not match the expected value '1HDR'"
-                                    date_str = data[:8]  # YYYYMMDD
-                                    time_str = data[8:14]  # HHMMSS
-                                    terminal_code = data[14:18]  # 4 letters
-                                    datetime_obj = datetime.datetime.strptime(date_str + time_str, '%Y%m%d%H%M%S')
-                                    line_count+=1
-                                elif line.startswith("2DTD"):
-                                    prefix, data = line.split(':') 
-                                    release_order = data[:10].strip() 
-                                    sales_item = data[10:16].strip() 
-                                    date=data[16:24].strip()
-                                    date = datetime.datetime.strptime(date, '%Y%m%d').date()
-                                    transport_type=data[24:26].strip()
-                                    transport_sequential=data[26:30].strip()
-                                    vehicle_id=data[30:50].strip()
-                                    total_tonnage=int(data[50:66].strip())
-                                    carrier_code=data[105:115].strip()
-                                    bill_of_lading=data[115:165].strip()
-                                    eta_date=data[165:].strip()
-                                    eta_date = datetime.datetime.strptime(eta_date, '%Y%m%d').date()
-                                    line_count+=1
-                                elif line.startswith("2DEV"):
-                                    prefix, data = line.split(':')
-                                    line_release_order=data[:10]
-                                    line_sales_item=data[10:16].strip()
-                                    line_date=data[16:24].strip()
-                                    line_date = datetime.datetime.strptime(line_date, '%Y%m%d').date()
-                                    transport_type=data[24:26].strip()
-                                    lot_number=data[26:36].strip()
-                                    line_weight=int(data[51:56].strip())
-                                    line_unit_count=line_weight/2000
-                                    line_tonnage+=line_weight
-                                    unit_count+=line_unit_count
-                                    dev_count+=1
-                                    line_count+=1
+                #             # Step 2: Process the contents
+                #             data = []
+                #             count=1
+                #             line_count=0
+                #             dev_count=0
+                #             line_tonnage=0
+                #             unit_count=0
+                #             for line in lines:
+                #                 if line.startswith("1HDR"):
+                #                     prefix, data = line.split(':') 
+                #                     assert prefix=="1HDR" , "Prefix does not match the expected value '1HDR'"
+                #                     date_str = data[:8]  # YYYYMMDD
+                #                     time_str = data[8:14]  # HHMMSS
+                #                     terminal_code = data[14:18]  # 4 letters
+                #                     datetime_obj = datetime.datetime.strptime(date_str + time_str, '%Y%m%d%H%M%S')
+                #                     line_count+=1
+                #                 elif line.startswith("2DTD"):
+                #                     prefix, data = line.split(':') 
+                #                     release_order = data[:10].strip() 
+                #                     sales_item = data[10:16].strip() 
+                #                     date=data[16:24].strip()
+                #                     date = datetime.datetime.strptime(date, '%Y%m%d').date()
+                #                     transport_type=data[24:26].strip()
+                #                     transport_sequential=data[26:30].strip()
+                #                     vehicle_id=data[30:50].strip()
+                #                     total_tonnage=int(data[50:66].strip())
+                #                     carrier_code=data[105:115].strip()
+                #                     bill_of_lading=data[115:165].strip()
+                #                     eta_date=data[165:].strip()
+                #                     eta_date = datetime.datetime.strptime(eta_date, '%Y%m%d').date()
+                #                     line_count+=1
+                #                 elif line.startswith("2DEV"):
+                #                     prefix, data = line.split(':')
+                #                     line_release_order=data[:10]
+                #                     line_sales_item=data[10:16].strip()
+                #                     line_date=data[16:24].strip()
+                #                     line_date = datetime.datetime.strptime(line_date, '%Y%m%d').date()
+                #                     transport_type=data[24:26].strip()
+                #                     lot_number=data[26:36].strip()
+                #                     line_weight=int(data[51:56].strip())
+                #                     line_unit_count=line_weight/2000
+                #                     line_tonnage+=line_weight
+                #                     unit_count+=line_unit_count
+                #                     dev_count+=1
+                #                     line_count+=1
                         
-                                elif line.startswith("9TRL"):
-                                    prefix, data = line.split(':')
-                                    edi_line_count=int(data[:4])
-                                    line_count+=1
-                                    assert edi_line_count==line_count,f"no, line_count is {line_count}"
-                                    assert line_tonnage==total_tonnage
-                            base.append({'Date Shipped':datetime_obj, 'Vehicle':vehicle_id, 'Shipment ID #':bill_of_lading, 'Release #':release_order,
-                                             'Carrier':carrier_code, 'Quantity':unit_count, 'Metric Ton':total_tonnage/1000})
+                #                 elif line.startswith("9TRL"):
+                #                     prefix, data = line.split(':')
+                #                     edi_line_count=int(data[:4])
+                #                     line_count+=1
+                #                     assert edi_line_count==line_count,f"no, line_count is {line_count}"
+                #                     assert line_tonnage==total_tonnage
+                #             base.append({'Date Shipped':datetime_obj, 'Vehicle':vehicle_id, 'Shipment ID #':bill_of_lading, 'Release #':release_order,
+                #                              'Carrier':carrier_code, 'Quantity':unit_count, 'Metric Ton':total_tonnage/1000})
                         
-                        edis=pd.DataFrame(base)
-                        edis=edis.sort_values(by="Date Shipped")
-                        edis.set_index("Shipment ID #",drop=True,inplace=True)
+                #         edis=pd.DataFrame(base)
+                #         edis=edis.sort_values(by="Date Shipped")
+                #         edis.set_index("Shipment ID #",drop=True,inplace=True)
                         
-                        suz=gcp_download(target_bucket,rf"suzano_report.json")
-                        suz=json.loads(suz)
-                        suz_frame=pd.DataFrame(suz).T
-                        suz_frame["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suz_frame["Date Shipped"]]
-                        suz_frame_daily=suz_frame[suz_frame.Date==(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date()]
-                        suz_frame_daily=suz_frame_daily[['Date Shipped', 'Vehicle', 'Shipment ID #', 'Release #', 'Carrier',
-                                      'Quantity', 'Metric Ton',]]
-                        suz_frame_daily.set_index("Shipment ID #",drop=True,inplace=True)
-                        # suz_frame_daily.loc["MF01799999"]={"Date Shipped":"2024-03-28 12:26:58","Vehicle":"3423C",
-                        #                                            "Shipment ID #":"MF01799420","Release #":"3172295",
-                        #                                        "Carrier":"123456","Quantity":14.0,"Metric Ton":28.0}
-                        more=None
-                        if len(edis)!=len(suz_frame_daily):
-                            diff=abs(len(edis)-len(suz_frame_daily))
-                            if len(edis)<len(suz_frame_daily):
-                                more=suz_frame_daily.copy()
-                                guilty="edis"
-                                for i in range(diff):
-                                    edis.loc[len(edis)]=None
-                            else:
-                                more=edis.copy()
-                                guilty="suz_frame_daily"
-                        
-                        
-                        difference = (edis.index!=suz_frame_daily.index)
+                #         suz=gcp_download(target_bucket,rf"suzano_report.json")
+                #         suz=json.loads(suz)
+                #         suz_frame=pd.DataFrame(suz).T
+                #         suz_frame["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in suz_frame["Date Shipped"]]
+                #         suz_frame_daily=suz_frame[suz_frame.Date==(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date()]
+                #         suz_frame_daily=suz_frame_daily[['Date Shipped', 'Vehicle', 'Shipment ID #', 'Release #', 'Carrier',
+                #                       'Quantity', 'Metric Ton',]]
+                #         suz_frame_daily.set_index("Shipment ID #",drop=True,inplace=True)
+                #         # suz_frame_daily.loc["MF01799999"]={"Date Shipped":"2024-03-28 12:26:58","Vehicle":"3423C",
+                #         #                                            "Shipment ID #":"MF01799420","Release #":"3172295",
+                #         #                                        "Carrier":"123456","Quantity":14.0,"Metric Ton":28.0}
+                #         more=None
+                #         if len(edis)!=len(suz_frame_daily):
+                #             diff=abs(len(edis)-len(suz_frame_daily))
+                #             if len(edis)<len(suz_frame_daily):
+                #                 more=suz_frame_daily.copy()
+                #                 guilty="edis"
+                #                 for i in range(diff):
+                #                     edis.loc[len(edis)]=None
+                #             else:
+                #                 more=edis.copy()
+                #                 guilty="suz_frame_daily"
                         
                         
+                #         difference = (edis.index!=suz_frame_daily.index)
                         
-                        if guilty=="edis":
-                            more=more[difference]
-                            st.markdown("**:red[Following Shipment from Suzano Report is Missing an EDI]**")
-                            st.write(more)
-                        elif guilty=="suz_frame_daily":
-                            more=more[difference]
-                            st.markdown("**:red[Following EDI is Missing in Suzano Report]**")
-                            st.write(more)
-                        else:
-                            st.success("All EDIs and Suzano Report Entries are accounted for!! ")  
+                        
+                        
+                #         if guilty=="edis":
+                #             more=more[difference]
+                #             st.markdown("**:red[Following Shipment from Suzano Report is Missing an EDI]**")
+                #             st.write(more)
+                #         elif guilty=="suz_frame_daily":
+                #             more=more[difference]
+                #             st.markdown("**:red[Following EDI is Missing in Suzano Report]**")
+                #             st.write(more)
+                #         else:
+                #             st.success("All EDIs and Suzano Report Entries are accounted for!! ")  
                             
             with admin_tab2:   #### BILL OF LADINGS
                 bill_data=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")

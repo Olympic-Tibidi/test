@@ -4497,7 +4497,10 @@ if authentication_status:
                                         if ocean_bill_of_lading not in bols:
                                             bols[ocean_bill_of_lading] = []
                                         bols[ocean_bill_of_lading].append(key)
-                        
+                        for i in map['bol_mapping']:
+                            if i not in bols:
+                                bols[i]=[]
+ 
                         inventory={}
                         a=[i for i in map['bol_mapping']]
                         for bill in a:
@@ -4524,15 +4527,19 @@ if authentication_status:
                             final[k]["Fit To Ship"]=final[k]["Total"]-final[k]["Damaged"]   
                         
                             if k in bols:
-                                
-                                for ro in set(bols[k]):
-                                    a,b,c=extract_qt(raw_ro,ro,k)[0],extract_qt(raw_ro,ro,k)[1],extract_qt(raw_ro,ro,k)[2]
-                                    final[k]["Allocated to ROs"]+=a
-                                    #final[k]["Shipped"]=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[['quantity']].sum().loc[k,'quantity']
-                                    final[k]["Shipped"]+=b
-                                    
-                                    final[k]["Remaining in Warehouse"]=final[k]["Fit To Ship"]-final[k]["Shipped"]
-                                    final[k]["Remaining on ROs"]=final[k]["Allocated to ROs"]-final[k]["Shipped"]
+                                if len(bols[k])>0:
+                                    for ro in set(bols[k]):
+                                        a,b,c=extract_qt(raw_ro,ro,k)[0],extract_qt(raw_ro,ro,k)[1],extract_qt(raw_ro,ro,k)[2]
+                                        final[k]["Allocated to ROs"]+=a
+                                        #final[k]["Shipped"]=inv_bill_of_ladings.groupby("ocean_bill_of_lading")[['quantity']].sum().loc[k,'quantity']
+                                        final[k]["Shipped"]+=b
+                        
+                                        final[k]["Remaining in Warehouse"]=final[k]["Fit To Ship"]-final[k]["Shipped"]
+                                        final[k]["Remaining on ROs"]=final[k]["Allocated to ROs"]-final[k]["Shipped"]
+                                        final[k]["Remaining After ROs"]=final[k]["Fit To Ship"]-final[k]["Allocated to ROs"]
+                                else:
+                                    final[k]["Remaining in Warehouse"]=final[k]["Fit To Ship"]
+                                    final[k]["Remaining on ROs"]=0
                                     final[k]["Remaining After ROs"]=final[k]["Fit To Ship"]-final[k]["Allocated to ROs"]
                             else:
                                 pass

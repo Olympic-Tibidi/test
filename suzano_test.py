@@ -3176,8 +3176,13 @@ if authentication_status:
                                                                                 release_order_database[i][sale]["shipped"],
                                                                                 release_order_database[i][sale]["remaining"]]
                       
-                        
-                        st.write(pd.DataFrame(completed_release_order_dest_map).T)
+                        column_names = ["Sale", "Destination", "Ocean Bill of Lading", "Grade", "Vessel", "Total", "Shipped", "Remaining"]
+
+                        # Create DataFrame and assign column names
+                        completed_frame = pd.DataFrame(completed_release_order_dest_map).T
+                        completed_frame.columns = column_names
+
+                        st.write(completed_frame)
                         activate_list=list(set([i.split("-")[0] for i in completed_release_order_dest_map.keys()]))
                         to_reactivate=st.selectbox("SELECT RELEASE ORDER TO CHANGE FROM COMPLETE TO UNCOMPLETE",activate_list,key="erfdaq")
                         if st.button("ACTIVATE RELEASE ORDER"):

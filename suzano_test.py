@@ -1111,264 +1111,264 @@ if authentication_status:
         #                         st.plotly_chart(fig2)
         #                     #st.write(monthly)
                             
-        #             with fintab2:
-        #                 year=st.selectbox("Select Year",["2024","2023","2022","2021","2020","2019","2018", "2017","2016"],key="second")
+                    with fintab2:
+                        year=st.selectbox("Select Year",["2024","2023","2022","2021","2020","2019","2018", "2017","2016"],key="second")
                         
-        #                 ### LETS PUT YEAR in st.session state to use later.
+                        ### LETS PUT YEAR in st.session state to use later.
                         
                             
-        #                 ### LOAD LEDGERS by year
-        #                 ledger_b=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
-        #                 ledger_b=pd.read_feather(io.BytesIO(ledger_b))
-        #                 ledger_b["Account"]=ledger_b["Account"].astype("str")
-        #                 ledger_b.set_index("index",drop=True,inplace=True)
+                        ### LOAD LEDGERS by year
+                        ledger_b=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
+                        ledger_b=pd.read_feather(io.BytesIO(ledger_b))
+                        ledger_b["Account"]=ledger_b["Account"].astype("str")
+                        ledger_b.set_index("index",drop=True,inplace=True)
                         
-        #                 ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
+                        ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
                         
-        #                 ledger_b.Account=[str(i)+"-"+str(j) for i,j in zip(ledger_b.Account,ledger_b.Sub_Cat)]
+                        ledger_b.Account=[str(i)+"-"+str(j) for i,j in zip(ledger_b.Account,ledger_b.Sub_Cat)]
                         
                         
-        #                 ins=ledger_b[ledger_b["Account"].isin(revenues_codes)].Net.sum()
-        #                 outs=ledger_b[ledger_b["Account"].isin(expenses)].Net.sum()
-        #                 outs_dep=ledger_b[ledger_b["Account"].isin(expenses_dep)].Net.sum()
-        #                 dep=ledger_b[ledger_b["Account"].isin(depreciation_codes)].Net.sum()
+                        ins=ledger_b[ledger_b["Account"].isin(revenues_codes)].Net.sum()
+                        outs=ledger_b[ledger_b["Account"].isin(expenses)].Net.sum()
+                        outs_dep=ledger_b[ledger_b["Account"].isin(expenses_dep)].Net.sum()
+                        dep=ledger_b[ledger_b["Account"].isin(depreciation_codes)].Net.sum()
                         
-        #                 a1, a2,= st.columns([2,5])
-        #                 with a1:
+                        a1, a2,= st.columns([2,5])
+                        with a1:
                             
-        #                     st.write(f"**REVENUES     :  {'${:,.1f}**'.format(ins)}")
-        #                     st.write(f"**EXPENSES      :  {'${:,.1f}**'.format(outs)}")
-        #                     if ins+outs<0:
-        #                         tt=f"NET BEFORE DEPRECIATION:  {'${:,.1f}'.format(ins+outs)}"
-        #                         original_title = f'<p style="font-family:Arial;font-weight: bold; color:Red; font-size: 15px;">{tt}</p>'
-        #                         st.markdown(original_title, unsafe_allow_html=True)
-        #                     else:
-        #                         st.write(f"**NET BEFORE DEPRECIATION:  {'${:,.1f}**'.format(ins+outs)}")
-        #                     st.write(f"**DEPRECIATION:  {'${:,.1f}**'.format(dep)}")
-        #                     if ins+outs+dep<0:
-        #                         tt=f"NET AFTER DEPRECIATION:  {'${:,.1f}'.format(ins+outs+dep)}"
-        #                         original_title = f'<p style="font-family:Arial;font-weight: bold; color:Red; font-size: 15px;">{tt}</p>'
-        #                         st.markdown(original_title, unsafe_allow_html=True)
-        #                     else:
-        #                         st.write(f"**NET AFTER DEPRECIATION:  {'${:,.1f}**'.format(ins+outs+dep)}")
+                            st.write(f"**REVENUES     :  {'${:,.1f}**'.format(ins)}")
+                            st.write(f"**EXPENSES      :  {'${:,.1f}**'.format(outs)}")
+                            if ins+outs<0:
+                                tt=f"NET BEFORE DEPRECIATION:  {'${:,.1f}'.format(ins+outs)}"
+                                original_title = f'<p style="font-family:Arial;font-weight: bold; color:Red; font-size: 15px;">{tt}</p>'
+                                st.markdown(original_title, unsafe_allow_html=True)
+                            else:
+                                st.write(f"**NET BEFORE DEPRECIATION:  {'${:,.1f}**'.format(ins+outs)}")
+                            st.write(f"**DEPRECIATION:  {'${:,.1f}**'.format(dep)}")
+                            if ins+outs+dep<0:
+                                tt=f"NET AFTER DEPRECIATION:  {'${:,.1f}'.format(ins+outs+dep)}"
+                                original_title = f'<p style="font-family:Arial;font-weight: bold; color:Red; font-size: 15px;">{tt}</p>'
+                                st.markdown(original_title, unsafe_allow_html=True)
+                            else:
+                                st.write(f"**NET AFTER DEPRECIATION:  {'${:,.1f}**'.format(ins+outs+dep)}")
                         
-        #                 with a2:
+                        with a2:
                             
-        #                 # Define the list of values and labels for the waterfall chart
-        #                     values = [ins,outs,ins+outs, dep,ins+outs+dep]
-        #                     labels = ['Revenues', 'Expenses', 'Net Before Depreciation', 'Depreciation', 'Net After Depreciation']
+                        # Define the list of values and labels for the waterfall chart
+                            values = [ins,outs,ins+outs, dep,ins+outs+dep]
+                            labels = ['Revenues', 'Expenses', 'Net Before Depreciation', 'Depreciation', 'Net After Depreciation']
                             
-        #                     # Define the colors for each bar in the waterfall chart
-        #                     end=ins+outs+dep
-        #                     #st.write(end)
-        #                     if end<0:
-        #                         #colors = ['#4CAF50', '#FFC107', '#2196F3', '#F44336', '#F44336']
-        #                         totals={"marker":{"color":"maroon", "line":{"color":"rgb(63, 63, 63)", "width":1}}}
-        #                     else:
-        #                         #colors=['#4CAF50', '#FFC107', '#2196F3', '#F44336', '#EF9A9A']
-        #                         totals={"marker":{"color":f"#2196F3", "line":{"color":"rgb(63, 63, 63)", "width":1}}}
+                            # Define the colors for each bar in the waterfall chart
+                            end=ins+outs+dep
+                            #st.write(end)
+                            if end<0:
+                                #colors = ['#4CAF50', '#FFC107', '#2196F3', '#F44336', '#F44336']
+                                totals={"marker":{"color":"maroon", "line":{"color":"rgb(63, 63, 63)", "width":1}}}
+                            else:
+                                #colors=['#4CAF50', '#FFC107', '#2196F3', '#F44336', '#EF9A9A']
+                                totals={"marker":{"color":f"#2196F3", "line":{"color":"rgb(63, 63, 63)", "width":1}}}
                            
                 
-        #                     # Define the text for each bar in the waterfall chart
-        #                     text = ['<b>${:,.1f}<b>'.format(value) for value in values]
-        #                     text_font = {'size': 14,'color':['black','red','black','red','black']}
-        #                     this_year=f"So Far This Year" if year=="2023" else ""
-        #                     # Create the trace for the waterfall chart
-        #                     trace = go.Waterfall(
-        #                         name = "Net Result",
-        #                         orientation = "v",
-        #                         measure = ['absolute', 'relative', 'total', 'relative', 'total'],
-        #                         x = labels,
-        #                         text = text,
-        #                         textfont=text_font,
+                            # Define the text for each bar in the waterfall chart
+                            text = ['<b>${:,.1f}<b>'.format(value) for value in values]
+                            text_font = {'size': 14,'color':['black','red','black','red','black']}
+                            this_year=f"So Far This Year" if year=="2023" else ""
+                            # Create the trace for the waterfall chart
+                            trace = go.Waterfall(
+                                name = "Net Result",
+                                orientation = "v",
+                                measure = ['absolute', 'relative', 'total', 'relative', 'total'],
+                                x = labels,
+                                text = text,
+                                textfont=text_font,
                                  
-        #                         y = values,
-        #                         connector = {"line":{"color":"rgb(63, 63, 63)"}},
-        #                         decreasing = {"marker":{"color":"#FFC107"}},
-        #                         increasing = {"marker":{"color":"#4CAF50"}},
-        #                         totals={"marker":{"color":f"#2196F3", "line":{"color":"rgb(63, 63, 63)", "width":1}}},
-        #                         cliponaxis = False,  
-        #                     )
+                                y = values,
+                                connector = {"line":{"color":"rgb(63, 63, 63)"}},
+                                decreasing = {"marker":{"color":"#FFC107"}},
+                                increasing = {"marker":{"color":"#4CAF50"}},
+                                totals={"marker":{"color":f"#2196F3", "line":{"color":"rgb(63, 63, 63)", "width":1}}},
+                                cliponaxis = False,  
+                            )
                 
-        #                     # Define the layout for the waterfall chart
-        #             #                 layout = go.Layout(
-        #             #                     title = f'MARINE TERMINAL FINANCIALS-WATERFALL-{year}',
-        #             #                     xaxis = {'title': 'Components'},
-        #             #                     yaxis = {'title': 'Amount ($)'},
-        #             #                 )
-        #             #                 layout = go.Layout(
-        #             #                                     title = 'Waterfall Chart',
-        #             #                                     titlefont=dict(size=24, family='Arial', color='black',),
-        #             #                                     xaxis = {'title': 'Components', 'titlefont': dict(size=18, family='Arial', color='black'),
-        #             #                                              'tickfont': dict(size=16, family='Arial', color='black',)},
-        #             #                                     yaxis = {'title': 'Amount ($)', 'titlefont': dict(size=18, family='Arial', color='black'),
-        #             #                                              'tickfont': dict(size=16, family='Arial', color='black',)},
-        #             #                                 )
+                            # Define the layout for the waterfall chart
+                    #                 layout = go.Layout(
+                    #                     title = f'MARINE TERMINAL FINANCIALS-WATERFALL-{year}',
+                    #                     xaxis = {'title': 'Components'},
+                    #                     yaxis = {'title': 'Amount ($)'},
+                    #                 )
+                    #                 layout = go.Layout(
+                    #                                     title = 'Waterfall Chart',
+                    #                                     titlefont=dict(size=24, family='Arial', color='black',),
+                    #                                     xaxis = {'title': 'Components', 'titlefont': dict(size=18, family='Arial', color='black'),
+                    #                                              'tickfont': dict(size=16, family='Arial', color='black',)},
+                    #                                     yaxis = {'title': 'Amount ($)', 'titlefont': dict(size=18, family='Arial', color='black'),
+                    #                                              'tickfont': dict(size=16, family='Arial', color='black',)},
+                    #                                 )
                             
-        #                     layout = go.Layout(
-        #                                 title = f'MARINE TERMINAL FINANCIALS-WATERFALL-{year}<br>{this_year}',
-        #                                 titlefont=dict(size=20, family='Arial', color='black',),
-        #                                 xaxis = { 'titlefont': dict(size=18, family='Arial', color='black'),
-        #                                          'tickfont': dict(size=16, family='Arial', color='black',)},
-        #                                 yaxis = {'title': 'Amount ($)', 'titlefont': dict(size=18, family='Arial', color='black'),
-        #                                          'tickfont': dict(size=16, family='Arial', color='black',)},
-        #                                 shapes = [
-        #                                     {'type': 'line', 'x0': -0.5, 'y0': -0, 'x1': len(labels)-0.5, 'y1': 0, 'line': {'color': 'red', 'width': 2}}
-        #                                 ],height=600,
-        #                             )
+                            layout = go.Layout(
+                                        title = f'MARINE TERMINAL FINANCIALS-WATERFALL-{year}<br>{this_year}',
+                                        titlefont=dict(size=20, family='Arial', color='black',),
+                                        xaxis = { 'titlefont': dict(size=18, family='Arial', color='black'),
+                                                 'tickfont': dict(size=16, family='Arial', color='black',)},
+                                        yaxis = {'title': 'Amount ($)', 'titlefont': dict(size=18, family='Arial', color='black'),
+                                                 'tickfont': dict(size=16, family='Arial', color='black',)},
+                                        shapes = [
+                                            {'type': 'line', 'x0': -0.5, 'y0': -0, 'x1': len(labels)-0.5, 'y1': 0, 'line': {'color': 'red', 'width': 2}}
+                                        ],height=600,
+                                    )
                 
-        #                     fig = go.Figure(data = trace, layout = layout)
+                            fig = go.Figure(data = trace, layout = layout)
                             
                 
-        #                     st.plotly_chart(fig)
+                            st.plotly_chart(fig)
                             
-        #                 def key_from_value(d,val):
-        #                     keys={}
-        #                     for k, v in d.items():
+                        def key_from_value(d,val):
+                            keys={}
+                            for k, v in d.items():
                                 
-        #                         if isinstance(v, dict):
-        #                             get_all_keys(v,keys)
-        #                         else:
-        #                             if d[k]==val:
-        #                                 return(k)
-        #                 def get_all_keys(d,keys):
-        #                     keys={}
-        #                     for k, v in d.items():
-        #                         if isinstance(v, dict):
-        #                             get_all_keys(v,keys)
-        #                         else:
-        #                             keys[k]=v
-        #                     return keys
-        #                 labels=['Vessel Operations','Labor','Tenants','Stormwater Revenue','Other Revenue',
-        #                        'TOTAL REVENUE',
-        #                        'OPERATING EXPENSES',
-        #                        'Operating Overhead','Terminal Operating Expense','Outside Professional Services','Labor','Vessel Operational Expenses',
-        #                              'Stormwater Operating Expenses','Utilities',
-        #                         "MAINTENANCE EXPENSES",
-        #                         'Maintenance Overhead','Property Maintenance','Equipment Maintenance','Stormwater Maintenance Expenses',
-        #                               'Other Maintenance Expenses',
-        #                         "DEPRECIATION",
-        #                         'Depreciation Terminal','Depreciation Grants','Depreciation Stormwater',
-        #                          "G&A OVERHEAD",
-        #                         'Executive G&A Overhead','Marketing G&A Overhead',
-        #                         'Finance G&A Overhead','Engineering G&A Overhead',
-        #                              'I/S G&A Overhead','Administrative G&A Overhead',
-        #                         "Excess Revenue",
-        #                         "Loss After Depreciation"]
+                                if isinstance(v, dict):
+                                    get_all_keys(v,keys)
+                                else:
+                                    if d[k]==val:
+                                        return(k)
+                        def get_all_keys(d,keys):
+                            keys={}
+                            for k, v in d.items():
+                                if isinstance(v, dict):
+                                    get_all_keys(v,keys)
+                                else:
+                                    keys[k]=v
+                            return keys
+                        labels=['Vessel Operations','Labor','Tenants','Stormwater Revenue','Other Revenue',
+                               'TOTAL REVENUE',
+                               'OPERATING EXPENSES',
+                               'Operating Overhead','Terminal Operating Expense','Outside Professional Services','Labor','Vessel Operational Expenses',
+                                     'Stormwater Operating Expenses','Utilities',
+                                "MAINTENANCE EXPENSES",
+                                'Maintenance Overhead','Property Maintenance','Equipment Maintenance','Stormwater Maintenance Expenses',
+                                      'Other Maintenance Expenses',
+                                "DEPRECIATION",
+                                'Depreciation Terminal','Depreciation Grants','Depreciation Stormwater',
+                                 "G&A OVERHEAD",
+                                'Executive G&A Overhead','Marketing G&A Overhead',
+                                'Finance G&A Overhead','Engineering G&A Overhead',
+                                     'I/S G&A Overhead','Administrative G&A Overhead',
+                                "Excess Revenue",
+                                "Loss After Depreciation"]
                 
-        #                 keys={}
+                        keys={}
                         
-        #                 revs=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Revenues"][i],keys).keys())]["Net"].sum()) for i in labels[:5]]
+                        revs=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Revenues"][i],keys).keys())]["Net"].sum()) for i in labels[:5]]
                 
-        #                 ops=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Operating Expenses"][i],keys).keys())]["Net"].sum()) for i in labels[7:14]]
+                        ops=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Operating Expenses"][i],keys).keys())]["Net"].sum()) for i in labels[7:14]]
                 
-        #                 maint=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Maintenance Expenses"][i],keys).keys())]["Net"].sum())for i in labels[15:20]]
+                        maint=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Maintenance Expenses"][i],keys).keys())]["Net"].sum())for i in labels[15:20]]
                 
-        #                 dep=[abs(ledger_b[ledger_b["Account"]==key_from_value(budget["Depreciation"],i)]["Net"].sum()) for i in labels[21:24]]
+                        dep=[abs(ledger_b[ledger_b["Account"]==key_from_value(budget["Depreciation"],i)]["Net"].sum()) for i in labels[21:24]]
                 
-        #                 overhead=[abs(ledger_b[ledger_b["Account"]==key_from_value(budget["G & A Overhead"],i)]["Net"].sum()) for i in labels[25:31]]
-        #                 overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
-        #                 valerians=[]
-        #                 for i in revs:
-        #                     valerians.append(i)
-        #                 valerians.append(sum(revs))
-        #                 valerians.append(sum(ops))
-        #                 for i in ops:
-        #                     valerians.append(i)
-        #                 valerians.append(sum(maint))
-        #                 for i in maint:
-        #                     valerians.append(i)
-        #                 valerians.append(sum(dep))
-        #                 for i in dep:
-        #                     valerians.append(i)
+                        overhead=[abs(ledger_b[ledger_b["Account"]==key_from_value(budget["G & A Overhead"],i)]["Net"].sum()) for i in labels[25:31]]
+                        overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
+                        valerians=[]
+                        for i in revs:
+                            valerians.append(i)
+                        valerians.append(sum(revs))
+                        valerians.append(sum(ops))
+                        for i in ops:
+                            valerians.append(i)
+                        valerians.append(sum(maint))
+                        for i in maint:
+                            valerians.append(i)
+                        valerians.append(sum(dep))
+                        for i in dep:
+                            valerians.append(i)
                 
-        #                 valerians.append(sum(overhead))
-        #                 for i in overhead:
-        #                     valerians.append(i)
+                        valerians.append(sum(overhead))
+                        for i in overhead:
+                            valerians.append(i)
                 
-        #                 valerians.append(overall)
+                        valerians.append(overall)
                 
-        #                 valerians.append(overall)
+                        valerians.append(overall)
                 
-        #                 valerians=['<b>${:,.1f}<b>'.format(round(i,1)) for i in valerians]
-        #                 labels=[f'<b>{i}<b>' for i in labels]
-        #                 if overall>0:
+                        valerians=['<b>${:,.1f}<b>'.format(round(i,1)) for i in valerians]
+                        labels=[f'<b>{i}<b>' for i in labels]
+                        if overall>0:
                             
                           
-        #                     source=[0,1,2,3,4]+[5,5, 5 ,5,5]+ [6,6,6, 6, 6, 6, 6]+[14,14,14,14,14]+[20,20,20]+[24,24,24,24,24,24]
-        #                     target=[5,5,5,5,5]+[6,14,20,24,31]+[7,8,9,10,11,12,13]+[15,16,17,18,19]+[21,22,23]+[25,26,27,28,29,30,]
-        #                     values=revs+[sum(ops)]+[sum(maint)]+[sum(dep)]+[sum(overhead)]+[overall]+ops+maint+dep+overhead
-        #                     linkcolor=['#66CD00']*5+\
-        #                           ['#FFB90F','#BF3EFF', '#A6E3D7', '#EC7063','#FFC0CB',]+\
-        #                             ['#FFB90F']*7+\
-        #                                 ['#BF3EFF']*5+\
-        #                             ['#A6E3D7']*3+\
-        #                             ['#EC7063']*6
-        #                 else:
+                            source=[0,1,2,3,4]+[5,5, 5 ,5,5]+ [6,6,6, 6, 6, 6, 6]+[14,14,14,14,14]+[20,20,20]+[24,24,24,24,24,24]
+                            target=[5,5,5,5,5]+[6,14,20,24,31]+[7,8,9,10,11,12,13]+[15,16,17,18,19]+[21,22,23]+[25,26,27,28,29,30,]
+                            values=revs+[sum(ops)]+[sum(maint)]+[sum(dep)]+[sum(overhead)]+[overall]+ops+maint+dep+overhead
+                            linkcolor=['#66CD00']*5+\
+                                  ['#FFB90F','#BF3EFF', '#A6E3D7', '#EC7063','#FFC0CB',]+\
+                                    ['#FFB90F']*7+\
+                                        ['#BF3EFF']*5+\
+                                    ['#A6E3D7']*3+\
+                                    ['#EC7063']*6
+                        else:
                             
                            
-        #                     source=[0,1,2,3,4,32]+[5,5, 5 ,5,]+ [6,6,6, 6, 6, 6, 6]+[14,14,14,14,14]+[20,20,20]+[24,24,24,24,24,24]
-        #                     target=[5,5,5,5,5,5]+[6,14,20,24,]+[7,8,9,10,11,12,13]+[15,16,17,18,19]+[21,22,23]+[25,26,27,28,29,30,]
-        #                     values=revs+[abs(overall)]+[sum(ops)]+[sum(maint)]+[sum(dep)]+[sum(overhead)]+ops+maint+dep+overhead
-        #                     linkcolor=['#66CD00']*5+['#FFC0CB']+\
-        #                           ['#FFB90F','#BF3EFF', '#A6E3D7', '#EC7063',]+\
-        #                             ['#FFB90F']*7+\
-        #                                 ['#BF3EFF']*5+\
-        #                             ['#A6E3D7']*3+\
-        #                             ['#EC7063']*6
-        #                 #'#104E8B'
-        #                 title_=f'{year}-YTD' if year=="2023" else year  
-        #                 fig = go.Figure(data=[go.Sankey(
-        #                     node = dict(
-        #                     thickness = 10,
-        #                     #label = [f'<b>{i}<b>'+"-"+str(valerians[labels.index(i)]) for i in labels],
-        #                    # label = [str(valerians[labels.index(i)]) for i in labels],
-        #                     #label = [i+" - "+str(valerians[labels.index(i)]) for i in labels],
-        #                     label=[f'<b>{i} - {str(valerians[labels.index(i)])}</b>' for i in labels],
-        #                     color = [
-        #                             '#808B96', 
-        #                             '#EC7063', '#F7DC6F', '#48C9B0', '#AF7AC5',
-        #                             '#EC7063', '#EC7063',
-        #                             '#F7DC6F', '#F7DC6F',
-        #                             '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0',
-        #                             '#AF7AC5', '#AF7AC5', '#AF7AC5'] #"cyan"
-        #                                 ),
-        #                     link = dict(
+                            source=[0,1,2,3,4,32]+[5,5, 5 ,5,]+ [6,6,6, 6, 6, 6, 6]+[14,14,14,14,14]+[20,20,20]+[24,24,24,24,24,24]
+                            target=[5,5,5,5,5,5]+[6,14,20,24,]+[7,8,9,10,11,12,13]+[15,16,17,18,19]+[21,22,23]+[25,26,27,28,29,30,]
+                            values=revs+[abs(overall)]+[sum(ops)]+[sum(maint)]+[sum(dep)]+[sum(overhead)]+ops+maint+dep+overhead
+                            linkcolor=['#66CD00']*5+['#FFC0CB']+\
+                                  ['#FFB90F','#BF3EFF', '#A6E3D7', '#EC7063',]+\
+                                    ['#FFB90F']*7+\
+                                        ['#BF3EFF']*5+\
+                                    ['#A6E3D7']*3+\
+                                    ['#EC7063']*6
+                        #'#104E8B'
+                        title_=f'{year}-YTD' if year=="2023" else year  
+                        fig = go.Figure(data=[go.Sankey(
+                            node = dict(
+                            thickness = 10,
+                            #label = [f'<b>{i}<b>'+"-"+str(valerians[labels.index(i)]) for i in labels],
+                           # label = [str(valerians[labels.index(i)]) for i in labels],
+                            #label = [i+" - "+str(valerians[labels.index(i)]) for i in labels],
+                            label=[f'<b>{i} - {str(valerians[labels.index(i)])}</b>' for i in labels],
+                            color = [
+                                    '#808B96', 
+                                    '#EC7063', '#F7DC6F', '#48C9B0', '#AF7AC5',
+                                    '#EC7063', '#EC7063',
+                                    '#F7DC6F', '#F7DC6F',
+                                    '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0',
+                                    '#AF7AC5', '#AF7AC5', '#AF7AC5'] #"cyan"
+                                        ),
+                            link = dict(
                 
-        #                     # indices correspond to labels
-        #                     source = source,
-        #                     target = target,
-        #                     value = values,
-        #                     color=linkcolor
-        #                     )
-        #                 )])
-        #                 # fig.add_annotation(
-        #                 #                                         x=0.5,
-        #                 #                                         y=-0.05,
-        #                 #                                         text="From Budgeted Monthly",
-        #                 #                                         showarrow=False,
-        #                 #                                         font=dict(
-        #                 #                                             size=16,
-        #                 #                                             color="darkblue",
-        #                 #                                             family="Arial"
-        #                 #                                         )
-        #                 #                                     )
-        #                 fig.update_layout(width=1200, height=800,
-        #                     title=title_,hovermode = 'x',
+                            # indices correspond to labels
+                            source = source,
+                            target = target,
+                            value = values,
+                            color=linkcolor
+                            )
+                        )])
+                        # fig.add_annotation(
+                        #                                         x=0.5,
+                        #                                         y=-0.05,
+                        #                                         text="From Budgeted Monthly",
+                        #                                         showarrow=False,
+                        #                                         font=dict(
+                        #                                             size=16,
+                        #                                             color="darkblue",
+                        #                                             family="Arial"
+                        #                                         )
+                        #                                     )
+                        fig.update_layout(width=1200, height=800,
+                            title=title_,hovermode = 'x',
                                           
-        #                     font=dict(size = 12, color = 'black'),paper_bgcolor='#FCE6C9',margin=dict(
-        #                         l=50,  # Set the left margin to 50 pixels
-        #                         r=350,  # Set the right margin to 150 pixels
-        #                         t=50,  # Set the top margin to 50 pixels
-        #                         b=50,  # Set the bottom margin to 50 pixels
-        #                     ),
+                            font=dict(size = 12, color = 'black'),paper_bgcolor='#FCE6C9',margin=dict(
+                                l=50,  # Set the left margin to 50 pixels
+                                r=350,  # Set the right margin to 150 pixels
+                                t=50,  # Set the top margin to 50 pixels
+                                b=50,  # Set the bottom margin to 50 pixels
+                            ),
                                           
                 
                 
-        #                 )
-        #                 st.plotly_chart(fig)
-        #             #fig.write_html(fr'c:\Users\{loc}\Desktop\OldBudget.html')
-        #             #fig.show()
+                        )
+                        st.plotly_chart(fig)
+                    #fig.write_html(fr'c:\Users\{loc}\Desktop\OldBudget.html')
+                    #fig.show()
                 
                 
         #             with fintab3:

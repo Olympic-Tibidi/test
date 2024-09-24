@@ -3172,7 +3172,9 @@ if authentication_status:
                                                                      release_order_database[i][sale]["ocean_bill_of_lading"],
                                                                      release_order_database[i][sale]["grade"],
                                                                      release_order_database[i][sale]["vessel"],
-                                                                     release_order_database[i][sale]["total"]]
+                                                                     release_order_database[i][sale]["total"],
+                                                                                release_order_database[i][sale]["shipped"],
+                                                                                release_order_database[i][sale]["remaining"]]
                       
                         
                         st.write(pd.DataFrame(completed_release_order_dest_map).T)

@@ -3221,7 +3221,7 @@ if authentication_status:
                             
                             release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR SHIPMENT NUMBERS",destinations_of_release_orders,key="tatata")
                             release_order_number_mf=release_order_number_mf.split(" ")[0]
-                            carrier_mf=st.selectbox("SELECT CARRIER",[map["carrier"][i[j]] for i,j in map["carriers"].items()],key="tatpota")
+                            carrier_mf=st.selectbox("SELECT CARRIER",[map["carriers"][i[j]] for i,j in map["carriers"].items()],key="tatpota")
                             input_mf_numbers=st.text_area("**ENTER SHIPMENT NUMBERS**",height=100,key="juy")
                             if input_mf_numbers is not None:
                                 input_mf_numbers = input_mf_numbers.splitlines()

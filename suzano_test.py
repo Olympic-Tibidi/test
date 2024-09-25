@@ -3229,7 +3229,8 @@ if authentication_status:
                            
                             if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
                                 if release_order_number_mf not in mf_numbers.keys():   
-                                    mf_numbers[release_order_number_mf][carrier_mf]=[]
+                                    if carrier_mf not in mf_numbers[release_order_number_mf]:
+                                        mf_numbers[release_order_number_mf][carrier_mf]=[]
                                 mf_numbers[release_order_number_mf][carrier_mf]+=input_mf_numbers
                                 mf_numbers[release_order_number_mf][carrier_mf]=list(set(mf_numbers[release_order_number_mf]))
                                 mf_data=json.dumps(mf_numbers)

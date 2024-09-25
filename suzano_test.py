@@ -3226,7 +3226,7 @@ if authentication_status:
                             if input_mf_numbers is not None:
                                 input_mf_numbers = input_mf_numbers.splitlines()
                                 #input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]####### CAREFUL THIS ASSUMES SAME DIGIT MF EACH TIME
-                           
+                            st.write(input_mf_numbers)
                             if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
                                 if release_order_number_mf not in mf_numbers.keys():   
                                     mf_numbers[release_order_number_mf]={}

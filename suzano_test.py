@@ -3208,26 +3208,23 @@ if authentication_status:
                         mf_numbers=json.loads(mf_numbers)
                         def check_home(ro):
                             destination=release_order_database[ro]['destination']
-                            if destination not in ["GP-Clatskanie,OR","GP-Halsey,OR"]:
-                                return False 
-                            else:
-                                keys=[sale for sale in release_order_database[ro] if sale in ["001","002","003","004","005"]]
-                                remains=[release_order_database[ro][key]["remaining"] for key in keys]
-                                if sum(remains)==0:
-                                    return False
-                                return f"{ro} to {destination}"
+                            keys=[sale for sale in release_order_database[ro] if sale in ["001","002","003","004","005"]]
+                            remains=[release_order_database[ro][key]["remaining"] for key in keys]
+                            if sum(remains)==0:
+                                return False
+                            return f"{ro} to {destination}"
                             
                         destinations_of_release_orders=[check_home(i) for i in release_order_database if check_home(i) ]
                         if len(destinations_of_release_orders)==0:
                             st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
                         else:
                             
-                            release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR MF",destinations_of_release_orders,key="tatata")
+                            release_order_number_mf=st.selectbox("SELECT RELEASE ORDER FOR SHIPMENT NUMBERS",destinations_of_release_orders,key="tatata")
                             release_order_number_mf=release_order_number_mf.split(" ")[0]
-                            input_mf_numbers=st.text_area("**ENTER MF NUMBERS**",height=100,key="juy")
+                            input_mf_numbers=st.text_area("**ENTER SHIPMENT NUMBERS**",height=100,key="juy")
                             if input_mf_numbers is not None:
                                 input_mf_numbers = input_mf_numbers.splitlines()
-                                input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]####### CAREFUL THIS ASSUMES SAME DIGIT MF EACH TIME
+                                #input_mf_numbers=[i for i in input_mf_numbers if len(i)==10]####### CAREFUL THIS ASSUMES SAME DIGIT MF EACH TIME
                            
                             if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
                                 if release_order_number_mf not in mf_numbers.keys():   

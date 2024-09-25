@@ -3632,31 +3632,31 @@ if authentication_status:
                                     carrier_code=st.selectbox("Carrier Code",[carrier_code,"310897-Ashley"],disabled=False,key=29)
                                 else:
                                     carrier_code=st.text_input("Carrier Code",carrier_code,disabled=True,key=9)
-                                if destination in ["GP-Halsey,OR","GP-Clatskanie,OR"] and carrier_code=="123456-KBX" :
-                                    if 'load_mf_number' not in st.session_state:
-                                        st.session_state.load_mf_number = None
-                                    if release_order_number in mf_numbers_for_load.keys():
-                                        mf_liste=[i for i in mf_numbers_for_load[release_order_number]]
-                                        if len(mf_liste)>0:
-                                            try:
-                                                load_mf_number = st.selectbox("MF NUMBER", mf_liste, disabled=False, key=14551, index=mf_liste.index(st.session_state.load_mf_number) if st.session_state.load_mf_number else 0)
-                                            except:
-                                                load_mf_number = st.selectbox("MF NUMBER", mf_liste, disabled=False, key=14551)
-                                            mf=True
-                                            load_mf_number_issued=True
-                                            yes=True
-                                            st.session_state.load_mf_number = load_mf_number
-                                           
-                                        else:
-                                            st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
-                                            mf=False
-                                            yes=False
-                                            load_mf_number_issued=False  
+                                
+                                if 'load_mf_number' not in st.session_state:
+                                    st.session_state.load_mf_number = None
+                                if release_order_number in mf_numbers_for_load.keys():
+                                    mf_liste=[i for i in mf_numbers_for_load[release_order_number]]
+                                    if len(mf_liste)>0:
+                                        try:
+                                            load_mf_number = st.selectbox("MF NUMBER", mf_liste, disabled=False, key=14551, index=mf_liste.index(st.session_state.load_mf_number) if st.session_state.load_mf_number else 0)
+                                        except:
+                                            load_mf_number = st.selectbox("MF NUMBER", mf_liste, disabled=False, key=14551)
+                                        mf=True
+                                        load_mf_number_issued=True
+                                        yes=True
+                                        st.session_state.load_mf_number = load_mf_number
+                                       
                                     else:
-                                        st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                                        st.write(f"**:red[ASK ADMIN TO PUT SHIPMENT NUMBERS]**")
                                         mf=False
                                         yes=False
                                         load_mf_number_issued=False  
+                                else:
+                                    st.write(f"**:red[ASK ADMIN TO PUT MF NUMBERS]**")
+                                    mf=False
+                                    yes=False
+                                    load_mf_number_issued=False  
                                    
                                 foreman_quantity=st.number_input("**:blue[ENTER Quantity of Units]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=8)
                                 foreman_bale_quantity=st.number_input("**:blue[ENTER Quantity of Bales]**", min_value=0, max_value=30, value=0, step=1, help=None, on_change=None, disabled=False, label_visibility="visible",key=123)

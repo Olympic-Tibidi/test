@@ -3229,9 +3229,9 @@ if authentication_status:
                            
                             if st.button("SUBMIT MF NUMBERS",key="ioeru" ):
                                 if release_order_number_mf not in mf_numbers.keys():   
-                                    mf_numbers[release_order_number_mf]=[]
-                                mf_numbers[release_order_number_mf]+=input_mf_numbers
-                                mf_numbers[release_order_number_mf]=list(set(mf_numbers[release_order_number_mf]))
+                                    mf_numbers[release_order_number_mf][carrier_mf]=[]
+                                mf_numbers[release_order_number_mf][carrier_mf]+=input_mf_numbers
+                                mf_numbers[release_order_number_mf][carrier_mf]=list(set(mf_numbers[release_order_number_mf]))
                                 mf_data=json.dumps(mf_numbers)
                                 #storage_client = storage.Client()
                                 storage_client = get_storage_client()
@@ -3241,8 +3241,9 @@ if authentication_status:
                                 st.success(f"MF numbers entered to {release_order_number_mf} successfully!")
                             if st.button("REMOVE MF NUMBERS",key="ioerssu" ):
                                 for i in input_mf_numbers:
-                                    if i in mf_numbers[release_order_number_mf]:
-                                        mf_numbers[release_order_number_mf].remove(i)
+                                    for carrier in mf_numbers[release_order_number_mf]:
+                                        if i in mf_numbers[release_order_number_mf][carrier]:
+                                            mf_numbers[release_order_number_mf][carrier].remove(i)
                                 mf_data=json.dumps(mf_numbers)
                                # storage_client = storage.Client()
                                 storage_client = get_storage_client()

@@ -3642,7 +3642,7 @@ if authentication_status:
                                     st.session_state.load_mf_number = None
                                     
                                 if release_order_number in mf_numbers_for_load.keys():
-                                    mf_liste=[i for i in mf_numbers_for_load[release_order_number][carrier_code]]
+                                    mf_liste=[i for i in mf_numbers_for_load[release_order_number][f"{carrier_code[1]}-{carrier_code[0]}"]]
                                     if len(mf_liste)>0:
                                         try:
                                             load_mf_number = st.selectbox("MF NUMBER", mf_liste, disabled=False, key=14551, index=mf_liste.index(st.session_state.load_mf_number) if st.session_state.load_mf_number else 0)

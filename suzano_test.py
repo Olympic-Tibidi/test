@@ -597,7 +597,7 @@ if authentication_status:
                 ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","TRIAL"])
 
                 with ttab3:
-                    upto_month=st.selectbox("Choose End Month",range(1,12))
+                    upto_month=st.selectbox("Choose End Month",range(2,13))
                     ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger_b.ftr")
                     budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
                     budget1=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget1.json"))
@@ -661,6 +661,131 @@ if authentication_status:
                     ignore=set(ledger_b[ledger_b["Group"]==0].Account.to_list())
                     ledger_b=ledger_b[~ledger_b["Account"].isin(ignore)]
                     ### LEDGER-B READY
+                    grouped_ledger=round(ledger_b.groupby(["Group","Sub_Group","Acc","Name"])[["Net"]].sum(),1)
+                    grouped_ledger["Monthly"]=round(grouped_ledger["Net"]/month_count,1)
+                    #grouped_ledger.to_excel(fr"C:\Users\AfsinY\Desktop\LEDGERS\grouped.xlsx", sheet_name='Sheet1', index=True)
+                    grouped_ledger.reset_index(inplace=True)
+                    #grouped_ledger
+                    
+                    grouped_ledger[f"Budget {year}"]=0
+                    for i in grouped_ledger.index:
+                        a=grouped_ledger.loc[i,"Group"]
+                        
+                        b=grouped_ledger.loc[i,"Sub_Group"]
+                        c=grouped_ledger.loc[i,"Acc"]
+                        try:
+                            grouped_ledger.loc[i,f"Budget {year}"]=budget_year[a][b][c]
+                        except:
+                            grouped_ledger.loc[i,f"Budget {year}"]=budget_year[a][c]
+                    grouped_ledger[f"Budget {year} YTD"]=round(grouped_ledger[f"Budget {year}"]/12*month_count,1)
+                    grouped_ledger["Variance"]=round(-grouped_ledger[f"Budget {year} YTD"]+grouped_ledger["Net"])
+                    ### GROUPED LEDGER READY
+                    
+                    grouped_ledger_todate=grouped_ledger.groupby(["Group","Sub_Group"])[['Net', 'Monthly', f'Budget {year}',
+                           f'Budget {year} YTD', 'Variance']].sum()
+                    ### GROUPED LEDGER TODATE READY
+                    
+                    
+                    order = {'Revenues': 1, 'Operating Expenses': 2, 'Maintenance Expenses': 3,"G & A Overhead":4,"Depreciation":5}
+                    grouped_ledger_todate['Sort_Key'] = grouped_ledger_todate.index.get_level_values('Group').map(order)
+                    
+                    # Sort the DataFrame using the sort key
+                    grouped_ledger_todate.sort_values(by='Sort_Key',ascending=True, inplace=True)
+                    
+                    # Drop the sort key column after sorting
+                    grouped_ledger_todate.drop(columns='Sort_Key', inplace=True)
+                    #grouped_ledger_todate.sort_index(level='Group', inplace=True)  # Sort by Group
+                    
+                    ####   PREPARE NEW_DF
+                    
+                    new_df = pd.DataFrame()
+                    
+                    # Iterate through each group to calculate and insert totals
+                    for group, group_df in grouped_ledger_todate.groupby(level=0):
+                        # Append the group DataFrame to the new DataFrame
+                        new_df = pd.concat([new_df, group_df])
+                        
+                        # Calculate the total for the current group
+                        total_row = group_df.sum()
+                        total_row.name = (group, f'Total {group}', '')  # Setting up the name tuple to match the MultiIndex
+                        
+                        # Append the total row to the new DataFrame
+                        new_df = pd.concat([new_df, pd.DataFrame([total_row], index=pd.MultiIndex.from_tuples([total_row.name]))])
+                    
+                    # Display the new DataFrame with totals inserted
+                    
+                    order = {'Revenues': 1, 'Operating Expenses': 2, 'Maintenance Expenses': 3,"G & A Overhead":4,"Depreciation":5}
+                    new_df['Sort_Key'] = new_df.index.get_level_values('Group').map(order)
+                    
+                    # Sort the DataFrame using the sort key
+                    new_df.sort_values(by='Sort_Key',ascending=True, inplace=True)
+                    
+                    # Drop the sort key column after sorting
+                    new_df.drop(columns='Sort_Key', inplace=True)
+                    #grouped_ledger_todate.sort_index(level='Group', inplace=True)  # Sort by Group
+                    total_rows = new_df.loc[[idx for idx in new_df.index if idx[1].startswith('Total')]]
+                    
+                    # Calculate the overall total from these rows
+                    overall_total = total_rows.sum()
+                    overall_total.name = ('OVERALL', 'TOTAL', '')  # Naming the total row
+                    
+                    # Append the overall total row to the new DataFrame
+                    new_df = pd.concat([new_df, pd.DataFrame([overall_total], index=pd.MultiIndex.from_tuples([overall_total.name]))])
+                    new_df=new_df[["Net","Budget 2024 YTD","Variance","Budget 2024"]]
+                    new_df.reset_index(inplace=True)
+                    fig, ax = plt.subplots(figsize=(15, 10))
+                    
+                    # Plotting the data first to define axes limits
+                    bars_actual = ax.barh(new_df.Sub_Group, new_df['Net'], color='blue',alpha=0.3 ,label='Actual', zorder=3)
+                    bars_budget = ax.barh(new_df.Sub_Group, new_df[f'Budget {year} YTD'], color='red', alpha=0.2, label='Budgeted ', zorder=3)
+                    
+                    # Load and show background image after plotting to get the correct extent
+                    bg_image = plt.imread('salish.png')  # Adjust this path if necessary
+                    ax.imshow(bg_image, aspect='auto', extent=[ax.get_xlim()[0], ax.get_xlim()[1], ax.get_ylim()[0], ax.get_ylim()[1]], zorder=1, alpha=0.2)
+                    
+                    # Formatting the x-axis with commas and a dollar sign
+                    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: f'${x:,.0f}'))
+                    
+                    # Title and other settings
+                    current_date = datetime.datetime.now().date()
+                    ax.set_title(f'Marine Terminal\nBUDGET {year} PERFORMANCE\nAs of {as_of}', fontsize=18)
+                    
+                    ax.set_xlabel('Amount ($)')
+                    ax.legend()
+                    
+                    # Adding light shade grids and formatting labels
+                    ax.grid(True, color='grey', alpha=0.3)
+                    labels = ax.get_yticklabels()
+                    for label in labels:
+                        if "Total" in label.get_text() or "TOTAL" in label.get_text():
+                            label.set_fontsize(12)
+                            label.set_fontweight('bold')
+                            
+                    ax.tick_params(axis='y', labelsize=12)
+                    ax.text(
+                        0.95, 0.95, f'Overall Budgeted YTD NET - ${round(overall_total["Budget 2024 YTD"],1)}', 
+                        transform=ax.transAxes, 
+                        fontsize=14, 
+                        verticalalignment='top', 
+                        horizontalalignment='right', 
+                        bbox=dict(facecolor='white', alpha=0.6, edgecolor='black')
+                    )
+                    ax.text(
+                        0.95, 0.85, f'Actual YTD NET- ${round(overall_total["Net"],1)}', 
+                        transform=ax.transAxes, 
+                        fontsize=14, 
+                        verticalalignment='top', 
+                        horizontalalignment='right', 
+                        bbox=dict(facecolor='white', alpha=0.6, edgecolor='black')
+                    )
+                    plt.style.use("fivethirtyeight")
+                    
+                    plt.rcParams['font.size'] = 5
+                    plt.rcParams['grid.color'] = "black"
+                    fig.patch.set_facecolor('lightblue')
+                            #ax.patch.set_facecolor('yellow')
+                    plt.tight_layout()
+                    st.pyplot(fig)
 
 
 

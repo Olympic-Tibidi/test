@@ -31,6 +31,7 @@ from collections import defaultdict
 import json
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import seaborn as sns
 import datetime as dt
 from docx import Document

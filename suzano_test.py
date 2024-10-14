@@ -740,8 +740,8 @@ if authentication_status:
                     bars_budget = ax.barh(new_df.Sub_Group, new_df[f'Budget {year} YTD'], color='red', alpha=0.2, label='Budgeted ', zorder=3)
                     
                     # Load and show background image after plotting to get the correct extent
-                    bg_image = plt.imread('salish.png')  # Adjust this path if necessary
-                    ax.imshow(bg_image, aspect='auto', extent=[ax.get_xlim()[0], ax.get_xlim()[1], ax.get_ylim()[0], ax.get_ylim()[1]], zorder=1, alpha=0.2)
+                    #bg_image = plt.imread('salish.png')  # Adjust this path if necessary
+                   # ax.imshow(bg_image, aspect='auto', extent=[ax.get_xlim()[0], ax.get_xlim()[1], ax.get_ylim()[0], ax.get_ylim()[1]], zorder=1, alpha=0.2)
                     
                     # Formatting the x-axis with commas and a dollar sign
                     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: f'${x:,.0f}'))

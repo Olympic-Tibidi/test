@@ -594,7 +594,15 @@ if authentication_status:
             if fin_password=="marineterm98501!":
                 hadi=True
             if hadi:
-                ttab1,ttab2=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES"])
+                ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","TRIAL"])
+
+                with ttab3:
+                    ledger_b=gcp_download(target_bucket,rf"FIN/2024/ledger_n.feather")
+                    ledger_b=pd.read_feather(fr"C:\Users\AfsinY\Desktop\LEDGERS\2024\ledger_b.ftr").set_index("index",drop=True).reset_index(drop=True)
+                    st.write(ledger_b
+
+
+
                 
                 with ttab2:
                     

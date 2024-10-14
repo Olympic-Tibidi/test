@@ -977,6 +977,8 @@ if authentication_status:
                     
                     with budget3:
                         df=ledger.copy()
+                        ledger_p=pd.DataFrame()
+                        main={}
                         dep=df[(df['Account']>=1712000)&(df["Account"]<=1865000)]
                         capital=df[(df['Account']<1712000)]
                         pma=df[(df['Account']>1865000)&(df["Account"]<=2131001)]
@@ -989,8 +991,8 @@ if authentication_status:
                         df=df[~df["Account"].isin([7370000,7370010])]
                         labor=df[df['Account'].isin([7311015,6315000,6317030,7313015])]
                         
-                        ledger=pd.concat([ledger,df])
-                        terminal=populate_main(main,ledger)
+                        ledger_p=pd.concat([ledger_p,df])
+                        terminal=populate_main(main,ledger_p)
                         
                         
                         main={}
@@ -1000,7 +1002,7 @@ if authentication_status:
                         stormwater=populate_main(main,sw_ledger)
                         
                         main={}
-                        combined_ledger=pd.concat([ledger,sw_ledger])
+                        combined_ledger=pd.concat([ledger_p,sw_ledger])
                         combined_main=populate_main(main,combined_ledger)
                         
                         df=pd.DataFrame(combined_main).T

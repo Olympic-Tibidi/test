@@ -595,9 +595,12 @@ if authentication_status:
             if fin_password=="marineterm98501!":
                 hadi=True
             if hadi:
-                ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","TRIAL"])
+                ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","BUDGET PERFORMANCE"])
 
                 with ttab3:
+                    budget1,budget2,budget3=st.tabs(["TABULAR","VERSUS BUDGETED","SUNBURST CHART"])
+                    with budget2:
+                        
                     upto_month=st.selectbox("Choose End Month",range(2,13))
                     ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger_b.ftr")
                     budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
@@ -608,7 +611,6 @@ if authentication_status:
                     ledger_b = ledger_b.set_index("index", drop=True).reset_index(drop=True)
                     
                     ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
-                    st.write(ledger_b)
 
                     ledger_b.reset_index(drop=True,inplace=True)
                     ledger_b=ledger_b.copy()
@@ -734,60 +736,65 @@ if authentication_status:
                     # Append the overall total row to the new DataFrame
                     new_df = pd.concat([new_df, pd.DataFrame([overall_total], index=pd.MultiIndex.from_tuples([overall_total.name]))])
                     new_df=new_df[["Net","Budget 2024 YTD","Variance","Budget 2024"]]
-                    new_df.reset_index(inplace=True)
-                    fig, ax = plt.subplots(figsize=(15, 10))
+
+                    with budget1:
+                        st.write(new_df)
+                    with budget2:
                     
-                    # Plotting the data first to define axes limits
-                    bars_actual = ax.barh(new_df.Sub_Group, new_df['Net'], color='blue',alpha=0.3 ,label='Actual', zorder=3)
-                    bars_budget = ax.barh(new_df.Sub_Group, new_df[f'Budget {year} YTD'], color='red', alpha=0.2, label='Budgeted ', zorder=3)
-                    
-                    # Load and show background image after plotting to get the correct extent
-                    #bg_image = plt.imread('salish.png')  # Adjust this path if necessary
-                   # ax.imshow(bg_image, aspect='auto', extent=[ax.get_xlim()[0], ax.get_xlim()[1], ax.get_ylim()[0], ax.get_ylim()[1]], zorder=1, alpha=0.2)
-                    
-                    # Formatting the x-axis with commas and a dollar sign
-                    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: f'${x:,.0f}'))
-                    
-                    # Title and other settings
-                    current_date = datetime.datetime.now().date()
-                    ax.set_title(f'Marine Terminal\nBUDGET {year} PERFORMANCE\nAs of {as_of}', fontsize=18)
-                    
-                    ax.set_xlabel('Amount ($)')
-                    ax.legend()
-                    
-                    # Adding light shade grids and formatting labels
-                    ax.grid(True, color='grey', alpha=0.3)
-                    labels = ax.get_yticklabels()
-                    for label in labels:
-                        if "Total" in label.get_text() or "TOTAL" in label.get_text():
-                            label.set_fontsize(12)
-                            label.set_fontweight('bold')
-                            
-                    ax.tick_params(axis='y', labelsize=12)
-                    ax.text(
-                        0.95, 0.95, f'Overall Budgeted YTD NET - ${round(overall_total["Budget 2024 YTD"],1)}', 
-                        transform=ax.transAxes, 
-                        fontsize=14, 
-                        verticalalignment='top', 
-                        horizontalalignment='right', 
-                        bbox=dict(facecolor='white', alpha=0.6, edgecolor='black')
-                    )
-                    ax.text(
-                        0.95, 0.85, f'Actual YTD NET- ${round(overall_total["Net"],1)}', 
-                        transform=ax.transAxes, 
-                        fontsize=14, 
-                        verticalalignment='top', 
-                        horizontalalignment='right', 
-                        bbox=dict(facecolor='white', alpha=0.6, edgecolor='black')
-                    )
-                    plt.style.use("fivethirtyeight")
-                    
-                    plt.rcParams['font.size'] = 5
-                    plt.rcParams['grid.color'] = "black"
-                    fig.patch.set_facecolor('lightblue')
-                            #ax.patch.set_facecolor('yellow')
-                    plt.tight_layout()
-                    st.pyplot(fig)
+                        new_df.reset_index(inplace=True)
+                        fig, ax = plt.subplots(figsize=(15, 10))
+                        
+                        # Plotting the data first to define axes limits
+                        bars_actual = ax.barh(new_df.Sub_Group, new_df['Net'], color='blue',alpha=0.3 ,label='Actual', zorder=3)
+                        bars_budget = ax.barh(new_df.Sub_Group, new_df[f'Budget {year} YTD'], color='red', alpha=0.2, label='Budgeted ', zorder=3)
+                        
+                        # Load and show background image after plotting to get the correct extent
+                        #bg_image = plt.imread('salish.png')  # Adjust this path if necessary
+                       # ax.imshow(bg_image, aspect='auto', extent=[ax.get_xlim()[0], ax.get_xlim()[1], ax.get_ylim()[0], ax.get_ylim()[1]], zorder=1, alpha=0.2)
+                        
+                        # Formatting the x-axis with commas and a dollar sign
+                        ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: f'${x:,.0f}'))
+                        
+                        # Title and other settings
+                        current_date = datetime.datetime.now().date()
+                        ax.set_title(f'Marine Terminal\nBUDGET {year} PERFORMANCE\nAs of {as_of}', fontsize=18)
+                        
+                        ax.set_xlabel('Amount ($)')
+                        ax.legend()
+                        
+                        # Adding light shade grids and formatting labels
+                        ax.grid(True, color='grey', alpha=0.3)
+                        labels = ax.get_yticklabels()
+                        for label in labels:
+                            if "Total" in label.get_text() or "TOTAL" in label.get_text():
+                                label.set_fontsize(12)
+                                label.set_fontweight('bold')
+                                
+                        ax.tick_params(axis='y', labelsize=12)
+                        ax.text(
+                            0.95, 0.95, f'Overall Budgeted YTD NET - ${round(overall_total["Budget 2024 YTD"],1)}', 
+                            transform=ax.transAxes, 
+                            fontsize=14, 
+                            verticalalignment='top', 
+                            horizontalalignment='right', 
+                            bbox=dict(facecolor='white', alpha=0.6, edgecolor='black')
+                        )
+                        ax.text(
+                            0.95, 0.85, f'Actual YTD NET- ${round(overall_total["Net"],1)}', 
+                            transform=ax.transAxes, 
+                            fontsize=14, 
+                            verticalalignment='top', 
+                            horizontalalignment='right', 
+                            bbox=dict(facecolor='white', alpha=0.6, edgecolor='black')
+                        )
+                        plt.style.use("fivethirtyeight")
+                        
+                        plt.rcParams['font.size'] = 5
+                        plt.rcParams['grid.color'] = "black"
+                        fig.patch.set_facecolor('lightblue')
+                                #ax.patch.set_facecolor('yellow')
+                        plt.tight_layout()
+                        st.pyplot(fig)
 
 
 

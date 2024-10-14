@@ -597,9 +597,68 @@ if authentication_status:
                 ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","TRIAL"])
 
                 with ttab3:
-                    ledger_b=gcp_download(target_bucket,rf"FIN/NEW/ledger_b.ftr")
+                    ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger_b.ftr")
+                    budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
+                    budget1=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget1.json"))
+                    budget_2023=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2023.json"))
+                    budget_2024=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2024.json"))
                     ledger_b=pd.read_feather(fr"C:\Users\AfsinY\Desktop\LEDGERS\2024\ledger_b.ftr").set_index("index",drop=True).reset_index(drop=True)
+                    
+                    ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
                     st.write(ledger_b)
+
+                    ledger_b.reset_index(drop=True,inplace=True)
+                    ledger_b=ledger_b.copy()
+                                        
+                    
+                    
+                    year="2024"
+                    
+                    if year=="2024":
+                        budget_year=budget_2024.copy()
+                        month_count=9
+                    else:
+                        budget_year=budget_2023.copy()
+                        month_count=12
+                    
+                                                      
+                    
+                    def get_key(d,item):
+                        
+                        for k, v in d.items():
+                            if isinstance(v, dict):
+                                for a, b in v.items():
+                                    if isinstance(b, dict):
+                                        for c, d in b.items():
+                                            if c==item:
+                                                return k,a
+                                    else:
+                                        if a==item:
+                                            return k,b
+                            else:
+                                if v==item:
+                                    return k,v
+                    for i in ledger_b.index:
+                        try:
+                            ledger_b.loc[i,"Group"]=get_key(budget1,ledger_b.loc[i,"Acc"])[0]
+                        except:
+                            pass
+                        try:
+                            ledger_b.loc[i,"Sub_Group"]=get_key(budget1,ledger_b.loc[i,"Acc"])[1]
+                        except:
+                            pass
+                       # ledger_b.loc[i,"Sub_Group"]=get_key(budget,ledger_b.loc[i,"Account"])
+                    ledger_b.head()
+                    
+                    
+                    #### LABOR ADJUSTMENT
+                    ledger_b.loc[ledger_b["Name"]=="Longshore Services","Group"]="Revenues"
+                    ledger_b.loc[ledger_b["Name"]=="Longshore Fringe Benefits","Group"]="Revenues"
+                    
+                    
+                    ignore=set(ledger_b[ledger_b["Group"]==0].Account.to_list())
+                    ledger_b=ledger_b[~ledger_b["Account"].isin(ignore)]
+                    ### LEDGER-B READY
 
 
 

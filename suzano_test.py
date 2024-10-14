@@ -603,7 +603,7 @@ if authentication_status:
                     budget1=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget1.json"))
                     budget_2023=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2023.json"))
                     budget_2024=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2024.json"))
-                    ledger_b=pd.read_feather(ledger_b.set_index("index",drop=True).reset_index(drop=True))
+                    ledger_b=pd.read_feather(ledger_b).set_index("index",drop=True).reset_index(drop=True)
                     
                     ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
                     st.write(ledger_b)

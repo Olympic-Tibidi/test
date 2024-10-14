@@ -599,7 +599,7 @@ if authentication_status:
 
                 with ttab3:
                     budget1,budget2,budget3=st.tabs(["TABULAR","VERSUS BUDGETED","SUNBURST CHART"])
-                    with budget2:
+                    
                         
                     upto_month=st.selectbox("Choose End Month",range(2,13))
                     ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger_b.ftr")

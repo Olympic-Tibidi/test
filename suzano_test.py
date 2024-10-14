@@ -598,7 +598,6 @@ if authentication_status:
                 ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","BUDGET PERFORMANCE"])
 
                 with ttab3:
-                    budget1,budget2,budget3=st.tabs(["TABULAR","VERSUS BUDGETED","SUNBURST CHART"])
                     
                         
                     upto_month=st.selectbox("Choose End Month",range(2,13))
@@ -736,7 +735,7 @@ if authentication_status:
                     # Append the overall total row to the new DataFrame
                     new_df = pd.concat([new_df, pd.DataFrame([overall_total], index=pd.MultiIndex.from_tuples([overall_total.name]))])
                     new_df=new_df[["Net","Budget 2024 YTD","Variance","Budget 2024"]]
-
+                    budget1,budget2,budget3=st.tabs(["TABULAR","VERSUS BUDGETED","SUNBURST CHART"])
                     with budget1:
                         st.write(new_df)
                     with budget2:

@@ -992,18 +992,10 @@ if authentication_status:
                         labor=df[df['Account'].isin([7311015,6315000,6317030,7313015])]
                         
                         ledger_p=pd.concat([ledger_p,df])
-                        terminal=populate_main(main,ledger_p)
+                        combined_main=populate_main(main,ledger_p)
                         
                         
-                        main={}
-                        sw_ledger=prep_ledger(sw_file,year1,month1,year2,month2)
-                        sw_ledger=sw_ledger[(sw_ledger["Account"]>=6411070)|(sw_ledger["Account"]<2391040)]
-                        sw_ledger=sw_ledger[~sw_ledger["Account"].isin([2391040,7370000,7370010,7470000])]
-                        stormwater=populate_main(main,sw_ledger)
                         
-                        main={}
-                        combined_ledger=pd.concat([ledger_p,sw_ledger])
-                        combined_main=populate_main(main,combined_ledger)
                         
                         df=pd.DataFrame(combined_main).T
                         df.drop(df[df["Net"]==0].index,inplace=True)

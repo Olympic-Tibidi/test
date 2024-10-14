@@ -599,7 +599,7 @@ if authentication_status:
                 with ttab3:
                     ledger_b=gcp_download(target_bucket,rf"FIN/2024/ledger_n.feather")
                     ledger_b=pd.read_feather(fr"C:\Users\AfsinY\Desktop\LEDGERS\2024\ledger_b.ftr").set_index("index",drop=True).reset_index(drop=True)
-                    st.write(ledger_b
+                    st.write(ledger_b)
 
 
 

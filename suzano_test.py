@@ -976,7 +976,7 @@ if authentication_status:
                         st.pyplot(fig)
                     
                     with budget3:
-                        df=ledger.copy()
+                        df=ledger_b.copy()
                         ledger_p=pd.DataFrame()
                         main={}
                         dep=df[(df['Account']>=1712000)&(df["Account"]<=1865000)]

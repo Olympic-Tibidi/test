@@ -597,12 +597,13 @@ if authentication_status:
                 ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","TRIAL"])
 
                 with ttab3:
+                    upto_month=st.selectbox("Choose End Month",range(1,12))
                     ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger_b.ftr")
                     budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
                     budget1=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget1.json"))
                     budget_2023=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2023.json"))
                     budget_2024=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2024.json"))
-                    ledger_b=pd.read_feather(fr"C:\Users\AfsinY\Desktop\LEDGERS\2024\ledger_b.ftr").set_index("index",drop=True).reset_index(drop=True)
+                    ledger_b=pd.read_feather(ledger_b.set_index("index",drop=True).reset_index(drop=True)
                     
                     ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
                     st.write(ledger_b)

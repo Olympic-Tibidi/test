@@ -441,6 +441,183 @@ def parse_angle(angle_str):
     angle= mpcalc.parse_angle(angle_str)
     angle=re.findall(f'\d*\.?\d?',angle.__str__())[0]
     return float(angle)
+
+def prep_ledger(dosya,yr1,month1,yr2,month2):
+    
+    df=pd.read_csv(dosya,header=None)
+        
+    checkdate=datetime.datetime.strptime(df.loc[1,14].split(" ")[-1],"%m/%d/%Y")
+
+    a=df.iloc[:,41:45]
+    b=df.iloc[:,49:59]
+
+    df=pd.concat([a,b],axis=1)
+    df.drop(columns=[43,54,57],inplace=True)
+
+    columns=["Account","Name","Sub_Cat","Bat_No","Per_Entry","Ref_No","Date","Description","Debit","Credit","Job_No"]
+    df.columns=columns
+    df.dropna(subset="Date",inplace=True)
+
+    temp=[]
+    for i in df.Credit:
+        try:
+            temp.append(int(i.split(",")[0])*1000+float(i.split(",")[1]))
+            #print(int(i.split(",")[0])*1000+float(i.split(",")[1]))
+        except:
+            temp.append(float(i))
+    df.Credit=temp
+    
+    temp=[]
+    for i in df.Debit:
+        try:
+            temp.append(int(i.split(",")[0])*1000+float(i.split(",")[1]))
+            #print(int(i.split(",")[0])*1000+float(i.split(",")[1]))
+        except:
+            temp.append(float(i))
+    df.Debit=temp
+    
+    df["Date"]=pd.to_datetime(df["Date"])
+    df=df[(df["Date"]>= pd.Timestamp(datetime.date(yr1,month1,1)))&
+         (df["Date"]< pd.Timestamp(datetime.date(yr2,month2,1)))]   #########################################DATE!@!@
+    df["Net"]=df["Credit"]-df['Debit']
+    
+    df=apply_corrections(df)
+    
+    return df
+
+def apply_corrections(df):
+    df["Acc"]=[f"{i}-{j}" for i,j in zip(df["Account"],df["Sub_Cat"])]
+    
+    #### WEYCO CREDIT
+    df.loc[df["Acc"]=="6313002-32","Account"]=6341000
+    df.loc[df["Acc"]=="6313002-32","Name"]="Real Prop Rent - Land"
+    df.loc[df["Acc"]=="6313002-32","Acc"]="6341000-32"
+    #df=df[~df["Acc"]=="6313002-32"]
+    
+    
+    ### SUZANO CORRECTIONS
+    df.loc[df['Ref_No'].isin(["069998","070097","070138","070108","070268","070293","070499","070485",
+                       "070592","070634","070713","070929","070980","071150"
+                       ]),"Job_No"]="23SUZANO / 14"
+
+    df.loc[df['Ref_No'].isin(["071462","071711","071746","071921","071922","071923"
+                       ]),"Job_No"]="23SUZANO / 20"
+
+    df.loc[df['Ref_No'].isin(["071931","072270","072279"
+                       ]),"Job_No"]="24SUZANO / 03"
+    df.loc[df['Ref_No'].isin(["072501","072505"
+                       ]),"Job_No"]="24SUZANO / 08"
+    df.loc[df['Ref_No']=="070485","Job_No"]="NP"
+
+    df.loc[(df["Description"]=="Rev Accr. SSA Pacific 12.23")&(df["Name"]=="Equipment Rentals"),"Net"]=0
+    df.loc[(df["Description"]=="Rev Accr. SSA Pacific 12.23")&(df["Name"]=="Equipment Rentals"),"Debit"]=0
+
+    #### LOADOUTS TO HANDLING
+
+    df.loc[df['Ref_No'].isin(["058498","058283","058710","058923","058924","059168","059386","059624",
+                                      "059625","059881","060097","060298","060096"
+                       ]),"Name"]="Handling"
+    df.loc[df['Ref_No'].isin(["058498","058283","058710","058923","058924","059168","059386","059624",
+                                      "059625","059881","060097","060298","060096"
+                       ]),"Account"]=6316000
+
+    #### UNITED FROM 03 to 05
+
+    df.loc[df['Ref_No'].isin(["059426"
+                       ]),"Job_No"]="24UNITED / 05"
+
+    #### SAGA ENVIRONMENTAL TO SF
+
+    df.loc[(df['Ref_No']=="060106")&(df['Description']=="Environmental Fee"),"Name"]="SWTF Facility Charge"
+    df.loc[(df['Ref_No']=="060106")&(df['Description']=="Environmental Fee"),"Account"]=6318540
+    
+    #### MAKE FOREMAN OPERATOR REVENUE TO LOADING UNLOADING REVENUE
+    
+    df.loc[df["Acc"]=="6315100-32","Account"]=6315000
+    df.loc[df["Acc"]=="6315100-32","Name"]="Loading & Unloading"
+    df.loc[df["Acc"]=="6315100-32","Acc"]="6315000-32"
+    df.loc[df["Acc"]=="6315200-32","Account"]=6315000
+    df.loc[df["Acc"]=="6315200-32","Name"]="Loading & Unloading"
+    df.loc[df["Acc"]=="6315200-32","Acc"]="6315000-32"
+    
+    
+    ####  LABOR NORMALIZING
+#     df.loc[df['Account'].isin([7311015,6315000,6316000,6317030,7313015,7311015]),"Name"]="Loading & Unloading"
+#     df.loc[df['Account'].isin([7311015,6315000,6316000,6317030,7313015,7311015]),"Account"]=6315000
+#     df["Acc"]=[f"{i}-{j}" for i,j in zip(df["Account"],df["Sub_Cat"])]
+    
+    return df
+
+
+def find_account_path(budget_dict, account_number):
+    def recurse(d, path):
+        for key, value in d.items():
+            new_path = path + [key]  # Extend the path with the current key
+            if isinstance(value, dict):
+                # If the value is another dictionary, recurse into it
+                result = recurse(value, new_path)
+                if result:
+                    return result
+            elif key == account_number:
+                # If the key is the account number we're looking for, return the path
+                return new_path
+        return None
+
+    # Start the recursive search from the top of the dictionary
+    return recurse(budget_dict, [])
+
+# def populate_main(main,df):
+    
+#     for i in df["Account"].unique():
+#         cost_center=df[df["Account"]==i]["Sub_Cat"].values[0]
+#         #print(df[df["Account"]==i]["Name"].unique()[0])
+#         acc=f"{i}-{cost_center}"
+#         main[f"{i}-{cost_center}"]={"Name":None,"Cat":None,"Sub_Cat":None,"Net":0}
+#         main[f"{i}-{cost_center}"]["Name"]=df[df["Account"]==i]["Name"].unique()[0]
+#         try:
+#             main[f"{i}-{cost_center}"]["Sub_Cat"]=find_account_path(Budget_Dict,acc)[1]
+#         except:
+#             main[f"{i}-{cost_center}"]["Sub_Cat"]=None
+#         try:
+#             main[f"{i}-{cost_center}"]["Cat"]=find_account_path(Budget_Dict,acc)[0]
+#         except:
+#             main[f"{i}-{cost_center}"]["Cat"]=None
+#         main[f"{i}-{cost_center}"]["Net"]=round(df[df["Account"]==i]["Net"].sum(),2)
+#     return main
+
+
+def populate_main(main,df):
+    
+    for i in df["Acc"].unique():
+        #cost_center=df[df["Account"]==i]["Sub_Cat"].values[0]
+        #print(df[df["Account"]==i]["Name"].unique()[0])
+        #acc=f"{i}-{cost_center}"
+        main[i]={"Name":None,"Cat":None,"Sub_Cat":None,"Net":0}
+        main[i]["Name"]=df[df["Acc"]==i]["Name"].unique()[0]
+        try:
+            main[i]["Sub_Cat"]=find_account_path(Budget_Dict,i)[1]
+        except:
+            main[i]["Sub_Cat"]=None
+        try:
+            main[i]["Cat"]=find_account_path(Budget_Dict,i)[0]
+        except:
+            main[i]["Cat"]=None
+        main[i]["Net"]=round(df[df["Acc"]==i]["Net"].sum(),2)
+    return main
+
+def add_stat_rows(df):
+    df=df.copy()
+    df.loc[("_","Total"),:]=df.sum(axis=0)
+    df=df.copy()
+    df.loc[:,"Mean"]=round(df.mean(axis=1),1)
+    return df
+
+def dollar_format(x):
+    if isinstance(x, (int, float)):  
+        return f"${x:,.2f}"  
+    return x
+
+
 def get_gov_weather():
     weather=defaultdict(int)
     headers = { 
@@ -602,12 +779,15 @@ if authentication_status:
                         
                     upto_month=st.selectbox("Choose End Month",range(2,13))
                     ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger_b.ftr")
+                    ledger=gcp_download_x(target_bucket,rf"FIN/NEW/ledger.ftr")
                     budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
                     budget1=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget1.json"))
                     budget_2023=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2023.json"))
                     budget_2024=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2024.json"))
                     ledger_b = pd.read_feather(io.BytesIO(ledger_b))
                     ledger_b = ledger_b.set_index("index", drop=True).reset_index(drop=True)
+                    ledger = pd.read_feather(io.BytesIO(ledger))
+                    ledger = ledger.set_index("index", drop=True).reset_index(drop=True)
                     
                     ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
 
@@ -794,8 +974,78 @@ if authentication_status:
                                 #ax.patch.set_facecolor('yellow')
                         plt.tight_layout()
                         st.pyplot(fig)
+                    
+                    with budget3:
+                        df=ledger.copy()
+                        dep=df[(df['Account']>=1712000)&(df["Account"]<=1865000)]
+                        capital=df[(df['Account']<1712000)]
+                        pma=df[(df['Account']>1865000)&(df["Account"]<=2131001)]
+                        deposits=df[(df['Account']>2131001)&(df["Account"]<=2391030)]
+                        df=df[((df['Account']>=1712000)&(df['Account']<=1865000))|(df["Account"]>2391030)]
+                        # main=populate_main(main,main_30,accso)
+                        # ledger=pd.concat([ledger,main_30])
+                        #df=df[df["Account"]>2391030]
+                        # df=prep_ledger(accso,yr)
+                        df=df[~df["Account"].isin([7370000,7370010])]
+                        labor=df[df['Account'].isin([7311015,6315000,6317030,7313015])]
+                        
+                        ledger=pd.concat([ledger,df])
+                        terminal=populate_main(main,ledger)
+                        
+                        
+                        main={}
+                        sw_ledger=prep_ledger(sw_file,year1,month1,year2,month2)
+                        sw_ledger=sw_ledger[(sw_ledger["Account"]>=6411070)|(sw_ledger["Account"]<2391040)]
+                        sw_ledger=sw_ledger[~sw_ledger["Account"].isin([2391040,7370000,7370010,7470000])]
+                        stormwater=populate_main(main,sw_ledger)
+                        
+                        main={}
+                        combined_ledger=pd.concat([ledger,sw_ledger])
+                        combined_main=populate_main(main,combined_ledger)
+                        
+                        df=pd.DataFrame(combined_main).T
+                        df.drop(df[df["Net"]==0].index,inplace=True)
+                        df.loc[df["Cat"]=="Depreciation","Net"]=-df.loc[df["Cat"]=="Depreciation","Net"]
+                        net_amount=df.Net.sum()
+                        df["Net"]=abs(df["Net"])
+                        fig = px.sunburst(
+                            df, 
+                            path=['Cat','Sub_Cat','Name'],  # Path is used to define the hierarchy of the chart
+                            values='Net', 
+                            color='Cat',  # Coloring based on the net value
+                            color_continuous_scale='Blues',  # You can choose other color scales
+                            #color_continuous_midpoint=np.average(df['Net'], weights=df['Net']),
+                            title='Terminal Categories Sunburst Chart',
+                            hover_data={'Net': ':,.2f'}  # Format 'Net' as a float with two decimal places
+                        )
+                        fig.update_traces(hovertemplate='<b>%{label}</b><br>Net: $%{customdata[0]:,.2f}')
+                        fig.add_annotation(
+                            x=0.95,  # x position, centered
+                            y=0.9,  # y position, centered
+                            text=f'Total Net: ${net_amount:,.2f}',  # text to display
+                            showarrow=False,  # no arrow, just the text
+                            font=dict(
+                                family="Arial",
+                                size=16,
+                                color="black"
+                            ),
+                            align="center",
+                            bgcolor="white",  # background color for better readability
+                            opacity=0.8  # slightly transparent background
+                        )
+                        
+                        fig.update_layout(
+                            hoverlabel=dict(
+                                bgcolor="white",  # Background color of the hover labels
+                                font_size=16,     # Font size of the text in hover labels
+                                font_family="Arial" ), # Font of the text in hover labels
+                            margin=dict(t=40, l=10, r=10, b=10),  # Adjust margins to ensure the title and labels fit
+                            width=800,  # Width of the figure in pixels
+                            height=600,  # Height of the figure in pixels
+                            #uniformtext=dict(minsize=15, mode='hide')
+                        )
 
-
+                        st.plotly(fig)
 
                 
                 with ttab2:

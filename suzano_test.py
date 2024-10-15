@@ -1563,7 +1563,7 @@ if authentication_status:
                             
                     with fintab2:
                         year=st.selectbox("Select Year",["2024","2023","2022","2021","2020","2019","2018", "2017","2016"],key="second")
-                        month=st.selectbox("Select Month",range(1,13),12,key="secsond")
+                        month=st.selectbox("Select Month",range(1,13),placeholder="12",key="secsond")
                         ### LETS PUT YEAR in st.session state to use later.
                         
                             
@@ -1576,6 +1576,7 @@ if authentication_status:
                             ledger_b=pd.read_feather(io.BytesIO(ledger_b))
                         ledger_b["Account"]=ledger_b["Account"].astype("str")
                         ledger_b.set_index("index",drop=True,inplace=True)
+                        ledger_b=ledger_b[ledger_b["Date"]<datetime.date(year,month,1)
                         
                         ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
                         

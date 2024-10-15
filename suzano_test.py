@@ -975,6 +975,7 @@ if authentication_status:
                         st.pyplot(fig)
                     
                     with budget3:
+                        Budget_Dict=budget.copy()
                         df=ledger.copy()
                         ledger_p=pd.DataFrame()
                         main={}

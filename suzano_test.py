@@ -1232,7 +1232,7 @@ if authentication_status:
                     budget_codes=gcp_download_x(target_bucket,rf"FIN/budget_codes.feather")
                     budget_codes=pd.read_feather(io.BytesIO(budget_codes))
                     budget_codes.set_index("index",drop=True,inplace=True)
-                    budget=gcp_download_x(target_bucket,rf"FIN/budget.pkl")
+                    budget=gcp_download_x(target_bucket,rf"FIN/NEW/budget.ftr")
                     budget = pickle.load(io.BytesIO(budget))
                     keys={}
                     revenues_codes=list(get_all_keys(budget["Revenues"],keys).keys())
@@ -1262,8 +1262,11 @@ if authentication_status:
                             st.session_state.year=year
                             
                         ### LOAD LEDGERS by year
-                        ledgers=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
-                        ledgers=pd.read_feather(io.BytesIO(ledgers))
+                        if year=="2024":
+                            ledgers=gcp_download_x(target_bucket,rf"FIN/NEW/ledger.ftr")
+                            ledgers=pd.read_feather(io.BytesIO(ledgers))
+                        else:
+                            ledgers=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
                         ledgers["Account"]=ledgers["Account"].astype("str")
                         ledgers.set_index("index",drop=True,inplace=True)
                         

@@ -485,6 +485,52 @@ def prep_ledger(dosya,yr1,month1,yr2,month2):
     
     return df
 
+def prep_weyco_ledger(ldg,yr):
+    
+#     target=f"{ldg}-{yr}"
+
+#     if yr=="2024":
+#         df=pd.read_csv(fr"C:\Users\AfsinY\Desktop\LEDGERS\2024\{target}.csv",header=None) 
+#     else:
+#         df=pd.read_csv(fr"C:\Users\AfsinY\Desktop\LEDGERS\{target}.csv",header=None)
+    
+    df=pd.read_csv(ldg,header=None)
+    checkdate=datetime.datetime.strptime(df.loc[1,14].split(" ")[-1],"%m/%d/%Y")
+
+    a=df.iloc[:,41:45]
+    b=df.iloc[:,49:59]
+
+    df=pd.concat([a,b],axis=1)
+    df.drop(columns=[43,54,57],inplace=True)
+
+    columns=["Account","Name","Sub_Cat","Bat_No","Per_Entry","Ref_No","Date","Description","Debit","Credit","Job_No"]
+    df.columns=columns
+    df.dropna(subset="Date",inplace=True)
+
+    temp=[]
+    for i in df.Credit:
+        try:
+            temp.append(int(i.split(",")[0])*1000+float(i.split(",")[1]))
+            #print(int(i.split(",")[0])*1000+float(i.split(",")[1]))
+        except:
+            temp.append(float(i))
+    df.Credit=temp
+    temp=[]
+    for i in df.Debit:
+        try:
+            temp.append(int(i.split(",")[0])*1000+float(i.split(",")[1]))
+            #print(int(i.split(",")[0])*1000+float(i.split(",")[1]))
+        except:
+            temp.append(float(i))
+    df.Debit=temp
+    df["Date"]=pd.to_datetime(df["Date"])
+    df=df[df["Date"]>= pd.Timestamp(datetime.date(2024,1,1))]   #########################################DATE!@!@
+    df["Net"]=df["Credit"]-df['Debit']
+    
+    df=apply_weyco_corrections(df)
+    
+    return df
+
 def apply_corrections(df):
     df["Acc"]=[f"{i}-{j}" for i,j in zip(df["Account"],df["Sub_Cat"])]
     
@@ -545,6 +591,80 @@ def apply_corrections(df):
 #     df.loc[df['Account'].isin([7311015,6315000,6316000,6317030,7313015,7311015]),"Name"]="Loading & Unloading"
 #     df.loc[df['Account'].isin([7311015,6315000,6316000,6317030,7313015,7311015]),"Account"]=6315000
 #     df["Acc"]=[f"{i}-{j}" for i,j in zip(df["Account"],df["Sub_Cat"])]
+    
+    return df
+
+def apply_weyco_corrections(df):
+    df["Acc"]=[f"{i}-{j}" for i,j in zip(df["Account"],df["Sub_Cat"])]
+    
+    #### WEYCO CREDIT
+    df.loc[df["Acc"]=="6313002-32","Account"]=6341000
+    df.loc[df["Acc"]=="6313002-32","Name"]="Real Prop Rent - Land"
+    #df=df[~df["Acc"]=="6313002-32"]
+    
+    
+    ### SUZANO CORRECTIONS
+    df.loc[df['Ref_No'].isin(["069998","070097","070138","070108","070268","070293","070499","070485",
+                       "070592","070634","070713","070929","070980","071150"
+                       ]),"Job_No"]="23SUZANO / 14"
+
+    df.loc[df['Ref_No'].isin(["071462","071711","071746","071921","071922","071923"
+                       ]),"Job_No"]="23SUZANO / 20"
+
+    df.loc[df['Ref_No'].isin(["071931","072270","072279"
+                       ]),"Job_No"]="24SUZANO / 03"
+    df.loc[df['Ref_No'].isin(["072501","072505"
+                       ]),"Job_No"]="24SUZANO / 08"
+    df.loc[df['Ref_No']=="070485","Job_No"]="NP"
+
+    df.loc[(df["Description"]=="Rev Accr. SSA Pacific 12.23")&(df["Name"]=="Equipment Rentals"),"Net"]=0
+    df.loc[(df["Description"]=="Rev Accr. SSA Pacific 12.23")&(df["Name"]=="Equipment Rentals"),"Debit"]=0
+
+    #### LOADOUTS TO HANDLING
+
+    df.loc[df['Ref_No'].isin(["058498","058283","058710","058923","058924","059168","059386","059624",
+                                      "059625","059881","060097","060298","060096"
+                       ]),"Name"]="Handling"
+    df.loc[df['Ref_No'].isin(["058498","058283","058710","058923","058924","059168","059386","059624",
+                                      "059625","059881","060097","060298","060096"
+                       ]),"Account"]=6316000
+
+    #### UNITED FROM 03 to 05
+
+    df.loc[df['Ref_No'].isin(["059426"
+                       ]),"Job_No"]="24UNITED / 05"
+
+    #### SAGA ENVIRONMENTAL TO SF
+
+    df.loc[(df['Ref_No']=="060106")&(df['Description']=="Environmental Fee"),"Name"]="SWTF Facility Charge"
+    df.loc[(df['Ref_No']=="060106")&(df['Description']=="Environmental Fee"),"Account"]=6318540
+    
+    #### WEYCO BARK CLEANUP WERE NP LETS BE FAIR
+    df.loc[((df["Name"].isin(ships_jobs))&(df["Description"].str.contains("Vessel Bark Clean Up"))),"Job_No"]="WEYCO"
+    
+    #### MAKE FOREMAN OPERATOR REVENUE TO LOADING UNLOADING REVENUE
+    
+    df.loc[df["Acc"]=="6315100-32","Account"]=6315000
+    df.loc[df["Acc"]=="6315100-32","Name"]="Loading & Unloading"
+    df.loc[df["Acc"]=="6315200-32","Account"]=6315000
+    df.loc[df["Acc"]=="6315200-32","Name"]="Loading & Unloading"
+    
+    
+    
+    #### All LABOR GOES TO LOADING UNLOADING AS REVENUE AS NET LABOR 
+    df.loc[df['Account'].isin([6315000,6316000,6317030,7313015,7311015]),"Name"]="Loading & Unloading"
+    df.loc[df['Account'].isin([6315000,6316000,6317030,7313015,7311015]),"Account"]=6315000
+    
+    df.loc[(df["Name"].isin(ships_jobs))&(df["Job_No"].str.contains("WEYCO")),"Account"]=6999999
+    df.loc[(df["Name"].isin(ships_jobs))&(df["Job_No"].str.contains("WEYCO")),"Name"]="Tenant Ship Income"
+    
+    df.loc[(df["Name"].isin(ships_jobs))&(df["Job_No"].str.contains("SUZANO")),"Account"]=6888888
+    df.loc[(df["Name"]=="Handling")&(df["Job_No"].str.contains("SUZANO")),"Account"]=6888889
+    
+    df.loc[(df["Name"].isin(ships_jobs))&(df["Job_No"].str.contains("SUZANO")),"Name"]="Suzano Vessels"
+    df.loc[(df["Name"]=="Handling")&(df["Job_No"].str.contains("SUZANO")),"Name"]="Suzano Warehouse"
+    
+    
     
     return df
 
@@ -780,15 +900,20 @@ if authentication_status:
                     upto_month=st.selectbox("Choose End Month",range(2,13))
                     ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger_b.ftr")
                     ledger=gcp_download_x(target_bucket,rf"FIN/NEW/ledger.ftr")
+                    weyco_ledger=gcp_download_x(target_bucket,rf"FIN/NEW/weyco_ledger.ftr")
+                    
                     budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
                     budget1=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget1.json"))
                     budget_2023=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2023.json"))
                     budget_2024=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2024.json"))
                     weyco_suzano_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/weyco_suzano_budget.json"))
+                    
                     ledger_b = pd.read_feather(io.BytesIO(ledger_b))
                     ledger_b = ledger_b.set_index("index", drop=True).reset_index(drop=True)
                     ledger = pd.read_feather(io.BytesIO(ledger))
                     ledger = ledger.set_index("index", drop=True).reset_index(drop=True)
+                    weyco_ledger = pd.read_feather(io.BytesIO(weyco_ledger))
+                    weyco_ledger = weyco_ledger.set_index("index", drop=True).reset_index(drop=True)
                     
                     ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
                     ledger=ledger[ledger["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
@@ -980,10 +1105,11 @@ if authentication_status:
                         weyco= st.checkbox("WEYCO SUZANO NORMALIZED")
                         if weyco:
                             Budget_Dict=weyco_suzano_budget.copy()
+                            df=weyco_ledger.copy()
                         else:
                             Budget_Dict=budget.copy()
+                            df=ledger.copy()
                         
-                        df=ledger.copy()
                         ledger_p=pd.DataFrame()
                         main={}
                         dep=df[(df['Account']>=1712000)&(df["Account"]<=1865000)]

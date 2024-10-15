@@ -984,7 +984,7 @@ if authentication_status:
                         capital=df[(df['Account']<1712000)]
                         pma=df[(df['Account']>1865000)&(df["Account"]<=2131001)]
                         deposits=df[(df['Account']>2131001)&(df["Account"]<=2391030)]
-                        df=df[((df['Account']>=1712000)&(df['Account']<=1865000))|(df["Account"]>2391030)]
+                        df=df[((df['Account']>=1712000)&(df['Account']<=1865000))|(df["Account"]>2391040)]
                         # main=populate_main(main,main_30,accso)
                         # ledger=pd.concat([ledger,main_30])
                         #df=df[df["Account"]>2391030]

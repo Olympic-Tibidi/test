@@ -1003,6 +1003,7 @@ if authentication_status:
                         df.loc[df["Cat"]=="Depreciation","Net"]=-df.loc[df["Cat"]=="Depreciation","Net"]
                         net_amount=df.Net.sum()
                         df["Net"]=abs(df["Net"])
+                        st.write(df)
                         fig = px.sunburst(
                             df, 
                             path=['Cat','Sub_Cat','Name'],  # Path is used to define the hierarchy of the chart

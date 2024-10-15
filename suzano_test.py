@@ -1240,7 +1240,7 @@ if authentication_status:
                         a.loc["Total",:]=a.sum(axis=0)
                         formatted_a = a.applymap(dollar_format)
                         formatted_a.columns=[calendar.month_abbr[int(i)] for i in formatted_a.columns[:-1]]+["Per Month"]
-                        st.write(a)
+                        st.write(formatted_a)
                 
                 with ttab2:
                     

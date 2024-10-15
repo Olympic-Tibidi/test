@@ -485,7 +485,7 @@ def prep_ledger(dosya,yr1,month1,yr2,month2):
     
     return df
 
-def prep_weyco_ledger(ldg,yr):
+def prep_weyco_ledger(dosya,yr1,month1,yr2,month2):
     
 #     target=f"{ldg}-{yr}"
 
@@ -494,7 +494,7 @@ def prep_weyco_ledger(ldg,yr):
 #     else:
 #         df=pd.read_csv(fr"C:\Users\AfsinY\Desktop\LEDGERS\{target}.csv",header=None)
     
-    df=pd.read_csv(ldg,header=None)
+    df=pd.read_csv(dosya,header=None)
     checkdate=datetime.datetime.strptime(df.loc[1,14].split(" ")[-1],"%m/%d/%Y")
 
     a=df.iloc[:,41:45]
@@ -524,7 +524,8 @@ def prep_weyco_ledger(ldg,yr):
             temp.append(float(i))
     df.Debit=temp
     df["Date"]=pd.to_datetime(df["Date"])
-    df=df[df["Date"]>= pd.Timestamp(datetime.date(2024,1,1))]   #########################################DATE!@!@
+    df=df[(df["Date"]>= pd.Timestamp(datetime.date(yr1,month1,1)))&
+         (df["Date"]< pd.Timestamp(datetime.date(yr2,month2,1)))]   #########################################DATE!@!@
     df["Net"]=df["Credit"]-df['Debit']
     
     df=apply_weyco_corrections(df)
@@ -663,8 +664,8 @@ def apply_weyco_corrections(df):
     
     df.loc[(df["Name"].isin(ships_jobs))&(df["Job_No"].str.contains("SUZANO")),"Name"]="Suzano Vessels"
     df.loc[(df["Name"]=="Handling")&(df["Job_No"].str.contains("SUZANO")),"Name"]="Suzano Warehouse"
-    
-    
+
+    df["Acc"]=[f"{i}-{j}" for i,j in zip(df["Account"],df["Sub_Cat"])]
     
     return df
 

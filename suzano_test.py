@@ -1179,7 +1179,7 @@ if authentication_status:
 
                         st.plotly_chart(fig)
                     with budget4:
-                        combined_ledger=ledger_b.copy()
+                        combined_ledger=ledger.copy()
                         combined_ledger["Month"]=combined_ledger["Date"].dt.month
                         combined_ledger=combined_ledger[combined_ledger["Month"]<upto_month]
                         combined_ledger["Net"] = combined_ledger["Net"].map('{:.2f}'.format)

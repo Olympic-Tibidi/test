@@ -1045,7 +1045,7 @@ if authentication_status:
                     # Append the overall total row to the new DataFrame
                     new_df = pd.concat([new_df, pd.DataFrame([overall_total], index=pd.MultiIndex.from_tuples([overall_total.name]))])
                     new_df=new_df[["Net","Budget 2024 YTD","Variance","Budget 2024"]]
-                    budget1,budget2,budget3=st.tabs(["TABULAR","VERSUS BUDGETED","SUNBURST CHART"])
+                    budget1,budget2,budget3,budget4=st.tabs(["TABULAR","VERSUS BUDGETED","SUNBURST CHART","MONTHLY PIVOT TABLE"])
                     with budget1:
                         st.write(new_df)
                     with budget2:
@@ -1178,7 +1178,69 @@ if authentication_status:
                         )
 
                         st.plotly_chart(fig)
-
+                    with budget4:
+                        combined_ledger=ledger_b.copy()
+                        combined_ledger["Month"]=combined_ledger["Date"].dt.month
+                        combined_ledger=combined_ledger[combined_ledger["Month"]<upto_month]
+                        combined_ledger["Net"] = combined_ledger["Net"].map('{:.2f}'.format)
+                        combined_ledger["Net"]=combined_ledger["Net"].astype('float')
+                        
+                        ledger_pivot = combined_ledger.pivot_table(index=["Account", "Name"], columns="Month", values="Net", aggfunc="sum")
+                        #ledger_pivot.to_excel("Ledger_Pivot.xlsx")
+                        #ledger_pivot
+                        temp=ledger_pivot.loc[:,:10]
+                        temp.iloc[:20,:]=-temp.iloc[:20,:]
+                        #temp = temp.append(temp.sum(axis=0).rename("Total"))
+                        
+                        ship_accounts=[6311000,6312000,6313000,6314000,6313950,6315000,6315100,6315200,6316000,6317030,6318540,6318600,
+                                       6318900,6329000,6373000,6381000,6389000,7313015,7311015,7314300,7313949,7315000,7338700]
+                        overhead=[7350080,7350082,7350083,7350085,7350087,7350088]
+                        
+                        weyco_non_ship_income=[6313001,6313003,6313955,6318101,6318301,6318501,6319040,6341000,6341010,6351000,6418500]
+                        
+                        non_vessel_expense = temp[(~temp.index.get_level_values("Account").isin(ship_accounts))&
+                                                  (temp.index.get_level_values("Account")>7000000)&
+                                                  (~temp.index.get_level_values("Account").isin(overhead))]
+                                            
+                        
+                        vessel_expense = temp[temp.index.get_level_values("Account").isin(ship_accounts)&
+                                                  (temp.index.get_level_values("Account")>7000000)]
+                        
+                        depreciation=temp[temp.index.get_level_values("Account")<2000000]
+                        overhead=temp[temp.index.get_level_values("Account").isin(overhead)]
+                        vessel_ops=temp[temp.index.get_level_values("Account").isin(ship_accounts)]
+                        weyco_static=temp[temp.index.get_level_values("Account").isin(weyco_non_ship_income)]
+                        other_income=temp[(~temp.index.get_level_values("Account").isin(weyco_non_ship_income))&
+                                          (~temp.index.get_level_values("Account").isin(ship_accounts))&
+                                         (temp.index.get_level_values("Account")<7000000)&
+                                         (temp.index.get_level_values("Account")>2000000)]
+                        
+                        
+                        
+                        temp=add_stat_rows(temp)
+                        non_vessel_expense = add_stat_rows(non_vessel_expense)
+                        vessel_expense = add_stat_rows(vessel_expense)
+                        depreciation=add_stat_rows(depreciation)
+                        overhead=add_stat_rows(overhead)
+                        vessel_ops=add_stat_rows(vessel_ops)
+                        weyco_static=add_stat_rows(weyco_static)
+                        other_income=add_stat_rows(other_income)
+                        
+                        a=pd.DataFrame(columns=range(1,upto_month))
+                        a.loc["Revenue - Vessel Ops"]=vessel_ops.iloc[-1,:-1]
+                        a.loc["Revenue - Weyco Static"]=weyco_static.iloc[-1,:-1]
+                        a.loc["Revenue - Other"]=other_income.iloc[-1,:-1]
+                        a.loc["Expense - Running Cost"]=non_vessel_expense.iloc[-1,:-1]
+                        a.loc["Expense - Overhead"]=overhead.iloc[-1,:-1]
+                        a.loc["Expense - Depreciation"]=depreciation.iloc[-1,:-1]
+                        
+                        a=a.copy()
+                        a.loc[:,"Mean"]=round(a.mean(axis=1),1)
+                        a=a.copy()
+                        a.loc["Total",:]=a.sum(axis=0)
+                        formatted_a = a.applymap(dollar_format)
+                        formatted_a.columns=[calendar.month_abbr[int(i)] for i in formatted_a.columns[:-1]]+["Per Month"]
+                        st.write(a)
                 
                 with ttab2:
                     

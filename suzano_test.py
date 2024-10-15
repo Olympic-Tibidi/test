@@ -779,7 +779,7 @@ if authentication_status:
                         
                     upto_month=st.selectbox("Choose End Month",range(2,13))
                     ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger_b.ftr")
-                    ledger=gcp_download_x(target_bucket,rf"FIN/NEW/ledger_detail.ftr")
+                    ledger=gcp_download_x(target_bucket,rf"FIN/NEW/ledger.ftr")
                     budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
                     budget1=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget1.json"))
                     budget_2023=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2023.json"))
@@ -833,7 +833,6 @@ if authentication_status:
                         except:
                             pass
                        # ledger_b.loc[i,"Sub_Group"]=get_key(budget,ledger_b.loc[i,"Account"])
-                    ledger_b.head()
                     
                     
                     #### LABOR ADJUSTMENT
@@ -976,7 +975,7 @@ if authentication_status:
                         st.pyplot(fig)
                     
                     with budget3:
-                        df=ledger_b.copy()
+                        df=ledger.copy()
                         ledger_p=pd.DataFrame()
                         main={}
                         dep=df[(df['Account']>=1712000)&(df["Account"]<=1865000)]

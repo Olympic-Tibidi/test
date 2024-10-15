@@ -1568,9 +1568,12 @@ if authentication_status:
                         
                             
                         ### LOAD LEDGERS by year
-                        
-                        ledger_b=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
-                        ledger_b=pd.read_feather(io.BytesIO(ledger_b))
+                        if year=="2024":
+                            ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger.ftr")
+                            ledger_b=pd.read_feather(io.BytesIO(ledger_b))
+                        else:
+                            ledger_b=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
+                            ledger_b=pd.read_feather(io.BytesIO(ledger_b))
                         ledger_b["Account"]=ledger_b["Account"].astype("str")
                         ledger_b.set_index("index",drop=True,inplace=True)
                         

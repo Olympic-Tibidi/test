@@ -1232,8 +1232,7 @@ if authentication_status:
                     budget_codes=gcp_download_x(target_bucket,rf"FIN/budget_codes.feather")
                     budget_codes=pd.read_feather(io.BytesIO(budget_codes))
                     budget_codes.set_index("index",drop=True,inplace=True)
-                    budget=gcp_download_x(target_bucket,rf"FIN/NEW/budget.ftr")
-                    budget = pickle.load(io.BytesIO(budget))
+                    budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
                     keys={}
                     revenues_codes=list(get_all_keys(budget["Revenues"],keys).keys())
                     keys={}

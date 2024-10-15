@@ -899,6 +899,7 @@ if authentication_status:
                     
                         
                     upto_month=st.selectbox("Choose End Month",range(2,13))
+                    
                     ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger_b.ftr")
                     ledger=gcp_download_x(target_bucket,rf"FIN/NEW/ledger.ftr")
                     weyco_ledger=gcp_download_x(target_bucket,rf"FIN/NEW/weyco_ledger.ftr")
@@ -918,6 +919,8 @@ if authentication_status:
                     
                     ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
                     ledger=ledger[ledger["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
+                    weyco_ledger=weyco_ledger[weyco_ledger["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
+
 
                     ledger_b.reset_index(drop=True,inplace=True)
                     ledger_b=ledger_b.copy()

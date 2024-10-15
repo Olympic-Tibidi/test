@@ -1000,7 +1000,7 @@ if authentication_status:
                         
                         df=pd.DataFrame(combined_main).T
                         df.drop(df[df["Net"]==0].index,inplace=True)
-                        df.loc[df["Cat"]=="Depreciation","Net"]=-df.loc[df["Cat"]=="Depreciation","Net"]
+                        #df.loc[df["Cat"]=="Depreciation","Net"]=-df.loc[df["Cat"]=="Depreciation","Net"]
                         net_amount=df.Net.sum()
                         df["Net"]=abs(df["Net"])
                         st.write(df)

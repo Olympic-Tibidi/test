@@ -989,7 +989,7 @@ if authentication_status:
                         # ledger=pd.concat([ledger,main_30])
                         #df=df[df["Account"]>2391030]
                         # df=prep_ledger(accso,yr)
-                        df=df[~df["Account"].isin([7370000,7370010])]
+                        df=df[~df["Account"].isin([7370000,7370010,7470000])]
                         labor=df[df['Account'].isin([7311015,6315000,6317030,7313015])]
                         
                         ledger_p=pd.concat([ledger_p,df])

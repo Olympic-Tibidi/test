@@ -1416,150 +1416,150 @@ if authentication_status:
                             #st.write(monthly)
                             monthly.set_index("Date",drop=True, inplace=True)
         #                     #st.write(monthly)
-        #                     monthly_=monthly.resample("M")["Debit","Credit","Net"].sum()
-        #                     monthly_.index=[i.month_name() for i in monthly_.index]
-        #                     avg=round(monthly_.Net.sum()/monthly_.shape[0],1)
-        #                     total=round(monthly_.Net.sum(),1)
-        #                     if year=="2023":
+                            monthly_=monthly.resample("M")["Debit","Credit","Net"].sum()
+                            monthly_.index=[i.month_name() for i in monthly_.index]
+                            avg=round(monthly_.Net.sum()/monthly_.shape[0],1)
+                            total=round(monthly_.Net.sum(),1)
+                            if year=="2023":
                                
-        #                         annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2023 Adopted"].values.sum()
-        #                         #st.write(annual_budget)
-        #                     elif year=="2022":
-        #                         annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2022 Adopted"].values.sum()
-        #                         annual_budget1=budget_codes[budget_codes["Account"].isin(accounts)]["2023 Adopted"].values.sum()
+                                annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2023 Adopted"].values.sum()
+                                #st.write(annual_budget)
+                            elif year=="2022":
+                                annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2022 Adopted"].values.sum()
+                                annual_budget1=budget_codes[budget_codes["Account"].isin(accounts)]["2023 Adopted"].values.sum()
                             
-        #                     else:
+                            else:
                                 
-        #                         annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2022 Adopted"].values.sum()
+                                annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2022 Adopted"].values.sum()
                                 
                                
-        #                     budgeted_monthly=annual_budget/12
-        #                     monthly_=monthly_.applymap(dollar_format)
-        #                     #st.write(annual_budget)
-        #                     #st.write(accounts)
-        #                     col1, col2,col3= st.columns([2,2,5])
+                            budgeted_monthly=annual_budget/12
+                            monthly_=monthly_.applymap(dollar_format)
+                            #st.write(annual_budget)
+                            #st.write(accounts)
+                            col1, col2,col3= st.columns([2,2,5])
                             
-        #                     with col1:
-        #                         st.write(monthly_)
-        #                     with col2:
-        #                         text='${:,.1f}'.format(total)
-        #                         st.markdown('**Average Monthly    :      ${:,.1f}**'.format(avg))
-        #                         st.markdown(f"**Budgeted {st.session_state.year} Monthly:  {'${:,.1f}**'.format(budgeted_monthly)}")
-        #                         st.markdown("##")
-        #                         st.markdown(f"**Budgeted {st.session_state.year} Annual:  {'${:,.1f}**'.format(annual_budget)}")
-        #                         st.markdown(f'**TOTAL so far in {st.session_state.year}:   {text}**')
+                            with col1:
+                                st.write(monthly_)
+                            with col2:
+                                text='${:,.1f}'.format(total)
+                                st.markdown('**Average Monthly    :      ${:,.1f}**'.format(avg))
+                                st.markdown(f"**Budgeted {st.session_state.year} Monthly:  {'${:,.1f}**'.format(budgeted_monthly)}")
+                                st.markdown("##")
+                                st.markdown(f"**Budgeted {st.session_state.year} Annual:  {'${:,.1f}**'.format(annual_budget)}")
+                                st.markdown(f'**TOTAL so far in {st.session_state.year}:   {text}**')
                             
                                 
-        #                         percent_spent = avg / budgeted_monthly * 100
+                                percent_spent = avg / budgeted_monthly * 100
                 
-        #                         #st_gauge(percent_spent, label='Monthly Budget Status', min_value=0, max_value=100)
-        #                     with col3:
-        #                         agree = st.checkbox('**CHECK FOR YTD GAUGE INSTEAD OF MONTHLY**')
+                                #st_gauge(percent_spent, label='Monthly Budget Status', min_value=0, max_value=100)
+                            with col3:
+                                agree = st.checkbox('**CHECK FOR YTD GAUGE INSTEAD OF MONTHLY**')
                                 
-        #                         if agree:
-        #                             value=total
-        #                             budgeted=annual_budget
-        #                         else:
-        #                             value=avg
-        #                             budgeted=budgeted_monthly
-        #                         gauge_text=f"MONTHLY BUDGET STATUS FOR {monthly_label}"
-        #                         fig = go.Figure(go.Indicator(
-        #                                 mode = "gauge+number+delta",
-        #                                 value = abs(round(value,1)),
-        #                                 number = { 'prefix': '$', 'font': {'size':50}},
-        #                                 domain = {'x': [0,1], 'y': [0, 1]},
-        #                                 title = {'text': gauge_text, 'font': {'size': 24}},
-        #                                 delta = {'position':'bottom','reference': abs(round(budgeted,1)), 'increasing': {'color': "RebeccaPurple"}},
-        #                                 gauge = {
-        #                                     'axis': {'range': [None, 1.5*abs(budgeted)], 'tickwidth': 1, 'tickcolor': "darkblue"},
-        #                                     'bar': {'color': "darkblue"},
-        #                                     'bgcolor': "white",
-        #                                     'borderwidth': 2,
-        #                                     'bordercolor': "gray",
-        #                                     'steps': [
-        #                                         {'range': [0, abs(budgeted)], 'color': 'cyan'},
-        #                                         {'range': [abs(budgeted),
-        #                                                   abs(1.5*budgeted)], 'color': 'royalblue'}],
-        #                                     'threshold': {
-        #                                         'line': {'color': "red", 'width': 4},
-        #                                         'thickness': 0.75,
-        #                                         'value': abs(budgeted*1.25)}}))
-        #                         fig.add_annotation(
-        #                                             x=0.5,
-        #                                             y=0.35,
-        #                                             text="Monthly Average",
-        #                                             showarrow=False,
-        #                                             font=dict(
-        #                                                 size=16,
-        #                                                 color="darkblue",
-        #                                                 family="Arial"   )  )
-        #                         fig.add_annotation(
-        #                                             x=0,
-        #                                             y=-0.2,
-        #                                             text="<b>**DARK BLUE:Running Monthly Average**<b>",
-        #                                             showarrow=False,
-        #                                             font=dict(
-        #                                                 size=12,
-        #                                                 color="darkblue",
-        #                                                 family="Arial"   )  )
-        #                         fig.add_annotation(
-        #                                             x=0,
-        #                                             y=-0.1,
-        #                                             text="<b>**CYAN : MONTHLY BUDGET**<b>",
-        #                                             showarrow=False,
-        #                                             font=dict(
-        #                                                 size=12,
-        #                                                 color="darkblue",
-        #                                                 family="Arial"   )  )
-        #                         fig.add_annotation(
-        #                                             x=0,
-        #                                             y=-0.3,
-        #                                             text="**<b>RED LINE : 1.5 X MONTHLY BUDGET**<b>",
-        #                                             showarrow=False,
-        #                                             font=dict(
-        #                                                 size=12,
-        #                                                 color="darkblue",
-        #                                                 family="Arial"   )  )
-        #                         fig.add_annotation(
-        #                                             x=0.5,
-        #                                             y=-0.05,
-        #                                             text="From Budgeted Monthly",
-        #                                             showarrow=False,
-        #                                             font=dict(
-        #                                                 size=16,
-        #                                                 color="darkblue",
-        #                                                 family="Arial"
-        #                                             )
-        #                                         )
-        #                         fig.update_layout(paper_bgcolor = "lavender",
-        #                                           font = {'color': "darkblue", 'family': "Arial"})
+                                if agree:
+                                    value=total
+                                    budgeted=annual_budget
+                                else:
+                                    value=avg
+                                    budgeted=budgeted_monthly
+                                gauge_text=f"MONTHLY BUDGET STATUS FOR {monthly_label}"
+                                fig = go.Figure(go.Indicator(
+                                        mode = "gauge+number+delta",
+                                        value = abs(round(value,1)),
+                                        number = { 'prefix': '$', 'font': {'size':50}},
+                                        domain = {'x': [0,1], 'y': [0, 1]},
+                                        title = {'text': gauge_text, 'font': {'size': 24}},
+                                        delta = {'position':'bottom','reference': abs(round(budgeted,1)), 'increasing': {'color': "RebeccaPurple"}},
+                                        gauge = {
+                                            'axis': {'range': [None, 1.5*abs(budgeted)], 'tickwidth': 1, 'tickcolor': "darkblue"},
+                                            'bar': {'color': "darkblue"},
+                                            'bgcolor': "white",
+                                            'borderwidth': 2,
+                                            'bordercolor': "gray",
+                                            'steps': [
+                                                {'range': [0, abs(budgeted)], 'color': 'cyan'},
+                                                {'range': [abs(budgeted),
+                                                          abs(1.5*budgeted)], 'color': 'royalblue'}],
+                                            'threshold': {
+                                                'line': {'color': "red", 'width': 4},
+                                                'thickness': 0.75,
+                                                'value': abs(budgeted*1.25)}}))
+                                fig.add_annotation(
+                                                    x=0.5,
+                                                    y=0.35,
+                                                    text="Monthly Average",
+                                                    showarrow=False,
+                                                    font=dict(
+                                                        size=16,
+                                                        color="darkblue",
+                                                        family="Arial"   )  )
+                                fig.add_annotation(
+                                                    x=0,
+                                                    y=-0.2,
+                                                    text="<b>**DARK BLUE:Running Monthly Average**<b>",
+                                                    showarrow=False,
+                                                    font=dict(
+                                                        size=12,
+                                                        color="darkblue",
+                                                        family="Arial"   )  )
+                                fig.add_annotation(
+                                                    x=0,
+                                                    y=-0.1,
+                                                    text="<b>**CYAN : MONTHLY BUDGET**<b>",
+                                                    showarrow=False,
+                                                    font=dict(
+                                                        size=12,
+                                                        color="darkblue",
+                                                        family="Arial"   )  )
+                                fig.add_annotation(
+                                                    x=0,
+                                                    y=-0.3,
+                                                    text="**<b>RED LINE : 1.5 X MONTHLY BUDGET**<b>",
+                                                    showarrow=False,
+                                                    font=dict(
+                                                        size=12,
+                                                        color="darkblue",
+                                                        family="Arial"   )  )
+                                fig.add_annotation(
+                                                    x=0.5,
+                                                    y=-0.05,
+                                                    text="From Budgeted Monthly",
+                                                    showarrow=False,
+                                                    font=dict(
+                                                        size=16,
+                                                        color="darkblue",
+                                                        family="Arial"
+                                                    )
+                                                )
+                                fig.update_layout(paper_bgcolor = "lavender",
+                                                  font = {'color': "darkblue", 'family': "Arial"})
                 
-        #                         st.plotly_chart(fig)
-        #                     col5, col6= st.columns([2,2])
-        #                     with col5:
+                                st.plotly_chart(fig)
+                            col5, col6= st.columns([2,2])
+                            with col5:
                                 
-        #                         st.subheader(f"Monthly Bar Graph for {st.session_state.year} - {monthly_label}")
-        #                         fig1 = go.Figure(data=[go.Bar(x=monthly_.index, y=monthly_.Net)])
-        #                         st.plotly_chart(fig1)
-        #                     with col6:
-        #                         st.subheader(f"{monthly_label} Across Years")
-        #                         yillar=["2023","2022","2021","2020","2019","2018", "2017","2016"]
-        #                         results=[]
-        #                         for k in yillar:
-        #                             temp=gcp_download_x(target_bucket,rf"FIN/main{k}.ftr")
-        #                             temp=pd.read_feather(io.BytesIO(temp))
+                                st.subheader(f"Monthly Bar Graph for {st.session_state.year} - {monthly_label}")
+                                fig1 = go.Figure(data=[go.Bar(x=monthly_.index, y=monthly_.Net)])
+                                st.plotly_chart(fig1)
+                            with col6:
+                                st.subheader(f"{monthly_label} Across Years")
+                                yillar=["2023","2022","2021","2020","2019","2018", "2017","2016"]
+                                results=[]
+                                for k in yillar:
+                                    temp=gcp_download_x(target_bucket,rf"FIN/main{k}.ftr")
+                                    temp=pd.read_feather(io.BytesIO(temp))
                                     
                                 
-        #                             temp.set_index("index",drop=True,inplace=True)
+                                    temp.set_index("index",drop=True,inplace=True)
                 
-        #                             ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
-        #                             temp1=temp.copy()
-        #                             temp1.Account=[str(i)+"-"+str(j) for i,j in zip(temp1.Account,temp1.Sub_Cat)]
-        #                             result=temp1[temp1["Account"].isin(accounts)]["Net"].sum()
-        #                             results.append(result)
-        #                         fig2 = go.Figure(data=[go.Bar(x=yillar, y=results)])
-        #                         st.plotly_chart(fig2)
-        #                     #st.write(monthly)
+                                    ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
+                                    temp1=temp.copy()
+                                    temp1.Account=[str(i)+"-"+str(j) for i,j in zip(temp1.Account,temp1.Sub_Cat)]
+                                    result=temp1[temp1["Account"].isin(accounts)]["Net"].sum()
+                                    results.append(result)
+                                fig2 = go.Figure(data=[go.Bar(x=yillar, y=results)])
+                                st.plotly_chart(fig2)
+                            #st.write(monthly)
                             
                     with fintab2:
                         year=st.selectbox("Select Year",["2024","2023","2022","2021","2020","2019","2018", "2017","2016"],key="second")
@@ -1568,6 +1568,7 @@ if authentication_status:
                         
                             
                         ### LOAD LEDGERS by year
+                        
                         ledger_b=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
                         ledger_b=pd.read_feather(io.BytesIO(ledger_b))
                         ledger_b["Account"]=ledger_b["Account"].astype("str")

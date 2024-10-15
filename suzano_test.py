@@ -790,6 +790,7 @@ if authentication_status:
                     ledger = ledger.set_index("index", drop=True).reset_index(drop=True)
                     
                     ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
+                    ledger=ledger[ledger["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
 
                     ledger_b.reset_index(drop=True,inplace=True)
                     ledger_b=ledger_b.copy()

@@ -1247,8 +1247,8 @@ if authentication_status:
                     expenses=operations_codes+maintenance_codes+overhead_codes
                     expenses_dep=expenses+depreciation_codes
                 
-                    accounts_classes=gcp_download_x(target_bucket,rf"FIN/accounts_classes.pkl")
-                    accounts_classes = pickle.load(io.BytesIO(accounts_classes))
+                    # accounts_classes=gcp_download_x(target_bucket,rf"FIN/accounts_classes.pkl")
+                    # accounts_classes = pickle.load(io.BytesIO(accounts_classes))
                 
                      
                 

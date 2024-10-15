@@ -1040,7 +1040,7 @@ if authentication_status:
                             #uniformtext=dict(minsize=15, mode='hide')
                         )
 
-                        st.plotly(fig)
+                        st.plotly_chart(fig)
 
                 
                 with ttab2:

@@ -784,6 +784,7 @@ if authentication_status:
                     budget1=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget1.json"))
                     budget_2023=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2023.json"))
                     budget_2024=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2024.json"))
+                    weyco_suzano_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/weyco_suzano_budget.json"))
                     ledger_b = pd.read_feather(io.BytesIO(ledger_b))
                     ledger_b = ledger_b.set_index("index", drop=True).reset_index(drop=True)
                     ledger = pd.read_feather(io.BytesIO(ledger))
@@ -976,7 +977,12 @@ if authentication_status:
                         st.pyplot(fig)
                     
                     with budget3:
-                        Budget_Dict=budget.copy()
+                        weyco= st.checkbox("WEYCO SUZANO NORMALIZED")
+                        if weyco:
+                            Budget_Dict=weyco_suzano_budget.copy()
+                        else:
+                            Budget_Dict=budget.copy()
+                        
                         df=ledger.copy()
                         ledger_p=pd.DataFrame()
                         main={}

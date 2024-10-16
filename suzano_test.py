@@ -1179,7 +1179,7 @@ if authentication_status:
 
                         st.plotly_chart(fig)
                     with budget4:
-                        weycom= st.checkbox("WEYCO SUZANO NORMALIZED")
+                        weycom= st.checkbox("WEYCO SUZANO NORMALIZED",key="fsa")
                         combined_ledger=ledger.copy()
                         combined_ledger["Month"]=combined_ledger["Date"].dt.month
                         combined_ledger=combined_ledger[combined_ledger["Month"]<upto_month]

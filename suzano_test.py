@@ -587,7 +587,7 @@ def apply_corrections(df):
     df.loc[df["Acc"]=="6315200-32","Name"]="Loading & Unloading"
     df.loc[df["Acc"]=="6315200-32","Acc"]="6315000-32"
     
-    
+    df["Acc"]=[f"{i}-{j}" for i,j in zip(df["Account"],df["Sub_Cat"])]
     ####  LABOR NORMALIZING
 #     df.loc[df['Account'].isin([7311015,6315000,6316000,6317030,7313015,7311015]),"Name"]="Loading & Unloading"
 #     df.loc[df['Account'].isin([7311015,6315000,6316000,6317030,7313015,7311015]),"Account"]=6315000
@@ -1278,6 +1278,7 @@ if authentication_status:
                             if terminal and stormwater:
                                 
                                 mnth=datetime.date.today().month
+                                #t = pd.read_csv(terminal)
                                 ledger=prep_ledger(terminal,2024,1,2024,mnth+1)
                                 ledger=pd.concat([ledger,prep_ledger(stormwater,2024,1,2024,mnth+1)])
                                 # wey_ledger=prep_weyco_ledger(terminal,2024,1,2024,mnth+1)

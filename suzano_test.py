@@ -1302,87 +1302,34 @@ if authentication_status:
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"FIN/NEW/ledger-{year}.ftr")
                                 blob.upload_from_filename(temp_file_path)
-    
-                                # feather_data = BytesIO()
-                                # df.reset_index().to_feather(feather_data)
-                                # # Create a temporary local file to store Feather data
-                                # temp_file_path = tempfile.NamedTemporaryFile(delete=False).name
-                                # df.reset_index().to_feather(temp_file_path)
-                                # storage_client = get_storage_client()
-                                # bucket = storage_client.bucket(target_bucket)
-                                # blob = bucket.blob(rf"FIN/NEW/weyco_ledger-{year}.ftr")
-                                # blob.upload_from_filename(temp_file_path)
+                                
+                               
                                     
-                                    #     set=pd.read_feather(feather_data).set_index("index",drop=True).reset_index(drop=True)
-                                    #     if k==m30:
-                                    #         with led_col3:
-                                    #             st.write("Processing Depreciation/Overhead")
-                                    #         set["Net"]=set["Credit"]-set["Debit"]
-                                    #         depreciation=set[set.Account.astype(str).str.startswith("17")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
-                                    #         overhead=set[set.Account.astype(str).str.startswith("735")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
-                                    #         main30=set[set.Account.astype(str).str.startswith("731")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
-                                    #         with led_col3:
-                                    #             st.markdown(f"**Depreciation**")
-                                    #             st.write("Total Credit :${:,}".format(round(depreciation.Credit.sum(),2)))
-                                    #             st.write("Total Debit  :${:,}".format(round(depreciation.Debit.sum(),2)))
-                                    #             st.write("Net          :${:,}".format(round(depreciation.Credit.sum()-depreciation.Debit.sum(),2)))
-                                    #         with led_col3:
-                                    #             st.markdown(f"**Overhead**")
-                                    #             st.write("Total Credit :${:,}".format(round(overhead.Credit.sum(),2)))
-                                    #             st.write("Total Debit  :${:,}".format(round(overhead.Debit.sum(),2)))
-                                    #             st.write("Net          :${:,}".format(round(overhead.Credit.sum()-overhead.Debit.sum(),2)))
-                                    #         with led_col3:
-                                    #             st.markdown(f"**Main Ledger 030**")
-                                    #             st.write("Total Credit :${:,}".format(round(main30.Credit.sum(),2)))
-                                    #             st.write("Total Debit  :${:,}".format(round(main30.Debit.sum(),2)))
-                                    #             st.write("Net          :${:,}".format(round(main30.Credit.sum()-main30.Debit.sum(),2)))
-                                    #         temp_file_path = tempfile.NamedTemporaryFile(delete=False).name
-                                    #         depreciation.reset_index().to_feather(temp_file_path)
-                                    #         storage_client = get_storage_client()
-                                    #         bucket = storage_client.bucket(target_bucket)
-                                    #         blob = bucket.blob(rf"FIN/str(year)-30.ftr")
-                                    #         blob.upload_from_filename(temp_file_path)
-                                    #     if k==m32:
-                                            
-                                    #         set["Net"]=set["Credit"]-set["Debit"]
-                                            
-                                    #         first=set.copy()
-                                    #         with led_col4:
-                                    #             st.markdown(f"**Re-processing Ledger 032**")
-                                    #             st.write("Total Credit :${:,}".format(round(first.Credit.sum(),2)))
-                                    #             st.write("Total Debit  :${:,}".format(round(first.Debit.sum(),2)))
-                                    #             st.write("Net          :${:,}".format(round(first.Credit.sum()-first.Debit.sum(),2)))
+                                set=pd.read_feather(feather_data).set_index("index",drop=True).reset_index(drop=True)
                                        
-                                    #     if k==m36:
-                                            
-                                    #         set["Net"]=set["Credit"]-set["Debit"]
-                                    #         third=set.copy()
-                                    #         with led_col4:
-                                    #             st.markdown(f"**Re-processing Ledger 036**")
-                                    #             st.write("Total Credit :${:,}".format(round(third.Credit.sum(),2)))
-                                    #             st.write("Total Debit  :${:,}".format(round(third.Debit.sum(),2)))
-                                    #             st.write("Net          :${:,}".format(round(third.Credit.sum()-third.Debit.sum(),2)))
-                                    #     if k==m40:
-                                            
-                                    #         set["Net"]=set["Credit"]-set["Debit"]
-                                    #         fourth=set.copy()
-                                    #         with led_col4:
-                                    #             st.markdown(f"**Re-processing Ledger 040**")
-                                    #             st.write("Total Credit :${:,}".format(round(fourth.Credit.sum(),2)))
-                                    #             st.write("Total Debit  :${:,}".format(round(fourth.Debit.sum(),2)))
-                                    #             st.write("Net          :${:,}".format(round(fourth.Credit.sum()-fourth.Debit.sum(),2)))
-                                    # store=pd.concat([first,main30,overhead,third,fourth])
-                                        
-                                        
-                                    # temp_file_path = tempfile.NamedTemporaryFile(delete=False).name
-                                    # store.reset_index().to_feather(temp_file_path)
-                                    # storage_client = get_storage_client()
-                                    # bucket = storage_client.bucket(target_bucket)
-                                    # blob = bucket.blob(rf"FIN/main{str(year)}.ftr")
-                                    # blob.upload_from_filename(temp_file_path)
-                                    # with led_col2:
-                                    #     st.success(f"**SUCCESS. {year} Ledger has been updated!", icon="✅")     
-                
+                                with led_col3:
+                                    st.write("Processing Depreciation/Overhead")
+                                    set["Net"]=set["Credit"]-set["Debit"]
+                                    depreciation=set[set.Account.astype(str).str.startswith("17")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
+                                    overhead=set[set.Account.astype(str).str.startswith("735")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
+                                    main30=set[set.Account.astype(str).str.startswith("731")]#.resample("M",on="Date")[["Debit","Credit"]].sum()
+                                with led_col3:
+                                    st.markdown(f"**Depreciation**")
+                                    st.write("Total Credit :${:,}".format(round(depreciation.Credit.sum(),2)))
+                                    st.write("Total Debit  :${:,}".format(round(depreciation.Debit.sum(),2)))
+                                    st.write("Net          :${:,}".format(round(depreciation.Credit.sum()-depreciation.Debit.sum(),2)))
+                                with led_col3:
+                                    st.markdown(f"**Overhead**")
+                                    st.write("Total Credit :${:,}".format(round(overhead.Credit.sum(),2)))
+                                    st.write("Total Debit  :${:,}".format(round(overhead.Debit.sum(),2)))
+                                    st.write("Net          :${:,}".format(round(overhead.Credit.sum()-overhead.Debit.sum(),2)))
+                                with led_col3:
+                                    st.markdown(f"**Main Ledger 030**")
+                                    st.write("Total Credit :${:,}".format(round(main30.Credit.sum(),2)))
+                                    st.write("Total Debit  :${:,}".format(round(main30.Debit.sum(),2)))
+                                    st.write("Net          :${:,}".format(round(main30.Credit.sum()-main30.Debit.sum(),2)))
+                                st.success(f"**SUCCESS. {year} Ledger has been updated!", icon="✅") 
+                         
                     
                 with ttab1:
                     

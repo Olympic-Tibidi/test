@@ -1197,7 +1197,9 @@ if authentication_status:
                         overhead=[7350080,7350082,7350083,7350085,7350087,7350088]
                         
                         weyco_non_ship_income=[6313001,6313003,6313955,6318101,6318301,6318501,6319040,6341000,6341010,6351000,6418500]
-                        
+                        suzano_income=[6888888]
+                        weyco_ship_income=[6999999]
+
                         non_vessel_expense = temp[(~temp.index.get_level_values("Account").isin(ship_accounts))&
                                                   (temp.index.get_level_values("Account")>7000000)&
                                                   (~temp.index.get_level_values("Account").isin(overhead))]
@@ -1212,8 +1214,10 @@ if authentication_status:
                         weyco_static=temp[temp.index.get_level_values("Account").isin(weyco_non_ship_income)]
                         other_income=temp[(~temp.index.get_level_values("Account").isin(weyco_non_ship_income))&
                                           (~temp.index.get_level_values("Account").isin(ship_accounts))&
-                                         (temp.index.get_level_values("Account")<7000000)&
-                                         (temp.index.get_level_values("Account")>2000000)]
+                                          (~temp.index.get_level_values("Account").isin(suzano_income))&
+                                          (~temp.index.get_level_values("Account").isin(weyco_ship_income))&
+                                          (temp.index.get_level_values("Account")<7000000)&
+                                          (temp.index.get_level_values("Account")>2000000)]
                         
                         
                         
@@ -1225,14 +1229,28 @@ if authentication_status:
                         vessel_ops=add_stat_rows(vessel_ops)
                         weyco_static=add_stat_rows(weyco_static)
                         other_income=add_stat_rows(other_income)
-                        
-                        a=pd.DataFrame(columns=range(1,upto_month))
-                        a.loc["Revenue - Vessel Ops"]=vessel_ops.iloc[-1,:-1]
-                        a.loc["Revenue - Weyco Static"]=weyco_static.iloc[-1,:-1]
-                        a.loc["Revenue - Other"]=other_income.iloc[-1,:-1]
-                        a.loc["Expense - Running Cost"]=non_vessel_expense.iloc[-1,:-1]
-                        a.loc["Expense - Overhead"]=overhead.iloc[-1,:-1]
-                        a.loc["Expense - Depreciation"]=-depreciation.iloc[-1,:-1]
+                        suzano_income=add_stat_rows(suzano_income)
+                        weyco_ship_income=add_stat_rows(weyco_ship_income)
+
+                        if weyco:
+                            a=pd.DataFrame(columns=range(1,upto_month))
+                            a.loc["Revenue - Other Vessel Ops"]=vessel_ops.iloc[-1,:-1]
+                            a.loc["Revenue - Weyco Static"]=weyco_static.iloc[-1,:-1]
+                            a.loc["Revenue - Weyco Ship Income"]=weyco_ship_income.iloc[-1,:-1]
+                            a.loc["Revenue - Suzano Income"]=suzano_income.iloc[-1,:-1]
+                            a.loc["Revenue - Other"]=other_income.iloc[-1,:-1]
+                            a.loc["Expense - Running Cost"]=non_vessel_expense.iloc[-1,:-1]
+                            a.loc["Expense - Overhead"]=overhead.iloc[-1,:-1]
+                            a.loc["Expense - Depreciation"]=depreciation.iloc[-1,:-1]
+                        else:
+                            
+                            a=pd.DataFrame(columns=range(1,upto_month))
+                            a.loc["Revenue - Vessel Ops"]=vessel_ops.iloc[-1,:-1]
+                            a.loc["Revenue - Weyco Static"]=weyco_static.iloc[-1,:-1]
+                            a.loc["Revenue - Other"]=other_income.iloc[-1,:-1]
+                            a.loc["Expense - Running Cost"]=non_vessel_expense.iloc[-1,:-1]
+                            a.loc["Expense - Overhead"]=overhead.iloc[-1,:-1]
+                            a.loc["Expense - Depreciation"]=-depreciation.iloc[-1,:-1]
                         
                         a=a.copy()
                         a.loc[:,"Mean"]=round(a.mean(axis=1),1)

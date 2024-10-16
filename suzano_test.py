@@ -1387,6 +1387,7 @@ if authentication_status:
                     budget_codes=pd.read_feather(io.BytesIO(budget_codes))
                     budget_codes.set_index("index",drop=True,inplace=True)
                     budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
+                    weyco_normalized_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/weyco_suzano_budget.json"))
                     keys={}
                     revenues_codes=list(get_all_keys(budget["Revenues"],keys).keys())
                     keys={}
@@ -1407,7 +1408,8 @@ if authentication_status:
                      
                 
                     with fintab1: 
-                        
+
+                        weyco_normalized=st.checkbox("CLICK FOR CLIENT NORMALIZED VIEW")
                         year=st.selectbox("Select Year",["2024","2023","2022","2021","2020","2019","2018", "2017","2016"])
                         
                         ### LETS PUT YEAR in st.session state to use later.
@@ -1416,8 +1418,12 @@ if authentication_status:
                             
                         ### LOAD LEDGERS by year
                         if year=="2024":
-                            ledgers=gcp_download_x(target_bucket,rf"FIN/NEW/ledger.ftr")
-                            ledgers=pd.read_feather(io.BytesIO(ledgers))
+                            if weyco_normalized:
+                                ledgers=gcp_download_x(target_bucket,rf"FIN/NEW/weyco_ledger.ftr")
+                                ledgers=pd.read_feather(io.BytesIO(ledgers))
+                            else:
+                                ledgers=gcp_download_x(target_bucket,rf"FIN/NEW/ledger.ftr")
+                                ledgers=pd.read_feather(io.BytesIO(ledgers))
                         else:
                             ledgers=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
                         ledgers["Account"]=ledgers["Account"].astype("str")
@@ -1443,7 +1449,10 @@ if authentication_status:
                 
                         # Lets check if Deep categories or shallow (Revenue versus Depreciation)
                         deep=True if category in ["Revenues","Operating Expenses","Maintenance Expenses","Depreciation"] else False
-                        structure=budget.copy()
+                        if weyco_normalized:
+                            structure=weyco_normalized_budget.copy()
+                        else:
+                            structure=budget.copy()
                         # LOAD a list of sub_cats to display. If not deep the keys becomes the names of subcats due to shallow depth.(last nodes)
                         liste=[f"ALL {category.upper()}"]+list(structure[category].keys()) if deep else [f"ALL {category.upper()}"]+list(structure[category].values())
                             

@@ -1280,8 +1280,8 @@ if authentication_status:
                                 mnth=datetime.date.today().month
                                 ledger=prep_ledger(terminal,2024,1,2024,mnth+1)
                                 ledger=pd.concat([ledger,prep_ledger(stormwater,2024,1,2024,mnth+1)])
-                                wey_ledger=prep_weyco_ledger(terminal,2024,1,2024,mnth+1)
-                                ledger=pd.concat([ledger,prep_weyco_ledger(stormwater,2024,1,2024,mnth+1)])
+                                # wey_ledger=prep_weyco_ledger(terminal,2024,1,2024,mnth+1)
+                                # ledger=pd.concat([ledger,prep_weyco_ledger(stormwater,2024,1,2024,mnth+1)])
                                 ledger.loc[ledger["Acc"].isin(["1712000-30","1721000-30","1721100-30","1722000-30","1731000-30","1758000-30","1765000-30",
                                    "1777000-30","1778000-30","1782000-30","1782001-30","1785000-30","1786001-30","1787000-30",
                                    "1796000-30","1861000-30","1865000-30","1738000-40","1757000-40","1761000-40","1796000-40",
@@ -1302,15 +1302,15 @@ if authentication_status:
                                 blob = bucket.blob(rf"FIN/NEW/ledger-{year}.ftr")
                                 blob.upload_from_filename(temp_file_path)
     
-                                feather_data = BytesIO()
-                                df.reset_index().to_feather(feather_data)
-                                # Create a temporary local file to store Feather data
-                                temp_file_path = tempfile.NamedTemporaryFile(delete=False).name
-                                df.reset_index().to_feather(temp_file_path)
-                                storage_client = get_storage_client()
-                                bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"FIN/NEW/weyco_ledger-{year}.ftr")
-                                blob.upload_from_filename(temp_file_path)
+                                # feather_data = BytesIO()
+                                # df.reset_index().to_feather(feather_data)
+                                # # Create a temporary local file to store Feather data
+                                # temp_file_path = tempfile.NamedTemporaryFile(delete=False).name
+                                # df.reset_index().to_feather(temp_file_path)
+                                # storage_client = get_storage_client()
+                                # bucket = storage_client.bucket(target_bucket)
+                                # blob = bucket.blob(rf"FIN/NEW/weyco_ledger-{year}.ftr")
+                                # blob.upload_from_filename(temp_file_path)
                                     
                                     #     set=pd.read_feather(feather_data).set_index("index",drop=True).reset_index(drop=True)
                                     #     if k==m30:

@@ -1218,6 +1218,8 @@ if authentication_status:
                                           (~temp.index.get_level_values("Account").isin(weyco_ship_income))&
                                           (temp.index.get_level_values("Account")<7000000)&
                                           (temp.index.get_level_values("Account")>2000000)]
+                        suzano_income=temp[temp.index.get_level_values("Account").isin(suzano_income)]
+                        weyco_ship_income=temp[temp.index.get_level_values("Account").isin(weyco_ship_income)]
                         
                         
                         

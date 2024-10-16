@@ -1179,6 +1179,7 @@ if authentication_status:
 
                         st.plotly_chart(fig)
                     with budget4:
+                        weycom= st.checkbox("WEYCO SUZANO NORMALIZED")
                         combined_ledger=ledger.copy()
                         combined_ledger["Month"]=combined_ledger["Date"].dt.month
                         combined_ledger=combined_ledger[combined_ledger["Month"]<upto_month]
@@ -1234,7 +1235,7 @@ if authentication_status:
                         suzano_income=add_stat_rows(suzano_income)
                         weyco_ship_income=add_stat_rows(weyco_ship_income)
 
-                        if weyco:
+                        if weycom:
                             a=pd.DataFrame(columns=range(1,upto_month))
                             a.loc["Revenue - Other Vessel Ops"]=vessel_ops.iloc[-1,:-1]
                             a.loc["Revenue - Weyco Static"]=weyco_static.iloc[-1,:-1]

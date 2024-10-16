@@ -1247,7 +1247,7 @@ if authentication_status:
                             a.loc["Revenue - Other"]=other_income.iloc[-1,:-1]
                             a.loc["Expense - Running Cost"]=non_vessel_expense.iloc[-1,:-1]
                             a.loc["Expense - Overhead"]=overhead.iloc[-1,:-1]
-                            a.loc["Expense - Depreciation"]=depreciation.iloc[-1,:-1]
+                            a.loc["Expense - Depreciation"]=-depreciation.iloc[-1,:-1]
                         else:
                             
                             a=pd.DataFrame(columns=range(1,upto_month))

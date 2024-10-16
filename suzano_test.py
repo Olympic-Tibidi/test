@@ -1182,6 +1182,8 @@ if authentication_status:
                         weycom= st.checkbox("WEYCO SUZANO NORMALIZED",key="fsa")
                         if weycom:
                             combined_ledger=weyco_ledger.copy()
+                        else:
+                            combined_ledger=ledger.copy()
                         combined_ledger["Month"]=combined_ledger["Date"].dt.month
                         combined_ledger=combined_ledger[combined_ledger["Month"]<upto_month]
                         combined_ledger["Net"] = combined_ledger["Net"].map('{:.2f}'.format)

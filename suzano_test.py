@@ -1323,7 +1323,7 @@ if authentication_status:
                     keys={}
                     overhead_codes=list(get_all_keys(budget["G & A Overhead"],keys).keys())
                 
-                    expenses=operations_codes+maintenance_codes+overhead_codes
+                    expenses=operations_codes+maintenance_codes#+overhead_codes
                     expenses_dep=expenses+depreciation_codes
                 
                     # accounts_classes=gcp_download_x(target_bucket,rf"FIN/accounts_classes.pkl")
@@ -1656,7 +1656,7 @@ if authentication_status:
                             
                         ### LOAD LEDGERS by year
                         if year=="2024":
-                            ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger.ftr")
+                            ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger-2024.ftr")
                             ledger_b=pd.read_feather(io.BytesIO(ledger_b))
                         else:
                             ledger_b=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
@@ -1672,6 +1672,7 @@ if authentication_status:
                         
                         ins=ledger_b[ledger_b["Account"].isin(revenues_codes)].Net.sum()
                         outs=ledger_b[ledger_b["Account"].isin(expenses)].Net.sum()
+                        outs_overhead=ledger_b[ledger_b["Account"].isin(overhead_expenses)].Net.sum()
                         outs_dep=ledger_b[ledger_b["Account"].isin(expenses_dep)].Net.sum()
                         dep=ledger_b[ledger_b["Account"].isin(depreciation_codes)].Net.sum()
                         
@@ -1680,28 +1681,29 @@ if authentication_status:
                             
                             st.write(f"**REVENUES     :  {'${:,.1f}**'.format(ins)}")
                             st.write(f"**EXPENSES      :  {'${:,.1f}**'.format(outs)}")
+                            st.write(f"**EXPENSES      :  {'${:,.1f}**'.format(outs_overhead)}")
                             if ins+outs<0:
-                                tt=f"NET BEFORE DEPRECIATION:  {'${:,.1f}'.format(ins+outs)}"
+                                tt=f"NET BEFORE DEPRECIATION:  {'${:,.1f}'.format(ins+outs+outs_overhead)}"
                                 original_title = f'<p style="font-family:Arial;font-weight: bold; color:Red; font-size: 15px;">{tt}</p>'
                                 st.markdown(original_title, unsafe_allow_html=True)
                             else:
-                                st.write(f"**NET BEFORE DEPRECIATION:  {'${:,.1f}**'.format(ins+outs)}")
+                                st.write(f"**NET BEFORE DEPRECIATION:  {'${:,.1f}**'.format(ins+outs+outs_overhead)}")
                             st.write(f"**DEPRECIATION:  {'${:,.1f}**'.format(dep)}")
-                            if ins+outs+dep<0:
-                                tt=f"NET AFTER DEPRECIATION:  {'${:,.1f}'.format(ins+outs+dep)}"
+                            if ins+outs+outs+overhead+dep<0:
+                                tt=f"NET AFTER DEPRECIATION:  {'${:,.1f}'.format(ins+outs+dep+outs_overhead)}"
                                 original_title = f'<p style="font-family:Arial;font-weight: bold; color:Red; font-size: 15px;">{tt}</p>'
                                 st.markdown(original_title, unsafe_allow_html=True)
                             else:
-                                st.write(f"**NET AFTER DEPRECIATION:  {'${:,.1f}**'.format(ins+outs+dep)}")
+                                st.write(f"**NET AFTER DEPRECIATION:  {'${:,.1f}**'.format(ins+outs+dep+outs_overhead)}")
                         
                         with a2:
                             
                         # Define the list of values and labels for the waterfall chart
-                            values = [ins,outs,ins+outs, dep,ins+outs+dep]
-                            labels = ['Revenues', 'Expenses', 'Net Before Depreciation', 'Depreciation', 'Net After Depreciation']
+                            values = [ins,outs,outs_overhead,ins+outs, dep,ins+outs+dep]
+                            labels = ['Revenues', 'Expenses','Overhead', 'Net Before Depreciation', 'Depreciation', 'Net After Depreciation']
                             
                             # Define the colors for each bar in the waterfall chart
-                            end=ins+outs+dep
+                            end=ins+outs+outs_overhead+dep
                             #st.write(end)
                             if end<0:
                                 #colors = ['#4CAF50', '#FFC107', '#2196F3', '#F44336', '#F44336']

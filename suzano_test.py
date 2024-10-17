@@ -545,13 +545,13 @@ def apply_corrections(df):
     weyco_df.loc[weyco_df['Account'].isin([6315000,6316000,6317030,7313015,7311015]),"Name"]="Loading & Unloading"
     weyco_df.loc[weyco_df['Account'].isin([6315000,6316000,6317030,7313015,7311015]),"Account"]=6315000
     
-    weyco_df.loc[(weyco_df["Name"].isin(ships_jobs))&(weyco_df["Job_No"].str.contains("WEYCO")),"Account"]=6999999
-    weyco_df.loc[(weyco_df["Name"].isin(ships_jobs))&(weyco_df["Job_No"].str.contains("WEYCO")),"Name"]="Tenant Ship Income"
+    weyco_df.loc[(weyco_df["Accounts"].isin(ship_accounts))&(weyco_df["Job_No"].str.contains("WEYCO")),"Account"]=6999999
+    weyco_df.loc[(weyco_df["Accounts"].isin(ship_accounts))&(weyco_df["Job_No"].str.contains("WEYCO")),"Name"]="Tenant Ship Income"
     
-    weyco_df.loc[(weyco_df["Name"].isin(ships_jobs))&(weyco_df["Job_No"].str.contains("SUZANO")),"Account"]=6888888
+    weyco_df.loc[(weyco_df["Accounts"].isin(ship_accounts))&(weyco_df["Job_No"].str.contains("SUZANO")),"Account"]=6888888
     weyco_df.loc[(weyco_df["Name"]=="Handling")&(weyco_df["Job_No"].str.contains("SUZANO")),"Account"]=6888889
     
-    weyco_df.loc[(weyco_df["Name"].isin(ships_jobs))&(weyco_df["Job_No"].str.contains("SUZANO")),"Name"]="Suzano Vessels"
+    weyco_df.loc[(weyco_df["Accounts"].isin(ship_accounts))&(weyco_df["Job_No"].str.contains("SUZANO")),"Name"]="Suzano Vessels"
     weyco_df.loc[(weyco_df["Name"]=="Handling")&(weyco_df["Job_No"].str.contains("SUZANO")),"Name"]="Suzano Warehouse"
     
     
@@ -1175,6 +1175,8 @@ if authentication_status:
                             stormwater= st.file_uploader("**Upload Ledger 040 csv**", type=["csv"],key="34ws2ss")
                             
                             if terminal and stormwater:
+                                ship_accounts=[6311000,6312000,6313000,6314000,6313950,6315000,6315100,6315200,6316000,6317030,6318540,6318600,
+                                       6318900,6329000,6373000,6381000,6389000,7313015,7311015,7314300,7313949,7315000,7338700]
                                 
                                 mnth=datetime.date.today().month
                                 #t = pd.read_csv(terminal)

@@ -545,13 +545,13 @@ def apply_corrections(df):
     weyco_df.loc[weyco_df['Account'].isin([6315000,6316000,6317030,7313015,7311015]),"Name"]="Loading & Unloading"
     weyco_df.loc[weyco_df['Account'].isin([6315000,6316000,6317030,7313015,7311015]),"Account"]=6315000
     
-    weyco_df.loc[(weyco_df["Accounts"].isin(ship_accounts))&(weyco_df["Job_No"].str.contains("WEYCO")),"Account"]=6999999
-    weyco_df.loc[(weyco_df["Accounts"].isin(ship_accounts))&(weyco_df["Job_No"].str.contains("WEYCO")),"Name"]="Tenant Ship Income"
+    weyco_df.loc[(weyco_df["Account"].isin(ship_accounts))&(weyco_df["Job_No"].str.contains("WEYCO")),"Account"]=6999999
+    weyco_df.loc[(weyco_df["Account"].isin(ship_accounts))&(weyco_df["Job_No"].str.contains("WEYCO")),"Name"]="Tenant Ship Income"
     
-    weyco_df.loc[(weyco_df["Accounts"].isin(ship_accounts))&(weyco_df["Job_No"].str.contains("SUZANO")),"Account"]=6888888
+    weyco_df.loc[(weyco_df["Account"].isin(ship_accounts))&(weyco_df["Job_No"].str.contains("SUZANO")),"Account"]=6888888
     weyco_df.loc[(weyco_df["Name"]=="Handling")&(weyco_df["Job_No"].str.contains("SUZANO")),"Account"]=6888889
     
-    weyco_df.loc[(weyco_df["Accounts"].isin(ship_accounts))&(weyco_df["Job_No"].str.contains("SUZANO")),"Name"]="Suzano Vessels"
+    weyco_df.loc[(weyco_df["Account"].isin(ship_accounts))&(weyco_df["Job_No"].str.contains("SUZANO")),"Name"]="Suzano Vessels"
     weyco_df.loc[(weyco_df["Name"]=="Handling")&(weyco_df["Job_No"].str.contains("SUZANO")),"Name"]="Suzano Warehouse"
     
     

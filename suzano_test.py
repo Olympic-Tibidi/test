@@ -1681,7 +1681,7 @@ if authentication_status:
                             
                             st.write(f"**REVENUES     :  {'${:,.1f}**'.format(ins)}")
                             st.write(f"**EXPENSES      :  {'${:,.1f}**'.format(outs)}")
-                            st.write(f"**EXPENSES      :  {'${:,.1f}**'.format(outs_overhead)}")
+                            st.write(f"**OVERHEAD      :  {'${:,.1f}**'.format(outs_overhead)}")
                             if ins+outs<0:
                                 tt=f"NET BEFORE DEPRECIATION:  {'${:,.1f}'.format(ins+outs+outs_overhead)}"
                                 original_title = f'<p style="font-family:Arial;font-weight: bold; color:Red; font-size: 15px;">{tt}</p>'
@@ -1689,7 +1689,7 @@ if authentication_status:
                             else:
                                 st.write(f"**NET BEFORE DEPRECIATION:  {'${:,.1f}**'.format(ins+outs+outs_overhead)}")
                             st.write(f"**DEPRECIATION:  {'${:,.1f}**'.format(dep)}")
-                            if ins+outs+outs+overhead+dep<0:
+                            if ins+outs+outs_overhead+dep<0:
                                 tt=f"NET AFTER DEPRECIATION:  {'${:,.1f}'.format(ins+outs+dep+outs_overhead)}"
                                 original_title = f'<p style="font-family:Arial;font-weight: bold; color:Red; font-size: 15px;">{tt}</p>'
                                 st.markdown(original_title, unsafe_allow_html=True)

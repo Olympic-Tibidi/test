@@ -1219,7 +1219,7 @@ if authentication_status:
                                 weyco_ledger.reset_index().to_feather(temp_file_path)
                                 storage_client = get_storage_client()
                                 bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"FIN/NEW/ledger-{year}.ftr")
+                                blob = bucket.blob(rf"FIN/NEW/weyco_ledger-{year}.ftr")
                                 blob.upload_from_filename(temp_file_path)
                                 
                                

@@ -1182,7 +1182,7 @@ if authentication_status:
                                 #t = pd.read_csv(terminal)
                                 ter,weyco_ter=prep_ledger(terminal,2024,1,2024,mnth+1)
                                 storm,weyco_storm=prep_ledger(stormwater,2024,1,2024,mnth+1)
-                                ledger=pd.concat([ledger,storm])
+                                ledger=pd.concat([ter,storm])
                                 weyco_ledger=pd.concat([weyco_ter,weyco_storm])
                                 # wey_ledger=prep_weyco_ledger(terminal,2024,1,2024,mnth+1)
                                 # ledger=pd.concat([ledger,prep_weyco_ledger(stormwater,2024,1,2024,mnth+1)])

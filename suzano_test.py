@@ -1204,6 +1204,8 @@ if authentication_status:
                                 
                                 ledger_detail=ledger[~ledger["Acc"].isin(["7370000-32","7370010-32","7470000-40"])]
                                 ledger_detail=ledger_detail[(ledger_detail["Account"]>1690000)&(~ledger_detail["Account"].isin([2131001,2391030]))]
+                                weyco_ledger=weyco_ledger[~weyco_ledger["Acc"].isin(["7370000-32","7370010-32","7470000-40"])]
+                                weyco_ledger=weyco_ledger[(weyco_ledger["Account"]>1690000)&(~weyco_ledger["Account"].isin([2131001,2391030]))]
                                 ledger_b=ledger[ledger["Account"]>6000000]
                                 feather_data = BytesIO()
                                 ledger_detail.reset_index().to_feather(feather_data)

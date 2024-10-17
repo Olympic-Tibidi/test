@@ -1721,7 +1721,7 @@ if authentication_status:
                             trace = go.Waterfall(
                                 name = "Net Result",
                                 orientation = "v",
-                                measure = ['absolute', 'relative', 'total', 'relative', 'total'],
+                                measure = ['absolute', 'relative','relative','total', 'relative', 'total'],
                                 x = labels,
                                 text = text,
                                 textfont=text_font,

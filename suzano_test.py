@@ -1672,7 +1672,7 @@ if authentication_status:
                         
                         ins=ledger_b[ledger_b["Account"].isin(revenues_codes)].Net.sum()
                         outs=ledger_b[ledger_b["Account"].isin(expenses)].Net.sum()
-                        outs_overhead=ledger_b[ledger_b["Account"].isin(overhead_expenses)].Net.sum()
+                        outs_overhead=ledger_b[ledger_b["Account"].isin(overhead_codes)].Net.sum()
                         outs_dep=ledger_b[ledger_b["Account"].isin(expenses_dep)].Net.sum()
                         dep=ledger_b[ledger_b["Account"].isin(depreciation_codes)].Net.sum()
                         

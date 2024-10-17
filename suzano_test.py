@@ -1699,7 +1699,7 @@ if authentication_status:
                         with a2:
                             
                         # Define the list of values and labels for the waterfall chart
-                            values = [ins,outs,outs_overhead,ins+outs, dep,ins+outs+dep]
+                            values = [ins,outs,outs_overhead,ins+outs, dep,ins+outs+outs_overhead+dep]
                             labels = ['Revenues', 'Expenses','Overhead', 'Net Before Depreciation', 'Depreciation', 'Net After Depreciation']
                             
                             # Define the colors for each bar in the waterfall chart
@@ -1715,8 +1715,8 @@ if authentication_status:
                 
                             # Define the text for each bar in the waterfall chart
                             text = ['<b>${:,.1f}<b>'.format(value) for value in values]
-                            text_font = {'size': 14,'color':['black','red','black','red','black']}
-                            this_year=f"So Far This Year" if year=="2023" else ""
+                            text_font = {'size': 14,'color':['black','red','red','black','red','black']}
+                            this_year=f"So Far This Year" if year=="2024" else ""
                             # Create the trace for the waterfall chart
                             trace = go.Waterfall(
                                 name = "Net Result",

@@ -1981,7 +1981,10 @@ if authentication_status:
                     with fintab4:
                         ear=st.selectbox("Select Year",["2024","2023","2022","2021"],key="yeartab2")
                 
-                        ledgers=gcp_download_x(target_bucket,rf"FIN/ledger-{ear}.ftr")
+                        try:
+                            ledgers=gcp_download_x(target_bucket,rf"FIN/NEW/ledger-{ear}.ftr")
+                        except:
+                            ledgers=gcp_download_x(target_bucket,rf"FIN/main-{ear}.ftr")
                         ledgers=pd.read_feather(io.BytesIO(ledgers))
                         ledgers["Account"]=ledgers["Account"].astype("str")
                         ledgers.set_index("index",drop=True,inplace=True)

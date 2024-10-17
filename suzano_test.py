@@ -542,6 +542,7 @@ def apply_corrections(df):
     df.loc[df["Acc"]=="6315200-32","Acc"]="6315000-32"
 
     weyco_df=df.copy()
+    weyco_df.loc[((weyco_df["Account"].isin(ship_accounts))&(df["Description"].str.contains("Vessel Bark Clean Up"))),"Job_No"]="WEYCO"
     weyco_df.loc[weyco_df['Account'].isin([6315000,6316000,6317030,7313015,7311015]),"Name"]="Loading & Unloading"
     weyco_df.loc[weyco_df['Account'].isin([6315000,6316000,6317030,7313015,7311015]),"Account"]=6315000
     

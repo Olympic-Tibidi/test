@@ -1030,7 +1030,7 @@ if authentication_status:
                         
                         ledger_p=pd.concat([ledger_p,df])
                         combined_main=populate_main(main,ledger_p)
-                        
+                        st.write(ledger_p)
                         
                         
                         
@@ -1100,7 +1100,7 @@ if authentication_status:
                                        6318900,6329000,6373000,6381000,6389000,7313015,7311015,7314300,7313949,7315000,7338700]
                         overhead=[7350080,7350082,7350083,7350085,7350087,7350088]
                         
-                        weyco_non_ship_income=[6313001,6313003,6313955,6318101,6318301,6318501,6319040,6341000,6341010,6351000,6418500]
+                        weyco_non_ship_income=[6313001,6313002,6313003,6313955,6318101,6318301,6318501,6319040,6341000,6341010,6351000,6418500]
                         suzano_income=[6888888]
                         weyco_ship_income=[6999999]
 

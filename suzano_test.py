@@ -1030,11 +1030,12 @@ if authentication_status:
                         
                         ledger_p=pd.concat([ledger_p,df])
                         combined_main=populate_main(main,ledger_p)
-                        st.write(ledger_p)
+                        
                         
                         
                         
                         df=pd.DataFrame(combined_main).T
+                        st.write(df)
                         df.drop(df[df["Net"]==0].index,inplace=True)
                         #df.loc[df["Cat"]=="Depreciation","Net"]=-df.loc[df["Cat"]=="Depreciation","Net"]
                         net_amount=df.Net.sum()

@@ -4829,6 +4829,7 @@ if authentication_status:
                                     error=f"**:red[{updated_quantity} units and {bale_updated_quantity} bales on this truck. Please check. You planned for {foreman_quantity} units and {foreman_bale_quantity} bales!]** "
                                     st.write(error)
                                 if proceed:
+                                    mf_carrier_code=carrier_code.copy()
                                     carrier_code_mf=f"{carrier_code.split('-')[0]}-{carrier_code.split('-')[1]}"
                                     carrier_code=carrier_code.split("-")[0]
                                     
@@ -4993,9 +4994,9 @@ if authentication_status:
                                     
                                     
                                     try:
-                                        mf_numbers_for_load[a_][dest][release_order_number][f"{carrier_code.split('-')[0]}-{carrier_code.split('-')[1].upper()}"].remove(str(bill_of_lading_number))
+                                        mf_numbers_for_load[a_][dest][release_order_number][carrier_code_mf.upper()].remove(str(bill_of_lading_number))
                                     except:
-                                        mf_numbers_for_load[a_][dest][release_order_number][f"{carrier_code.split('-')[0]}-{carrier_code.split('-')[1].upper()}"].remove(int(bill_of_lading_number))
+                                        mf_numbers_for_load[a_][dest][release_order_number][carrier_code_mf.upper()].remove(int(bill_of_lading_number))
                                     mf_numbers_for_load=json.dumps(mf_numbers_for_load)
                                     #storage_client = storage.Client()
                                     storage_client = get_storage_client()

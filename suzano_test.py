@@ -3489,7 +3489,7 @@ if authentication_status:
                         dfb=dfb[dfb["St_Date"]==datetime.datetime.now().date()]
                         
                         scheduled=[]
-                        day=datetime.date.today()
+                        day=str(datetime.date.today())
                         for dest in schedule[day]:
                             for rel in schedule[day][dest]:
                                 for carrier in schedule[day][dest][rel]:

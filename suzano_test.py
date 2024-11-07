@@ -3915,7 +3915,7 @@ if authentication_status:
                                 done=False
                             done=False
                             
-                            if st.button("PROCESS FILES",disabled=button):
+                            if not button:
                             
                                 
                                 df=pd.read_excel(suzano_shipment)

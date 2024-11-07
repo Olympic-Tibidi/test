@@ -3484,7 +3484,7 @@ if authentication_status:
                         schedule=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                         schedule=json.loads(schedule)
                         dfb=pd.DataFrame.from_dict(json.loads(bill_data)).T[1:]
-                        dfb=bill.copy()
+                        #dfb=bill.copy()
                         dfb["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in dfb["issued"]]
                         dfb=dfb[dfb["St_Date"]==datetime.datetime.now().date()]
                         

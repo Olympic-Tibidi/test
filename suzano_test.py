@@ -3514,7 +3514,7 @@ if authentication_status:
                             #scheduled.set_index('Destination',drop=True,inplace=True)
 
                             def style_row(row):
-                                location = scheduled['Destination']
+                                location = row['Destination']
                                 #shipment_status = row["Status"]
                                 
                                 # Define colors for different locations

@@ -3494,12 +3494,12 @@ if authentication_status:
                             for rel in schedule[day][dest]:
                                 for carrier in schedule[day][dest][rel]:
                                     scheduled.append({"Destination":dest,
-                                          "Release Order":rel,"Sales Item":1,
+                                          "Release Order":rel,"Sales Item":"001",
                                           "ISP":release_order_database[rel]["001"]['grade'],
                                           "Prep":release_order_database[rel]["001"]['unitized'],
                                           "Carrier":carrier.split("-")[1],
-                                          "Scheduled":len(schedule[day][dest][rel][carrier]),
-                                          "Loaded":dfb[(dfb["release_order"]==rel)&(dfb["sales_order"]=="001")&
+                                          "Scheduled":int(len(schedule[day][dest][rel][carrier])),
+                                          "Loaded":int(dfb[(dfb["release_order"]==rel)&(dfb["sales_order"]=="001"))&
                             (dfb["St_Date"]==datetime.date.today())&
                             (dfb["carrier_id"]==str(carrier.split("-")[0]))].vehicle.count(),
                                           "Remaining":0})
@@ -3509,7 +3509,7 @@ if authentication_status:
                         
                         if len(scheduled)>0:
                             
-                            scheduled["Remaining"]=scheduled["Scheduled"]-scheduled["Loaded"]
+                            scheduled["Remaining"]=int(scheduled["Scheduled"]-scheduled["Loaded"])
                             scheduled.loc["Total",["Scheduled","Loaded","Remaining"]]=scheduled[["Scheduled","Loaded","Remaining"]].sum()
                             #scheduled.set_index('Destination',drop=True,inplace=True)
 

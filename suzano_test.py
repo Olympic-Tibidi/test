@@ -3504,6 +3504,7 @@ if authentication_status:
                             (dfb["carrier_id"]==str(carrier.split("-")[0]))].vehicle.count(),
                                           "Remaining":0})
                         scheduled=pd.DataFrame(scheduled)
+                        
 
                         
                         if len(scheduled)>0:
@@ -3511,16 +3512,49 @@ if authentication_status:
                             scheduled["Remaining"]=scheduled["Scheduled"]-scheduled["Loaded"]
                             scheduled.loc["Total",["Scheduled","Loaded","Remaining"]]=scheduled[["Scheduled","Loaded","Remaining"]].sum()
                             scheduled.set_index('Destination',drop=True,inplace=True)
-                            a=st.data_editor(scheduled)
-                            a_=a.iloc[:-1]
-                            a_=json.dumps(a_.T.to_dict())
-                            if st.button("UPDATE TABLE"):
-                                storage_client = get_storage_client()
-                                bucket = storage_client.bucket(target_bucket)
-                                blob = bucket.blob(rf"schedule.json")
-                                blob.upload_from_string(a_)
-                                st.success(f"**UPDATED SCHEDULE**")   
-                                st.rerun()
+
+                            def style_row(row):
+                                location = scheduled.index
+                                shipment_status = row["Status"]
+                                
+                                # Define colors for different locations
+                                colors = {
+                                    "CLATSKANIE": "background-color: #d1e7dd;",  # light green
+                                    "LEWISTON": "background-color: #ffebcd;",    # light coral
+                                    "HALSEY": "background-color: #add8e6;",      # light blue
+                                }
+                                
+                                # Base style for the entire row based on location
+                                base_style = colors.get(location, "")
+                                
+                                # Apply styles based on shipment status
+                                if shipment_status == "Done":
+                                    base_style += "font-weight: lighter; font-style: italic; text-decoration: line-through;"  # Less bold, italic, and strikethrough
+                                else:
+                                    base_style += "font-weight: bold;"  # Slightly bolder for other statuses
+                                
+                                # Apply the style to all cells in the row
+                                return [base_style] * len(row)
+                            
+
+                            styled_schedule =scheduled.style.apply(style_row, axis=1)
+
+                                # Apply color to the Location column based on the destination
+                                #styled_df = display_flat_df.style.applymap(lambda x: color_destination(x) if x in ["CLATSKANIE", "LEWISTON", "HALSEY"] else "", subset=["Location"])
+                                #styled_df = display_flat_df.style.apply(color_row, axis=1)
+                                # Convert styled DataFrame to HTML and display in Streamlit
+                                #styled_df = styled_df.style.apply(strikethrough_row, axis=1)
+                            st.write(styled_df.to_html(), unsafe_allow_html=True)
+                            # a=st.data_editor(scheduled)
+                            # a_=a.iloc[:-1]
+                            # a_=json.dumps(a_.T.to_dict())
+                            # if st.button("UPDATE TABLE"):
+                            #     storage_client = get_storage_client()
+                            #     bucket = storage_client.bucket(target_bucket)
+                            #     blob = bucket.blob(rf"schedule.json")
+                            #     blob.upload_from_string(a_)
+                            #     st.success(f"**UPDATED SCHEDULE**")   
+                            #     st.rerun()
                         else:
                             st.write("Nothing Dispatched")
 

@@ -3511,10 +3511,10 @@ if authentication_status:
                             
                             scheduled["Remaining"]=scheduled["Scheduled"]-scheduled["Loaded"]
                             scheduled.loc["Total",["Scheduled","Loaded","Remaining"]]=scheduled[["Scheduled","Loaded","Remaining"]].sum()
-                            scheduled.set_index('Destination',drop=True,inplace=True)
+                            #scheduled.set_index('Destination',drop=True,inplace=True)
 
                             def style_row(row):
-                                location = row.name
+                                location = scheduled['Destination']
                                 #shipment_status = row["Status"]
                                 
                                 # Define colors for different locations

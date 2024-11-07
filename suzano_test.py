@@ -3499,7 +3499,7 @@ if authentication_status:
                                           "Prep":release_order_database[rel]["001"]['unitized'],
                                           "Carrier":carrier.split("-")[1],
                                           "Scheduled":int(len(schedule[day][dest][rel][carrier])),
-                                          "Loaded":int(dfb[(dfb["release_order"]==rel)&(dfb["sales_order"]=="001"))&
+                                          "Loaded":int(dfb[(dfb["release_order"]==rel)&(dfb["sales_order"]=="001")])&
                             (dfb["St_Date"]==datetime.date.today())&
                             (dfb["carrier_id"]==str(carrier.split("-")[0]))].vehicle.count(),
                                           "Remaining":0})

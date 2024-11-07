@@ -3518,6 +3518,7 @@ if authentication_status:
                             scheduled["Loaded"] = scheduled["Loaded"].astype(int)
                             scheduled["Remaining"] = scheduled["Remaining"].astype(int)
                             scheduled.loc["Total",["Scheduled","Loaded","Remaining"]].astype(int)
+                            scheduled.fillna("",inplace=True)
 
 
                             def style_row(row):

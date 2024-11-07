@@ -3837,7 +3837,7 @@ if authentication_status:
                                     #st.write(mf_numbers)
                                     flat_df=pd.DataFrame(flattened_data)
                                     display_flat_df=flat_df[flat_df.Date=="2024-11-07"]
-                                    display_flat_df.reset_index(inplace=True)
+                                    display_flat_df.reset_index(drop=True,inplace=True)
                                     display_flat_df.index+=1
                                     def color_destination(location):
                                         colors = {
@@ -3848,8 +3848,8 @@ if authentication_status:
                                         return colors.get(location, "")
 
                                     # Apply color to the Location column based on the destination
-                                    styled_df = display_flat_df.style.applymap(lambda x: color_destination(x) if x in ["CLATSKANIE", "LEWISTON", "HALSEY"] else "", subset=["Location"])
-                                    
+                                    #styled_df = display_flat_df.style.applymap(lambda x: color_destination(x) if x in ["CLATSKANIE", "LEWISTON", "HALSEY"] else "", subset=["Location"])
+                                    styled_df = display_flat_df.style.apply(color_row, axis=1)
                                     # Convert styled DataFrame to HTML and display in Streamlit
                                     st.write(styled_df.to_html(), unsafe_allow_html=True)
                                     #st.write(display_flat_df.to_html(index=False, escape=False), unsafe_allow_html=True)

@@ -3843,7 +3843,7 @@ if authentication_status:
                                     display_flat_df.loc[4,"Status"]="Done"
                                     def style_row(row):
                                         location = row["Location"]
-                                        shipment_status = row["Shipment Status"]
+                                        shipment_status = row["Status"]
                                         
                                         # Define colors for different locations
                                         colors = {

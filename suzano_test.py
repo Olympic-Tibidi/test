@@ -3544,7 +3544,7 @@ if authentication_status:
                                 #styled_df = display_flat_df.style.apply(color_row, axis=1)
                                 # Convert styled DataFrame to HTML and display in Streamlit
                                 #styled_df = styled_df.style.apply(strikethrough_row, axis=1)
-                            st.write(styled_df.to_html(), unsafe_allow_html=True)
+                            st.write(styled_schedule.to_html(), unsafe_allow_html=True)
                             # a=st.data_editor(scheduled)
                             # a_=a.iloc[:-1]
                             # a_=json.dumps(a_.T.to_dict())

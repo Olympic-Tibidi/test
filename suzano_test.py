@@ -3978,6 +3978,8 @@ if authentication_status:
                                 st.success("SHIPMENTS MATCHED AND REFRESHED!")
                                 if st.button("RECORD SUZANO LIST",disabled=button,key="sdsqawds2"):
                                     #suz_=json.dumps(df)
+                                    mf_schedule=matches.copy()
+                                    mf_schedule=json.dumps(mf_schedule)
                                     storage_client = get_storage_client()
                                     bucket = storage_client.bucket(target_bucket)
                                     blob = bucket.blob(rf"release_orders/suzano_shipments.json")

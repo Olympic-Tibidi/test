@@ -3839,6 +3839,8 @@ if authentication_status:
                                     display_flat_df=flat_df[flat_df.Date=="2024-11-07"]
                                     display_flat_df.reset_index(drop=True,inplace=True)
                                     display_flat_df.index+=1
+                                    display_flat_df["Status"]=["Scheduled"]*len(display_flat_df)
+                                    display_flat_df.loc[4,"Status"]="Done"
                                     def color_row(row):
                                         location = row["Location"]
                                         colors = {
@@ -3847,11 +3849,18 @@ if authentication_status:
                                             "HALSEY": "background-color: #add8e6;",      # light blue
                                         }
                                         return [colors.get(location, "")] * len(row)
+                                    def strikethrough_row(row):
+                                        if row["Shipment Status"] == "Done":
+                                            return ["text-decoration: line-through;"] * len(row)  # Apply strikethrough to the whole row
+                                        else:
+                                            return [""] * len(row)  # No styling for other rows
+
 
                                     # Apply color to the Location column based on the destination
                                     #styled_df = display_flat_df.style.applymap(lambda x: color_destination(x) if x in ["CLATSKANIE", "LEWISTON", "HALSEY"] else "", subset=["Location"])
                                     styled_df = display_flat_df.style.apply(color_row, axis=1)
                                     # Convert styled DataFrame to HTML and display in Streamlit
+                                    styled_df = styled_df.style.apply(strikethrough_row, axis=1)
                                     st.write(styled_df.to_html(), unsafe_allow_html=True)
                                     #st.write(display_flat_df.to_html(index=False, escape=False), unsafe_allow_html=True)
                        

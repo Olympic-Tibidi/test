@@ -3515,7 +3515,7 @@ if authentication_status:
 
                             def style_row(row):
                                 location = scheduled.index
-                                shipment_status = row["Status"]
+                                #shipment_status = row["Status"]
                                 
                                 # Define colors for different locations
                                 colors = {
@@ -3528,10 +3528,10 @@ if authentication_status:
                                 base_style = colors.get(location, "")
                                 
                                 # Apply styles based on shipment status
-                                if shipment_status == "Done":
-                                    base_style += "font-weight: lighter; font-style: italic; text-decoration: line-through;"  # Less bold, italic, and strikethrough
-                                else:
-                                    base_style += "font-weight: bold;"  # Slightly bolder for other statuses
+                                # if shipment_status == "Done":
+                                #     base_style += "font-weight: lighter; font-style: italic; text-decoration: line-through;"  # Less bold, italic, and strikethrough
+                                # else:
+                                #     base_style += "font-weight: bold;"  # Slightly bolder for other statuses
                                 
                                 # Apply the style to all cells in the row
                                 return [base_style] * len(row)

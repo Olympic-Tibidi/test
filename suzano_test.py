@@ -3843,7 +3843,7 @@ if authentication_status:
                                     display_flat_df.loc[4,"Status"]="Done"
                                     def style_row(row):
                                         location = row["Location"]
-                                        shipment_status = row["Status"]
+                                        shipment_status = row["Shipment Status"]
                                         
                                         # Define colors for different locations
                                         colors = {
@@ -3855,13 +3855,14 @@ if authentication_status:
                                         # Base style for the entire row based on location
                                         base_style = colors.get(location, "")
                                         
-                                        # If shipment is done, add strikethrough style
+                                        # Apply styles based on shipment status
                                         if shipment_status == "Done":
-                                            base_style += "text-decoration: line-through;"
+                                            base_style += "font-weight: lighter; font-style: italic; text-decoration: line-through;"  # Less bold, italic, and strikethrough
+                                        else:
+                                            base_style += "font-weight: bold;"  # Slightly bolder for other statuses
                                         
                                         # Apply the style to all cells in the row
                                         return [base_style] * len(row)
-
                                     
 
                                     styled_df = display_flat_df.style.apply(style_row, axis=1)

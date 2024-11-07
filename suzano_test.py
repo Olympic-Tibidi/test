@@ -3829,13 +3829,16 @@ if authentication_status:
                                                             "Order": order,
                                                             "Carrier": carrier_,
                                                             "EDI Bill Of Lading":shipment,
-                                                            "Shipment ID": shipment_parts[0],
-                                                            "MF Number": shipment_parts[1] if len(shipment_parts) > 1 else None
+                                                            "MF Number": shipment_parts[0] if len(shipment_parts) > 1 else None,
+                                                            "Shipment ID": shipment_parts[1] if len(shipment_parts) > 1 else shipment_parts[0]
+                                                            
                                                         })
                                
                                     #st.write(mf_numbers)
                                     flat_df=pd.DataFrame(flattened_data)
                                     display_flat_df=flat_df[flat_df.Date=="2024-11-07"]
+                                    display_flat_df.reset_index(inplace=True)
+                                    display_flat_df.index=[i+1 for i in display_flat_df.index)
                                     st.write(display_flat_df.to_html(index=False, escape=False), unsafe_allow_html=True)
                        
                                     

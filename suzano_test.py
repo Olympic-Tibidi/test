@@ -3841,26 +3841,36 @@ if authentication_status:
                                     display_flat_df.index+=1
                                     display_flat_df["Status"]=["Scheduled"]*len(display_flat_df)
                                     display_flat_df.loc[4,"Status"]="Done"
-                                    def color_row(row):
+                                    def style_row(row):
                                         location = row["Location"]
+                                        shipment_status = row["Shipment Status"]
+                                        
+                                        # Define colors for different locations
                                         colors = {
                                             "CLATSKANIE": "background-color: #d1e7dd;",  # light green
                                             "LEWISTON": "background-color: #ffebcd;",    # light coral
                                             "HALSEY": "background-color: #add8e6;",      # light blue
                                         }
-                                        return [colors.get(location, "")] * len(row)
-                                    def strikethrough_row(row):
-                                        if row["Shipment Status"] == "Done":
-                                            return ["text-decoration: line-through;"] * len(row)  # Apply strikethrough to the whole row
-                                        else:
-                                            return [""] * len(row)  # No styling for other rows
+                                        
+                                        # Base style for the entire row based on location
+                                        base_style = colors.get(location, "")
+                                        
+                                        # If shipment is done, add strikethrough style
+                                        if shipment_status == "Done":
+                                            base_style += "text-decoration: line-through;"
+                                        
+                                        # Apply the style to all cells in the row
+                                        return [base_style] * len(row)
 
+                                    
+
+                                    styled_df = display_flat_df.style.apply(style_row, axis=1)
 
                                     # Apply color to the Location column based on the destination
                                     #styled_df = display_flat_df.style.applymap(lambda x: color_destination(x) if x in ["CLATSKANIE", "LEWISTON", "HALSEY"] else "", subset=["Location"])
-                                    styled_df = display_flat_df.style.apply(color_row, axis=1)
+                                    #styled_df = display_flat_df.style.apply(color_row, axis=1)
                                     # Convert styled DataFrame to HTML and display in Streamlit
-                                    styled_df = styled_df.style.apply(strikethrough_row, axis=1)
+                                    #styled_df = styled_df.style.apply(strikethrough_row, axis=1)
                                     st.write(styled_df.to_html(), unsafe_allow_html=True)
                                     #st.write(display_flat_df.to_html(index=False, escape=False), unsafe_allow_html=True)
                        

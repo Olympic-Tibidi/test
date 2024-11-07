@@ -4993,9 +4993,9 @@ if authentication_status:
                                     
                                     
                                     try:
-                                        mf_numbers_for_load[a_][dest][current_releasae_order][f"{carrier_code.split('-')[0]}-{carrier_code.split('-')[1].upper()}"].remove(str(bill_of_lading_number))
+                                        mf_numbers_for_load[a_][dest][release_order_number][f"{carrier_code.split('-')[0]}-{carrier_code.split('-')[1].upper()}"].remove(str(bill_of_lading_number))
                                     except:
-                                        mf_numbers_for_load[a_][dest][current_releasae_order][f"{carrier_code.split('-')[0]}-{carrier_code.split('-')[1].upper()}"].remove(int(bill_of_lading_number))
+                                        mf_numbers_for_load[a_][dest][release_order_number][f"{carrier_code.split('-')[0]}-{carrier_code.split('-')[1].upper()}"].remove(int(bill_of_lading_number))
                                     mf_numbers_for_load=json.dumps(mf_numbers_for_load)
                                     #storage_client = storage.Client()
                                     storage_client = get_storage_client()

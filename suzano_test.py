@@ -3839,7 +3839,20 @@ if authentication_status:
                                     display_flat_df=flat_df[flat_df.Date=="2024-11-07"]
                                     display_flat_df.reset_index(inplace=True)
                                     display_flat_df.index+=1
-                                    st.write(display_flat_df.to_html(index=False, escape=False), unsafe_allow_html=True)
+                                    def color_destination(location):
+                                        colors = {
+                                            "CLATSKANIE": "background-color: #d1e7dd;",  # light green
+                                            "LEWISTON": "background-color: #ffebcd;",    # light coral
+                                            "HALSEY": "background-color: #add8e6;",      # light blue
+                                        }
+                                        return colors.get(location, "")
+
+                                    # Apply color to the Location column based on the destination
+                                    styled_df = display_flat_df.style.applymap(lambda x: color_destination(x) if x in ["CLATSKANIE", "LEWISTON", "HALSEY"] else "", subset=["Location"])
+                                    
+                                    # Convert styled DataFrame to HTML and display in Streamlit
+                                    st.write(styled_df.to_html(), unsafe_allow_html=True)
+                                    #st.write(display_flat_df.to_html(index=False, escape=False), unsafe_allow_html=True)
                        
                                     
                         

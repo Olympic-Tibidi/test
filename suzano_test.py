@@ -3981,8 +3981,8 @@ if authentication_status:
                                     storage_client = get_storage_client()
                                     bucket = storage_client.bucket(target_bucket)
                                     blob = bucket.blob(rf"release_orders/suzano_shipments.json")
-                                    suz.Pickup.astype(str,inplace=True)
-                                    blob.upload_from_string(json.dumps(suz.to_dict()))
+                                    
+                                    blob.upload_from_string(json.dumps(matches))
                                     st.success(f"Suzano list updated!")
                             cor1,cor2=st.columns([5,5])
                             with cor1:

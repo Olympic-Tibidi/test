@@ -3514,6 +3514,11 @@ if authentication_status:
                             scheduled["Remaining"]=[int(i) for i in scheduled["Scheduled"]-scheduled["Loaded"]]
                             scheduled.loc["Total",["Scheduled","Loaded","Remaining"]]=scheduled[["Scheduled","Loaded","Remaining"]].sum()
                             #scheduled.set_index('Destination',drop=True,inplace=True)
+                            scheduled["Scheduled"] = scheduled["Scheduled"].astype(int)
+                            scheduled["Loaded"] = scheduled["Loaded"].astype(int)
+                            scheduled["Remaining"] = scheduled["Remaining"].astype(int)
+                            scheduled.loc["Total",["Scheduled","Loaded","Remaining"]].astype(int)
+
 
                             def style_row(row):
                                 location = row['Destination']

@@ -3977,10 +3977,11 @@ if authentication_status:
                                 st.session_state.matches=matches
                                 st.success("SHIPMENTS MATCHED AND REFRESHED!")
                                 if st.button("RECORD SUZANO LIST",disabled=button,key="sdsqawds2"):
-                                    suz_=json.dumps(df)
+                                    #suz_=json.dumps(df)
                                     storage_client = get_storage_client()
                                     bucket = storage_client.bucket(target_bucket)
                                     blob = bucket.blob(rf"release_orders/suzano_shipments.json")
+                                    suz.Pickup.astype(str,inplace=True)
                                     blob.upload_from_string(json.dumps(suz.to_dict()))
                                     st.success(f"Suzano list updated!")
                             cor1,cor2=st.columns([5,5])

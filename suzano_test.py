@@ -3495,8 +3495,8 @@ if authentication_status:
                                 for carrier in schedule[day][dest][rel]:
                                     scheduled.append({"Destination":dest,
                                           "Release Order":rel,"Sales Item":1,
-                                          "ISP":raw_ro[rel]["001"]['grade'],
-                                          "Prep":raw_ro[rel]["001"]['unitized'],
+                                          "ISP":release_order_database[rel]["001"]['grade'],
+                                          "Prep":release_order_database[rel]["001"]['unitized'],
                                           "Carrier":carrier.split("-")[1],
                                           "Scheduled":len(schedule[day][dest][rel][carrier]),
                                           "Loaded":dfb[(dfb["release_order"]==rel)&(dfb["sales_order"]=="001")&

@@ -3834,7 +3834,7 @@ if authentication_status:
                                                         })
                                
                                     #st.write(mf_numbers)
-                                    st.write(df.to_html(index=False, escape=False), unsafe_allow_html=True)
+                                    st.write(pd.DataFrame(flattened_data).to_html(index=False, escape=False), unsafe_allow_html=True)
                        
                                     
                         

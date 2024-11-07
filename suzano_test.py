@@ -3511,7 +3511,7 @@ if authentication_status:
                             
                             scheduled["Remaining"]=scheduled["Scheduled"]-scheduled["Loaded"]
                             scheduled.loc["Total",["Scheduled","Loaded","Remaining"]]=scheduled[["Scheduled","Loaded","Remaining"]].sum()
-                            #scheduled.set_index('Destination',drop=True,inplace=True)
+                            scheduled.set_index('Destination',drop=True,inplace=True)
 
                             def style_row(row):
                                 location = row.name
@@ -3538,7 +3538,7 @@ if authentication_status:
                             
 
                             styled_schedule =scheduled.style.apply(style_row, axis=1)
-                            styled_schedule.set_index('Destination',drop=True,inplace=True)
+                            #styled_schedule.set_index('Destination',drop=True,inplace=True)
 
                                 # Apply color to the Location column based on the destination
                                 #styled_df = display_flat_df.style.applymap(lambda x: color_destination(x) if x in ["CLATSKANIE", "LEWISTON", "HALSEY"] else "", subset=["Location"])

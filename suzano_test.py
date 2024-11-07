@@ -4829,7 +4829,7 @@ if authentication_status:
                                     error=f"**:red[{updated_quantity} units and {bale_updated_quantity} bales on this truck. Please check. You planned for {foreman_quantity} units and {foreman_bale_quantity} bales!]** "
                                     st.write(error)
                                 if proceed:
-                                    mf_carrier_code=carrier_code.copy()
+                                    mf_carrier_code=carrier_code
                                     carrier_code_mf=f"{carrier_code.split('-')[0]}-{carrier_code.split('-')[1]}"
                                     carrier_code=carrier_code.split("-")[0]
                                     

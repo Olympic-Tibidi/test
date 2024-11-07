@@ -3812,25 +3812,30 @@ if authentication_status:
                                     blob = bucket.blob(rf"release_orders/mf_numbers.json")
                                     blob.upload_from_string(mf_data)
                                 #st.write(mf_numbers)
-                                mfcol1,mfcol2,mfcol3=st.columns([4,4,1])
+                                mfcol1,mfcol2,mfcol3=st.columns([8,1,1])
                                 with mfcol1:
-                                    # mf_frame=pd.DataFrame(mf_numbers)
-                                    # mf_frame.fillna(0,inplace=True)
-                                    # mf_frame.sort_index(inplace=True)
-                                    #mf_frame.columns=[check_home(i) for i in mf_frame.columns]
-                                    st.write(mf_numbers)
-                                # with mfcol2:
-                                #     for i in mf_frame.index:
-                                #         for j in mf_frame.columns:
-                                #             if isinstance(mf_frame.loc[i, j], dict):  # Ensure the cell is a dictionary
-                                #                 count = 0
-                                #                 for key in mf_frame.loc[i, j]:
-                                #                     count += len(mf_frame.loc[i, j][key])
-                                #                 mf_frame.loc[i, j] = count
-                                #             elif mf_frame.loc[i, j] != 0:
-                                #                 mf_frame.loc[i, j] = 1  # Or any other value to mark 
-                                #     mf_frame.sort_index(inplace=True)
-                                #     st.dataframe(mf_frame,width=5000)
+                                    flattened_data = []
+                                    for date, locations in mf_numbers.items():
+                                        for location, location_data in locations.items():
+                                            for order, carriers in location_data.items():
+                                                for carrier, shipments in carriers.items():
+                                                    for shipment in shipments:
+                                                        # Split the shipment data if needed (separate IDs if joined by "|")
+                                                        shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
+                                                        carrier_=carrier.split("-")[1]
+                                                        flattened_data.append({
+                                                            "Date": date,
+                                                            "Location": location,
+                                                            "Order": order,
+                                                            "Carrier": carrier_,
+                                                            "EDI Bill Of Lading":shipment,
+                                                            "Shipment ID": shipment_parts[0],
+                                                            "MF Number": shipment_parts[1] if len(shipment_parts) > 1 else None
+                                                        })
+                               
+                                    #st.write(mf_numbers)
+                                    st.write(df.to_html(index=False, escape=False), unsafe_allow_html=True)
+                       
                                     
                         
                         

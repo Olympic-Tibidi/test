@@ -3984,7 +3984,7 @@ if authentication_status:
                                     bucket = storage_client.bucket(target_bucket)
                                     blob = bucket.blob(rf"release_orders/suzano_shipments.json")
                                     
-                                    blob.upload_from_string(json.dumps(matches))
+                                    blob.upload_from_string(mf_schedule)
                                     st.success(f"Suzano list updated!")
                             cor1,cor2=st.columns([5,5])
                             with cor1:

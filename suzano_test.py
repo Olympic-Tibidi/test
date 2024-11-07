@@ -3484,33 +3484,28 @@ if authentication_status:
                         schedule=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                         schedule=json.loads(schedule)
                         dfb=pd.DataFrame.from_dict(json.loads(bill_data)).T[1:]
-                        scheduled=[]
-                        for rol in dispatch:
-                            for sale in dispatch[rol]:
-                                try:
-                                    previous=schedule[dispatch[rol][sale]['destination']]["Scheduled"]
-                                except:
-                                    previous=0
-                                scheduled.append({"Destination":dispatch[rol][sale]['destination'],
-                                                  "Release Order":rol,"Sales Item":sale,
-                                                  "ISP":release_order_database[rol][sale]['grade'],
-                                                  "Prep":release_order_database[rol][sale]['unitized'],
-                                                  "Scheduled":previous,"Loaded":0,"Remaining":0})
-                        scheduled=pd.DataFrame(scheduled)
+                        dfb=bill.copy()
                         dfb["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in dfb["issued"]]
                         dfb=dfb[dfb["St_Date"]==datetime.datetime.now().date()]
-                        for i in scheduled.index:      #### find loads from bill of ladings
-                            try:
-                                scheduled.loc[i,"Scheduled"]=schedule[scheduled.loc[i,'Destination']]['Scheduled']
-                            except:
-                                scheduled.loc[i,"Scheduled"]=0
-                            rol=scheduled.loc[i,"Release Order"]
-                            sale=scheduled.loc[i,"Sales Item"]
-                            try:
-                                yuk=dfb[(dfb['release_order']==rol)&(dfb['sales_order']==sale)].shape[0]
-                            except:
-                                yuk=0
-                            scheduled.loc[i,"Loaded"]=yuk
+                        
+                        scheduled=[]
+                        day=datetime.date.today()
+                        for dest in schedule[day]:
+                            for rel in schedule[day][dest]:
+                                for carrier in schedule[day][dest][rel]:
+                                    scheduled.append({"Destination":dest,
+                                          "Release Order":rel,"Sales Item":1,
+                                          "ISP":raw_ro[rel]["001"]['grade'],
+                                          "Prep":raw_ro[rel]["001"]['unitized'],
+                                          "Carrier":carrier.split("-")[1],
+                                          "Scheduled":len(schedule[day][dest][rel][carrier]),
+                                          "Loaded":dfb[(dfb["release_order"]==rel)&(dfb["sales_order"]=="001")&
+                            (dfb["St_Date"]==datetime.date.today())&
+                            (dfb["carrier_id"]==str(carrier.split("-")[0]))].vehicle.count(),
+                                          "Remaining":0})
+                        scheduled=pd.DataFrame(scheduled)
+
+                        
                         if len(scheduled)>0:
                             
                             scheduled["Remaining"]=scheduled["Scheduled"]-scheduled["Loaded"]

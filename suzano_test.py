@@ -3838,7 +3838,7 @@ if authentication_status:
                                     flat_df=pd.DataFrame(flattened_data)
                                     display_flat_df=flat_df[flat_df.Date=="2024-11-07"]
                                     display_flat_df.reset_index(inplace=True)
-                                    display_flat_df.index=[i+1 for i in display_flat_df.index)
+                                    display_flat_df.index=[i+1 for i in display_flat_df.index]
                                     st.write(display_flat_df.to_html(index=False, escape=False), unsafe_allow_html=True)
                        
                                     

@@ -3835,7 +3835,7 @@ if authentication_status:
                                
                                     #st.write(mf_numbers)
                                     flat_df=pd.DataFrame(flattened_data)
-                                    display_flat_df=flat_df[flat_df.Date==datetime.date(2024,11,7)]
+                                    display_flat_df=flat_df[flat_df.Date=="2022-11-07"]
                                     st.write(display_flat_df.to_html(index=False, escape=False), unsafe_allow_html=True)
                        
                                     

@@ -3482,7 +3482,7 @@ if authentication_status:
 ####  SCHEDULE
                     with rls_tab4:  #####  SCHEDULE
                         bill_for_schedule=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                        bill_for_schedule=json.loads(bill_for schedule)
+                        bill_for_schedule=json.loads(bill_for_schedule)
                         schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
                         schedule=json.loads(schedule)
                         dfb=pd.DataFrame.from_dict(bill_for schedule)).T[1:]

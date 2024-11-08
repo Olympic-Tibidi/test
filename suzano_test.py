@@ -3479,11 +3479,13 @@ if authentication_status:
                     rls_tab1,rls_tab2,rls_tab3,rls_tab4=st.tabs(["ACTIVE RELEASE ORDERS","COMPLETED RELEASE ORDERS","SHIPMENT NUMBERS","SCHEDULE"])
 
 
-
+####  SCHEDULE
                     with rls_tab4:  #####  SCHEDULE
+                        bill_for_schedule=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                        bill_for_schedule=json.loads(bill_for schedule)
                         schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
                         schedule=json.loads(schedule)
-                        dfb=pd.DataFrame.from_dict(json.loads(bill_data)).T[1:]
+                        dfb=pd.DataFrame.from_dict(bill_for schedule)).T[1:]
                         #dfb=bill.copy()
                         dfb["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in dfb["issued"]]
                         dfb=dfb[dfb["St_Date"]==datetime.datetime.now().date()]
@@ -3523,7 +3525,7 @@ if authentication_status:
 
                             def style_row(row):
                                 location = row['Destination']
-                                #shipment_status = row["Status"]
+                                shipment_status = row["Status"]
                                 
                                 # Define colors for different locations
                                 colors = {
@@ -3534,7 +3536,10 @@ if authentication_status:
                                 
                                 # Base style for the entire row based on location
                                 base_style = colors.get(location, "")
-                                
+                                if shipment_status == "Done":
+                                    base_style += "font-weight: lighter; font-style: italic; text-decoration: line-through;"  # Less bold, italic, and strikethrough
+                                else:
+                                    base_style += "font-weight: bold;"  # Slightly bolder for other statuses
                         
                                 return [base_style] * len(row)
                             
@@ -3546,7 +3551,7 @@ if authentication_status:
                         else:
                             st.write("Nothing Dispatched")
 
-                        
+### ACTIVATE RELEASE                        
                     with rls_tab1:
                         
                         destinations_of_release_orders=[f"{i} to {release_order_database[i]['destination']}" for i in release_order_database if release_order_database[i]["complete"]!=True]
@@ -3766,13 +3771,15 @@ if authentication_status:
                             blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                             blob.upload_from_string(json.dumps(release_order_database))
                             st.success(f"Deactivated {to_deactivate} successfully!")
-                        
+## MF NUMBERS ##
                     with rls_tab3:
 
                         mf1,mf2=st.tabs(["VIEW/EDIT MF NUMBERS","AUTO UPLOAD"])
                         with mf1:
                             mf_numbers=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
                             mf_numbers=json.loads(mf_numbers)
+                            bill_for_mf=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                            bill_for_mf=json.loads(bill_for_mf)
                             def check_home(ro):
                                 destination=release_order_database[ro]['destination']
                                 keys=[sale for sale in release_order_database[ro] if sale in ["001","002","003","004","005"]]

@@ -3529,6 +3529,7 @@ if authentication_status:
                                 location = row['Destination']
                                 if code==2:
                                     shipment_status = row["Status"]
+                                    location = row["Location"]
                                 
                                 # Define colors for different locations
                                 colors = {

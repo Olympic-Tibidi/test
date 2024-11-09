@@ -3896,7 +3896,7 @@ if authentication_status:
                                
                                     #st.write(mf_numbers)
                                     flat_df=pd.DataFrame(flattened_data)
-                                    #display_flat_df=flat_df[flat_df.Date=="2024-11-08"]
+                                    display_flat_df=flat_df[flat_df.Date=="2024-11-08"]
                                     display_flat_df.reset_index(drop=True,inplace=True)
                                     display_flat_df.index+=1
                                     display_flat_df["Status"]=["Scheduled"]*len(display_flat_df)

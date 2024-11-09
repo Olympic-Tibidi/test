@@ -3512,7 +3512,7 @@ if authentication_status:
                         scheduled["Loaded"] = scheduled["Loaded"].astype(int)
                         scheduled["Remaining"] = scheduled["Remaining"].astype(int)
 
-                        
+                        st.write(dfb)
                         if len(scheduled)>0:
                             
                             scheduled["Remaining"]=[int(i) for i in scheduled["Scheduled"]-scheduled["Loaded"]]

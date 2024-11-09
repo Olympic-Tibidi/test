@@ -3541,7 +3541,7 @@ if authentication_status:
                                 # Base style for the entire row based on location
                                 base_style = colors.get(location, "")
                                 if code==2:
-                                    if shipment_status == "Done":
+                                    if shipment_status == "SHIPPED":
                                         base_style += "font-weight: lighter; font-style: italic; text-decoration: line-through;"  # Less bold, italic, and strikethrough
                                     else:
                                         base_style += "font-weight: bold;"  # Slightly bolder for other statuses

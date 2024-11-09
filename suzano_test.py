@@ -3525,7 +3525,7 @@ if authentication_status:
                             scheduled.fillna("",inplace=True)
 
 
-                            def style_row(code=1,row):
+                            def style_row(row,code=1):
                                 location = row['Destination']
                                 if code==2:
                                     shipment_status = row["Status"]

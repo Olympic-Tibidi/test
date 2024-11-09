@@ -3561,10 +3561,9 @@ if authentication_status:
                                                     status="NONE"
                                                     # Split the shipment data if needed (separate IDs if joined by "|")
                                                     if shipment in dfb.index:
-                                                        st.write(shipment)
                                                         status_="SHIPPED"
                                                     else:
-                                                        status="Scheduled"
+                                                        status_="Scheduled"
                                                     shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
                                                     carrier_=carrier.split("-")[1]
                                                     flattened_data.append({

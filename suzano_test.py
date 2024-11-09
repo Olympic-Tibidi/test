@@ -3504,7 +3504,7 @@ if authentication_status:
                                           "Carrier":carrier.split("-")[1],
                                           "Scheduled":int(len(schedule[day][dest][rel][carrier])),
                                           "Loaded":int(dfb[(dfb["release_order"]==rel)&(dfb["sales_order"]=="001")&
-                            (dfb["St_Date"]==datetime.date.today())&
+                            (dfb["St_Date"]==(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date())&
                             (dfb["carrier_id"]==str(carrier.split("-")[0]))].vehicle.count()),
                                           "Remaining":0})
                         scheduled=pd.DataFrame(scheduled)

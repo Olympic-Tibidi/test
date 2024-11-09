@@ -3490,10 +3490,10 @@ if authentication_status:
                         dfb=pd.DataFrame.from_dict(bill_for_schedule).T[1:]
                         #dfb=bill.copy()
                         dfb["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in dfb["issued"]]
-                        dfb=dfb[dfb["St_Date"]==datetime.datetime.now().date()]
+                        dfb=dfb[dfb["St_Date"]==(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date()]
                         
                         scheduled=[]
-                        day=str((datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date)
+                        day=str((datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date())
                         for dest in schedule[day]:
                             for rel in schedule[day][dest]:
                                 for carrier in schedule[day][dest][rel]:

@@ -3481,6 +3481,8 @@ if authentication_status:
 
 ####  SCHEDULE
                     with rls_tab4:  #####  SCHEDULE
+                        
+                        
                         bill_for_schedule=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                         bill_for_schedule=json.loads(bill_for_schedule)
                         schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
@@ -3523,9 +3525,10 @@ if authentication_status:
                             scheduled.fillna("",inplace=True)
 
 
-                            def style_row(row):
+                            def style_row(code=1,row):
                                 location = row['Destination']
-                                shipment_status = row["Status"]
+                                if code==2:
+                                    shipment_status = row["Status"]
                                 
                                 # Define colors for different locations
                                 colors = {
@@ -3536,15 +3539,45 @@ if authentication_status:
                                 
                                 # Base style for the entire row based on location
                                 base_style = colors.get(location, "")
-                                if shipment_status == "Done":
-                                    base_style += "font-weight: lighter; font-style: italic; text-decoration: line-through;"  # Less bold, italic, and strikethrough
-                                else:
-                                    base_style += "font-weight: bold;"  # Slightly bolder for other statuses
+                                if code==2:
+                                    if shipment_status == "Done":
+                                        base_style += "font-weight: lighter; font-style: italic; text-decoration: line-through;"  # Less bold, italic, and strikethrough
+                                    else:
+                                        base_style += "font-weight: bold;"  # Slightly bolder for other statuses
                         
                                 return [base_style] * len(row)
                             
+                            list_view=st.checkbox("LIST VIEW")
+                            if list_view:
+                                flattened_data = []
+                                for date, locations in schedule.items():
+                                    for location, location_data in locations.items():
+                                        for order, carriers in location_data.items():
+                                            for carrier, shipments in carriers.items():
+                                                for shipment in shipments:
+                                                    # Split the shipment data if needed (separate IDs if joined by "|")
+                                                    shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
+                                                    carrier_=carrier.split("-")[1]
+                                                    flattened_data.append({
+                                                        "Date": date,
+                                                        "Location": location,
+                                                        "Order": order,
+                                                        "Carrier": carrier_,
+                                                        "EDI Bill Of Lading":shipment,
+                                                        "Shipment ID": shipment_parts[0],
+                                                        "MF Number": shipment_parts[1] if len(shipment_parts) > 1 else None
+                                                    })
 
-                            styled_schedule =scheduled.style.apply(style_row, axis=1)
+                            # Convert to DataFrame
+                            flat_df = pd.DataFrame(flattened_data)
+                            flat_df[flat_df.Date>datetime.datetime.strftime(datetime.date(2024,11,8),"%Y-%m-%d")]
+
+                            #styled_schedule =scheduled.style.apply(style_row, axis=1)
+                            if list_view:
+                                styled_schedule = flat_df.style.apply(lambda row: style_row(row, code=2), axis=1)
+                            else:
+                                styled_schedule = scheduled.style.apply(lambda row: style_row(row, code=1), axis=1)
+
                          
                             st.write(styled_schedule.to_html(), unsafe_allow_html=True)
                 

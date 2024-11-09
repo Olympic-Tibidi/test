@@ -3557,10 +3557,11 @@ if authentication_status:
                                         for order, carriers in location_data.items():
                                             for carrier, shipments in carriers.items():
                                                 for shipment in shipments:
-                                                    st.write(shipment)
+                                                    
                                                     status="NONE"
                                                     # Split the shipment data if needed (separate IDs if joined by "|")
                                                     if shipment in dfb.index:
+                                                        st.write(shipment)
                                                         status_="SHIPPED"
                                                     else:
                                                         status="Scheduled"

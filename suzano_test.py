@@ -3493,7 +3493,7 @@ if authentication_status:
                         dfb=dfb[dfb["St_Date"]==datetime.datetime.now().date()]
                         
                         scheduled=[]
-                        day=str(datetime.date.today())
+                        day=str(datetime.date.today()-datetime.timedelta(hours=utc_difference)
                         for dest in schedule[day]:
                             for rel in schedule[day][dest]:
                                 for carrier in schedule[day][dest][rel]:

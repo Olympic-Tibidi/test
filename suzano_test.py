@@ -3526,11 +3526,12 @@ if authentication_status:
 
 
                             def style_row(row,code=1):
-                                location = row['Destination']
+                                
                                 if code==2:
                                     shipment_status = row["Status"]
                                     location = row["Location"]
-                                
+                                else:
+                                    location = row['Destination']
                                 # Define colors for different locations
                                 colors = {
                                     "CLATSKANIE": "background-color: #d1e7dd;",  # light green

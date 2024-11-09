@@ -3573,7 +3573,7 @@ if authentication_status:
                             # Convert to DataFrame
                                 flat_df = pd.DataFrame(flattened_data)
                                 flat_df["Status"]=["Scheduled"]*len(flat_df)
-                                flat_df=flat_df[flat_df.Date>datetime.datetime.strftime(datetime.date.(2024,11,8),"%Y-%m-%d")]
+                                flat_df=flat_df[flat_df.Date>datetime.datetime.strftime(datetime.date(2024,11,8),"%Y-%m-%d")]
 
                             #styled_schedule =scheduled.style.apply(style_row, axis=1)
                             if list_view:

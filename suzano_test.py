@@ -3558,6 +3558,10 @@ if authentication_status:
                                             for carrier, shipments in carriers.items():
                                                 for shipment in shipments:
                                                     # Split the shipment data if needed (separate IDs if joined by "|")
+                                                    if shipment in dfb.index:
+                                                        status_="SHIPPED"
+                                                    else:
+                                                        status="Scheduled"
                                                     shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
                                                     carrier_=carrier.split("-")[1]
                                                     flattened_data.append({
@@ -3567,12 +3571,13 @@ if authentication_status:
                                                         "Carrier": carrier_,
                                                         "EDI Bill Of Lading":shipment,
                                                         "Shipment ID": shipment_parts[0],
-                                                        "MF Number": shipment_parts[1] if len(shipment_parts) > 1 else None
+                                                        "MF Number": shipment_parts[1] if len(shipment_parts) > 1 else None,
+                                                        "Status":status_
                                                     })
 
                             # Convert to DataFrame
                                 flat_df = pd.DataFrame(flattened_data)
-                                flat_df["Status"]=["Scheduled"]*len(flat_df)
+                                #flat_df["Status"]=["Scheduled"]*len(flat_df)
                                 flat_df=flat_df[flat_df.Date==datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y-%m-%d")]
 
                             #styled_schedule =scheduled.style.apply(style_row, axis=1)

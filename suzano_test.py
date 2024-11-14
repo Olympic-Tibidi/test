@@ -807,7 +807,7 @@ if authentication_status:
                     budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
                     budget1=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget1.json"))
                     budget_2023=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2023.json"))
-                    budget_2024=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2024.json"))
+                    pure_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/pure_budget.json"))
                     weyco_suzano_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/weyco_suzano_budget.json"))
                     
                     ledger_b = pd.read_feather(io.BytesIO(ledger_b))

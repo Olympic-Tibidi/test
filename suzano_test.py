@@ -1508,17 +1508,13 @@ if authentication_status:
                             monthly_.index=[i.month_name() for i in monthly_.index]
                             avg=round(monthly_.Net.sum()/monthly_.shape[0],1)
                             total=round(monthly_.Net.sum(),1)
-                            if year=="2023":
-                               
-                                annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2023 Adopted"].values.sum()
-                                #st.write(annual_budget)
-                            elif year=="2022":
-                                annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2022 Adopted"].values.sum()
-                                annual_budget1=budget_codes[budget_codes["Account"].isin(accounts)]["2023 Adopted"].values.sum()
                             
-                            else:
-                                
-                                annual_budget=budget_codes[budget_codes["Account"].isin(accounts)]["2022 Adopted"].values.sum()
+                               
+                            annual_budget=[pure_budget[i]["2024"] for i in accounts].values.sum()
+                                #st.write(annual_budget)
+                            
+                            
+                            
                                 
                                
                             budgeted_monthly=annual_budget/12

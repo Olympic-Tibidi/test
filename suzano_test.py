@@ -4056,7 +4056,7 @@ if authentication_status:
                                 with mf_display_tab3:
                                     #flat_df["Status"]=["Scheduled"]*len(flat_df)
                                     flattened_data = []
-                                    for date, locations in mf_numbers.items():
+                                    for date, locations in schedule.items():
                                         for location, location_data in locations.items():
                                             for order, carriers in location_data.items():
                                                 for carrier, shipments in carriers.items():

@@ -4422,6 +4422,7 @@ if authentication_status:
 
                             # Convert to DataFrame
                                 flat_df = pd.DataFrame(flattened_data)
+                                all_schedule_flat_df=flat_df.copy()
                                 #flat_df["Status"]=["Scheduled"]*len(flat_df)
                     def style_row(row,code=1):
                                     
@@ -4487,7 +4488,7 @@ if authentication_status:
     
     
                                 
-                                all_schedule_flat_df=flat_df.copy()
+                                
                                 flat_df_for_day=flat_df[flat_df.Date==selected_date]
                                 flat_df_for_day.reset_index(drop=True,inplace=True)
                                 flat_df_for_day.index+=1

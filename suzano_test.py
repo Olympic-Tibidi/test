@@ -3912,7 +3912,7 @@ if authentication_status:
  ### MF NUMBERS                                   
                                
                                 flattened_data = []
-                                for date, locations in schedule.items():
+                                for date, locations in mf_numbers.items():
                                     for location, location_data in locations.items():
                                         for order, carriers in location_data.items():
                                             for carrier, shipments in carriers.items():

@@ -3941,6 +3941,7 @@ if authentication_status:
                                 flat_df.insert(1,"Day",flat_df["Date"].dt.day_name())
                                 flat_df["Status"]="None"
                                 flat_df['Status'] = flat_df['EDI Bill Of Lading'].apply(lambda x: 'SHIPPED' if x in bill_for_mf else 'Scheduled')
+
                                 
                                 mf_display_tab1,mf_display_tab2,mf_display_tab3=st.tabs(["DAILY","WEEK","ALL SCHEDULE"])
                                 
@@ -4054,6 +4055,36 @@ if authentication_status:
                                     st.components.v1.html(html_content, height=300, scrolling=False)
                                 with mf_display_tab3:
                                     #flat_df["Status"]=["Scheduled"]*len(flat_df)
+                                    flattened_data = []
+                                    for date, locations in mf_numbers.items():
+                                        for location, location_data in locations.items():
+                                            for order, carriers in location_data.items():
+                                                for carrier, shipments in carriers.items():
+                                                    for shipment in shipments:
+                                                        dfb=dfb[dfb["St_Date"]==selected_date_datetime]
+                                                        status="NONE"
+                                                        if shipment in dfb.index:
+                                                            status_="SHIPPED"
+                                                        else:
+                                                            status_="Scheduled"
+                                                        shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
+                                                        carrier_=carrier.split("-")[1]
+                                                        flattened_data.append({
+                                                            "Date": date,
+                                                            "Location": location,
+                                                            "Order": order,
+                                                            "Carrier": carrier_,
+                                                            "EDI Bill Of Lading":shipment,
+                                                            "MF Number": shipment_parts[0] if len(shipment_parts) > 1 else None,
+                                                            "Shipment ID": shipment_parts[1] if len(shipment_parts) > 1 else shipment_parts[0]
+                                                        })
+    
+                                    
+                                    flat_df=pd.DataFrame(flattened_data)
+                                    flat_df["Date"] = pd.to_datetime(flat_df["Date"])#.dt.date
+                                    flat_df.insert(1,"Day",flat_df["Date"].dt.day_name())
+                                    flat_df["Status"]="None"
+                                    flat_df['Status'] = flat_df['EDI Bill Of Lading'].apply(lambda x: 'SHIPPED' if x in bill_for_mf else 'Scheduled')
                                     flat_df.reset_index(drop=True,inplace=True)
                                     flat_df.index+=1
                                     styled_df =flat_df.style.apply(style_row, axis=1)

@@ -4203,11 +4203,10 @@ if authentication_status:
                                 st.components.v1.html(button_html, height=120)
 
 # Handle backend logic
-if st.experimental_get_query_params().get("button_clicked") == ["true"]:
-    st.balloons()  # Celebrate the button click
-    st.success("3D Button Clicked and Python Action Triggered!")
+                                if st.experimental_get_query_params().get("button_clicked") == ["true"]:
+                                    st.balloons()  # Celebrate the button click
+                                    st.success("3D Button Clicked and Python Action Triggered!")
                                 
-                                st.components.v1.html(button_html, height=100)
                                 if st.button("RECORD SUZANO LIST",disabled=button,key="sdsqawds2"):
                                     suz_=json.dumps(matches)
                                     storage_client = get_storage_client()

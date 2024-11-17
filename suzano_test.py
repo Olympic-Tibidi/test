@@ -671,7 +671,28 @@ def get_gov_weather():
     forecast.Wind_Speed=[int(re.findall(f'\d+',i)[0]) for i in forecast.Wind_Speed.values]
     #forecast['Vector']=[vectorize(parse_angle(i),j) for i,j in zip(forecast.Wind_Direction.values,forecast.Wind_Speed.values)]
     return forecast
-
+def style_row(row):
+    location = row["Location"]
+    shipment_status = row["Status"]
+    
+    # Define colors for different locations
+    colors = {
+        "CLATSKANIE": "background-color: #d1e7dd;",  # light green
+        "LEWISTON": "background-color: #ffebcd;",    # light coral
+        "HALSEY": "background-color: #add8e6;",      # light blue
+    }
+    
+    # Base style for the entire row based on location
+    base_style = colors.get(location, "")
+    
+    # Apply styles based on shipment status
+    if shipment_status == "SHIPPED":
+        base_style += "font-weight: lighter; font-style: italic; text-decoration: line-through;"  # Less bold, italic, and strikethrough
+    else:
+        base_style += "font-weight: bold;"  # Slightly bolder for other statuses
+    
+    # Apply the style to all cells in the row
+    return [base_style] * len(row)
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 pd.options.mode.chained_assignment = None  # default='warn'
@@ -3823,28 +3844,7 @@ if authentication_status:
 ### EDIT - REMOVE
                         mf1,mf2=st.tabs(["VIEW/EDIT MF NUMBERS","AUTO UPLOAD"])
                         
-                        def style_row(row):
-                            location = row["Location"]
-                            shipment_status = row["Status"]
-                            
-                            # Define colors for different locations
-                            colors = {
-                                "CLATSKANIE": "background-color: #d1e7dd;",  # light green
-                                "LEWISTON": "background-color: #ffebcd;",    # light coral
-                                "HALSEY": "background-color: #add8e6;",      # light blue
-                            }
-                            
-                            # Base style for the entire row based on location
-                            base_style = colors.get(location, "")
-                            
-                            # Apply styles based on shipment status
-                            if shipment_status == "SHIPPED":
-                                base_style += "font-weight: lighter; font-style: italic; text-decoration: line-through;"  # Less bold, italic, and strikethrough
-                            else:
-                                base_style += "font-weight: bold;"  # Slightly bolder for other statuses
-                            
-                            # Apply the style to all cells in the row
-                            return [base_style] * len(row)
+                        
                         
                         with mf1:
                             mf_numbers=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
@@ -5832,6 +5832,42 @@ if authentication_status:
                         
                       
             with mill_progress:
+                schedule=gcp_download(target_bucket,rf"schedule.json")
+                schedule=json.loads(schedule)
+                flattened_data = []
+                for date, locations in schedule.items():
+                    for location, location_data in locations.items():
+                        for order, carriers in location_data.items():
+                            for carrier, shipments in carriers.items():
+                                for shipment in shipments:
+                                    dfb=dfb[dfb["St_Date"]==selected_date_datetime]
+                                    status="NONE"
+                                    if shipment in dfb.index:
+                                        status_="SHIPPED"
+                                    else:
+                                        status_="Scheduled"
+                                    shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
+                                    carrier_=carrier.split("-")[1]
+                                    flattened_data.append({
+                                        "Date": date,
+                                        "Location": location,
+                                        "Order": order,
+                                        "Carrier": carrier_,
+                                        "EDI Bill Of Lading":shipment,
+                                        "MF Number": shipment_parts[0] if len(shipment_parts) > 1 else None,
+                                        "Shipment ID": shipment_parts[1] if len(shipment_parts) > 1 else shipment_parts[0]
+                                    })
+
+                
+                flat_df=pd.DataFrame(flattened_data)
+                flat_df["Date"] = pd.to_datetime(flat_df["Date"])#.dt.date
+                flat_df.insert(1,"Day",flat_df["Date"].dt.day_name())
+                flat_df["Status"]="None"
+                flat_df['Status'] = flat_df['EDI Bill Of Lading'].apply(lambda x: 'SHIPPED' if x in bill_for_mf else 'Scheduled')
+                flat_df.reset_index(drop=True,inplace=True)
+                flat_df.index+=1
+                styled_df =flat_df.style.apply(style_row, axis=1)
+                st.write(styled_df.to_html(), unsafe_allow_html=True)
                 pass
                 # mf_numbers=json.loads(gcp_download(target_bucket,rf"release_orders/mf_numbers.json"))
                 

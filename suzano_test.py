@@ -4172,6 +4172,22 @@ if authentication_status:
                                     st.session_state.matches=matches
                                 st.session_state.matches=matches
                                 st.success("SHIPMENTS MATCHED AND REFRESHED!")
+                                button_html = """
+                                <div style="text-align: center; margin-top: 20px;">
+                                    <button onclick="alert('Button clicked!')" style="
+                                        background-color: #008CBA; 
+                                        color: white; 
+                                        border: none; 
+                                        padding: 10px 20px; 
+                                        font-size: 16px; 
+                                        border-radius: 5px; 
+                                        cursor: pointer;">
+                                        Click Me
+                                    </button>
+                                </div>
+                                """
+                                
+                                st.components.v1.html(button_html, height=100)
                                 if st.button("RECORD SUZANO LIST",disabled=button,key="sdsqawds2"):
                                     suz_=json.dumps(matches)
                                     storage_client = get_storage_client()

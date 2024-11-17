@@ -4174,18 +4174,38 @@ if authentication_status:
                                 st.success("SHIPMENTS MATCHED AND REFRESHED!")
                                 button_html = """
                                 <div style="text-align: center; margin-top: 20px;">
-                                    <button onclick="alert('Button clicked!')" style="
-                                        background-color: #008CBA; 
-                                        color: white; 
-                                        border: none; 
-                                        padding: 10px 20px; 
-                                        font-size: 16px; 
-                                        border-radius: 5px; 
-                                        cursor: pointer;">
-                                        Click Me
+                                    <button onclick="triggerPython()" style="
+                                        background: linear-gradient(145deg, #ffffff, #d4d4d4);
+                                        border: none;
+                                        border-radius: 12px;
+                                        box-shadow: 5px 5px 10px #b8b8b8, -5px -5px 10px #ffffff;
+                                        color: #444;
+                                        font-size: 18px;
+                                        font-weight: bold;
+                                        padding: 10px 20px;
+                                        cursor: pointer;
+                                        transition: 0.2s;
+                                    " 
+                                    onmouseover="this.style.background='#e0e0e0';"
+                                    onmouseout="this.style.background='linear-gradient(145deg, #ffffff, #d4d4d4)';"
+                                    onmousedown="this.style.boxShadow='inset 3px 3px 5px #b8b8b8, inset -3px -3px 5px #ffffff'; this.style.transform='translateY(2px)';"
+                                    onmouseup="this.style.boxShadow='5px 5px 10px #b8b8b8, -5px -5px 10px #ffffff'; this.style.transform='translateY(0px)';">
+                                        3D Button
                                     </button>
                                 </div>
+                                <script>
+                                    function triggerPython() {
+                                        window.location.href = "/?button_clicked=true";
+                                    }
+                                </script>
                                 """
+                                
+                                st.components.v1.html(button_html, height=120)
+
+# Handle backend logic
+if st.experimental_get_query_params().get("button_clicked") == ["true"]:
+    st.balloons()  # Celebrate the button click
+    st.success("3D Button Clicked and Python Action Triggered!")
                                 
                                 st.components.v1.html(button_html, height=100)
                                 if st.button("RECORD SUZANO LIST",disabled=button,key="sdsqawds2"):

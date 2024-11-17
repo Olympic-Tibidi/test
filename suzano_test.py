@@ -5833,7 +5833,7 @@ if authentication_status:
                       
             with mill_progress:
                 dfb=inv_bill_of_ladings.copy()
-                schedule=gcp_download(target_bucket,rf"schedule.json")
+                schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
                 schedule=json.loads(schedule)
                 flattened_data = []
                 for date, locations in schedule.items():

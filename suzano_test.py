@@ -5832,7 +5832,7 @@ if authentication_status:
                         
                       
             with mill_progress:
-                dfb=inv_bill_of_ladings.copy()
+                dfb=pd.DataFrame(inv_bill_of_ladings)).T
                 schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
                 schedule=json.loads(schedule)
                 flattened_data = []
@@ -5864,7 +5864,7 @@ if authentication_status:
                 flat_df["Date"] = pd.to_datetime(flat_df["Date"])#.dt.date
                 flat_df.insert(1,"Day",flat_df["Date"].dt.day_name())
                 flat_df["Status"]="None"
-                flat_df['Status'] = flat_df['EDI Bill Of Lading'].apply(lambda x: 'SHIPPED' if x in bill_for_mf else 'Scheduled')
+                flat_df['Status'] = flat_df['EDI Bill Of Lading'].apply(lambda x: 'SHIPPED' if x in dfb else 'Scheduled')
                 flat_df.reset_index(drop=True,inplace=True)
                 flat_df.index+=1
                 styled_df =flat_df.style.apply(style_row, axis=1)

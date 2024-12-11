@@ -4859,10 +4859,10 @@ if authentication_status:
                                         st.session_state.load_mf_number = load_mf_number
                                         if load_mf_number.str.contains("|"):
                                             mf_mix=True
-                                            otm_number=f"|{load_mf_number.split("|")[1]}"
-                                            mf_number_split=f"{load_mf_number.split("|")[0]}"
+                                            otm_number=f"|{load_mf_number.split('|')[1]}"
+                                            mf_number_split=f"{load_mf_number.split('|')[0]}"
                                         else:
-                                            otm_number=f"|{load_mf_number.split("|")[1]}"
+                                            otm_number=f"|{load_mf_number.split('|')[1]}"
                                        
                                     else:
                                         st.write(f"**:red[ASK ADMIN TO PUT SHIPMENT NUMBERS]**")

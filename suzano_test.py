@@ -4859,7 +4859,7 @@ if authentication_status:
                                         st.session_state.load_mf_number = load_mf_number
                                         if "|" in load_mf_number:
                                             mf_mix=True
-                                            otm_number=f"|{load_mf_number.split('|')[1]}"
+                                            otm_number=f"{load_mf_number.split('|')[1]}"
                                             mf_number_split=f"{load_mf_number.split('|')[0]}"
                                         else:
                                             otm_number=f"|{load_mf_number.split('|')[1]}"

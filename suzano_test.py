@@ -4862,7 +4862,7 @@ if authentication_status:
                                             otm_number=f"{load_mf_number.split('|')[1]}"
                                             mf_number_split=f"{load_mf_number.split('|')[0]}"
                                         else:
-                                            otm_number=f"|{load_mf_number}"
+                                            otm_number=f"{load_mf_number}"
                                        
                                     else:
                                         st.write(f"**:red[ASK ADMIN TO PUT SHIPMENT NUMBERS]**")

@@ -5848,7 +5848,7 @@ if authentication_status:
                         
                       
             with mill_progress:
-                dfb=pd.DataFrame(inv_bill_of_ladings)).T
+                dfb=pd.DataFrame(inv_bill_of_ladings).T
                 schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
                 schedule=json.loads(schedule)
                 flattened_data = []

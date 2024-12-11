@@ -358,7 +358,13 @@ def process():
     if double_load:
         line21="2DTD:"+current_release_order+" "*(10-len(current_release_order))+"000"+current_sales_order+a+tsn+tt+vehicle_id+" "*(20-len(vehicle_id))+str(first_quantity*2000)+" "*(16-len(str(first_quantity*2000)))+"USD"+" "*36+carrier_code+" "*(10-len(carrier_code))+terminal_bill_of_lading+" "*(50-len(terminal_bill_of_lading))+c
         line22="2DTD:"+next_release_order+" "*(10-len(next_release_order))+"000"+next_sales_order+a+tsn+tt+vehicle_id+" "*(20-len(vehicle_id))+str(second_quantity*2000)+" "*(16-len(str(second_quantity*2000)))+"USD"+" "*36+carrier_code+" "*(10-len(carrier_code))+terminal_bill_of_lading+" "*(50-len(terminal_bill_of_lading))+c
-    line2="2DTD:"+release_order_number+" "*(10-len(release_order_number))+"000"+sales_order_item+a+tsn+tt+vehicle_id+" "*(20-len(vehicle_id))+str(int(quantity*2000))+" "*(16-len(str(int(quantity*2000))))+"USD"+" "*36+carrier_code+" "*(10-len(carrier_code))+terminal_bill_of_lading+" "*(50-len(terminal_bill_of_lading))+c
+    if mf_mix:
+        line2="2DTD:"+release_order_number+" "*(10-len(release_order_number))+"000"+sales_order_item+a+tsn+tt+vehicle_id+" "*(20-len(vehicle_id))+str(int(quantity*2000))+" "*(16-len(str(int(quantity*2000))))+"USD"+" "*16+mf_number+" "*(20-len(mf_number))+"1"+" "*9+"|"+otm_number+" "*(49-len(otm_number))+c
+    else:
+        line2="2DTD:"+release_order_number+" "*(10-len(release_order_number))+"000"+sales_order_item+a+tsn+tt+vehicle_id+" "*(20-len(vehicle_id))+str(int(quantity*2000))+" "*(16-len(str(int(quantity*2000))))+"USD"+" "*16+" "*20+"1"+" "*9+"|"+otm_number+" "*(49-len(otm_number))+c
+    
+                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                             
                
     loadls=[]
     bale_loadls=[]
@@ -4822,11 +4828,15 @@ if authentication_status:
                                 if manual_bill:
                                     manual_bill_of_lading_number=st.text_input("ENTER BOL",key="eirufs")
                                 mf=True
+                                mf_mix=False
                                 load_mf_number_issued=False
-                                if destination=="CLEARWATER-Lewiston,ID":
+                                if destination in ["CLEARWATER-Lewiston,ID","SOFIDEL-Lewiston,ID"]:
                                     carrier_code=st.selectbox("Carrier Code",[carrier_code,"310897-Ashley"],disabled=False,key=29)
+                                elif destination=="GP-Halsey,OR":
+                                    carrier_code=st.selectbox("Carrier Code",["311627-KBX"],disabled=False,key=29)
+                                
                                 else:
-                                    carrier_code=st.text_input("Carrier Code",carrier_code,disabled=True,key=9)
+                                    carrier_code=st.selectbox("Carrier Code",["311627-KBX"],disabled=True,key=9)
                                    
                                 today_str=str(st.date_input("Shipment Date",(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date(),disabled=False,key="popdo3"))
                                 dest=destination.split("-")[1].split(",")[0].upper()
@@ -4847,6 +4857,12 @@ if authentication_status:
                                         load_mf_number_issued=True
                                         yes=True
                                         st.session_state.load_mf_number = load_mf_number
+                                        if load_mf_number.str.contains("|"):
+                                            mf_mix=True
+                                            otm_number=f"|{load_mf_number.split("|")[1]}"
+                                            mf_number_split=f"{load_mf_number.split("|")[0]}"
+                                        else:
+                                            otm_number=f"|{load_mf_number.split("|")[1]}"
                                        
                                     else:
                                         st.write(f"**:red[ASK ADMIN TO PUT SHIPMENT NUMBERS]**")

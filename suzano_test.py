@@ -809,7 +809,7 @@ if authentication_status:
         #             st.markdown(outbound_html, unsafe_allow_html=True)
         
         if select=="FINANCE":
-            hadi=False
+            hadi=True
             fin_password=st.sidebar.text_input("Enter Password",type="password",key="sas")
             if fin_password=="marineterm98501!":
                 hadi=True

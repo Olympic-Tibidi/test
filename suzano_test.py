@@ -5857,7 +5857,7 @@ if authentication_status:
                         for order, carriers in location_data.items():
                             for carrier, shipments in carriers.items():
                                 for shipment in shipments:
-                                    dfb=dfb[dfb["St_Date"]==selected_date_datetime]
+                                    dfb=dfb[dfb["Date Shipped"]==selected_date_datetime]
                                     status="NONE"
                                     if shipment in dfb.index:
                                         status_="SHIPPED"

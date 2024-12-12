@@ -3942,400 +3942,400 @@ if authentication_status:
                         
                         
                         with mf1:
-                            mf_numbers=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
-                            mf_numbers=json.loads(mf_numbers)
-                            schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
-                            schedule=json.loads(schedule)
+#                             mf_numbers=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
+#                             mf_numbers=json.loads(mf_numbers)
+#                             schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
+#                             schedule=json.loads(schedule)
 
                             
-                            def check_home(ro):
-                                destination=release_order_database[ro]['destination']
-                                keys=[sale for sale in release_order_database[ro] if sale in ["001","002","003","004","005"]]
-                                remains=[release_order_database[ro][key]["remaining"] for key in keys]
-                                if sum(remains)==0:
-                                    return False
-                                return f"{ro} to {destination}"
+#                             def check_home(ro):
+#                                 destination=release_order_database[ro]['destination']
+#                                 keys=[sale for sale in release_order_database[ro] if sale in ["001","002","003","004","005"]]
+#                                 remains=[release_order_database[ro][key]["remaining"] for key in keys]
+#                                 if sum(remains)==0:
+#                                     return False
+#                                 return f"{ro} to {destination}"
                                 
-                            destinations_of_release_orders=[check_home(i) for i in release_order_database if check_home(i) ]
-                            if len(destinations_of_release_orders)==0:
-                                st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
-                            else:
+#                             destinations_of_release_orders=[check_home(i) for i in release_order_database if check_home(i) ]
+#                             if len(destinations_of_release_orders)==0:
+#                                 st.warning("NO GP RELEASE ORDERS FOR THIS VESSEL")
+#                             else:
                                 
-                                release_order_number_mf_=st.selectbox("SELECT RELEASE ORDER FOR SHIPMENT NUMBERS",destinations_of_release_orders,key="tatata")
-                                release_order_number_mf=release_order_number_mf_.split(" ")[0]
-                                dest=release_order_number_mf_.split(" ")[2].split("-")[1].split(",")[0].upper()
-                                mf_date_str=datetime.datetime.strftime((st.date_input("Shipment Date",datetime.datetime.today(),disabled=False,key="popddao3")),"%Y-%m-%d")
-                                carrier_mf=st.selectbox("SELECT CARRIER",[f"{i}-{j}" for i,j in map["carriers"].items()],key="tatpota")
-                                input_mf_numbers=st.text_area("**ENTER SHIPMENT NUMBERS**",height=100,key="juy")
-                                if input_mf_numbers is not None:
-                                    input_mf_numbers = input_mf_numbers.splitlines()
-                                    input_mf_numbers=[i for i in input_mf_numbers]####### CAREFUL THIS ASSUMES SAME DIGIT MF EACH TIME
-                                if st.button("SUBMIT SHIPMENT NUMBERS",key="ioeru" ):
+#                                 release_order_number_mf_=st.selectbox("SELECT RELEASE ORDER FOR SHIPMENT NUMBERS",destinations_of_release_orders,key="tatata")
+#                                 release_order_number_mf=release_order_number_mf_.split(" ")[0]
+#                                 dest=release_order_number_mf_.split(" ")[2].split("-")[1].split(",")[0].upper()
+#                                 mf_date_str=datetime.datetime.strftime((st.date_input("Shipment Date",datetime.datetime.today(),disabled=False,key="popddao3")),"%Y-%m-%d")
+#                                 carrier_mf=st.selectbox("SELECT CARRIER",[f"{i}-{j}" for i,j in map["carriers"].items()],key="tatpota")
+#                                 input_mf_numbers=st.text_area("**ENTER SHIPMENT NUMBERS**",height=100,key="juy")
+#                                 if input_mf_numbers is not None:
+#                                     input_mf_numbers = input_mf_numbers.splitlines()
+#                                     input_mf_numbers=[i for i in input_mf_numbers]####### CAREFUL THIS ASSUMES SAME DIGIT MF EACH TIME
+#                                 if st.button("SUBMIT SHIPMENT NUMBERS",key="ioeru" ):
                                     
-                                    if mf_date_str not in mf_numbers.keys():   
-                                        mf_numbers[mf_date_str]={}
-                                    if dest not in mf_numbers[mf_date_str]:
-                                        mf_numbers[mf_date_str][dest]={}
-                                    if release_order_number_mf not in mf_numbers[mf_date_str][dest]:
-                                        mf_numbers[mf_date_str][dest][release_order_number_mf]={}
-                                    if carrier_mf not in mf_numbers[mf_date_str][dest][release_order_number_mf]:
-                                       mf_numbers[mf_date_str][dest][release_order_number_mf][carrier_mf]=[]
-                                    mf_numbers[mf_date_str][dest][release_order_number_mf][carrier_mf]+=input_mf_numbers
-                                    mf_numbers[mf_date_str][dest][release_order_number_mf][carrier_mf]=list(set(mf_numbers[mf_date_str][dest][release_order_number_mf][carrier_mf]))
-                                    mf_data=json.dumps(mf_numbers)
-                                    #storage_client = storage.Client()
-                                    storage_client = get_storage_client()
-                                    bucket = storage_client.bucket(target_bucket)
-                                    blob = bucket.blob(rf"release_orders/mf_numbers.json")
-                                    blob.upload_from_string(mf_data)
-                                    st.success(f"MF numbers entered to {release_order_number_mf} successfully!")
+#                                     if mf_date_str not in mf_numbers.keys():   
+#                                         mf_numbers[mf_date_str]={}
+#                                     if dest not in mf_numbers[mf_date_str]:
+#                                         mf_numbers[mf_date_str][dest]={}
+#                                     if release_order_number_mf not in mf_numbers[mf_date_str][dest]:
+#                                         mf_numbers[mf_date_str][dest][release_order_number_mf]={}
+#                                     if carrier_mf not in mf_numbers[mf_date_str][dest][release_order_number_mf]:
+#                                        mf_numbers[mf_date_str][dest][release_order_number_mf][carrier_mf]=[]
+#                                     mf_numbers[mf_date_str][dest][release_order_number_mf][carrier_mf]+=input_mf_numbers
+#                                     mf_numbers[mf_date_str][dest][release_order_number_mf][carrier_mf]=list(set(mf_numbers[mf_date_str][dest][release_order_number_mf][carrier_mf]))
+#                                     mf_data=json.dumps(mf_numbers)
+#                                     #storage_client = storage.Client()
+#                                     storage_client = get_storage_client()
+#                                     bucket = storage_client.bucket(target_bucket)
+#                                     blob = bucket.blob(rf"release_orders/mf_numbers.json")
+#                                     blob.upload_from_string(mf_data)
+#                                     st.success(f"MF numbers entered to {release_order_number_mf} successfully!")
                                     
-                                if st.button("REMOVE SHIPMENT NUMBERS",key="ioerssu" ):
-                                    for i in input_mf_numbers:
-                                        try:
-                                            mf_numbers[mf_date_str][dest][release_order_number_mf][carrier_mf].remove(int(i))
-                                        except:
-                                            mf_numbers[mf_date_str][dest][release_order_number_mf][carrier_mf].remove(str(i))
-                                        st.success(f"MF numbers removed from {release_order_number_mf} successfully!")   
+#                                 if st.button("REMOVE SHIPMENT NUMBERS",key="ioerssu" ):
+#                                     for i in input_mf_numbers:
+#                                         try:
+#                                             mf_numbers[mf_date_str][dest][release_order_number_mf][carrier_mf].remove(int(i))
+#                                         except:
+#                                             mf_numbers[mf_date_str][dest][release_order_number_mf][carrier_mf].remove(str(i))
+#                                         st.success(f"MF numbers removed from {release_order_number_mf} successfully!")   
                                                 
-                                    mf_data=json.dumps(mf_numbers)
-                                   # storage_client = storage.Client()
-                                    storage_client = get_storage_client()
-                                    bucket = storage_client.bucket(target_bucket)
-                                    blob = bucket.blob(rf"release_orders/mf_numbers.json")
-                                    blob.upload_from_string(mf_data)
- ### MF NUMBERS                                   
+#                                     mf_data=json.dumps(mf_numbers)
+#                                    # storage_client = storage.Client()
+#                                     storage_client = get_storage_client()
+#                                     bucket = storage_client.bucket(target_bucket)
+#                                     blob = bucket.blob(rf"release_orders/mf_numbers.json")
+#                                     blob.upload_from_string(mf_data)
+#  ### MF NUMBERS                                   
                                
-                                flattened_data = []
-                                for date, locations in mf_numbers.items():
-                                    for location, location_data in locations.items():
-                                        for order, carriers in location_data.items():
-                                            for carrier, shipments in carriers.items():
-                                                for shipment in shipments:
-                                                    dfb=dfb[dfb["St_Date"]==selected_date_datetime]
-                                                    status="NONE"
-                                                    if shipment in dfb.index:
-                                                        status_="SHIPPED"
-                                                    else:
-                                                        status_="Scheduled"
-                                                    shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
-                                                    carrier_=carrier.split("-")[1]
-                                                    flattened_data.append({
-                                                        "Date": date,
-                                                        "Location": location,
-                                                        "Order": order,
-                                                        "Carrier": carrier_,
-                                                        "EDI Bill Of Lading":shipment,
-                                                        "MF Number": shipment_parts[0] if len(shipment_parts) > 1 else None,
-                                                        "Shipment ID": shipment_parts[1] if len(shipment_parts) > 1 else shipment_parts[0]
-                                                    })
+#                                 flattened_data = []
+#                                 for date, locations in mf_numbers.items():
+#                                     for location, location_data in locations.items():
+#                                         for order, carriers in location_data.items():
+#                                             for carrier, shipments in carriers.items():
+#                                                 for shipment in shipments:
+#                                                     dfb=dfb[dfb["St_Date"]==selected_date_datetime]
+#                                                     status="NONE"
+#                                                     if shipment in dfb.index:
+#                                                         status_="SHIPPED"
+#                                                     else:
+#                                                         status_="Scheduled"
+#                                                     shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
+#                                                     carrier_=carrier.split("-")[1]
+#                                                     flattened_data.append({
+#                                                         "Date": date,
+#                                                         "Location": location,
+#                                                         "Order": order,
+#                                                         "Carrier": carrier_,
+#                                                         "EDI Bill Of Lading":shipment,
+#                                                         "MF Number": shipment_parts[0] if len(shipment_parts) > 1 else None,
+#                                                         "Shipment ID": shipment_parts[1] if len(shipment_parts) > 1 else shipment_parts[0]
+#                                                     })
 
                                 
-                                flat_df=pd.DataFrame(flattened_data)
-                                flat_df["Date"] = pd.to_datetime(flat_df["Date"])#.dt.date
-                                flat_df.insert(1,"Day",flat_df["Date"].dt.day_name())
-                                flat_df["Status"]="None"
-                                flat_df['Status'] = flat_df['EDI Bill Of Lading'].apply(lambda x: 'SHIPPED' if x in bill_for_mf else 'Scheduled')
+#                                 flat_df=pd.DataFrame(flattened_data)
+#                                 flat_df["Date"] = pd.to_datetime(flat_df["Date"])#.dt.date
+#                                 flat_df.insert(1,"Day",flat_df["Date"].dt.day_name())
+#                                 flat_df["Status"]="None"
+#                                 flat_df['Status'] = flat_df['EDI Bill Of Lading'].apply(lambda x: 'SHIPPED' if x in bill_for_mf else 'Scheduled')
 
                                 
-                                mf_display_tab1,mf_display_tab2,mf_display_tab3=st.tabs(["DAILY","WEEK","ALL SCHEDULE"])
+#                                 mf_display_tab1,mf_display_tab2,mf_display_tab3=st.tabs(["DAILY","WEEK","ALL SCHEDULE"])
                                 
-                                with mf_display_tab1:
+#                                 with mf_display_tab1:
                                     
-                                    display_flat_df=flat_df[flat_df.Date==mf_date_str]
-                                    display_flat_df.reset_index(drop=True,inplace=True)
-                                    display_flat_df.index+=1
-                                    display_flat_df["Date"] = display_flat_df["Date"].dt.date
+#                                     display_flat_df=flat_df[flat_df.Date==mf_date_str]
+#                                     display_flat_df.reset_index(drop=True,inplace=True)
+#                                     display_flat_df.index+=1
+#                                     display_flat_df["Date"] = display_flat_df["Date"].dt.date
                                     
 
-                                    styled_df = display_flat_df.style.apply(style_row, axis=1)
-                                    st.write(styled_df.to_html(), unsafe_allow_html=True)
+#                                     styled_df = display_flat_df.style.apply(style_row, axis=1)
+#                                     st.write(styled_df.to_html(), unsafe_allow_html=True)
 
                               
-                                with mf_display_tab2:
+#                                 with mf_display_tab2:
                               
-                                    #flat_df["Status"] = ["Scheduled"] * len(flat_df)
-                                    flat_df.reset_index(drop=True, inplace=True)
-                                    flat_df.index += 1
+#                                     #flat_df["Status"] = ["Scheduled"] * len(flat_df)
+#                                     flat_df.reset_index(drop=True, inplace=True)
+#                                     flat_df.index += 1
                                     
-                                    # Convert "Date" to datetime and set as index
-                                    #flat_df["Date"] = pd.to_datetime(flat_df["Date"])
-                                    #flat_df.insert(1,"Day",flat_df["Date"].dt.day_name())
+#                                     # Convert "Date" to datetime and set as index
+#                                     #flat_df["Date"] = pd.to_datetime(flat_df["Date"])
+#                                     #flat_df.insert(1,"Day",flat_df["Date"].dt.day_name())
                                     
-                                    today=(datetime.datetime.today()-datetime.timedelta(hours=utc_difference)).date()
-                                    start_of_this_week = today - datetime.timedelta(days=today.weekday()) 
-                                    start_of_next_week = (start_of_this_week + datetime.timedelta(days=7))
-                                    end_of_next_week = (start_of_next_week + datetime.timedelta(days=7))
+#                                     today=(datetime.datetime.today()-datetime.timedelta(hours=utc_difference)).date()
+#                                     start_of_this_week = today - datetime.timedelta(days=today.weekday()) 
+#                                     start_of_next_week = (start_of_this_week + datetime.timedelta(days=7))
+#                                     end_of_next_week = (start_of_next_week + datetime.timedelta(days=7))
                                     
-                                    if today.weekday() < 5:  # 0 = Monday, 4 = Friday
-                                        # Filter to display only the current week
-                                        weekly_display = flat_df[(flat_df["Date"]<pd.Timestamp(start_of_next_week))&
-                                                                 (flat_df["Date"]>pd.Timestamp(start_of_this_week))]
-                                    else:
-                                        # Display the upcoming week
-                                        weekly_display = flat_df[(flat_df["Date"]>pd.Timestamp(start_of_next_week))&
-                                                                 (flat_df["Date"]<pd.Timestamp(end_of_next_week))]
+#                                     if today.weekday() < 5:  # 0 = Monday, 4 = Friday
+#                                         # Filter to display only the current week
+#                                         weekly_display = flat_df[(flat_df["Date"]<pd.Timestamp(start_of_next_week))&
+#                                                                  (flat_df["Date"]>pd.Timestamp(start_of_this_week))]
+#                                     else:
+#                                         # Display the upcoming week
+#                                         weekly_display = flat_df[(flat_df["Date"]>pd.Timestamp(start_of_next_week))&
+#                                                                  (flat_df["Date"]<pd.Timestamp(end_of_next_week))]
 
 
                                     
-                                    weekly_counts = (
-                                        weekly_display.groupby([weekly_display["Date"].dt.day_name(), "Location"])
-                                        .size()
-                                        .unstack(fill_value=0)
-                                    )
+#                                     weekly_counts = (
+#                                         weekly_display.groupby([weekly_display["Date"].dt.day_name(), "Location"])
+#                                         .size()
+#                                         .unstack(fill_value=0)
+#                                     )
                                     
                                     
-                                    # Define weekdays to display in the table (Monday to Friday)
-                                    weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-                                    weekly_counts_ = weekly_counts.reindex(weekdays)
+#                                     # Define weekdays to display in the table (Monday to Friday)
+#                                     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+#                                     weekly_counts_ = weekly_counts.reindex(weekdays)
                                     
-                                    weekly_counts_.fillna("",inplace=True)
-                                    weekly_counts_ = weekly_counts_.applymap(lambda x: int(x) if isinstance(x, float) else x)
+#                                     weekly_counts_.fillna("",inplace=True)
+#                                     weekly_counts_ = weekly_counts_.applymap(lambda x: int(x) if isinstance(x, float) else x)
 
                                     
                                     
-                                    st.write(weekly_counts_)
-                                    # Generate HTML table with large squares
-                                    weekly_counts = weekly_counts.dropna(axis=0)
-                                    html_content = """
-                                    <style>
-                                        .day-table {
-                                            display: flex;
-                                            justify-content: space-around;
-                                            margin-top: 20px;
-                                        }
-                                        .day-cell {
-                                            width: 150px;
-                                            height: 150px;
-                                            display: flex;
-                                            flex-direction: column;
-                                            justify-content: center;
-                                            align-items: center;
-                                            border: 2px solid #ddd;
-                                            font-size: 20px;
-                                            font-weight: bold;
-                                            background-color: #f9f9f9;
-                                        }
-                                        .day-name {
-                                            font-size: 18px;
-                                            color: #333;
-                                            margin-bottom: 10px;
-                                        }
-                                        .shipment-info {
-                                            font-size: 16px;
-                                            color: #555;
-                                        }
-                                    </style>
+#                                     st.write(weekly_counts_)
+#                                     # Generate HTML table with large squares
+#                                     weekly_counts = weekly_counts.dropna(axis=0)
+#                                     html_content = """
+#                                     <style>
+#                                         .day-table {
+#                                             display: flex;
+#                                             justify-content: space-around;
+#                                             margin-top: 20px;
+#                                         }
+#                                         .day-cell {
+#                                             width: 150px;
+#                                             height: 150px;
+#                                             display: flex;
+#                                             flex-direction: column;
+#                                             justify-content: center;
+#                                             align-items: center;
+#                                             border: 2px solid #ddd;
+#                                             font-size: 20px;
+#                                             font-weight: bold;
+#                                             background-color: #f9f9f9;
+#                                         }
+#                                         .day-name {
+#                                             font-size: 18px;
+#                                             color: #333;
+#                                             margin-bottom: 10px;
+#                                         }
+#                                         .shipment-info {
+#                                             font-size: 16px;
+#                                             color: #555;
+#                                         }
+#                                     </style>
                                     
-                                    <div class="day-table">
-                                    """
+#                                     <div class="day-table">
+#                                     """
                                     
-                                    # Populate each weekday's cell with shipment information
-                                    for day in weekdays:
-                                        shipments = weekly_counts.loc[day] if day in weekly_counts.index else None
-                                        html_content += f"""
-                                        <div class="day-cell">
-                                            <div class="day-name">{day}</div>
-                                        """
-                                        if shipments is not None:
-                                            for destination, count in shipments.items():
-                                                html_content += f'<div class="shipment-info">{count}  x  {destination.title()}</div>'
-                                        else:
-                                            html_content += '<div class="shipment-info">No Shipments</div>'
-                                        html_content += "</div>"
+#                                     # Populate each weekday's cell with shipment information
+#                                     for day in weekdays:
+#                                         shipments = weekly_counts.loc[day] if day in weekly_counts.index else None
+#                                         html_content += f"""
+#                                         <div class="day-cell">
+#                                             <div class="day-name">{day}</div>
+#                                         """
+#                                         if shipments is not None:
+#                                             for destination, count in shipments.items():
+#                                                 html_content += f'<div class="shipment-info">{count}  x  {destination.title()}</div>'
+#                                         else:
+#                                             html_content += '<div class="shipment-info">No Shipments</div>'
+#                                         html_content += "</div>"
                                     
-                                    html_content += "</div>"
+#                                     html_content += "</div>"
                                     
-                                    # Display the HTML table in Streamlit
-                                    st.components.v1.html(html_content, height=300, scrolling=False)
-                                with mf_display_tab3:
-                                    #flat_df["Status"]=["Scheduled"]*len(flat_df)
-                                    flattened_data = []
-                                    for date, locations in schedule.items():
-                                        for location, location_data in locations.items():
-                                            for order, carriers in location_data.items():
-                                                for carrier, shipments in carriers.items():
-                                                    for shipment in shipments:
-                                                        dfb=dfb[dfb["St_Date"]==selected_date_datetime]
-                                                        status="NONE"
-                                                        if shipment in dfb.index:
-                                                            status_="SHIPPED"
-                                                        else:
-                                                            status_="Scheduled"
-                                                        shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
-                                                        carrier_=carrier.split("-")[1]
-                                                        flattened_data.append({
-                                                            "Date": date,
-                                                            "Location": location,
-                                                            "Order": order,
-                                                            "Carrier": carrier_,
-                                                            "EDI Bill Of Lading":shipment,
-                                                            "MF Number": shipment_parts[0] if len(shipment_parts) > 1 else None,
-                                                            "Shipment ID": shipment_parts[1] if len(shipment_parts) > 1 else shipment_parts[0]
-                                                        })
+#                                     # Display the HTML table in Streamlit
+#                                     st.components.v1.html(html_content, height=300, scrolling=False)
+#                                 with mf_display_tab3:
+#                                     #flat_df["Status"]=["Scheduled"]*len(flat_df)
+#                                     flattened_data = []
+#                                     for date, locations in schedule.items():
+#                                         for location, location_data in locations.items():
+#                                             for order, carriers in location_data.items():
+#                                                 for carrier, shipments in carriers.items():
+#                                                     for shipment in shipments:
+#                                                         dfb=dfb[dfb["St_Date"]==selected_date_datetime]
+#                                                         status="NONE"
+#                                                         if shipment in dfb.index:
+#                                                             status_="SHIPPED"
+#                                                         else:
+#                                                             status_="Scheduled"
+#                                                         shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
+#                                                         carrier_=carrier.split("-")[1]
+#                                                         flattened_data.append({
+#                                                             "Date": date,
+#                                                             "Location": location,
+#                                                             "Order": order,
+#                                                             "Carrier": carrier_,
+#                                                             "EDI Bill Of Lading":shipment,
+#                                                             "MF Number": shipment_parts[0] if len(shipment_parts) > 1 else None,
+#                                                             "Shipment ID": shipment_parts[1] if len(shipment_parts) > 1 else shipment_parts[0]
+#                                                         })
     
                                     
-                                    flat_df=pd.DataFrame(flattened_data)
-                                    flat_df["Date"] = pd.to_datetime(flat_df["Date"])#.dt.date
-                                    flat_df.insert(1,"Day",flat_df["Date"].dt.day_name())
-                                    flat_df["Status"]="None"
-                                    flat_df['Status'] = flat_df['EDI Bill Of Lading'].apply(lambda x: 'SHIPPED' if x in bill_for_mf else 'Scheduled')
-                                    flat_df.reset_index(drop=True,inplace=True)
-                                    flat_df.index+=1
-                                    styled_df =flat_df.style.apply(style_row, axis=1)
-                                    st.write(styled_df.to_html(), unsafe_allow_html=True)
+#                                     flat_df=pd.DataFrame(flattened_data)
+#                                     flat_df["Date"] = pd.to_datetime(flat_df["Date"])#.dt.date
+#                                     flat_df.insert(1,"Day",flat_df["Date"].dt.day_name())
+#                                     flat_df["Status"]="None"
+#                                     flat_df['Status'] = flat_df['EDI Bill Of Lading'].apply(lambda x: 'SHIPPED' if x in bill_for_mf else 'Scheduled')
+#                                     flat_df.reset_index(drop=True,inplace=True)
+#                                     flat_df.index+=1
+#                                     styled_df =flat_df.style.apply(style_row, axis=1)
+#                                     st.write(styled_df.to_html(), unsafe_allow_html=True)
 
                         
                         
-                        with mf2:
-                            col11,col22,col33=st.columns([3,3,4])
-                            button=True
-                            with col11:
+#                         with mf2:
+#                             col11,col22,col33=st.columns([3,3,4])
+#                             button=True
+#                             with col11:
                                 
-                                st.subheader("SELECT DATES TO UPLOAD")
-                                dates1=st.date_input("FROM (INCLUSIVE)",datetime.date.today()-datetime.timedelta(hours=utc_difference),key="r3wsd")
-                                dates2=st.date_input("TO (INCLUSIVE)",datetime.date.today()+datetime.timedelta(days=30),key="rz3wsd")
-                            with col22:
-                                st.subheader("UPLOAD SHIPMENT CSV FILES")
-                                suzano_shipment = st.file_uploader("Upload **SUZANO** Shipment CSV", type="xlsx",key="dsds")
-                                kbx_shipment = st.file_uploader("Upload **KBX** Shipment CSV", type="xls",key="dsdfqa")
+#                                 st.subheader("SELECT DATES TO UPLOAD")
+#                                 dates1=st.date_input("FROM (INCLUSIVE)",datetime.date.today()-datetime.timedelta(hours=utc_difference),key="r3wsd")
+#                                 dates2=st.date_input("TO (INCLUSIVE)",datetime.date.today()+datetime.timedelta(days=30),key="rz3wsd")
+#                             with col22:
+#                                 st.subheader("UPLOAD SHIPMENT CSV FILES")
+#                                 suzano_shipment = st.file_uploader("Upload **SUZANO** Shipment CSV", type="xlsx",key="dsds")
+#                                 kbx_shipment = st.file_uploader("Upload **KBX** Shipment CSV", type="xls",key="dsdfqa")
                             
-                            if suzano_shipment and kbx_shipment:
-                                st.success("Files uploaded")
-                                button=False
-                                done=False
-                            done=False
+#                             if suzano_shipment and kbx_shipment:
+#                                 st.success("Files uploaded")
+#                                 button=False
+#                                 done=False
+#                             done=False
                             
-                            if not button:
+#                             if not button:
                             
                                 
-                                df=pd.read_excel(suzano_shipment)
-                                df=df[['PK', 'Release Order','Start Time', 'Destination City',
-                                       'Destination Province Code', 'Weight', 'Unit Count', 
-                                       'Service Provider ID',  'Transit Status','BOL','Vehicle ID']]
-                                df['Release Order']=[i[10:] for i in df['Release Order']]
-                                df["Pickup"] = pd.to_datetime(df["Start Time"]).dt.date#.apply(lambda i: datetime.datetime.strptime(i, "%m/%d/%Y %I:%M %p").date())
+#                                 df=pd.read_excel(suzano_shipment)
+#                                 df=df[['PK', 'Release Order','Start Time', 'Destination City',
+#                                        'Destination Province Code', 'Weight', 'Unit Count', 
+#                                        'Service Provider ID',  'Transit Status','BOL','Vehicle ID']]
+#                                 df['Release Order']=[i[10:] for i in df['Release Order']]
+#                                 df["Pickup"] = pd.to_datetime(df["Start Time"]).dt.date#.apply(lambda i: datetime.datetime.strptime(i, "%m/%d/%Y %I:%M %p").date())
                                 
-                                df["Service Provider ID"]=df["Service Provider ID"].astype(str)
-                                df["PK"]=[i[7:] for i in df["PK"].values]
-                                
-                                
-                                df1=pd.read_html(kbx_shipment)[0]
-                                df1=df1[[ 'Load Number', 'Owner', 'Pro Number',
-                                           'SCAC', 'Pickup Date','Orig Loc Nbr', 'Orig Name', 'Delivery Date', 
-                                         'Dest Loc Nbr', 'Dest City', 'Dest Name', 'Movement Type',  'Miles',
-                                           'Total Weight']]
-                                df1["Pickup Date"] = pd.to_datetime(df1["Pickup Date"]).dt.date
-                                df1.rename(columns={"Dest City":"Destination City"},inplace=True)
+#                                 df["Service Provider ID"]=df["Service Provider ID"].astype(str)
+#                                 df["PK"]=[i[7:] for i in df["PK"].values]
                                 
                                 
+#                                 df1=pd.read_html(kbx_shipment)[0]
+#                                 df1=df1[[ 'Load Number', 'Owner', 'Pro Number',
+#                                            'SCAC', 'Pickup Date','Orig Loc Nbr', 'Orig Name', 'Delivery Date', 
+#                                          'Dest Loc Nbr', 'Dest City', 'Dest Name', 'Movement Type',  'Miles',
+#                                            'Total Weight']]
+#                                 df1["Pickup Date"] = pd.to_datetime(df1["Pickup Date"]).dt.date
+#                                 df1.rename(columns={"Dest City":"Destination City"},inplace=True)
                                 
-                                df=df[(df['Pickup']>=dates1)&(df['Pickup']<=dates2)].sort_values(by="Pickup")
-                                df1=df1[df1['Pickup Date']>=dates1].sort_values(by="Pickup Date")
+                                
+                                
+#                                 df=df[(df['Pickup']>=dates1)&(df['Pickup']<=dates2)].sort_values(by="Pickup")
+#                                 df1=df1[df1['Pickup Date']>=dates1].sort_values(by="Pickup Date")
                                
-                                matches={}
-                                days_loads={}
-                                kbx_loads={}
+#                                 matches={}
+#                                 days_loads={}
+#                                 kbx_loads={}
                                 
-                                #for i in sorted(df[df["Pickup"]>=datetime.date.today()]["Pickup"].unique()):  ### RULE FROM TODAY
-                                for i in sorted(df["Pickup"].unique()):  ### RULE FROM TODAY
-                                    matches[str(i)]={}
+#                                 #for i in sorted(df[df["Pickup"]>=datetime.date.today()]["Pickup"].unique()):  ### RULE FROM TODAY
+#                                 for i in sorted(df["Pickup"].unique()):  ### RULE FROM TODAY
+#                                     matches[str(i)]={}
                                    
                                     
-                                    for dest in df[df["Pickup"]==i]["Destination City"].unique():
-                                        matches[str(i)][dest]={}
-                                        for rel in df.loc[(df["Pickup"] == i) & (df["Destination City"] == dest), "Release Order"].unique():
-                                            matches[str(i)][dest][rel]={}
-                                            for trans in df.loc[(df["Release Order"] == rel) &(df["Pickup"] == i) & (df["Destination City"] == dest),
-                                                                "Service Provider ID"]:
-                                                if trans=="KBX":
-                                                    trans="123456-KBX"
-                                                    suz=sorted(df.loc[(df["Release Order"] == rel) &(df["Pickup"] == i) & (df["Destination City"] == dest), 
-                                                                      "PK"])
-                                                    kbx=sorted(df1.loc[(df1["Pickup Date"] == i) & (df1["Destination City"] == dest)&(~df1["SCAC"].isna()),
-                                                                       "Load Number"])
-                                                    mat=[f"{j}|{k}" for j,k in zip(kbx,suz)]
-                                                    matches[str(i)][dest][rel][trans]=mat
-                                                else:
-                                                    trans_=f"{str(trans)}-{map['carriers'][str(trans)]}"
-                                                    suz=sorted(df.loc[(df["Service Provider ID"] == trans) &(df["Release Order"] == rel) &(df["Pickup"] == i) & (df["Destination City"] == dest), 
-                                                                      "PK"])
-                                                    mat=suz.copy()
-                                                    matches[str(i)][dest][rel][trans_]=mat
-                                done=True
-                                if matches not in st.session_state:
-                                    st.session_state.matches=matches
-                                st.session_state.matches=matches
-                                st.success("SHIPMENTS MATCHED AND REFRESHED!")
-                                button_html = """
-                                <div style="text-align: center; margin-top: 20px;">
-                                    <button onclick="triggerPython()" style="
-                                        background: linear-gradient(145deg, #ffffff, #d4d4d4);
-                                        border: none;
-                                        border-radius: 12px;
-                                        box-shadow: 5px 5px 10px #b8b8b8, -5px -5px 10px #ffffff;
-                                        color: #444;
-                                        font-size: 18px;
-                                        font-weight: bold;
-                                        padding: 10px 20px;
-                                        cursor: pointer;
-                                        transition: 0.2s;
-                                    " 
-                                    onmouseover="this.style.background='#e0e0e0';"
-                                    onmouseout="this.style.background='linear-gradient(145deg, #ffffff, #d4d4d4)';"
-                                    onmousedown="this.style.boxShadow='inset 3px 3px 5px #b8b8b8, inset -3px -3px 5px #ffffff'; this.style.transform='translateY(2px)';"
-                                    onmouseup="this.style.boxShadow='5px 5px 10px #b8b8b8, -5px -5px 10px #ffffff'; this.style.transform='translateY(0px)';">
-                                        RECORD SUZANO
-                                    </button>
-                                </div>
-                                <script>
-                                    function triggerPython() {
-                                        window.location.href = "/?button_clicked=true";
-                                    }
-                                </script>
-                                """
+#                                     for dest in df[df["Pickup"]==i]["Destination City"].unique():
+#                                         matches[str(i)][dest]={}
+#                                         for rel in df.loc[(df["Pickup"] == i) & (df["Destination City"] == dest), "Release Order"].unique():
+#                                             matches[str(i)][dest][rel]={}
+#                                             for trans in df.loc[(df["Release Order"] == rel) &(df["Pickup"] == i) & (df["Destination City"] == dest),
+#                                                                 "Service Provider ID"]:
+#                                                 if trans=="KBX":
+#                                                     trans="123456-KBX"
+#                                                     suz=sorted(df.loc[(df["Release Order"] == rel) &(df["Pickup"] == i) & (df["Destination City"] == dest), 
+#                                                                       "PK"])
+#                                                     kbx=sorted(df1.loc[(df1["Pickup Date"] == i) & (df1["Destination City"] == dest)&(~df1["SCAC"].isna()),
+#                                                                        "Load Number"])
+#                                                     mat=[f"{j}|{k}" for j,k in zip(kbx,suz)]
+#                                                     matches[str(i)][dest][rel][trans]=mat
+#                                                 else:
+#                                                     trans_=f"{str(trans)}-{map['carriers'][str(trans)]}"
+#                                                     suz=sorted(df.loc[(df["Service Provider ID"] == trans) &(df["Release Order"] == rel) &(df["Pickup"] == i) & (df["Destination City"] == dest), 
+#                                                                       "PK"])
+#                                                     mat=suz.copy()
+#                                                     matches[str(i)][dest][rel][trans_]=mat
+#                                 done=True
+#                                 if matches not in st.session_state:
+#                                     st.session_state.matches=matches
+#                                 st.session_state.matches=matches
+#                                 st.success("SHIPMENTS MATCHED AND REFRESHED!")
+#                                 button_html = """
+#                                 <div style="text-align: center; margin-top: 20px;">
+#                                     <button onclick="triggerPython()" style="
+#                                         background: linear-gradient(145deg, #ffffff, #d4d4d4);
+#                                         border: none;
+#                                         border-radius: 12px;
+#                                         box-shadow: 5px 5px 10px #b8b8b8, -5px -5px 10px #ffffff;
+#                                         color: #444;
+#                                         font-size: 18px;
+#                                         font-weight: bold;
+#                                         padding: 10px 20px;
+#                                         cursor: pointer;
+#                                         transition: 0.2s;
+#                                     " 
+#                                     onmouseover="this.style.background='#e0e0e0';"
+#                                     onmouseout="this.style.background='linear-gradient(145deg, #ffffff, #d4d4d4)';"
+#                                     onmousedown="this.style.boxShadow='inset 3px 3px 5px #b8b8b8, inset -3px -3px 5px #ffffff'; this.style.transform='translateY(2px)';"
+#                                     onmouseup="this.style.boxShadow='5px 5px 10px #b8b8b8, -5px -5px 10px #ffffff'; this.style.transform='translateY(0px)';">
+#                                         RECORD SUZANO
+#                                     </button>
+#                                 </div>
+#                                 <script>
+#                                     function triggerPython() {
+#                                         window.location.href = "/?button_clicked=true";
+#                                     }
+#                                 </script>
+#                                 """
                                 
-                                st.components.v1.html(button_html, height=120)
+#                                 st.components.v1.html(button_html, height=120)
 
-# Handle backend logic
-                                if st.experimental_get_query_params().get("button_clicked") == ["true"]:
-                                    st.balloons()  # Celebrate the button click
-                                    st.success("3D Button Clicked and Python Action Triggered!")
+# # Handle backend logic
+#                                 if st.experimental_get_query_params().get("button_clicked") == ["true"]:
+#                                     st.balloons()  # Celebrate the button click
+#                                     st.success("3D Button Clicked and Python Action Triggered!")
                                 
-                                if st.button("RECORD SUZANO LIST",disabled=button,key="sdsqawds2"):
-                                    suz_=json.dumps(matches)
-                                    storage_client = get_storage_client()
-                                    bucket = storage_client.bucket(target_bucket)
-                                    blob = bucket.blob(rf"release_orders/suzano_shipments.json")
-                                    blob.upload_from_string(suz_)
-                                    st.success(f"Suzano list updated!")
-                            cor1,cor2=st.columns([5,5])
-                            with cor1:
-                                if done:
-                                    st.write(dict(matches))
-                            with cor2:
-                                try:
-                                    matches=st.session_state.matches
-                                except:
-                                    pass
-                                if st.button("UPLOAD SHIPMENTS TO SYSTEM",key="dsdsdads2"):
+#                                 if st.button("RECORD SUZANO LIST",disabled=button,key="sdsqawds2"):
+#                                     suz_=json.dumps(matches)
+#                                     storage_client = get_storage_client()
+#                                     bucket = storage_client.bucket(target_bucket)
+#                                     blob = bucket.blob(rf"release_orders/suzano_shipments.json")
+#                                     blob.upload_from_string(suz_)
+#                                     st.success(f"Suzano list updated!")
+#                             cor1,cor2=st.columns([5,5])
+#                             with cor1:
+#                                 if done:
+#                                     st.write(dict(matches))
+#                             with cor2:
+#                                 try:
+#                                     matches=st.session_state.matches
+#                                 except:
+#                                     pass
+#                                 if st.button("UPLOAD SHIPMENTS TO SYSTEM",key="dsdsdads2"):
                                     
-                                    # for i in matches:
-                                    #     st.write("Processing date:", i)
-                                    #     if i not in mf_numbers:
-                                    #         mf_numbers[i]={}
-                                    #     mf_numbers[i]=matches[i].copy()
-                                    # st.write("MF Numbers Dictionary (after update):", mf_numbers)
-                                    mf_numbers=matches.copy()
-                                    mf_datam=json.dumps(mf_numbers)
-                                        #storage_client = storage.Client()
-                                    storage_client = get_storage_client()
-                                    bucket = storage_client.bucket(target_bucket)
-                                    blob = bucket.blob(rf"release_orders/mf_numbers.json")
-                                    blob.upload_from_string(mf_datam)
-                                    st.success(f"MF numbers updated with schedule!")
-                                    st.rerun()
-                                #st.write(mf_numbers)
+#                                     # for i in matches:
+#                                     #     st.write("Processing date:", i)
+#                                     #     if i not in mf_numbers:
+#                                     #         mf_numbers[i]={}
+#                                     #     mf_numbers[i]=matches[i].copy()
+#                                     # st.write("MF Numbers Dictionary (after update):", mf_numbers)
+#                                     mf_numbers=matches.copy()
+#                                     mf_datam=json.dumps(mf_numbers)
+#                                         #storage_client = storage.Client()
+#                                     storage_client = get_storage_client()
+#                                     bucket = storage_client.bucket(target_bucket)
+#                                     blob = bucket.blob(rf"release_orders/mf_numbers.json")
+#                                     blob.upload_from_string(mf_datam)
+#                                     st.success(f"MF numbers updated with schedule!")
+#                                     st.rerun()
+#                                 #st.write(mf_numbers)
 
 ###  RELEASE ORDER STATUS                
                 with release_order_tab3:  ### RELEASE ORDER STATUS

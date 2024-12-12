@@ -3472,8 +3472,7 @@ if authentication_status:
                                     "grade": df.loc[i, "Grade"],
                                     "unitized":cargo_prep,
                                     "dryness": str(df.loc[i, "Dryness"]),
-                                    
-                            #         "unitized": df.loc[i, "Unitized"],          # Adjust column name if different
+                                    "unitized": df.loc[i, "Unitized"],          # Adjust column name if different
                                     "total": int(df.loc[i, "Weight"]/2),               # Add relevant columns
                                     "shipped": 0,           # Add relevant columns
                                     "remaining": int(df.loc[i, "Weight"]/2),       # Add relevant columns
@@ -3484,7 +3483,7 @@ if authentication_status:
                                 storage_client = get_storage_client()
                                 bucket = storage_client.bucket(target_bucket)
                                 blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
-                                blob.upload_from_string(release_order_database)
+                                blob.upload_from_string(json.dumps(release_order_database))
                                 st.success(f"UPLOADED {release_order_number_upload}!")
 
                     

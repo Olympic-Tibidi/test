@@ -4334,7 +4334,7 @@ if authentication_status:
                                     blob.upload_from_string(mf_datam)
                                     st.success(f"MF numbers updated with schedule!")
                                     st.rerun()
-                                st.write(mf_numbers)
+                                #st.write(mf_numbers)
 
 ###  RELEASE ORDER STATUS                
                 with release_order_tab3:  ### RELEASE ORDER STATUS

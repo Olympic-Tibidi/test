@@ -4908,7 +4908,7 @@ if authentication_status:
                             delivery_date=(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date()
                             eta_date=delivery_date
                             
-                            carrier_code=release_order_database[current_release_order][current_sales_order]["carrier_code"]
+                            # carrier_code=release_order_database[current_release_order][current_sales_order]["carrier_code"]
                             vessel=release_order_database[current_release_order][current_sales_order]["vessel"]
                             transport_sequential_number="TRUCK"
                             transport_type="TRUCK"

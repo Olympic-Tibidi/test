@@ -3470,7 +3470,7 @@ if authentication_status:
                                     "batch": str(df.loc[i, "Batch"]),
                                     "ocean_bill_of_lading": df.loc[i, "Vessel BOL"],
                                     "grade": df.loc[i, "Grade"],
-                                    "unitized":cargo_prep
+                                    "unitized":cargo_prep,
                                     "dryness": str(df.loc[i, "Dryness"]),
                                     
                             #         "unitized": df.loc[i, "Unitized"],          # Adjust column name if different

@@ -3486,7 +3486,7 @@ if authentication_status:
                                 st.success(f"UPLOADED {release_order_number_upload}!")
 
                     
-                    if edit:
+                    elif edit:
                         
                         release_order_number=st.selectbox("SELECT RELEASE ORDER",([i for i in release_order_database]))
                         po_number_edit=st.text_input("PO No",release_order_database[release_order_number]["po_number"],disabled=False)

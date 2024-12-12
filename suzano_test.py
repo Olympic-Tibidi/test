@@ -3448,6 +3448,14 @@ if authentication_status:
                         if release_order_upload:
                             df=pd.read_excel(release_order_upload)
                             ro_payload = {}
+                            required_columns = ["Order Base ID", "Order Base Line ID", "Destination City", "PO Number", "Weight"]
+                            missing_columns = [col for col in required_columns if col not in df.columns]
+                            
+                            if missing_columns:
+                                st.error(f"Missing columns in the uploaded file: {missing_columns}")
+                            else:
+                                # Proceed with processing
+                                pass
     
                             for i in df.index:
                                 # Extract data from the DataFrame

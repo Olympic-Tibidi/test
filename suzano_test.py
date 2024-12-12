@@ -3459,7 +3459,7 @@ if authentication_status:
                                 # Ensure the release order exists in the dictionary
                                 if release_order_number_upload not in ro_payload:
                                     ro_payload[release_order_number_upload] = {
-                                        "po_number": df.loc[i, "PO Number"],
+                                        "po_number": str(df.loc[i, "PO Number"]),
                                         "destination": destination,
                                         "complete": False  # Set this based on logic if required
                                     }
@@ -3467,10 +3467,10 @@ if authentication_status:
                                 # Add or update the sales order item details directly under the release order number
                                 ro_payload[release_order_number_upload][str(sales_order_item_upload)] = {
                                     "vessel": df.loc[i, "Vessel"],
-                                    "batch": df.loc[i, "Batch"],
+                                    "batch": str(df.loc[i, "Batch"]),
                                     "ocean_bill_of_lading": df.loc[i, "Vessel BOL"],
                                     "grade": df.loc[i, "Grade"],
-                                    "dryness": df.loc[i, "Dryness"],
+                                    "dryness": str(df.loc[i, "Dryness"]),
                                     
                             #         "unitized": df.loc[i, "Unitized"],          # Adjust column name if different
                                     "total": int(df.loc[i, "Weight"]/2),               # Add relevant columns

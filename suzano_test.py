@@ -3445,38 +3445,40 @@ if authentication_status:
                             return destinations[processed_destinations.index(match[0])] if match else None
                         
                         # Find the closest match
-                        ro_payload = {}
-
-                        for i in df.index:
-                            # Extract data from the DataFrame
-                            release_order_number_upload = df.loc[i, "Order Base ID"]
-                            sales_order_item_upload = df.loc[i, "Order Base Line ID"][-3:]  # Extract the last 3 characters (e.g., "001")
-                            destination = find_closest_match(df.loc[i, "Destination City"], destinations)
-                        
-                            # Ensure the release order exists in the dictionary
-                            if release_order_number_upload not in ro_payload:
-                                ro_payload[release_order_number_upload] = {
-                                    "po_number": df.loc[i, "PO Number"],
-                                    "destination": destination,
-                                    "complete": False  # Set this based on logic if required
+                        if release_order_upload:
+                            df=pd.read_excel(release_order_upload)
+                            ro_payload = {}
+    
+                            for i in df.index:
+                                # Extract data from the DataFrame
+                                release_order_number_upload = df.loc[i, "Order Base ID"]
+                                sales_order_item_upload = df.loc[i, "Order Base Line ID"][-3:]  # Extract the last 3 characters (e.g., "001")
+                                destination = find_closest_match(df.loc[i, "Destination City"], destinations)
+                            
+                                # Ensure the release order exists in the dictionary
+                                if release_order_number_upload not in ro_payload:
+                                    ro_payload[release_order_number_upload] = {
+                                        "po_number": df.loc[i, "PO Number"],
+                                        "destination": destination,
+                                        "complete": False  # Set this based on logic if required
+                                    }
+                            
+                                # Add or update the sales order item details directly under the release order number
+                                ro_payload[release_order_number_upload][sales_order_item_upload] = {
+                                    "vessel": df.loc[i, "Vessel"],
+                                    "batch": df.loc[i, "Batch"],
+                                    "ocean_bill_of_lading": df.loc[i, "Vessel BOL"],
+                                    "grade": df.loc[i, "Grade"],
+                                    "dryness": df.loc[i, "Dryness"],
+                                    
+                            #         "unitized": df.loc[i, "Unitized"],          # Adjust column name if different
+                                    "total": int(df.loc[i, "Weight"]/2),               # Add relevant columns
+                                    "shipped": 0,           # Add relevant columns
+                                    "remaining": int(df.loc[i, "Weight"]/2),       # Add relevant columns
                                 }
-                        
-                            # Add or update the sales order item details directly under the release order number
-                            ro_payload[release_order_number_upload][sales_order_item_upload] = {
-                                "vessel": df.loc[i, "Vessel"],
-                                "batch": df.loc[i, "Batch"],
-                                "ocean_bill_of_lading": df.loc[i, "Vessel BOL"],
-                                "grade": df.loc[i, "Grade"],
-                                "dryness": df.loc[i, "Dryness"],
-                                
-                        #         "unitized": df.loc[i, "Unitized"],          # Adjust column name if different
-                                "total": int(df.loc[i, "Weight"]/2),               # Add relevant columns
-                                "shipped": 0,           # Add relevant columns
-                                "remaining": int(df.loc[i, "Weight"]/2),       # Add relevant columns
-                            }
-                        
-                        # Example Output
-                        st.write(ro_payload)
+                            
+                            # Example Output
+                            st.write(ro_payload)
 
                     
                     if edit:

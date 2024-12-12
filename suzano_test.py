@@ -3485,6 +3485,7 @@ if authentication_status:
                                     "remaining": int(df.loc[i, "Weight"]/2),       # Add relevant columns
                                 }
                             release_order_database.update(ro_payload)
+                            st.write(pay_load)
                             # Example Output
                             if st.button("UPLOAD RELEASE ORDER"):
                                 storage_client = get_storage_client()

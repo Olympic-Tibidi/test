@@ -3413,7 +3413,7 @@ if authentication_status:
 
                     if upload:
                         st.subheader("UPLOAD RELEASE ORDER")
-                        release_order_upload= = st.file_uploader("Upload **SUZANO** Release Order", type="xlsx",key="dssds")
+                        release_order_upload=  st.file_uploader("Upload **SUZANO** Release Order", type="xlsx",key="dssds")
                         destinations = [ 'GP-Halsey,OR', 'GP-Clatskanie,OR',
                                         'KRUGER-New Westminster,BC', 'WILLAMETTE FALLS-West Linn,OR',
                                         'WILLAMETTE FALLS-Vancouver,WA', 'AHLSTROM-MUNKSJO-Kaukauna,WI',

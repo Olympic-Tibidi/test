@@ -3591,120 +3591,121 @@ if authentication_status:
 
 ### SCHEDULE ADMIN
                     with rls_tab4:  #####  SCHEDULE
-                        bill_for_schedule=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                        bill_for_schedule=json.loads(bill_for_schedule)
-                        schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
-                        schedule=json.loads(schedule)
-                        dfb=pd.DataFrame.from_dict(bill_for_schedule).T[1:]
-                        #dfb=bill.copy()
-                        dfb["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in dfb["issued"]]
-                        #dfb=dfb[dfb["St_Date"]==(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date()]
-                        scheduled=[]
-                        today=str((datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date())
-                        selected_date_datetime=st.date_input("SELECT DATE",(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date())
-                        selected_date=str(selected_date_datetime)
+                        pass
+                        # bill_for_schedule=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                        # bill_for_schedule=json.loads(bill_for_schedule)
+                        # schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
+                        # schedule=json.loads(schedule)
+                        # dfb=pd.DataFrame.from_dict(bill_for_schedule).T[1:]
+                        # #dfb=bill.copy()
+                        # dfb["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in dfb["issued"]]
+                        # #dfb=dfb[dfb["St_Date"]==(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date()]
+                        # scheduled=[]
+                        # today=str((datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date())
+                        # selected_date_datetime=st.date_input("SELECT DATE",(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date())
+                        # selected_date=str(selected_date_datetime)
                         
-                        if selected_date in schedule:
-                            dfb=dfb[dfb["St_Date"]==selected_date_datetime]
-                            for dest in schedule[selected_date]:
-                                for rel in schedule[selected_date][dest]:
-                                    for carrier in schedule[selected_date][dest][rel]:
-                                        scheduled.append({"Destination":dest,
-                                              "Release Order":rel,"Sales Item":"001",
-                                              "ISP":release_order_database[rel]["001"]['grade'],
-                                              "Prep":release_order_database[rel]["001"]['unitized'],
-                                              "Carrier":carrier.split("-")[1],
-                                              "Scheduled":int(len(schedule[selected_date][dest][rel][carrier])),
-                                              "Loaded":int(dfb[(dfb["release_order"]==rel)&(dfb["sales_order"]=="001")&
-                                               (dfb["carrier_id"]==str(carrier.split("-")[0]))].vehicle.count()),
-                                              "Remaining":0})
-                            scheduled=pd.DataFrame(scheduled)
-                            scheduled["Scheduled"] = scheduled["Scheduled"].astype(int)
-                            scheduled["Loaded"] = scheduled["Loaded"].astype(int)
-                            scheduled["Remaining"] = scheduled["Remaining"].astype(int)
+                        # if selected_date in schedule:
+                        #     dfb=dfb[dfb["St_Date"]==selected_date_datetime]
+                        #     for dest in schedule[selected_date]:
+                        #         for rel in schedule[selected_date][dest]:
+                        #             for carrier in schedule[selected_date][dest][rel]:
+                        #                 scheduled.append({"Destination":dest,
+                        #                       "Release Order":rel,"Sales Item":"001",
+                        #                       "ISP":release_order_database[rel]["001"]['grade'],
+                        #                       "Prep":release_order_database[rel]["001"]['unitized'],
+                        #                       "Carrier":carrier.split("-")[1],
+                        #                       "Scheduled":int(len(schedule[selected_date][dest][rel][carrier])),
+                        #                       "Loaded":int(dfb[(dfb["release_order"]==rel)&(dfb["sales_order"]=="001")&
+                        #                        (dfb["carrier_id"]==str(carrier.split("-")[0]))].vehicle.count()),
+                        #                       "Remaining":0})
+                        #     scheduled=pd.DataFrame(scheduled)
+                        #     scheduled["Scheduled"] = scheduled["Scheduled"].astype(int)
+                        #     scheduled["Loaded"] = scheduled["Loaded"].astype(int)
+                        #     scheduled["Remaining"] = scheduled["Remaining"].astype(int)
     
-                            if len(scheduled)>0:
+                        #     if len(scheduled)>0:
                                 
-                                scheduled["Remaining"]=[int(i) for i in scheduled["Scheduled"]-scheduled["Loaded"]]
-                                scheduled.loc["Total",["Scheduled","Loaded","Remaining"]]=scheduled[["Scheduled","Loaded","Remaining"]].sum()
-                                #scheduled.set_index('Destination',drop=True,inplace=True)
-                                scheduled["Scheduled"] = scheduled["Scheduled"].astype(int)
-                                scheduled["Loaded"] = scheduled["Loaded"].astype(int)
-                                scheduled["Remaining"] = scheduled["Remaining"].astype(int)
-                                scheduled.loc["Total",["Scheduled","Loaded","Remaining"]].astype(int)
-                                scheduled.fillna("",inplace=True)
+                        #         scheduled["Remaining"]=[int(i) for i in scheduled["Scheduled"]-scheduled["Loaded"]]
+                        #         scheduled.loc["Total",["Scheduled","Loaded","Remaining"]]=scheduled[["Scheduled","Loaded","Remaining"]].sum()
+                        #         #scheduled.set_index('Destination',drop=True,inplace=True)
+                        #         scheduled["Scheduled"] = scheduled["Scheduled"].astype(int)
+                        #         scheduled["Loaded"] = scheduled["Loaded"].astype(int)
+                        #         scheduled["Remaining"] = scheduled["Remaining"].astype(int)
+                        #         scheduled.loc["Total",["Scheduled","Loaded","Remaining"]].astype(int)
+                        #         scheduled.fillna("",inplace=True)
     
     
-                                def style_row(row,code=1):
+                        #         def style_row(row,code=1):
                                     
-                                    if code==2:
-                                        shipment_status = row["Status"]
-                                        location = row["Location"]
-                                    else:
-                                        location = row['Destination']
-                                    # Define colors for different locations
-                                    colors = {
-                                        "CLATSKANIE": "background-color: #d1e7dd;",  # light green
-                                        "LEWISTON": "background-color: #ffebcd;",    # light coral
-                                        "HALSEY": "background-color: #add8e6;",      # light blue
-                                    }
+                        #             if code==2:
+                        #                 shipment_status = row["Status"]
+                        #                 location = row["Location"]
+                        #             else:
+                        #                 location = row['Destination']
+                        #             # Define colors for different locations
+                        #             colors = {
+                        #                 "CLATSKANIE": "background-color: #d1e7dd;",  # light green
+                        #                 "LEWISTON": "background-color: #ffebcd;",    # light coral
+                        #                 "HALSEY": "background-color: #add8e6;",      # light blue
+                        #             }
                                     
-                                    # Base style for the entire row based on location
-                                    base_style = colors.get(location, "")
-                                    if code==2:
-                                        if shipment_status == "SHIPPED":
-                                            base_style += "font-weight: lighter; font-style: italic; text-decoration: line-through;"  # Less bold, italic, and strikethrough
-                                        else:
-                                            base_style += "font-weight: bold;"  # Slightly bolder for other statuses
+                        #             # Base style for the entire row based on location
+                        #             base_style = colors.get(location, "")
+                        #             if code==2:
+                        #                 if shipment_status == "SHIPPED":
+                        #                     base_style += "font-weight: lighter; font-style: italic; text-decoration: line-through;"  # Less bold, italic, and strikethrough
+                        #                 else:
+                        #                     base_style += "font-weight: bold;"  # Slightly bolder for other statuses
                             
-                                    return [base_style] * len(row)
+                        #             return [base_style] * len(row)
                                 
-                                list_view=st.checkbox("LIST VIEW")
-                                if list_view:
-                                    flattened_data = []
-                                    for date, locations in schedule.items():
-                                        for location, location_data in locations.items():
-                                            for order, carriers in location_data.items():
-                                                for carrier, shipments in carriers.items():
-                                                    for shipment in shipments:
-                                                        dfb_=dfb[dfb["St_Date"]==selected_date_datetime]
-                                                        status="NONE"
-                                                        # Split the shipment data if needed (separate IDs if joined by "|")
-                                                        if shipment in dfb_.index:
-                                                            status_="SHIPPED"
-                                                        else:
-                                                            status_="Scheduled"
-                                                        shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
-                                                        carrier_=carrier.split("-")[1]
-                                                        flattened_data.append({
-                                                            "Date": date,
-                                                            "Location": location,
-                                                            "Order": order,
-                                                            "Carrier": carrier_,
-                                                            "EDI Bill Of Lading":shipment,
-                                                            "Shipment ID": shipment_parts[0],
-                                                            "MF Number": shipment_parts[1] if len(shipment_parts) > 1 else None,
-                                                            "Status":status_
-                                                        })
+                        #         list_view=st.checkbox("LIST VIEW")
+                        #         if list_view:
+                        #             flattened_data = []
+                        #             for date, locations in schedule.items():
+                        #                 for location, location_data in locations.items():
+                        #                     for order, carriers in location_data.items():
+                        #                         for carrier, shipments in carriers.items():
+                        #                             for shipment in shipments:
+                        #                                 dfb_=dfb[dfb["St_Date"]==selected_date_datetime]
+                        #                                 status="NONE"
+                        #                                 # Split the shipment data if needed (separate IDs if joined by "|")
+                        #                                 if shipment in dfb_.index:
+                        #                                     status_="SHIPPED"
+                        #                                 else:
+                        #                                     status_="Scheduled"
+                        #                                 shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
+                        #                                 carrier_=carrier.split("-")[1]
+                        #                                 flattened_data.append({
+                        #                                     "Date": date,
+                        #                                     "Location": location,
+                        #                                     "Order": order,
+                        #                                     "Carrier": carrier_,
+                        #                                     "EDI Bill Of Lading":shipment,
+                        #                                     "Shipment ID": shipment_parts[0],
+                        #                                     "MF Number": shipment_parts[1] if len(shipment_parts) > 1 else None,
+                        #                                     "Status":status_
+                        #                                 })
     
-                                # Convert to DataFrame
-                                    flat_df = pd.DataFrame(flattened_data)
-                                    #flat_df["Status"]=["Scheduled"]*len(flat_df)
-                                    flat_df=flat_df[flat_df.Date==selected_date]
-                                    flat_df.reset_index(drop=True,inplace=True)
-                                    flat_df.index+=1
+                        #         # Convert to DataFrame
+                        #             flat_df = pd.DataFrame(flattened_data)
+                        #             #flat_df["Status"]=["Scheduled"]*len(flat_df)
+                        #             flat_df=flat_df[flat_df.Date==selected_date]
+                        #             flat_df.reset_index(drop=True,inplace=True)
+                        #             flat_df.index+=1
     
-                                #styled_schedule =scheduled.style.apply(style_row, axis=1)
-                                if list_view:
-                                    styled_schedule = flat_df.style.apply(lambda row: style_row(row, code=2), axis=1)
-                                else:
-                                    styled_schedule = scheduled.style.apply(lambda row: style_row(row, code=1), axis=1)
+                        #         #styled_schedule =scheduled.style.apply(style_row, axis=1)
+                        #         if list_view:
+                        #             styled_schedule = flat_df.style.apply(lambda row: style_row(row, code=2), axis=1)
+                        #         else:
+                        #             styled_schedule = scheduled.style.apply(lambda row: style_row(row, code=1), axis=1)
     
                              
-                                st.write(styled_schedule.to_html(), unsafe_allow_html=True)
+                        #         st.write(styled_schedule.to_html(), unsafe_allow_html=True)
                 
-                        else:
-                            st.write("Nothing Scheduled")
+                        # else:
+                        #     st.write("Nothing Scheduled")
 
 
                         

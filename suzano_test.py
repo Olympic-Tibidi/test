@@ -62,7 +62,7 @@ from google.cloud.sql.connector import Connector, IPTypes
 import sqlalchemy
 
 import google.auth
-from rapidfuzz import process
+from rapidfuzz import process as processs
 
 #from google.cloud import bigquery
 
@@ -3440,7 +3440,7 @@ if authentication_status:
                             processed_input = preprocess(client_input)
                             processed_destinations = [preprocess(dest) for dest in destinations]
                             # Find the best match
-                            match = process.extractOne(processed_input, processed_destinations)
+                            match = processs.extractOne(processed_input, processed_destinations)
                             # Return the original destination corresponding to the match
                             return destinations[processed_destinations.index(match[0])] if match else None
                         

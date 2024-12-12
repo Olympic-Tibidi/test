@@ -3454,6 +3454,7 @@ if authentication_status:
                                 release_order_number_upload = df.loc[i, "Order Base ID"]
                                 sales_order_item_upload = df.loc[i, "Order Base Line ID"][-3:]  # Extract the last 3 characters (e.g., "001")
                                 destination = find_closest_match(df.loc[i, "Destination City"], destinations)
+                                st.write(release_order_number_upload)
                             
                                 # Ensure the release order exists in the dictionary
                                 if release_order_number_upload not in ro_payload:

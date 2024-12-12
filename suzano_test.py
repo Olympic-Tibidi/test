@@ -3454,7 +3454,6 @@ if authentication_status:
                                 release_order_number_upload = str(df.loc[i, "Order Base ID"])
                                 sales_order_item_upload = df.loc[i, "Order Base Line ID"][-3:]  # Extract the last 3 characters (e.g., "001")
                                 destination = find_closest_match(df.loc[i, "Destination City"], destinations)
-                                st.write(release_order_number_upload)
                             
                                 # Ensure the release order exists in the dictionary
                                 if release_order_number_upload not in ro_payload:
@@ -3463,13 +3462,15 @@ if authentication_status:
                                         "destination": destination,
                                         "complete": False  # Set this based on logic if required
                                     }
-                            
+                                cargo_prep="UNITIZED" if destination=='SOFIDEL-Lewiston,ID' else "DE-UNITIZED"
+
                                 # Add or update the sales order item details directly under the release order number
                                 ro_payload[release_order_number_upload][str(sales_order_item_upload)] = {
                                     "vessel": df.loc[i, "Vessel"],
                                     "batch": str(df.loc[i, "Batch"]),
                                     "ocean_bill_of_lading": df.loc[i, "Vessel BOL"],
                                     "grade": df.loc[i, "Grade"],
+                                    "unitized":cargo_prep
                                     "dryness": str(df.loc[i, "Dryness"]),
                                     
                             #         "unitized": df.loc[i, "Unitized"],          # Adjust column name if different
@@ -3477,9 +3478,14 @@ if authentication_status:
                                     "shipped": 0,           # Add relevant columns
                                     "remaining": int(df.loc[i, "Weight"]/2),       # Add relevant columns
                                 }
-                            
+                            release_order_database.update(ro_payload)
                             # Example Output
-                            st.write(ro_payload)
+                            if st.button("UPLOAD RELEASE ORDER"):
+                                storage_client = get_storage_client()
+                                bucket = storage_client.bucket(target_bucket)
+                                blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
+                                blob.upload_from_string(release_order_database)
+                                st.success(f"UPLOADED {release_order_number_upload}!")
 
                     
                     if edit:

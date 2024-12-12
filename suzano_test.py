@@ -3478,7 +3478,7 @@ if authentication_status:
                                     "vessel": df.loc[i, "Vessel"],
                                     "batch": str(df.loc[i, "Batch"]),
                                     "ocean_bill_of_lading": df.loc[i, "Vessel BOL"],
-                                    "grade": df.loc[i, "Grade"],
+                                    "grade": df.loc[i, "Grade"].split("-")[0],
                                     "dryness": str(df.loc[i, "Dryness"]),
                                     "unitized":cargo_prep,
                                     "total": int(df.loc[i, "Weight"]/2),               # Add relevant columns

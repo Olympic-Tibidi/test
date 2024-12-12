@@ -3464,7 +3464,7 @@ if authentication_status:
                                     }
                             
                                 # Add or update the sales order item details directly under the release order number
-                                ro_payload[release_order_number_upload][sales_order_item_upload] = {
+                                ro_payload[release_order_number_upload][str(sales_order_item_upload)] = {
                                     "vessel": df.loc[i, "Vessel"],
                                     "batch": df.loc[i, "Batch"],
                                     "ocean_bill_of_lading": df.loc[i, "Vessel BOL"],

@@ -3590,8 +3590,8 @@ if authentication_status:
 
 
 ### SCHEDULE ADMIN
-                    with rls_tab4:  #####  SCHEDULE
-                        pass
+                    # with rls_tab4:  #####  SCHEDULE
+                    #     pass
                         # bill_for_schedule=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
                         # bill_for_schedule=json.loads(bill_for_schedule)
                         # schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
@@ -3929,19 +3929,19 @@ if authentication_status:
                             blob.upload_from_string(json.dumps(release_order_database))
                             st.success(f"Deactivated {to_deactivate} successfully!")
                         
-                    with rls_tab3:
-                        bill_for_mf=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                        bill_for_mf=json.loads(bill_for_mf)
-                        dfb=pd.DataFrame.from_dict(bill_for_mf).T[1:]
-                        #dfb=bill.copy()
-                        dfb["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in dfb["issued"]]
-###  MF NUMBERS
-### EDIT - REMOVE
-                        mf1,mf2=st.tabs(["VIEW/EDIT MF NUMBERS","AUTO UPLOAD"])
+#                     with rls_tab3:
+#                         bill_for_mf=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+#                         bill_for_mf=json.loads(bill_for_mf)
+#                         dfb=pd.DataFrame.from_dict(bill_for_mf).T[1:]
+#                         #dfb=bill.copy()
+#                         dfb["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in dfb["issued"]]
+# ###  MF NUMBERS
+# ### EDIT - REMOVE
+#                         mf1,mf2=st.tabs(["VIEW/EDIT MF NUMBERS","AUTO UPLOAD"])
                         
                         
                         
-                        with mf1:
+#                         with mf1:
 #                             mf_numbers=gcp_download(target_bucket,rf"release_orders/mf_numbers.json")
 #                             mf_numbers=json.loads(mf_numbers)
 #                             schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")

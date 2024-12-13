@@ -4927,7 +4927,7 @@ if authentication_status:
                                     carrier_code=st.selectbox("Carrier Code",["311627-KBX"],disabled=True,key=29)
                                                                 
                                 else:
-                                    carrier_code=st.selectbox("Carrier Code",[mf_numbers_for_load[today_str][dest][release_order_number].keys().to_list()],disabled=False,key=29)
+                                    carrier_code=st.selectbox("Carrier Code",[list(mf_numbers_for_load[today_str][dest][release_order_number].keys())],disabled=False,key=29)
                                    
                                 
                                 

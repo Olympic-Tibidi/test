@@ -4921,13 +4921,11 @@ if authentication_status:
                                 mf=True
                                 mf_mix=False
                                 load_mf_number_issued=False
-                                if destination in ["CLEARWATER-Lewiston,ID","SOFIDEL-Lewiston,ID"]:
-                                    carrier_code=st.selectbox("Carrier Code",[carrier_code,"310897-Ashley"],disabled=False,key=29)
-                                elif destination=="GP-Halsey,OR":
-                                    carrier_code=st.selectbox("Carrier Code",["311627-KBX"],disabled=False,key=29)
-                                
+                                if destination in ["GP-Halsey,OR","GP-Clatskanie,OR"]:
+                                    carrier_code=st.selectbox("Carrier Code",["311627-KBX"],disabled=True,key=29)
+                                                                
                                 else:
-                                    carrier_code=st.selectbox("Carrier Code",["311627-KBX"],disabled=True,key=9)
+                                    carrier_code=st.selectbox("Carrier Code",[mf_numbers_for_load[today_str][dest][release_order_number].keys()],disabled=False,key=29)
                                    
                                 today_str=str(st.date_input("Shipment Date",(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date(),disabled=False,key="popdo3"))
                                 dest=destination.split("-")[1].split(",")[0].upper()

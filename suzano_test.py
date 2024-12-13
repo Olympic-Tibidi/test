@@ -4914,6 +4914,7 @@ if authentication_status:
                             transport_type="TRUCK"
                             placeholder = st.empty()
                             with placeholder.container():
+                                today_str=str(st.date_input("Shipment Date",(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date(),disabled=False,key="popdo3"))
                                 vehicle_id=st.text_input("**:blue[Vehicle ID]**",value="",key=7)
                                 manual_bill=st.toggle("Toggle for Manual BOL")
                                 if manual_bill:
@@ -4927,7 +4928,7 @@ if authentication_status:
                                 else:
                                     carrier_code=st.selectbox("Carrier Code",[mf_numbers_for_load[today_str][dest][release_order_number].keys()],disabled=False,key=29)
                                    
-                                today_str=str(st.date_input("Shipment Date",(datetime.datetime.now()-datetime.timedelta(hours=utc_difference)).date(),disabled=False,key="popdo3"))
+                                
                                 dest=destination.split("-")[1].split(",")[0].upper()
                                 if 'load_mf_number' not in st.session_state:
                                     st.session_state.load_mf_number = None

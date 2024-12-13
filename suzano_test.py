@@ -4922,6 +4922,7 @@ if authentication_status:
                                 mf=True
                                 mf_mix=False
                                 load_mf_number_issued=False
+                                dest=destination.split("-")[1].split(",")[0].upper()
                                 if destination in ["GP-Halsey,OR","GP-Clatskanie,OR"]:
                                     carrier_code=st.selectbox("Carrier Code",["311627-KBX"],disabled=True,key=29)
                                                                 
@@ -4929,7 +4930,7 @@ if authentication_status:
                                     carrier_code=st.selectbox("Carrier Code",[mf_numbers_for_load[today_str][dest][release_order_number].keys()],disabled=False,key=29)
                                    
                                 
-                                dest=destination.split("-")[1].split(",")[0].upper()
+                                
                                 if 'load_mf_number' not in st.session_state:
                                     st.session_state.load_mf_number = None
                                     

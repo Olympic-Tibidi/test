@@ -5627,7 +5627,7 @@ if authentication_status:
             map=json.loads(map)
             mill_info=map["mill_info"]
             inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-            inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
+            inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings)
          
             raw_ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
             raw_ro = json.loads(raw_ro)

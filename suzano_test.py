@@ -5627,7 +5627,7 @@ if authentication_status:
             map=json.loads(map)
             mill_info=map["mill_info"]
             inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-            inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings)
+            inv_bill_of_ladings=pd.read_json(inv_bill_of_ladings).T
          
             raw_ro=gcp_download(target_bucket,rf"release_orders/RELEASE_ORDERS.json")
             raw_ro = json.loads(raw_ro)
@@ -5940,8 +5940,10 @@ if authentication_status:
                         
                       
             with mill_progress:
-                dfb=pd.DataFrame(inv_bill_of_ladings).T
-                st.write(dfb)
+                inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                dfb=pd.read_json(inv_bill_of_ladings).T
+                # dfb=pd.DataFrame(inv_bill_of_ladings).T
+                # st.write(dfb)
                 dfb["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in dfb["issued"]]
                 schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
                 schedule=json.loads(schedule)

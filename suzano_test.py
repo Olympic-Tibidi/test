@@ -5940,139 +5940,139 @@ if authentication_status:
                         
                       
             with mill_progress:
-                inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                dfb=pd.read_json(inv_bill_of_ladings).T
-                # dfb=pd.DataFrame(inv_bill_of_ladings).T
-                # st.write(dfb)
-                dfb["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in dfb["issued"]]
-                schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
-                schedule=json.loads(schedule)
-                flattened_data = []
-                for date, locations in schedule.items():
-                    for location, location_data in locations.items():
-                        for order, carriers in location_data.items():
-                            for carrier, shipments in carriers.items():
-                                for shipment in shipments:
-                                    dfb=dfb[dfb["Date Shipped"]==selected_date_datetime]
-                                    status="NONE"
-                                    if shipment in dfb.index:
-                                        status_="SHIPPED"
-                                    else:
-                                        status_="Scheduled"
-                                    shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
-                                    carrier_=carrier.split("-")[1]
-                                    flattened_data.append({
-                                        "Date": date,
-                                        "Location": location,
-                                        "Order": order,
-                                        "Carrier": carrier_,
-                                        "EDI Bill Of Lading":shipment,
-                                        "MF Number": shipment_parts[0] if len(shipment_parts) > 1 else None,
-                                        "Shipment ID": shipment_parts[1] if len(shipment_parts) > 1 else shipment_parts[0]
-                                    })
+                # inv_bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                # dfb=pd.read_json(inv_bill_of_ladings).T
+                # # dfb=pd.DataFrame(inv_bill_of_ladings).T
+                # # st.write(dfb)
+                # dfb["St_Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d %H:%M:%S").date() for i in dfb["issued"]]
+                # schedule=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
+                # schedule=json.loads(schedule)
+                # flattened_data = []
+                # for date, locations in schedule.items():
+                #     for location, location_data in locations.items():
+                #         for order, carriers in location_data.items():
+                #             for carrier, shipments in carriers.items():
+                #                 for shipment in shipments:
+                #                     dfb=dfb[dfb["Date Shipped"]==selected_date_datetime]
+                #                     status="NONE"
+                #                     if shipment in dfb.index:
+                #                         status_="SHIPPED"
+                #                     else:
+                #                         status_="Scheduled"
+                #                     shipment_parts = shipment.split("|") if "|" in shipment else [shipment]
+                #                     carrier_=carrier.split("-")[1]
+                #                     flattened_data.append({
+                #                         "Date": date,
+                #                         "Location": location,
+                #                         "Order": order,
+                #                         "Carrier": carrier_,
+                #                         "EDI Bill Of Lading":shipment,
+                #                         "MF Number": shipment_parts[0] if len(shipment_parts) > 1 else None,
+                #                         "Shipment ID": shipment_parts[1] if len(shipment_parts) > 1 else shipment_parts[0]
+                #                     })
 
                 
-                flat_df=pd.DataFrame(flattened_data)
-                flat_df["Date"] = pd.to_datetime(flat_df["Date"])#.dt.date
-                flat_df.insert(1,"Day",flat_df["Date"].dt.day_name())
-                flat_df["Status"]="None"
-                flat_df['Status'] = flat_df['EDI Bill Of Lading'].apply(lambda x: 'SHIPPED' if x in dfb else 'Scheduled')
-                flat_df.reset_index(drop=True,inplace=True)
-                flat_df.index+=1
-                styled_df =flat_df.style.apply(style_row, axis=1)
-                st.write(styled_df.to_html(), unsafe_allow_html=True)
-                pass
-                # mf_numbers=json.loads(gcp_download(target_bucket,rf"release_orders/mf_numbers.json"))
+                # flat_df=pd.DataFrame(flattened_data)
+                # flat_df["Date"] = pd.to_datetime(flat_df["Date"])#.dt.date
+                # flat_df.insert(1,"Day",flat_df["Date"].dt.day_name())
+                # flat_df["Status"]="None"
+                # flat_df['Status'] = flat_df['EDI Bill Of Lading'].apply(lambda x: 'SHIPPED' if x in dfb else 'Scheduled')
+                # flat_df.reset_index(drop=True,inplace=True)
+                # flat_df.index+=1
+                # styled_df =flat_df.style.apply(style_row, axis=1)
+                # st.write(styled_df.to_html(), unsafe_allow_html=True)
+                # pass
+                # # mf_numbers=json.loads(gcp_download(target_bucket,rf"release_orders/mf_numbers.json"))
                 
-                # bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
-                # bill_of_ladings=json.loads(bill_of_ladings)
-                # bill=pd.DataFrame(bill_of_ladings).T
-                # values=[]
-                # mfs=[]
-                # for i in bill.index:
-                #     if len(i.split("|"))>1:
-                #         values.append(i.split("|")[1])
-                #         mfs.append(i.split("|")[0])
-                #     else:
-                #         values.append(i)
-                #         mfs.append(i)
-                # bill.insert(0,"Shipment",values)
-                # bill.insert(1,"MF",mfs)
+                # # bill_of_ladings=gcp_download(target_bucket,rf"terminal_bill_of_ladings.json")
+                # # bill_of_ladings=json.loads(bill_of_ladings)
+                # # bill=pd.DataFrame(bill_of_ladings).T
+                # # values=[]
+                # # mfs=[]
+                # # for i in bill.index:
+                # #     if len(i.split("|"))>1:
+                # #         values.append(i.split("|")[1])
+                # #         mfs.append(i.split("|")[0])
+                # #     else:
+                # #         values.append(i)
+                # #         mfs.append(i)
+                # # bill.insert(0,"Shipment",values)
+                # # bill.insert(1,"MF",mfs)
                 
-                # suzano_shipment_=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
-                # suzano_shipment=json.loads(suzano_shipment_)
-                # suzano_shipment=pd.DataFrame(suzano_shipment).T
+                # # suzano_shipment_=gcp_download(target_bucket,rf"release_orders/suzano_shipments.json")
+                # # suzano_shipment=json.loads(suzano_shipment_)
+                # # suzano_shipment=pd.DataFrame(suzano_shipment).T
 
-                # suzano_shipment["PK"]=suzano_shipment["PK"].astype("str")
-                # bill["Shipment"]=bill["Shipment"].astype("str")
-                # suzano_shipment["Pickup"]=pd.to_datetime(suzano_shipment["Pickup"])
-                # suzano_shipment=suzano_shipment[suzano_shipment["Pickup"]>datetime.datetime(2024, 9, 24)]
-                # suzano_shipment.reset_index(drop=True,inplace=True)
-                # for i in suzano_shipment.index:
-                #     sh=suzano_shipment.loc[i,"Shipment ID"]
-                #     #print(sh)
-                #     if sh in bill[~bill["Shipment"].isna()]["Shipment"].to_list():
-                #         vehicle=bill.loc[bill["Shipment"]==sh,'vehicle'].values[0]
-                #         bol=str(bill.loc[bill["Shipment"]==sh].index.values[0])
-                #         suzano_shipment.loc[i,"Transit Status"]="COMPLETED"
-                #         suzano_shipment.loc[i,"BOL"]=bol
-                #         suzano_shipment.loc[i,"Vehicle ID"]=vehicle
-                # for rel,value in mf_numbers.items():
-                #     for date in value:
-                #         for carrier,liste in value[date].items():
-                #             if len(liste)>0:
-                #                 try:
-                #                     for k in liste:
-                #                         try:
-                #                             suzano_shipment.loc[suzano_shipment["Shipment ID"]==k.split("|")[1],"Transit Status"]="SCHEDULED"
-                #                         except:
-                #                             suzano_shipment.loc[suzano_shipment["Shipment ID"]==k,"Transit Status"]="SCHEDULED"
-                #                 except:
-                #                     pass
-                # st.subheader("SUZANO OTM LIST")
-                # st.write(suzano_shipment)
-                # maintenance=False
-                # if maintenance:
-                #     st.title("CURRENTLY IN MAINTENANCE, CHECK BACK LATER")
-                # else:
-                #     st.subheader("WEEKLY SHIPMENTS BY MILL (IN TONS)")
-                #     zf=inv_bill_of_ladings.copy()
-                #     zf['WEEK'] = pd.to_datetime(zf['issued'])
-                #     zf.set_index('WEEK', inplace=True)
+                # # suzano_shipment["PK"]=suzano_shipment["PK"].astype("str")
+                # # bill["Shipment"]=bill["Shipment"].astype("str")
+                # # suzano_shipment["Pickup"]=pd.to_datetime(suzano_shipment["Pickup"])
+                # # suzano_shipment=suzano_shipment[suzano_shipment["Pickup"]>datetime.datetime(2024, 9, 24)]
+                # # suzano_shipment.reset_index(drop=True,inplace=True)
+                # # for i in suzano_shipment.index:
+                # #     sh=suzano_shipment.loc[i,"Shipment ID"]
+                # #     #print(sh)
+                # #     if sh in bill[~bill["Shipment"].isna()]["Shipment"].to_list():
+                # #         vehicle=bill.loc[bill["Shipment"]==sh,'vehicle'].values[0]
+                # #         bol=str(bill.loc[bill["Shipment"]==sh].index.values[0])
+                # #         suzano_shipment.loc[i,"Transit Status"]="COMPLETED"
+                # #         suzano_shipment.loc[i,"BOL"]=bol
+                # #         suzano_shipment.loc[i,"Vehicle ID"]=vehicle
+                # # for rel,value in mf_numbers.items():
+                # #     for date in value:
+                # #         for carrier,liste in value[date].items():
+                # #             if len(liste)>0:
+                # #                 try:
+                # #                     for k in liste:
+                # #                         try:
+                # #                             suzano_shipment.loc[suzano_shipment["Shipment ID"]==k.split("|")[1],"Transit Status"]="SCHEDULED"
+                # #                         except:
+                # #                             suzano_shipment.loc[suzano_shipment["Shipment ID"]==k,"Transit Status"]="SCHEDULED"
+                # #                 except:
+                # #                     pass
+                # # st.subheader("SUZANO OTM LIST")
+                # # st.write(suzano_shipment)
+                # # maintenance=False
+                # # if maintenance:
+                # #     st.title("CURRENTLY IN MAINTENANCE, CHECK BACK LATER")
+                # # else:
+                # #     st.subheader("WEEKLY SHIPMENTS BY MILL (IN TONS)")
+                # #     zf=inv_bill_of_ladings.copy()
+                # #     zf['WEEK'] = pd.to_datetime(zf['issued'])
+                # #     zf.set_index('WEEK', inplace=True)
                     
-                #     def sum_quantity(x):
-                #         return x.resample('W')['quantity'].sum()*2
-                #     resampled_quantity = zf.groupby('destination').apply(sum_quantity).unstack(level=0)
-                #     resampled_quantity=resampled_quantity.fillna(0)
-                #     resampled_quantity.loc["TOTAL"]=resampled_quantity.sum(axis=0)
-                #     resampled_quantity["TOTAL"]=resampled_quantity.sum(axis=1)
-                #     resampled_quantity=resampled_quantity.reset_index()
-                #     resampled_quantity["WEEK"][:-1]=[i.strftime("%Y-%m-%d") for i in resampled_quantity["WEEK"][:-1]]
-                #     resampled_quantity.set_index("WEEK",drop=True,inplace=True)
-                #     st.dataframe(resampled_quantity)
+                # #     def sum_quantity(x):
+                # #         return x.resample('W')['quantity'].sum()*2
+                # #     resampled_quantity = zf.groupby('destination').apply(sum_quantity).unstack(level=0)
+                # #     resampled_quantity=resampled_quantity.fillna(0)
+                # #     resampled_quantity.loc["TOTAL"]=resampled_quantity.sum(axis=0)
+                # #     resampled_quantity["TOTAL"]=resampled_quantity.sum(axis=1)
+                # #     resampled_quantity=resampled_quantity.reset_index()
+                # #     resampled_quantity["WEEK"][:-1]=[i.strftime("%Y-%m-%d") for i in resampled_quantity["WEEK"][:-1]]
+                # #     resampled_quantity.set_index("WEEK",drop=True,inplace=True)
+                # #     st.dataframe(resampled_quantity)
                     
-                #     st.download_button(
-                #     label="DOWNLOAD WEEKLY REPORT AS CSV",
-                #     data=convert_df(resampled_quantity),
-                #     file_name=f'WEEKLY SHIPMENT REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
-                #     mime='text/csv')
+                # #     st.download_button(
+                # #     label="DOWNLOAD WEEKLY REPORT AS CSV",
+                # #     data=convert_df(resampled_quantity),
+                # #     file_name=f'WEEKLY SHIPMENT REPORT-{datetime.datetime.strftime(datetime.datetime.now()-datetime.timedelta(hours=utc_difference),"%Y_%m_%d")}.csv',
+                # #     mime='text/csv')
     
     
                    
-                #     zf['issued'] = pd.to_datetime(zf['issued'])                   
+                # #     zf['issued'] = pd.to_datetime(zf['issued'])                   
                    
-                #     weekly_tonnage = zf.groupby(['destination', pd.Grouper(key='issued', freq='W')])['quantity'].sum() * 2  # Assuming 2 tons per quantity
-                #     weekly_tonnage = weekly_tonnage.reset_index()                   
+                # #     weekly_tonnage = zf.groupby(['destination', pd.Grouper(key='issued', freq='W')])['quantity'].sum() * 2  # Assuming 2 tons per quantity
+                # #     weekly_tonnage = weekly_tonnage.reset_index()                   
                   
-                #     weekly_tonnage = weekly_tonnage.rename(columns={'issued': 'WEEK', 'quantity': 'Tonnage'})
+                # #     weekly_tonnage = weekly_tonnage.rename(columns={'issued': 'WEEK', 'quantity': 'Tonnage'})
                   
-                #     fig = px.bar(weekly_tonnage, x='WEEK', y='Tonnage', color='destination',
-                #                  title='Weekly Shipments Tonnage per Location',
-                #                  labels={'Tonnage': 'Tonnage (in Tons)', 'WEEK': 'Week'})
+                # #     fig = px.bar(weekly_tonnage, x='WEEK', y='Tonnage', color='destination',
+                # #                  title='Weekly Shipments Tonnage per Location',
+                # #                  labels={'Tonnage': 'Tonnage (in Tons)', 'WEEK': 'Week'})
                  
-                #     fig.update_layout(width=1000, height=700)  # You can adjust the width and height values as needed
+                # #     fig.update_layout(width=1000, height=700)  # You can adjust the width and height values as needed
                     
-                #     st.plotly_chart(fig)
+                # #     st.plotly_chart(fig)
 
 
             with status:

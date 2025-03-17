@@ -2382,7 +2382,7 @@ if authentication_status:
         
         if select=="LABOR":
             gate_entries=json.loads(gcp_download(target_bucket,rf"gate_entries.json"))
-            st.write(pd.DataFrame(gate_entries).T)
+            st.write(gate_entries)
                                     
         #     labor_issue=False
         #     secondary=True

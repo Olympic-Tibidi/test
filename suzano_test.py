@@ -2381,7 +2381,7 @@ if authentication_status:
         
         
         if select=="LABOR":
-            gate_entries=json.loads(gcp_download(target_bucket,rf"LABOR/pma_dues.json"))
+            gate_entries=json.loads(gcp_download(target_bucket,rf"gate_entries.json"))
             st.write(pd.DataFrame(gate_entries).T)
                                     
         #     labor_issue=False

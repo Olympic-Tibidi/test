@@ -2383,7 +2383,10 @@ if authentication_status:
         if select=="LABOR":
             gate_entries=json.loads(gcp_download(target_bucket,rf"gate_entries.json"))
             combined_entries = gate_entries['paper'] + gate_entries['log']
-            st.write(pd.DataFrame(combined_entries).T)
+            combined_entries=pd.DataFrame(combined_entries)
+            combined_entries.set_index("Date",drop=True,inplace=True)
+            st.write(combined_entries)
+            
                                     
         #     labor_issue=False
         #     secondary=True

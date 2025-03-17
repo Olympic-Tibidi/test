@@ -2384,7 +2384,7 @@ if authentication_status:
             gate_entries=json.loads(gcp_download(target_bucket,rf"gate_entries.json"))
             combined_entries = gate_entries['paper'] + gate_entries['log']
             combined_entries=pd.DataFrame(combined_entries)
-            combined_entries.set_index("DATE",drop=True,inplace=True)
+            # combined_entries.set_index("DATE",drop=True,inplace=True)
             st.write(combined_entries)
             
                                     

@@ -826,376 +826,377 @@ if authentication_status:
                 ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","BUDGET PERFORMANCE"])
 
                 with ttab3:
+                    pass
                     
                         
-                    upto_month=st.selectbox("Choose End Month",range(2,13))
+                    # upto_month=st.selectbox("Choose End Month",range(2,13))
                     
-                    ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger_b.ftr")
-                    ledger=gcp_download_x(target_bucket,rf"FIN/NEW/ledger-2024.ftr")
-                    weyco_ledger=gcp_download_x(target_bucket,rf"FIN/NEW/weyco_ledger-2024.ftr")
+                    # ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger_b.ftr")
+                    # ledger=gcp_download_x(target_bucket,rf"FIN/NEW/ledger-2024.ftr")
+                    # weyco_ledger=gcp_download_x(target_bucket,rf"FIN/NEW/weyco_ledger-2024.ftr")
                     
-                    budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
-                    budget1=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget1.json"))
-                    budget_2024=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2023.json"))
-                    pure_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/pure_budget.json"))
-                    weyco_suzano_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/weyco_suzano_budget.json"))
+                    # budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
+                    # budget1=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget1.json"))
+                    # budget_2024=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2023.json"))
+                    # pure_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/pure_budget.json"))
+                    # weyco_suzano_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/weyco_suzano_budget.json"))
                     
-                    ledger_b = pd.read_feather(io.BytesIO(ledger_b))
-                    ledger_b = ledger_b.set_index("index", drop=True).reset_index(drop=True)
-                    ledger = pd.read_feather(io.BytesIO(ledger))
-                    ledger = ledger.set_index("index", drop=True).reset_index(drop=True)
-                    weyco_ledger = pd.read_feather(io.BytesIO(weyco_ledger))
-                    weyco_ledger = weyco_ledger.set_index("index", drop=True).reset_index(drop=True)
+                    # ledger_b = pd.read_feather(io.BytesIO(ledger_b))
+                    # ledger_b = ledger_b.set_index("index", drop=True).reset_index(drop=True)
+                    # ledger = pd.read_feather(io.BytesIO(ledger))
+                    # ledger = ledger.set_index("index", drop=True).reset_index(drop=True)
+                    # weyco_ledger = pd.read_feather(io.BytesIO(weyco_ledger))
+                    # weyco_ledger = weyco_ledger.set_index("index", drop=True).reset_index(drop=True)
                     
-                    ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
-                    ledger=ledger[ledger["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
-                    weyco_ledger=weyco_ledger[weyco_ledger["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
+                    # ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
+                    # ledger=ledger[ledger["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
+                    # weyco_ledger=weyco_ledger[weyco_ledger["Date"]<pd.Timestamp(datetime.date(2024,upto_month,1))]
 
 
-                    ledger_b.reset_index(drop=True,inplace=True)
-                    ledger_b=ledger_b.copy()
-                    as_of=f"End of {calendar.month_name[upto_month-1]} 2024"
+                    # ledger_b.reset_index(drop=True,inplace=True)
+                    # ledger_b=ledger_b.copy()
+                    # as_of=f"End of {calendar.month_name[upto_month-1]} 2024"
                                         
                     
                     
-                    year="2024"
+                    # year="2024"
                     
-                    if year=="2024":
-                        budget_year=budget_2024.copy()
-                        month_count=9
-                    else:
-                        budget_year=budget_2023.copy()
-                        month_count=12
+                    # if year=="2024":
+                    #     budget_year=budget_2024.copy()
+                    #     month_count=9
+                    # else:
+                    #     budget_year=budget_2023.copy()
+                    #     month_count=12
                     
                                                       
                     
-                    def get_key(d,item):
+                    # def get_key(d,item):
                         
-                        for k, v in d.items():
-                            if isinstance(v, dict):
-                                for a, b in v.items():
-                                    if isinstance(b, dict):
-                                        for c, d in b.items():
-                                            if c==item:
-                                                return k,a
-                                    else:
-                                        if a==item:
-                                            return k,b
-                            else:
-                                if v==item:
-                                    return k,v
-                    for i in ledger_b.index:
-                        try:
-                            ledger_b.loc[i,"Group"]=get_key(budget1,ledger_b.loc[i,"Acc"])[0]
-                        except:
-                            pass
-                        try:
-                            ledger_b.loc[i,"Sub_Group"]=get_key(budget1,ledger_b.loc[i,"Acc"])[1]
-                        except:
-                            pass
-                       # ledger_b.loc[i,"Sub_Group"]=get_key(budget,ledger_b.loc[i,"Account"])
+                    #     for k, v in d.items():
+                    #         if isinstance(v, dict):
+                    #             for a, b in v.items():
+                    #                 if isinstance(b, dict):
+                    #                     for c, d in b.items():
+                    #                         if c==item:
+                    #                             return k,a
+                    #                 else:
+                    #                     if a==item:
+                    #                         return k,b
+                    #         else:
+                    #             if v==item:
+                    #                 return k,v
+                    # for i in ledger_b.index:
+                    #     try:
+                    #         ledger_b.loc[i,"Group"]=get_key(budget1,ledger_b.loc[i,"Acc"])[0]
+                    #     except:
+                    #         pass
+                    #     try:
+                    #         ledger_b.loc[i,"Sub_Group"]=get_key(budget1,ledger_b.loc[i,"Acc"])[1]
+                    #     except:
+                    #         pass
+                    #    # ledger_b.loc[i,"Sub_Group"]=get_key(budget,ledger_b.loc[i,"Account"])
                     
                     
-                    #### LABOR ADJUSTMENT
-                    ledger_b.loc[ledger_b["Name"]=="Longshore Services","Group"]="Revenues"
-                    ledger_b.loc[ledger_b["Name"]=="Longshore Fringe Benefits","Group"]="Revenues"
+                    # #### LABOR ADJUSTMENT
+                    # ledger_b.loc[ledger_b["Name"]=="Longshore Services","Group"]="Revenues"
+                    # ledger_b.loc[ledger_b["Name"]=="Longshore Fringe Benefits","Group"]="Revenues"
                     
                     
-                    ignore=set(ledger_b[ledger_b["Group"]==0].Account.to_list())
-                    ledger_b=ledger_b[~ledger_b["Account"].isin(ignore)]
-                    ### LEDGER-B READY
-                    grouped_ledger=round(ledger_b.groupby(["Group","Sub_Group","Acc","Name"])[["Net"]].sum(),1)
-                    grouped_ledger["Monthly"]=round(grouped_ledger["Net"]/month_count,1)
-                    #grouped_ledger.to_excel(fr"C:\Users\AfsinY\Desktop\LEDGERS\grouped.xlsx", sheet_name='Sheet1', index=True)
-                    grouped_ledger.reset_index(inplace=True)
-                    #grouped_ledger
+                    # ignore=set(ledger_b[ledger_b["Group"]==0].Account.to_list())
+                    # ledger_b=ledger_b[~ledger_b["Account"].isin(ignore)]
+                    # ### LEDGER-B READY
+                    # grouped_ledger=round(ledger_b.groupby(["Group","Sub_Group","Acc","Name"])[["Net"]].sum(),1)
+                    # grouped_ledger["Monthly"]=round(grouped_ledger["Net"]/month_count,1)
+                    # #grouped_ledger.to_excel(fr"C:\Users\AfsinY\Desktop\LEDGERS\grouped.xlsx", sheet_name='Sheet1', index=True)
+                    # grouped_ledger.reset_index(inplace=True)
+                    # #grouped_ledger
                     
-                    grouped_ledger[f"Budget {year}"]=0
-                    for i in grouped_ledger.index:
-                        a=grouped_ledger.loc[i,"Group"]
+                    # grouped_ledger[f"Budget {year}"]=0
+                    # for i in grouped_ledger.index:
+                    #     a=grouped_ledger.loc[i,"Group"]
                         
-                        b=grouped_ledger.loc[i,"Sub_Group"]
-                        c=grouped_ledger.loc[i,"Acc"]
-                        try:
-                            grouped_ledger.loc[i,f"Budget {year}"]=budget_year[a][b][c]
-                        except:
-                            grouped_ledger.loc[i,f"Budget {year}"]=budget_year[a][c]
-                    grouped_ledger[f"Budget {year} YTD"]=round(grouped_ledger[f"Budget {year}"]/12*month_count,1)
-                    grouped_ledger["Variance"]=round(-grouped_ledger[f"Budget {year} YTD"]+grouped_ledger["Net"])
-                    ### GROUPED LEDGER READY
+                    #     b=grouped_ledger.loc[i,"Sub_Group"]
+                    #     c=grouped_ledger.loc[i,"Acc"]
+                    #     try:
+                    #         grouped_ledger.loc[i,f"Budget {year}"]=budget_year[a][b][c]
+                    #     except:
+                    #         grouped_ledger.loc[i,f"Budget {year}"]=budget_year[a][c]
+                    # grouped_ledger[f"Budget {year} YTD"]=round(grouped_ledger[f"Budget {year}"]/12*month_count,1)
+                    # grouped_ledger["Variance"]=round(-grouped_ledger[f"Budget {year} YTD"]+grouped_ledger["Net"])
+                    # ### GROUPED LEDGER READY
                     
-                    grouped_ledger_todate=grouped_ledger.groupby(["Group","Sub_Group"])[['Net', 'Monthly', f'Budget {year}',
-                           f'Budget {year} YTD', 'Variance']].sum()
-                    ### GROUPED LEDGER TODATE READY
+                    # grouped_ledger_todate=grouped_ledger.groupby(["Group","Sub_Group"])[['Net', 'Monthly', f'Budget {year}',
+                    #        f'Budget {year} YTD', 'Variance']].sum()
+                    # ### GROUPED LEDGER TODATE READY
                     
                     
-                    order = {'Revenues': 1, 'Operating Expenses': 2, 'Maintenance Expenses': 3,"G & A Overhead":4,"Depreciation":5}
-                    grouped_ledger_todate['Sort_Key'] = grouped_ledger_todate.index.get_level_values('Group').map(order)
+                    # order = {'Revenues': 1, 'Operating Expenses': 2, 'Maintenance Expenses': 3,"G & A Overhead":4,"Depreciation":5}
+                    # grouped_ledger_todate['Sort_Key'] = grouped_ledger_todate.index.get_level_values('Group').map(order)
                     
-                    # Sort the DataFrame using the sort key
-                    grouped_ledger_todate.sort_values(by='Sort_Key',ascending=True, inplace=True)
+                    # # Sort the DataFrame using the sort key
+                    # grouped_ledger_todate.sort_values(by='Sort_Key',ascending=True, inplace=True)
                     
-                    # Drop the sort key column after sorting
-                    grouped_ledger_todate.drop(columns='Sort_Key', inplace=True)
-                    #grouped_ledger_todate.sort_index(level='Group', inplace=True)  # Sort by Group
+                    # # Drop the sort key column after sorting
+                    # grouped_ledger_todate.drop(columns='Sort_Key', inplace=True)
+                    # #grouped_ledger_todate.sort_index(level='Group', inplace=True)  # Sort by Group
                     
-                    ####   PREPARE NEW_DF
+                    # ####   PREPARE NEW_DF
                     
-                    new_df = pd.DataFrame()
+                    # new_df = pd.DataFrame()
                     
-                    # Iterate through each group to calculate and insert totals
-                    for group, group_df in grouped_ledger_todate.groupby(level=0):
-                        # Append the group DataFrame to the new DataFrame
-                        new_df = pd.concat([new_df, group_df])
+                    # # Iterate through each group to calculate and insert totals
+                    # for group, group_df in grouped_ledger_todate.groupby(level=0):
+                    #     # Append the group DataFrame to the new DataFrame
+                    #     new_df = pd.concat([new_df, group_df])
                         
-                        # Calculate the total for the current group
-                        total_row = group_df.sum()
-                        total_row.name = (group, f'Total {group}', '')  # Setting up the name tuple to match the MultiIndex
+                    #     # Calculate the total for the current group
+                    #     total_row = group_df.sum()
+                    #     total_row.name = (group, f'Total {group}', '')  # Setting up the name tuple to match the MultiIndex
                         
-                        # Append the total row to the new DataFrame
-                        new_df = pd.concat([new_df, pd.DataFrame([total_row], index=pd.MultiIndex.from_tuples([total_row.name]))])
+                    #     # Append the total row to the new DataFrame
+                    #     new_df = pd.concat([new_df, pd.DataFrame([total_row], index=pd.MultiIndex.from_tuples([total_row.name]))])
                     
-                    # Display the new DataFrame with totals inserted
+                    # # Display the new DataFrame with totals inserted
                     
-                    order = {'Revenues': 1, 'Operating Expenses': 2, 'Maintenance Expenses': 3,"G & A Overhead":4,"Depreciation":5}
-                    new_df['Sort_Key'] = new_df.index.get_level_values('Group').map(order)
+                    # order = {'Revenues': 1, 'Operating Expenses': 2, 'Maintenance Expenses': 3,"G & A Overhead":4,"Depreciation":5}
+                    # new_df['Sort_Key'] = new_df.index.get_level_values('Group').map(order)
                     
-                    # Sort the DataFrame using the sort key
-                    new_df.sort_values(by='Sort_Key',ascending=True, inplace=True)
+                    # # Sort the DataFrame using the sort key
+                    # new_df.sort_values(by='Sort_Key',ascending=True, inplace=True)
                     
-                    # Drop the sort key column after sorting
-                    new_df.drop(columns='Sort_Key', inplace=True)
-                    #grouped_ledger_todate.sort_index(level='Group', inplace=True)  # Sort by Group
-                    total_rows = new_df.loc[[idx for idx in new_df.index if idx[1].startswith('Total')]]
+                    # # Drop the sort key column after sorting
+                    # new_df.drop(columns='Sort_Key', inplace=True)
+                    # #grouped_ledger_todate.sort_index(level='Group', inplace=True)  # Sort by Group
+                    # total_rows = new_df.loc[[idx for idx in new_df.index if idx[1].startswith('Total')]]
                     
-                    # Calculate the overall total from these rows
-                    overall_total = total_rows.sum()
-                    overall_total.name = ('OVERALL', 'TOTAL', '')  # Naming the total row
+                    # # Calculate the overall total from these rows
+                    # overall_total = total_rows.sum()
+                    # overall_total.name = ('OVERALL', 'TOTAL', '')  # Naming the total row
                     
-                    # Append the overall total row to the new DataFrame
-                    new_df = pd.concat([new_df, pd.DataFrame([overall_total], index=pd.MultiIndex.from_tuples([overall_total.name]))])
-                    new_df=new_df[["Net","Budget 2024 YTD","Variance","Budget 2024"]]
-                    budget1,budget2,budget3,budget4=st.tabs(["TABULAR","VERSUS BUDGETED","SUNBURST CHART","MONTHLY PIVOT TABLE"])
-                    with budget1:
-                        st.write(new_df)
-                    with budget2:
+                    # # Append the overall total row to the new DataFrame
+                    # new_df = pd.concat([new_df, pd.DataFrame([overall_total], index=pd.MultiIndex.from_tuples([overall_total.name]))])
+                    # new_df=new_df[["Net","Budget 2024 YTD","Variance","Budget 2024"]]
+                    # budget1,budget2,budget3,budget4=st.tabs(["TABULAR","VERSUS BUDGETED","SUNBURST CHART","MONTHLY PIVOT TABLE"])
+                    # with budget1:
+                    #     st.write(new_df)
+                    # with budget2:
                     
-                        new_df.reset_index(inplace=True)
-                        fig, ax = plt.subplots(figsize=(15, 10))
+                    #     new_df.reset_index(inplace=True)
+                    #     fig, ax = plt.subplots(figsize=(15, 10))
                         
-                        # Plotting the data first to define axes limits
-                        bars_actual = ax.barh(new_df.Sub_Group, new_df['Net'], color='blue',alpha=0.3 ,label='Actual', zorder=3)
-                        bars_budget = ax.barh(new_df.Sub_Group, new_df[f'Budget {year} YTD'], color='red', alpha=0.2, label='Budgeted ', zorder=3)
+                    #     # Plotting the data first to define axes limits
+                    #     bars_actual = ax.barh(new_df.Sub_Group, new_df['Net'], color='blue',alpha=0.3 ,label='Actual', zorder=3)
+                    #     bars_budget = ax.barh(new_df.Sub_Group, new_df[f'Budget {year} YTD'], color='red', alpha=0.2, label='Budgeted ', zorder=3)
                         
-                        # Load and show background image after plotting to get the correct extent
-                        #bg_image = plt.imread('salish.png')  # Adjust this path if necessary
-                       # ax.imshow(bg_image, aspect='auto', extent=[ax.get_xlim()[0], ax.get_xlim()[1], ax.get_ylim()[0], ax.get_ylim()[1]], zorder=1, alpha=0.2)
+                    #     # Load and show background image after plotting to get the correct extent
+                    #     #bg_image = plt.imread('salish.png')  # Adjust this path if necessary
+                    #    # ax.imshow(bg_image, aspect='auto', extent=[ax.get_xlim()[0], ax.get_xlim()[1], ax.get_ylim()[0], ax.get_ylim()[1]], zorder=1, alpha=0.2)
                         
-                        # Formatting the x-axis with commas and a dollar sign
-                        ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: f'${x:,.0f}'))
+                    #     # Formatting the x-axis with commas and a dollar sign
+                    #     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: f'${x:,.0f}'))
                         
-                        # Title and other settings
-                        current_date = datetime.datetime.now().date()
-                        ax.set_title(f'Marine Terminal\nBUDGET {year} PERFORMANCE\nAs of {as_of}', fontsize=18)
+                    #     # Title and other settings
+                    #     current_date = datetime.datetime.now().date()
+                    #     ax.set_title(f'Marine Terminal\nBUDGET {year} PERFORMANCE\nAs of {as_of}', fontsize=18)
                         
-                        ax.set_xlabel('Amount ($)')
-                        ax.legend()
+                    #     ax.set_xlabel('Amount ($)')
+                    #     ax.legend()
                         
-                        # Adding light shade grids and formatting labels
-                        ax.grid(True, color='grey', alpha=0.3)
-                        labels = ax.get_yticklabels()
-                        for label in labels:
-                            if "Total" in label.get_text() or "TOTAL" in label.get_text():
-                                label.set_fontsize(12)
-                                label.set_fontweight('bold')
+                    #     # Adding light shade grids and formatting labels
+                    #     ax.grid(True, color='grey', alpha=0.3)
+                    #     labels = ax.get_yticklabels()
+                    #     for label in labels:
+                    #         if "Total" in label.get_text() or "TOTAL" in label.get_text():
+                    #             label.set_fontsize(12)
+                    #             label.set_fontweight('bold')
                                 
-                        ax.tick_params(axis='y', labelsize=12)
-                        ax.text(
-                            0.95, 0.95, f'Overall Budgeted YTD NET - ${round(overall_total["Budget 2024 YTD"],1)}', 
-                            transform=ax.transAxes, 
-                            fontsize=14, 
-                            verticalalignment='top', 
-                            horizontalalignment='right', 
-                            bbox=dict(facecolor='white', alpha=0.6, edgecolor='black')
-                        )
-                        ax.text(
-                            0.95, 0.85, f'Actual YTD NET- ${round(overall_total["Net"],1)}', 
-                            transform=ax.transAxes, 
-                            fontsize=14, 
-                            verticalalignment='top', 
-                            horizontalalignment='right', 
-                            bbox=dict(facecolor='white', alpha=0.6, edgecolor='black')
-                        )
-                        plt.style.use("fivethirtyeight")
+                    #     ax.tick_params(axis='y', labelsize=12)
+                    #     ax.text(
+                    #         0.95, 0.95, f'Overall Budgeted YTD NET - ${round(overall_total["Budget 2024 YTD"],1)}', 
+                    #         transform=ax.transAxes, 
+                    #         fontsize=14, 
+                    #         verticalalignment='top', 
+                    #         horizontalalignment='right', 
+                    #         bbox=dict(facecolor='white', alpha=0.6, edgecolor='black')
+                    #     )
+                    #     ax.text(
+                    #         0.95, 0.85, f'Actual YTD NET- ${round(overall_total["Net"],1)}', 
+                    #         transform=ax.transAxes, 
+                    #         fontsize=14, 
+                    #         verticalalignment='top', 
+                    #         horizontalalignment='right', 
+                    #         bbox=dict(facecolor='white', alpha=0.6, edgecolor='black')
+                    #     )
+                    #     plt.style.use("fivethirtyeight")
                         
-                        plt.rcParams['font.size'] = 5
-                        plt.rcParams['grid.color'] = "black"
-                        fig.patch.set_facecolor('lightblue')
-                                #ax.patch.set_facecolor('yellow')
-                        plt.tight_layout()
-                        st.pyplot(fig)
+                    #     plt.rcParams['font.size'] = 5
+                    #     plt.rcParams['grid.color'] = "black"
+                    #     fig.patch.set_facecolor('lightblue')
+                    #             #ax.patch.set_facecolor('yellow')
+                    #     plt.tight_layout()
+                    #     st.pyplot(fig)
                     
-                    with budget3:
-                        weyco= st.checkbox("WEYCO SUZANO NORMALIZED")
-                        if weyco:
-                            Budget_Dict=weyco_suzano_budget.copy()
-                            df=weyco_ledger.copy()
-                        else:
-                            Budget_Dict=budget.copy()
-                            df=ledger.copy()
+                    # with budget3:
+                    #     weyco= st.checkbox("WEYCO SUZANO NORMALIZED")
+                    #     if weyco:
+                    #         Budget_Dict=weyco_suzano_budget.copy()
+                    #         df=weyco_ledger.copy()
+                    #     else:
+                    #         Budget_Dict=budget.copy()
+                    #         df=ledger.copy()
                         
-                        ledger_p=pd.DataFrame()
-                        main={}
-                        dep=df[(df['Account']>=1712000)&(df["Account"]<=1865000)]
-                        capital=df[(df['Account']<1712000)]
-                        pma=df[(df['Account']>1865000)&(df["Account"]<=2131001)]
-                        deposits=df[(df['Account']>2131001)&(df["Account"]<=2391030)]
-                        df=df[((df['Account']>=1712000)&(df['Account']<=1865000))|(df["Account"]>2391040)]
-                        # main=populate_main(main,main_30,accso)
-                        # ledger=pd.concat([ledger,main_30])
-                        #df=df[df["Account"]>2391030]
-                        # df=prep_ledger(accso,yr)
-                        df=df[~df["Account"].isin([7370000,7370010,7470000])]
-                        labor=df[df['Account'].isin([7311015,6315000,6317030,7313015])]
+                    #     ledger_p=pd.DataFrame()
+                    #     main={}
+                    #     dep=df[(df['Account']>=1712000)&(df["Account"]<=1865000)]
+                    #     capital=df[(df['Account']<1712000)]
+                    #     pma=df[(df['Account']>1865000)&(df["Account"]<=2131001)]
+                    #     deposits=df[(df['Account']>2131001)&(df["Account"]<=2391030)]
+                    #     df=df[((df['Account']>=1712000)&(df['Account']<=1865000))|(df["Account"]>2391040)]
+                    #     # main=populate_main(main,main_30,accso)
+                    #     # ledger=pd.concat([ledger,main_30])
+                    #     #df=df[df["Account"]>2391030]
+                    #     # df=prep_ledger(accso,yr)
+                    #     df=df[~df["Account"].isin([7370000,7370010,7470000])]
+                    #     labor=df[df['Account'].isin([7311015,6315000,6317030,7313015])]
                         
-                        ledger_p=pd.concat([ledger_p,df])
-                        combined_main=populate_main(main,ledger_p)
-                        
-                        
+                    #     ledger_p=pd.concat([ledger_p,df])
+                    #     combined_main=populate_main(main,ledger_p)
                         
                         
-                        df=pd.DataFrame(combined_main).T
-                        st.write(df)
-                        df.drop(df[df["Net"]==0].index,inplace=True)
-                        #df.loc[df["Cat"]=="Depreciation","Net"]=-df.loc[df["Cat"]=="Depreciation","Net"]
-                        net_amount=df.Net.sum()
-                        df["Net"]=abs(df["Net"])
-                        #st.write(df)
-                        fig = px.sunburst(
-                            df, 
-                            path=['Cat','Sub_Cat','Name'],  # Path is used to define the hierarchy of the chart
-                            values='Net', 
-                            color='Cat',  # Coloring based on the net value
-                            color_continuous_scale='Blues',  # You can choose other color scales
-                            #color_continuous_midpoint=np.average(df['Net'], weights=df['Net']),
-                            title='Terminal Categories Sunburst Chart',
-                            hover_data={'Net': ':,.2f'}  # Format 'Net' as a float with two decimal places
-                        )
-                        fig.update_traces(hovertemplate='<b>%{label}</b><br>Net: $%{customdata[0]:,.2f}')
-                        fig.add_annotation(
-                            x=0.95,  # x position, centered
-                            y=0.9,  # y position, centered
-                            text=f'Total Net: ${net_amount:,.2f}',  # text to display
-                            showarrow=False,  # no arrow, just the text
-                            font=dict(
-                                family="Arial",
-                                size=16,
-                                color="black"
-                            ),
-                            align="center",
-                            bgcolor="white",  # background color for better readability
-                            opacity=0.8  # slightly transparent background
-                        )
                         
-                        fig.update_layout(
-                            hoverlabel=dict(
-                                bgcolor="white",  # Background color of the hover labels
-                                font_size=16,     # Font size of the text in hover labels
-                                font_family="Arial" ), # Font of the text in hover labels
-                            margin=dict(t=40, l=10, r=10, b=10),  # Adjust margins to ensure the title and labels fit
-                            width=800,  # Width of the figure in pixels
-                            height=600,  # Height of the figure in pixels
-                            #uniformtext=dict(minsize=15, mode='hide')
-                        )
+                        
+                    #     df=pd.DataFrame(combined_main).T
+                    #     st.write(df)
+                    #     df.drop(df[df["Net"]==0].index,inplace=True)
+                    #     #df.loc[df["Cat"]=="Depreciation","Net"]=-df.loc[df["Cat"]=="Depreciation","Net"]
+                    #     net_amount=df.Net.sum()
+                    #     df["Net"]=abs(df["Net"])
+                    #     #st.write(df)
+                    #     fig = px.sunburst(
+                    #         df, 
+                    #         path=['Cat','Sub_Cat','Name'],  # Path is used to define the hierarchy of the chart
+                    #         values='Net', 
+                    #         color='Cat',  # Coloring based on the net value
+                    #         color_continuous_scale='Blues',  # You can choose other color scales
+                    #         #color_continuous_midpoint=np.average(df['Net'], weights=df['Net']),
+                    #         title='Terminal Categories Sunburst Chart',
+                    #         hover_data={'Net': ':,.2f'}  # Format 'Net' as a float with two decimal places
+                    #     )
+                    #     fig.update_traces(hovertemplate='<b>%{label}</b><br>Net: $%{customdata[0]:,.2f}')
+                    #     fig.add_annotation(
+                    #         x=0.95,  # x position, centered
+                    #         y=0.9,  # y position, centered
+                    #         text=f'Total Net: ${net_amount:,.2f}',  # text to display
+                    #         showarrow=False,  # no arrow, just the text
+                    #         font=dict(
+                    #             family="Arial",
+                    #             size=16,
+                    #             color="black"
+                    #         ),
+                    #         align="center",
+                    #         bgcolor="white",  # background color for better readability
+                    #         opacity=0.8  # slightly transparent background
+                    #     )
+                        
+                    #     fig.update_layout(
+                    #         hoverlabel=dict(
+                    #             bgcolor="white",  # Background color of the hover labels
+                    #             font_size=16,     # Font size of the text in hover labels
+                    #             font_family="Arial" ), # Font of the text in hover labels
+                    #         margin=dict(t=40, l=10, r=10, b=10),  # Adjust margins to ensure the title and labels fit
+                    #         width=800,  # Width of the figure in pixels
+                    #         height=600,  # Height of the figure in pixels
+                    #         #uniformtext=dict(minsize=15, mode='hide')
+                    #     )
 
-                        st.plotly_chart(fig)
-                    with budget4:
-                        weycom= st.checkbox("WEYCO SUZANO NORMALIZED",key="fsa")
-                        if weycom:
-                            combined_ledger=weyco_ledger.copy()
-                        else:
-                            combined_ledger=ledger.copy()
-                        combined_ledger["Month"]=combined_ledger["Date"].dt.month
-                        combined_ledger=combined_ledger[combined_ledger["Month"]<upto_month]
-                        combined_ledger["Net"] = combined_ledger["Net"].map('{:.2f}'.format)
-                        combined_ledger["Net"]=combined_ledger["Net"].astype('float')
+                    #     st.plotly_chart(fig)
+                    # with budget4:
+                    #     weycom= st.checkbox("WEYCO SUZANO NORMALIZED",key="fsa")
+                    #     if weycom:
+                    #         combined_ledger=weyco_ledger.copy()
+                    #     else:
+                    #         combined_ledger=ledger.copy()
+                    #     combined_ledger["Month"]=combined_ledger["Date"].dt.month
+                    #     combined_ledger=combined_ledger[combined_ledger["Month"]<upto_month]
+                    #     combined_ledger["Net"] = combined_ledger["Net"].map('{:.2f}'.format)
+                    #     combined_ledger["Net"]=combined_ledger["Net"].astype('float')
                         
-                        ledger_pivot = combined_ledger.pivot_table(index=["Account", "Name"], columns="Month", values="Net", aggfunc="sum")
-                        #ledger_pivot.to_excel("Ledger_Pivot.xlsx")
-                        #ledger_pivot
-                        temp=ledger_pivot.loc[:,:10]
-                        temp.iloc[:20,:]=-temp.iloc[:20,:]
-                        #temp = temp.append(temp.sum(axis=0).rename("Total"))
+                    #     ledger_pivot = combined_ledger.pivot_table(index=["Account", "Name"], columns="Month", values="Net", aggfunc="sum")
+                    #     #ledger_pivot.to_excel("Ledger_Pivot.xlsx")
+                    #     #ledger_pivot
+                    #     temp=ledger_pivot.loc[:,:10]
+                    #     temp.iloc[:20,:]=-temp.iloc[:20,:]
+                    #     #temp = temp.append(temp.sum(axis=0).rename("Total"))
                         
-                        ship_accounts=[6311000,6312000,6313000,6314000,6313950,6315000,6315100,6315200,6316000,6317030,6318540,6318600,
-                                       6318900,6329000,6373000,6381000,6389000,7313015,7311015,7314300,7313949,7315000,7338700]
-                        overhead=[7350080,7350082,7350083,7350085,7350087,7350088]
+                    #     ship_accounts=[6311000,6312000,6313000,6314000,6313950,6315000,6315100,6315200,6316000,6317030,6318540,6318600,
+                    #                    6318900,6329000,6373000,6381000,6389000,7313015,7311015,7314300,7313949,7315000,7338700]
+                    #     overhead=[7350080,7350082,7350083,7350085,7350087,7350088]
                         
-                        weyco_non_ship_income=[6313001,6313002,6313003,6313955,6318101,6318301,6318501,6319040,6341000,6341010,6351000,6418500]
-                        suzano_income=[6888888]
-                        weyco_ship_income=[6999999]
+                    #     weyco_non_ship_income=[6313001,6313002,6313003,6313955,6318101,6318301,6318501,6319040,6341000,6341010,6351000,6418500]
+                    #     suzano_income=[6888888]
+                    #     weyco_ship_income=[6999999]
 
-                        non_vessel_expense = temp[(~temp.index.get_level_values("Account").isin(ship_accounts))&
-                                                  (temp.index.get_level_values("Account")>7000000)&
-                                                  (~temp.index.get_level_values("Account").isin(overhead))]
+                    #     non_vessel_expense = temp[(~temp.index.get_level_values("Account").isin(ship_accounts))&
+                    #                               (temp.index.get_level_values("Account")>7000000)&
+                    #                               (~temp.index.get_level_values("Account").isin(overhead))]
                                             
                         
-                        vessel_expense = temp[temp.index.get_level_values("Account").isin(ship_accounts)&
-                                                  (temp.index.get_level_values("Account")>7000000)]
+                    #     vessel_expense = temp[temp.index.get_level_values("Account").isin(ship_accounts)&
+                    #                               (temp.index.get_level_values("Account")>7000000)]
                         
-                        depreciation=temp[temp.index.get_level_values("Account")<2000000]
-                        overhead=temp[temp.index.get_level_values("Account").isin(overhead)]
-                        vessel_ops=temp[temp.index.get_level_values("Account").isin(ship_accounts)]
-                        weyco_static=temp[temp.index.get_level_values("Account").isin(weyco_non_ship_income)]
-                        other_income=temp[(~temp.index.get_level_values("Account").isin(weyco_non_ship_income))&
-                                          (~temp.index.get_level_values("Account").isin(ship_accounts))&
-                                          (~temp.index.get_level_values("Account").isin(suzano_income))&
-                                          (~temp.index.get_level_values("Account").isin(weyco_ship_income))&
-                                          (temp.index.get_level_values("Account")<7000000)&
-                                          (temp.index.get_level_values("Account")>2000000)]
-                        suzano_income=temp[temp.index.get_level_values("Account").isin(suzano_income)]
-                        weyco_ship_income=temp[temp.index.get_level_values("Account").isin(weyco_ship_income)]
+                    #     depreciation=temp[temp.index.get_level_values("Account")<2000000]
+                    #     overhead=temp[temp.index.get_level_values("Account").isin(overhead)]
+                    #     vessel_ops=temp[temp.index.get_level_values("Account").isin(ship_accounts)]
+                    #     weyco_static=temp[temp.index.get_level_values("Account").isin(weyco_non_ship_income)]
+                    #     other_income=temp[(~temp.index.get_level_values("Account").isin(weyco_non_ship_income))&
+                    #                       (~temp.index.get_level_values("Account").isin(ship_accounts))&
+                    #                       (~temp.index.get_level_values("Account").isin(suzano_income))&
+                    #                       (~temp.index.get_level_values("Account").isin(weyco_ship_income))&
+                    #                       (temp.index.get_level_values("Account")<7000000)&
+                    #                       (temp.index.get_level_values("Account")>2000000)]
+                    #     suzano_income=temp[temp.index.get_level_values("Account").isin(suzano_income)]
+                    #     weyco_ship_income=temp[temp.index.get_level_values("Account").isin(weyco_ship_income)]
                         
                         
                         
-                        temp=add_stat_rows(temp)
-                        non_vessel_expense = add_stat_rows(non_vessel_expense)
-                        vessel_expense = add_stat_rows(vessel_expense)
-                        depreciation=add_stat_rows(depreciation)
-                        overhead=add_stat_rows(overhead)
-                        vessel_ops=add_stat_rows(vessel_ops)
-                        weyco_static=add_stat_rows(weyco_static)
-                        other_income=add_stat_rows(other_income)
-                        suzano_income=add_stat_rows(suzano_income)
-                        weyco_ship_income=add_stat_rows(weyco_ship_income)
+                    #     temp=add_stat_rows(temp)
+                    #     non_vessel_expense = add_stat_rows(non_vessel_expense)
+                    #     vessel_expense = add_stat_rows(vessel_expense)
+                    #     depreciation=add_stat_rows(depreciation)
+                    #     overhead=add_stat_rows(overhead)
+                    #     vessel_ops=add_stat_rows(vessel_ops)
+                    #     weyco_static=add_stat_rows(weyco_static)
+                    #     other_income=add_stat_rows(other_income)
+                    #     suzano_income=add_stat_rows(suzano_income)
+                    #     weyco_ship_income=add_stat_rows(weyco_ship_income)
 
-                        if weycom:
-                            a=pd.DataFrame(columns=range(1,upto_month))
-                            a.loc["Revenue - Other Vessel Ops"]=vessel_ops.iloc[-1,:-1]
-                            a.loc["Revenue - Weyco Static"]=weyco_static.iloc[-1,:-1]
-                            a.loc["Revenue - Weyco Ship Income"]=weyco_ship_income.iloc[-1,:-1]
-                            a.loc["Revenue - Suzano Income"]=suzano_income.iloc[-1,:-1]
-                            a.loc["Revenue - Other"]=other_income.iloc[-1,:-1]
-                            a.loc["Expense - Running Cost"]=non_vessel_expense.iloc[-1,:-1]
-                            a.loc["Expense - Overhead"]=overhead.iloc[-1,:-1]
-                            a.loc["Expense - Depreciation"]=-depreciation.iloc[-1,:-1]
-                        else:
+                    #     if weycom:
+                    #         a=pd.DataFrame(columns=range(1,upto_month))
+                    #         a.loc["Revenue - Other Vessel Ops"]=vessel_ops.iloc[-1,:-1]
+                    #         a.loc["Revenue - Weyco Static"]=weyco_static.iloc[-1,:-1]
+                    #         a.loc["Revenue - Weyco Ship Income"]=weyco_ship_income.iloc[-1,:-1]
+                    #         a.loc["Revenue - Suzano Income"]=suzano_income.iloc[-1,:-1]
+                    #         a.loc["Revenue - Other"]=other_income.iloc[-1,:-1]
+                    #         a.loc["Expense - Running Cost"]=non_vessel_expense.iloc[-1,:-1]
+                    #         a.loc["Expense - Overhead"]=overhead.iloc[-1,:-1]
+                    #         a.loc["Expense - Depreciation"]=-depreciation.iloc[-1,:-1]
+                    #     else:
                             
-                            a=pd.DataFrame(columns=range(1,upto_month))
-                            a.loc["Revenue - Vessel Ops"]=vessel_ops.iloc[-1,:-1]
-                            a.loc["Revenue - Weyco Static"]=weyco_static.iloc[-1,:-1]
-                            a.loc["Revenue - Other"]=other_income.iloc[-1,:-1]
-                            a.loc["Expense - Running Cost"]=non_vessel_expense.iloc[-1,:-1]
-                            a.loc["Expense - Overhead"]=overhead.iloc[-1,:-1]
-                            a.loc["Expense - Depreciation"]=-depreciation.iloc[-1,:-1]
+                    #         a=pd.DataFrame(columns=range(1,upto_month))
+                    #         a.loc["Revenue - Vessel Ops"]=vessel_ops.iloc[-1,:-1]
+                    #         a.loc["Revenue - Weyco Static"]=weyco_static.iloc[-1,:-1]
+                    #         a.loc["Revenue - Other"]=other_income.iloc[-1,:-1]
+                    #         a.loc["Expense - Running Cost"]=non_vessel_expense.iloc[-1,:-1]
+                    #         a.loc["Expense - Overhead"]=overhead.iloc[-1,:-1]
+                    #         a.loc["Expense - Depreciation"]=-depreciation.iloc[-1,:-1]
                         
-                        a=a.copy()
-                        a.loc[:,"Mean"]=round(a.mean(axis=1),1)
-                        a=a.copy()
-                        a.loc["Total",:]=a.sum(axis=0)
-                        formatted_a = a.applymap(dollar_format)
-                        formatted_a.columns=[calendar.month_abbr[int(i)] for i in formatted_a.columns[:-1]]+["Per Month"]
-                        st.write(formatted_a)
+                    #     a=a.copy()
+                    #     a.loc[:,"Mean"]=round(a.mean(axis=1),1)
+                    #     a=a.copy()
+                    #     a.loc["Total",:]=a.sum(axis=0)
+                    #     formatted_a = a.applymap(dollar_format)
+                    #     formatted_a.columns=[calendar.month_abbr[int(i)] for i in formatted_a.columns[:-1]]+["Per Month"]
+                    #     st.write(formatted_a)
                 
                 with ttab2:
                     

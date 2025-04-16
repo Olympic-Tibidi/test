@@ -836,7 +836,7 @@ if authentication_status:
                     
                     budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
                     budget1=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget1.json"))
-                    budget_2023=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2023.json"))
+                    budget_2024=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget_2023.json"))
                     pure_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/pure_budget.json"))
                     weyco_suzano_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/weyco_suzano_budget.json"))
                     
@@ -2291,7 +2291,7 @@ if authentication_status:
         #                 #print(day)
         #                 balances[day]={"Remaining":tons_remaining,"Charge":0,"Accumulated":0}
         #                 if day % 7 < 5:  # Consider only weekdays
-        #                     tons_remaining-=daily_rate
+        #                     tons_remaining-=daily_rate58
         #                     #print(tons_remaining)
                             
         #                     balances[day]={"Remaining":tons_remaining,"Charge":0,"Accumulated":0}

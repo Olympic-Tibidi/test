@@ -1373,10 +1373,20 @@ if authentication_status:
                             st.session_state.year=year
                             
                         ### LOAD LEDGERS by year
-                        main_json=gcp_download_x(target_bucket,rf"main.json")
-                        #main_json=json.loads(main_json)
+                        main_json = gcp_download(target_bucket, "main.json")
+
+                        # Try loading once
+                        try:
+                            main_json = json.loads(main_json)
+                            # Check: was it a string again?
+                            if isinstance(main_json, str):
+                                main_json = json.loads(main_json)
+                        except Exception as e:
+                            st.error(f"Failed to load JSON: {e}")
+                            st.stop()
                         
-                        main = pd.DataFrame.from_dict(main_json, orient="index")
+                        # Now it's safely a dict of entries like {"0": {...}, "1": {...}}
+                        main = pd.DataFrame.from_dict(main_json, orient="index").reset_index(drop=True)
                         ledgers=main[main["Period_Year"]==int(year[-2:])]
                         ledgers["Account"]=ledgers["Account"].astype("str")
                         ledgers.set_index("index",drop=True,inplace=True)

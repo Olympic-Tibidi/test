@@ -1466,12 +1466,8 @@ if authentication_status:
                             monthly_label=category
                             # if it is revenues, operating expenses or maintenance expenses
                             if deep:
-                                all_values = []
-                                ###  WE CHOOSE DICTIONARY Items so we can go deeper
-                                for key, inner_dict in structure[category].items():
-                                    for inner_key, value in inner_dict.items():
-                                        all_values.append(inner_key)
-                                final=ledgers_b[ledgers_b["Account"].isin([i for i in all_values])]
+                                
+                                final=ledgers_b[ledgers_b["Account"].isin(structure[(structure["Group"]=="Revenues")&(structure["Subgroup"]=="Dockage")][["Account"]].values)]
                                 if final not in st.session_state:
                                     st.session_state["final"]=final
                             # if it is depreciation or overhead   

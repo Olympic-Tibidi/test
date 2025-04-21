@@ -1452,7 +1452,7 @@ if authentication_status:
                         structure.drop(columns=['afsin'], inplace=True)
                         structure=structure[['Account','Name','Group','Subgroup','ship','2024','2025']]
                         if depreciation_style=="normal":
-                            structure=structure[~structure["Account"].isin(["699999-32","6888888-32","688889-32"])]
+                            structure=structure[~structure["Account"].isin(["6999999-32","6888888-32","6888889-32"])]
                             structure=structure[~structure["Account"].str.startswith('1')]
                             
                             

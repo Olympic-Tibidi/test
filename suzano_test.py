@@ -702,6 +702,24 @@ def style_row(row):
     
     # Apply the style to all cells in the row
     return [base_style] * len(row)
+
+
+def apply_grouping_mode(df, mode_col='original'):
+    """
+    Flattens Group/Subgroup from the specified mode column and adds them to the DataFrame.
+    Drops the original nested column after expansion.
+    
+    Parameters:
+    - df: input DataFrame
+    - mode_col: name of the column containing nested {'Group': ..., 'Subgroup': ...} dict
+    """
+    df = df.copy()
+    df['Group'] = df[mode_col].apply(lambda x: x.get('Group') if isinstance(x, dict) else None)
+    df['Subgroup'] = df[mode_col].apply(lambda x: x.get('Subgroup') if isinstance(x, dict) else None)
+    df = df.drop(columns=[mode_col])
+    return df
+
+
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 pd.options.mode.chained_assignment = None  # default='warn'

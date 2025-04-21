@@ -1375,6 +1375,7 @@ if authentication_status:
                         ### LOAD LEDGERS by year
                         main_json=gcp_download(target_bucket,rf"main.json")
                         main_json=json.loads(main_json)
+                        st.write(main_json)
                         main = pd.DataFrame.from_dict(main_json, orient="index").reset_index(drop=True)
                         ledgers=main[main["Period_Year"]==int(year[-2:])]
                         ledgers["Account"]=ledgers["Account"].astype("str")

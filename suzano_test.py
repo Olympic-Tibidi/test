@@ -1703,7 +1703,7 @@ if authentication_status:
                             st.stop()
                         
                         # Now it's safely a dict of entries like {"0": {...}, "1": {...}}
-                        main = pd.DataFrame.from_dict(main_json, orient="index").reset_index(drop=True)
+                        main = pd.DataFrame.from_dict(main_json, orient="index").T
                         ledgers=main[main["Period_Year"]==int(year[-2:])]
                         ledgers["Account"]=ledgers["Account"].astype("str")
                         ledger_b=ledgers.copy()

@@ -1389,6 +1389,7 @@ if authentication_status:
                         main = pd.DataFrame.from_dict(main_json, orient="index").reset_index(drop=True)
                         ledgers=main[main["Period_Year"]==int(year[-2:])]
                         ledgers["Account"]=ledgers["Account"].astype("str")
+                        st.write(ledgers.head())
                         ledgers.set_index("index",drop=True,inplace=True)
                         
                         ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32

@@ -1376,7 +1376,7 @@ if authentication_status:
                         main_json=gcp_download(target_bucket,rf"main.json")
                         main_json=json.loads(main_json)
                         
-                        main = pd.DataFrame(main_json).T
+                        main = pd.DataFrame.from_dict(main_json, orient="index")
                         ledgers=main[main["Period_Year"]==int(year[-2:])]
                         ledgers["Account"]=ledgers["Account"].astype("str")
                         ledgers.set_index("index",drop=True,inplace=True)

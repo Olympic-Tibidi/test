@@ -1373,7 +1373,7 @@ if authentication_status:
                             st.session_state.year=year
                             
                         ### LOAD LEDGERS by year
-                        main_json=gcp_download(target_bucket,rf"main.json")
+                        main_json=gcp_download_x(target_bucket,rf"main.json")
                         #main_json=json.loads(main_json)
                         
                         main = pd.DataFrame.from_dict(main_json, orient="index")

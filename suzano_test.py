@@ -1581,8 +1581,8 @@ if authentication_status:
                             monthly.set_index("Date",drop=True, inplace=True)
         #                     #st.write(monthly)
                             monthly_=monthly.resample("M")["Debit","Credit","Net"].sum()
-                            monthly_.index=[i.month_name() for i in monthly_.index]
-                            avg=round(monthly_.Net.sum()/monthly_.shape[0],1)
+                            # monthly_.index=[i.month_name() for i in monthly_.index]
+                            avg=round(monthly_.Net.sum()/12 if year==2024 else 6
                             total=round(monthly_.Net.sum(),1)
                             
                                

@@ -1502,8 +1502,8 @@ if authentication_status:
                                     final=ledgers_b[ledgers_b["Acc"].isin(list(structure[(structure["Group"]==category)&(structure["Subgroup"]==sub_category)]["Account"].values))]
                                 else:
                                     level=3
-                                    acc=structure[(structure["Group"]==category)&(structure["Subgroup"]==sub_category)&(structure["Name"]==sub_item)]["Account"].unique()[0]
-                                    final=ledgers_b[ledgers_b["Acc"]==acc]
+                                    level_3_acc=structure[(structure["Group"]==category)&(structure["Subgroup"]==sub_category)&(structure["Name"]==sub_item)]["Account"].unique()[0]
+                                    final=ledgers_b[ledgers_b["Acc"]==level_3_acc]
                                 if sub_item not in st.session_state:
                                     st.session_state.sub_item=sub_item
                             else:
@@ -1545,14 +1545,14 @@ if authentication_status:
                                     for key, value in structure[a][b].items():
                                         if value == c:
                                             #st.write(key,":",value)
-                                            monthly=ledgers_b[ledgers_b["Account"]==key]
-                                            accounts=[key]         
+                                            monthly=ledgers_b[ledgers_b["Acc"]==level_3_account]
+                                            accounts=[level_3_account]         
                                     
                             elif level==2:
                                 if deep:
                                     #st.write(structure[a][b])
-                                    monthly=ledgers_b[ledgers_b["Account"].isin(structure[a][b].keys())]
-                                    accounts=structure[a][b].keys()
+                                    monthly=ledgers_b[ledgers_b["Acc"].isin(list(structure[(structure["Group"]==category)&(structure["Subgroup"]==sub_category)]["Account"].values))]
+                                    accounts=list(structure[(structure["Group"]==category)&(structure["Subgroup"]==sub_category)]["Account"].values)
                                 else:
                                     for key, value in structure[a].items():
                                         if value == b:

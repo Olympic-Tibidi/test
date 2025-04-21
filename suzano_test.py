@@ -1706,6 +1706,7 @@ if authentication_status:
                         main = pd.DataFrame.from_dict(main_json, orient="index").reset_index(drop=True)
                         ledgers=main[main["Period_Year"]==int(year[-2:])]
                         ledgers["Account"]=ledgers["Account"].astype("str")
+                        ledger_b=ledgers.copy()
                         ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(int(year),int(month),1))]
                         
                         ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32

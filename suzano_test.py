@@ -1392,7 +1392,6 @@ if authentication_status:
                         ledgers["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d") for i in ledgers["Date"]]
                         ledgers["Period_Date"]=[datetime.datetime.strptime(i,"%Y-%m") for i in ledgers["Period_Date"]]
                         
-                        st.write(ledgers.head())
                         # ledgers.set_index("index",drop=True,inplace=True)
                         
                         ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32

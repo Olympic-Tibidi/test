@@ -1561,7 +1561,7 @@ if authentication_status:
                             elif level==1:
                                 #st.write(structure[a])
                                 keys={}
-                                accounts=get_all_keys(structure[a],keys).keys()
+                                accounts=structure[structure["Group"]==a]["Account"].unique()
                                 
                             
                                            
@@ -1576,7 +1576,7 @@ if authentication_status:
                             #st.write(accounts)
                              
                             #st.write(ledgers_b)
-                            monthly=ledgers_b[ledgers_b["Account"].isin(accounts)]
+                            monthly=ledgers_b[ledgers_b["Acc"].isin(accounts)]
                             #st.write(monthly)
                             monthly.set_index("Date",drop=True, inplace=True)
         #                     #st.write(monthly)

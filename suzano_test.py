@@ -1804,12 +1804,12 @@ if authentication_status:
                                     x=0.5
                                 ),
                                 xaxis=dict(
-                                    titlefont=dict(size=18, family='Arial', color='black'),
+                                   
                                     tickfont=dict(size=16, family='Arial', color='black'),
                                 ),
                                 yaxis=dict(
                                     title='Amount ($)',
-                                    titlefont=dict(size=18, family='Arial', color='black'),
+                                    
                                     tickfont=dict(size=16, family='Arial', color='black'),
                                 ),
                                 shapes=[

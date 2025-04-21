@@ -1798,16 +1798,25 @@ if authentication_status:
                     #                                 )
                             
                             layout = go.Layout(
-                                        title = f'MARINE TERMINAL FINANCIALS-WATERFALL-{year}<br>{this_year}',
-                                        titlefont=dict(size=20, family='Arial', color='black',),
-                                        xaxis = { 'titlefont': dict(size=18, family='Arial', color='black'),
-                                                 'tickfont': dict(size=16, family='Arial', color='black',)},
-                                        yaxis = {'title': 'Amount ($)', 'titlefont': dict(size=18, family='Arial', color='black'),
-                                                 'tickfont': dict(size=16, family='Arial', color='black',)},
-                                        shapes = [
-                                            {'type': 'line', 'x0': -0.5, 'y0': -0, 'x1': len(labels)-0.5, 'y1': 0, 'line': {'color': 'red', 'width': 2}}
-                                        ],height=600,
-                                    )
+                                title=dict(
+                                    text=f'MARINE TERMINAL FINANCIALS-WATERFALL-{year}<br>{this_year}',
+                                    font=dict(size=20, family='Arial', color='black'),
+                                    x=0.5
+                                ),
+                                xaxis=dict(
+                                    titlefont=dict(size=18, family='Arial', color='black'),
+                                    tickfont=dict(size=16, family='Arial', color='black'),
+                                ),
+                                yaxis=dict(
+                                    title='Amount ($)',
+                                    titlefont=dict(size=18, family='Arial', color='black'),
+                                    tickfont=dict(size=16, family='Arial', color='black'),
+                                ),
+                                shapes=[
+                                    {'type': 'line', 'x0': -0.5, 'y0': 0, 'x1': len(labels)-0.5, 'y1': 0, 'line': {'color': 'red', 'width': 2}}
+                                ],
+                                height=600,
+                            )
                 
                             fig = go.Figure(data = trace, layout = layout)
                             

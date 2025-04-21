@@ -1390,7 +1390,7 @@ if authentication_status:
                         ledgers=main[main["Period_Year"]==int(year[-2:])]
                         ledgers["Account"]=ledgers["Account"].astype("str")
                         st.write(ledgers.head())
-                        ledgers.set_index("index",drop=True,inplace=True)
+                        # ledgers.set_index("index",drop=True,inplace=True)
                         
                         ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
                         ledgers_b=ledgers.copy()

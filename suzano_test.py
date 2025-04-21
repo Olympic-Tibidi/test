@@ -1422,7 +1422,7 @@ if authentication_status:
                             structure=weyco_normalized_budget.copy()
                         else:
                             structure=budget.copy()
-                        structure=pd.DataFrame(main_budget).T
+                        structure=pd.DataFrame(budget).T
                         structure=apply_grouping_mode(structure, mode_col='original')
                         structure.drop(columns=['afsin'], inplace=True)
                         structure=structure[['Account','Name','Group','Subgroup','ship','2024','2025']]

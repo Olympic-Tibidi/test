@@ -1690,14 +1690,22 @@ if authentication_status:
                         
                             
                         ### LOAD LEDGERS by year
-                        if year=="2024":
-                            ledger_b=gcp_download(target_bucket,rf"FIN/NEW/ledger-2024.ftr")
-                            ledger_b=pd.read_feather(io.BytesIO(ledger_b))
-                        else:
-                            ledger_b=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
-                            ledger_b=pd.read_feather(io.BytesIO(ledger_b))
-                        ledger_b["Account"]=ledger_b["Account"].astype("str")
-                        ledger_b.set_index("index",drop=True,inplace=True)
+                        main_json = gcp_download(target_bucket, "main.json")
+
+                        # Try loading once
+                        try:
+                            main_json = json.loads(main_json)
+                            # Check: was it a string again?
+                            if isinstance(main_json, str):
+                                main_json = json.loads(main_json)
+                        except Exception as e:
+                            st.error(f"Failed to load JSON: {e}")
+                            st.stop()
+                        
+                        # Now it's safely a dict of entries like {"0": {...}, "1": {...}}
+                        main = pd.DataFrame.from_dict(main_json, orient="index").reset_index(drop=True)
+                        ledgers=main[main["Period_Year"]==int(year[-2:])]
+                        ledgers["Account"]=ledgers["Account"].astype("str")
                         ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(int(year),int(month),1))]
                         
                         ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32

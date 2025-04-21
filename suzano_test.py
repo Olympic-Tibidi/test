@@ -1586,7 +1586,7 @@ if authentication_status:
                             total=round(monthly_.Net.sum(),1)
                             
                                
-                            annual_budget=[pure_budget[i]["2024"] for i in accounts].values.sum()
+                            annual_budget=[structure[structure["Account"].isin(accounts)][str(year)].sum()
                                 #st.write(annual_budget)
                             
                             

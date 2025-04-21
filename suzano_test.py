@@ -1339,11 +1339,15 @@ if authentication_status:
                 
                     #### LOAD BUDGET CODES, has information on 2022 and 2023 budget by account number
                 
-                    budget_codes=gcp_download_x(target_bucket,rf"FIN/budget_codes.feather")
-                    budget_codes=pd.read_feather(io.BytesIO(budget_codes))
-                    budget_codes.set_index("index",drop=True,inplace=True)
-                    budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
-                    weyco_normalized_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/weyco_suzano_budget.json"))
+                    # budget_codes=gcp_download_x(target_bucket,rf"FIN/budget_codes.feather")
+                    # budget_codes=pd.read_feather(io.BytesIO(budget_codes))
+                    # budget_codes.set_index("index",drop=True,inplace=True)
+                    # budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/budget.json"))
+                    # weyco_normalized_budget=json.loads(gcp_download(target_bucket,rf"FIN/NEW/weyco_suzano_budget.json"))
+                    
+
+                    budget=json.loads(gcp_download(target_bucket,rf"main_budget.json"))
+
                     keys={}
                     revenues_codes=list(get_all_keys(budget["Revenues"],keys).keys())
                     keys={}
@@ -1357,8 +1361,6 @@ if authentication_status:
                 
                     expenses=operations_codes+maintenance_codes#+overhead_codes
                     expenses_dep=expenses+depreciation_codes
-
-                    budget=json.loads(gcp_download(target_bucket,rf"main_budget.json"))
                 
                     # accounts_classes=gcp_download_x(target_bucket,rf"FIN/accounts_classes.pkl")
                     # accounts_classes = pickle.load(io.BytesIO(accounts_classes))
@@ -1420,8 +1422,14 @@ if authentication_status:
                             structure=weyco_normalized_budget.copy()
                         else:
                             structure=budget.copy()
+                        structure=pd.DataFrame(main_budget).T
+                        structure=apply_grouping_mode(structure, mode_col='original')
+                        structure.drop(columns=['afsin'], inplace=True)
+                        structure=structure[['Account','Name','Group','Subgroup','ship','2024','2025']]
+
+                        
                         # LOAD a list of sub_cats to display. If not deep the keys becomes the names of subcats due to shallow depth.(last nodes)
-                        liste=[f"ALL {category.upper()}"]+list(structure[category].keys()) if deep else [f"ALL {category.upper()}"]+list(structure[category].values())
+                        liste=[f"ALL {category.upper()}"]+list(structure[structure["Group"]==category]["Subgroup"].unique()) if deep else [f"ALL {category.upper()}"]+list(structure[category].values())
                             
                         ##CHOSE AND RECORD SUB_CAT in st session state
                         sub_category=st.selectbox("Select Sub_Category",liste)

@@ -1433,13 +1433,13 @@ if authentication_status:
                         st.session_state.sub_item=None
                         ###START LEVELS
                         ###CHOOSE AND RECORD CAT in st session state
-                        category=st.selectbox("Select Ledger",["Revenues","Operating Expenses","Maintenance Expenses","G & A Overhead","Depreciation"])
+                        category=st.selectbox("Select Ledger",["Revenues","Operating Expenses","Maintenance Expenses","General & Administrative Overhead","Depreciation"])
                                    
                         if category not in st.session_state:
                             st.session_state.category=category
                 
                         # Lets check if Deep categories or shallow (Revenue versus Depreciation)
-                        deep=True if category in ["Revenues","Operating Expenses","Maintenance Expenses","Depreciation"] else False
+                        deep=True if category in ["Revenues","Operating Expenses","Maintenance Expenses","Depreciation","General & Administrative Overhead"] else False
                         if weyco_normalized:
                             structure=weyco_normalized_budget.copy()
                         else:

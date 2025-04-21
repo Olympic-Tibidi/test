@@ -1481,7 +1481,7 @@ if authentication_status:
                         else:
                             level=2
                             if deep:
-                                sub_item=st.selectbox("Select Item",[f"ALL {sub_category.upper()}"]+list(structure[(structure["Group"]=="Revenues")&(structure["Subgroup"]=="Dockage")][["Name"]].values)))
+                                sub_item=st.selectbox("Select Item",[f"ALL {sub_category.upper()}"]+list(structure[(structure["Group"]==category)&(structure["Subgroup"]==sub_category)]["Name"].values)))
                                 monthly_label=sub_item
                                 
                                 display_allsubitem=True if sub_item==f"ALL {sub_category.upper()}" else False

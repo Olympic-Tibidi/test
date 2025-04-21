@@ -1366,22 +1366,16 @@ if authentication_status:
                     with fintab1: 
 
                         weyco_normalized=st.checkbox("CLICK FOR CLIENT NORMALIZED VIEW")
-                        year=st.selectbox("Select Year",["2024","2023","2022","2021","2020","2019","2018", "2017","2016"])
+                        year=st.selectbox("Select Year",["2025","2024","2023","2022","2021","2020","2019","2018", "2017","2016"])
                         
                         ### LETS PUT YEAR in st.session state to use later.
                         if year not in st.session_state:
                             st.session_state.year=year
                             
                         ### LOAD LEDGERS by year
-                        if year=="2024":
-                            if weyco_normalized:
-                                ledgers=gcp_download_x(target_bucket,rf"FIN/NEW/weyco_ledger.ftr")
-                                ledgers=pd.read_feather(io.BytesIO(ledgers))
-                            else:
-                                ledgers=gcp_download_x(target_bucket,rf"FIN/NEW/ledger-{year}.ftr")
-                                ledgers=pd.read_feather(io.BytesIO(ledgers))
-                        else:
-                            ledgers=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")
+                        main_json=gcp_download(target_bucket,rf"main.json")
+                        main = pd.DataFrame.from_dict(main_json, orient="index").reset_index(drop=True)
+                        ledgers=main[main["Period_Year"]==int)year[-2:]
                         ledgers["Account"]=ledgers["Account"].astype("str")
                         ledgers.set_index("index",drop=True,inplace=True)
                         
@@ -1684,7 +1678,7 @@ if authentication_status:
                             
                         ### LOAD LEDGERS by year
                         if year=="2024":
-                            ledger_b=gcp_download_x(target_bucket,rf"FIN/NEW/ledger-2024.ftr")
+                            ledger_b=gcp_download(target_bucket,rf"FIN/NEW/ledger-2024.ftr")
                             ledger_b=pd.read_feather(io.BytesIO(ledger_b))
                         else:
                             ledger_b=gcp_download_x(target_bucket,rf"FIN/main{year}.ftr")

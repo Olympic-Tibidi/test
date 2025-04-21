@@ -1471,7 +1471,7 @@ if authentication_status:
                             # if it is revenues, operating expenses or maintenance expenses
                             if deep:
                                 
-                                final=ledgers_b[ledgers_b["Acc"].isin(structure[(structure["Group"]==category)]]
+                                final=ledgers_b[ledgers_b["Acc"].isin(structure[(structure["Group"]==category)]["Account"].unique())]
                                 if final not in st.session_state:
                                     st.session_state["final"]=final
                             # if it is depreciation or overhead   

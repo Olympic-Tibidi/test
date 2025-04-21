@@ -1348,19 +1348,19 @@ if authentication_status:
 
                     budget=json.loads(gcp_download(target_bucket,rf"main_budget.json"))
 
-                    keys={}
-                    revenues_codes=list(get_all_keys(budget["Revenues"],keys).keys())
-                    keys={}
-                    operations_codes=list(get_all_keys(budget["Operating Expenses"],keys).keys())
-                    keys={}
-                    maintenance_codes=list(get_all_keys(budget["Maintenance Expenses"],keys).keys())
-                    keys={}
-                    depreciation_codes=list(get_all_keys(budget["Depreciation"],keys).keys())
-                    keys={}
-                    overhead_codes=list(get_all_keys(budget["G & A Overhead"],keys).keys())
+                    # keys={}
+                    # revenues_codes=list(get_all_keys(budget["Revenues"],keys).keys())
+                    # keys={}
+                    # operations_codes=list(get_all_keys(budget["Operating Expenses"],keys).keys())
+                    # keys={}
+                    # maintenance_codes=list(get_all_keys(budget["Maintenance Expenses"],keys).keys())
+                    # keys={}
+                    # depreciation_codes=list(get_all_keys(budget["Depreciation"],keys).keys())
+                    # keys={}
+                    # overhead_codes=list(get_all_keys(budget["G & A Overhead"],keys).keys())
                 
-                    expenses=operations_codes+maintenance_codes#+overhead_codes
-                    expenses_dep=expenses+depreciation_codes
+                    # expenses=operations_codes+maintenance_codes#+overhead_codes
+                    # expenses_dep=expenses+depreciation_codes
                 
                     # accounts_classes=gcp_download_x(target_bucket,rf"FIN/accounts_classes.pkl")
                     # accounts_classes = pickle.load(io.BytesIO(accounts_classes))

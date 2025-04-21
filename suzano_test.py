@@ -1413,6 +1413,10 @@ if authentication_status:
                         ledgers["Account"]=ledgers["Account"].astype("str")
                         ledgers["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d") for i in ledgers["Date"]]
                         ledgers["Period_Date"]=[datetime.datetime.strptime(i,"%Y-%m") for i in ledgers["Period_Date"]]
+
+                        ledgers["Credit"]=ledgers["Credit"].astype(float)
+                        ledgers["Debit"]=ledgers["Debit"].astype(float)
+                        ledgers["Net"]=ledgers["Net"].astype(float)
                         
                         # ledgers.set_index("index",drop=True,inplace=True)
                         

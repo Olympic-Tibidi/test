@@ -1444,10 +1444,18 @@ if authentication_status:
                             structure=weyco_normalized_budget.copy()
                         else:
                             structure=budget.copy()
+
+                        depreciation_style="normal"
+                        
                         structure=pd.DataFrame(budget).T
                         structure=apply_grouping_mode(structure, mode_col='original')
                         structure.drop(columns=['afsin'], inplace=True)
                         structure=structure[['Account','Name','Group','Subgroup','ship','2024','2025']]
+                        if depreciation_style=="normal":
+                            structure=structure[~structure["Account"].isin(["6999999-32","6888888-32","68888889-32"])]
+                            structure=structure[~structure["Account"].str.startswith('1')]
+                            
+                            
 
                         
                         # LOAD a list of sub_cats to display. If not deep the keys becomes the names of subcats due to shallow depth.(last nodes)

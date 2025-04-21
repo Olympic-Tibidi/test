@@ -1467,7 +1467,7 @@ if authentication_status:
                             # if it is revenues, operating expenses or maintenance expenses
                             if deep:
                                 
-                                final=ledgers_b[ledgers_b["Account"].isin(structure[(structure["Group"]=="Revenues")&(structure["Subgroup"]=="Dockage")][["Account"]].values)]
+                                final=ledgers_b[ledgers_b["Account"].isin(structure[(structure["Group"]==category)&(structure["Subgroup"]==sub_category)][["Account"]].values)]
                                 if final not in st.session_state:
                                     st.session_state["final"]=final
                             # if it is depreciation or overhead   
@@ -1490,8 +1490,8 @@ if authentication_status:
                                     final=ledgers_b[ledgers_b["Account"].isin([i for i in structure[category][sub_category].keys()])]
                                 else:
                                     level=3
-                                    account=[i for i in list(structure[category][sub_category]) if structure[category][sub_category][i]==sub_item][0]
-                                    final=ledgers_b[ledgers_b["Account"]==account]
+                                    acc=structure[structure["Name"]
+                                    final=ledgers_b[ledgers_b["Acc"]==account]
                                 if sub_item not in st.session_state:
                                     st.session_state.sub_item=sub_item
                             else:

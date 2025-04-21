@@ -1490,7 +1490,7 @@ if authentication_status:
                                     final=ledgers_b[ledgers_b["Account"].isin([i for i in structure[category][sub_category].keys()])]
                                 else:
                                     level=3
-                                    acc=structure[structure["Name"]
+                                    
                                     final=ledgers_b[ledgers_b["Acc"]==account]
                                 if sub_item not in st.session_state:
                                     st.session_state.sub_item=sub_item

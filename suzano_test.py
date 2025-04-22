@@ -1743,7 +1743,7 @@ if authentication_status:
                         
                         ledger_b.Account=[str(i)+"-"+str(j) for i,j in zip(ledger_b.Account,ledger_b.Sub_Cat)]
 
-                        revenues_codes=structure[structure["Group"]=="Revenues"]["Account"].unique()
+                        revenues_codes=list(structure[structure["Group"]=="Revenues"]["Account"].unique())
                         operations_codes=structure[structure["Group"]=="Operating Expenses"]["Account"].unique()
                         maintenance_codes=structure[structure["Group"]=="Maintenance Expenses"]["Account"].unique()
                         depreciation_codes=structure[structure["Group"]=="Depreciation"]["Account"].unique()

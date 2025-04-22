@@ -1874,133 +1874,139 @@ if authentication_status:
                                 else:
                                     keys[k]=v
                             return keys
-                        labels=['Vessel Operations','Labor','Tenants','Stormwater Revenue','Other Revenue',
-                               'TOTAL REVENUE',
-                               'OPERATING EXPENSES',
-                               'Operating Overhead','Terminal Operating Expense','Outside Professional Services','Labor','Vessel Operational Expenses',
-                                     'Stormwater Operating Expenses','Utilities',
-                                "MAINTENANCE EXPENSES",
-                                'Maintenance Overhead','Property Maintenance','Equipment Maintenance','Stormwater Maintenance Expenses',
-                                      'Other Maintenance Expenses',
-                                "DEPRECIATION",
-                                'Depreciation Terminal','Depreciation Grants','Depreciation Stormwater',
-                                 "G&A OVERHEAD",
-                                'Executive G&A Overhead','Marketing G&A Overhead',
-                                'Finance G&A Overhead','Engineering G&A Overhead',
-                                     'I/S G&A Overhead','Administrative G&A Overhead',
-                                "Excess Revenue",
+                        vlabels=list(temp[temp["Group"]=="Revenues"]["Sub_Group"].unique())+['TOTAL REVENUE','OPERATING EXPENSES']+\
+                               list(temp[temp["Group"]=="Operating Expenses"]["Sub_Group"].unique())+\
+                                ["MAINTENANCE EXPENSES"]+\
+                                list(temp[temp["Group"]=="Maintenance Expenses"]["Sub_Group"].unique())+\
+                                ["DEPRECIATION"]+\
+                                list(temp[temp["Group"]=="Depreciation"]["Sub_Group"].unique())+\
+                                ["G&A OVERHEAD"]+\
+                                list(temp[temp["Group"]=="General & Administrative Overhead"]["Sub_Group"].unique())+\
+                                ["Excess Revenue",
                                 "Loss After Depreciation"]
-                
-                        keys={}
+
+
+                        def extract_values(temp, labels, section_name_start, section_name_end):
+                            start = 0 if section_name_start is None else labels.index(section_name_start) + 1
+                            end = labels.index(section_name_end)
+                            return [round(abs(temp[temp["Sub_Group"] == i]["Net"].sum()), 1) for i in labels[start:end]]
                         
-                        revs=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Revenues"][i],keys).keys())]["Net"].sum()) for i in labels[:5]]
-                
-                        ops=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Operating Expenses"][i],keys).keys())]["Net"].sum()) for i in labels[7:14]]
-                
-                        maint=[abs(ledger_b[ledger_b["Account"].isin(get_all_keys(budget["Maintenance Expenses"][i],keys).keys())]["Net"].sum())for i in labels[15:20]]
-                
-                        dep=[abs(ledger_b[ledger_b["Account"]==key_from_value(budget["Depreciation"],i)]["Net"].sum()) for i in labels[21:24]]
-                
-                        overhead=[abs(ledger_b[ledger_b["Account"]==key_from_value(budget["G & A Overhead"],i)]["Net"].sum()) for i in labels[25:31]]
-                        overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
-                        valerians=[]
-                        for i in revs:
-                            valerians.append(i)
-                        valerians.append(sum(revs))
-                        valerians.append(sum(ops))
-                        for i in ops:
-                            valerians.append(i)
-                        valerians.append(sum(maint))
-                        for i in maint:
-                            valerians.append(i)
-                        valerians.append(sum(dep))
-                        for i in dep:
-                            valerians.append(i)
-                
-                        valerians.append(sum(overhead))
-                        for i in overhead:
-                            valerians.append(i)
-                
-                        valerians.append(overall)
-                
-                        valerians.append(overall)
-                
-                        valerians=['<b>${:,.1f}<b>'.format(round(i,1)) for i in valerians]
-                        labels=[f'<b>{i}<b>' for i in labels]
-                        if overall>0:
-                            
-                          
-                            source=[0,1,2,3,4]+[5,5, 5 ,5,5]+ [6,6,6, 6, 6, 6, 6]+[14,14,14,14,14]+[20,20,20]+[24,24,24,24,24,24]
-                            target=[5,5,5,5,5]+[6,14,20,24,31]+[7,8,9,10,11,12,13]+[15,16,17,18,19]+[21,22,23]+[25,26,27,28,29,30,]
-                            values=revs+[sum(ops)]+[sum(maint)]+[sum(dep)]+[sum(overhead)]+[overall]+ops+maint+dep+overhead
-                            linkcolor=['#66CD00']*5+\
-                                  ['#FFB90F','#BF3EFF', '#A6E3D7', '#EC7063','#FFC0CB',]+\
-                                    ['#FFB90F']*7+\
-                                        ['#BF3EFF']*5+\
-                                    ['#A6E3D7']*3+\
-                                    ['#EC7063']*6
-                        else:
-                            
-                           
-                            source=[0,1,2,3,4,32]+[5,5, 5 ,5,]+ [6,6,6, 6, 6, 6, 6]+[14,14,14,14,14]+[20,20,20]+[24,24,24,24,24,24]
-                            target=[5,5,5,5,5,5]+[6,14,20,24,]+[7,8,9,10,11,12,13]+[15,16,17,18,19]+[21,22,23]+[25,26,27,28,29,30,]
-                            values=revs+[abs(overall)]+[sum(ops)]+[sum(maint)]+[sum(dep)]+[sum(overhead)]+ops+maint+dep+overhead
-                            linkcolor=['#66CD00']*5+['#FFC0CB']+\
-                                  ['#FFB90F','#BF3EFF', '#A6E3D7', '#EC7063',]+\
-                                    ['#FFB90F']*7+\
-                                        ['#BF3EFF']*5+\
-                                    ['#A6E3D7']*3+\
-                                    ['#EC7063']*6
-                        #'#104E8B'
-                        title_=f'{year}-YTD' if year=="2023" else year  
-                        fig = go.Figure(data=[go.Sankey(
-                            node = dict(
-                            thickness = 10,
-                            #label = [f'<b>{i}<b>'+"-"+str(valerians[labels.index(i)]) for i in labels],
-                           # label = [str(valerians[labels.index(i)]) for i in labels],
-                            #label = [i+" - "+str(valerians[labels.index(i)]) for i in labels],
-                            label=[f'<b>{i} - {str(valerians[labels.index(i)])}</b>' for i in labels],
-                            color = [
-                                    '#808B96', 
-                                    '#EC7063', '#F7DC6F', '#48C9B0', '#AF7AC5',
-                                    '#EC7063', '#EC7063',
-                                    '#F7DC6F', '#F7DC6F',
-                                    '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0', '#48C9B0',
-                                    '#AF7AC5', '#AF7AC5', '#AF7AC5'] #"cyan"
-                                        ),
-                            link = dict(
-                
-                            # indices correspond to labels
-                            source = source,
-                            target = target,
-                            value = values,
-                            color=linkcolor
+                        
+                        def build_sankey_links(revs, ops, maint, dep, overhead, overall, labels):
+                            source = []
+                            target = []
+                            values = []
+                            link_colors = []
+                        
+                            palettes = {
+                                'revenue': '#FFA500',
+                                'ops': '#87CEFA',
+                                'maint': '#90EE90',
+                                'dep': '#DDA0DD',
+                                'overhead': '#808080',
+                                'net': '#C0C0C0'
+                            }
+                        
+                            def add_section_links(section_values, from_node, to_nodes_start_idx, color_key):
+                                for i, val in enumerate(section_values):
+                                    source.append(from_node)
+                                    target.append(to_nodes_start_idx + i)
+                                    values.append(val)
+                                    link_colors.append(palettes[color_key])
+                        
+                            # Revenue → TOTAL REVENUE
+                            for i, val in enumerate(revs):
+                                source.append(i)
+                                target.append(labels.index("TOTAL REVENUE"))
+                                values.append(val)
+                                link_colors.append(palettes['revenue'])
+                        
+                            idx = labels.index
+                        
+                            # TOTAL REVENUE → main sections
+                            for section, section_data, color_key in zip(
+                                ["OPERATING EXPENSES", "MAINTENANCE EXPENSES", "DEPRECIATION", "G&A OVERHEAD"],
+                                [ops, maint, dep, overhead],
+                                ['ops', 'maint', 'dep', 'overhead']):
+                                source.append(idx("TOTAL REVENUE"))
+                                target.append(idx(section))
+                                values.append(sum(section_data))
+                                link_colors.append(palettes[color_key])
+                        
+                            # Section headers → individual categories
+                            offset = len(revs) + 1
+                            for section, section_data, color_key in zip(
+                                ["OPERATING EXPENSES", "MAINTENANCE EXPENSES", "DEPRECIATION", "G&A OVERHEAD"],
+                                [ops, maint, dep, overhead],
+                                ['ops', 'maint', 'dep', 'overhead']):
+                                parent_idx = idx(section)
+                                for i, val in enumerate(section_data):
+                                    source.append(parent_idx)
+                                    target.append(parent_idx + 1 + i)
+                                    values.append(val)
+                                    link_colors.append(palettes[color_key])
+                        
+                            # Final surplus or deficit
+                            final_target = idx("Excess Revenue") if overall >= 0 else idx("Loss After Depreciation")
+                            final_source = idx("TOTAL REVENUE") if overall >= 0 else idx("Excess Revenue")
+                            source.append(final_source)
+                            target.append(final_target)
+                            values.append(abs(overall))
+                            link_colors.append(palettes['net'])
+                        
+                            return source, target, values, link_colors
+                        
+                        
+                        def build_sankey_chart(temp, year):
+                            raw_labels = list(temp[temp["Group"] == "Revenues"]["Sub_Group"].unique()) + [
+                                'TOTAL REVENUE', 'OPERATING EXPENSES'] + \
+                                     list(temp[temp["Group"] == "Operating Expenses"]["Sub_Group"].unique()) + \
+                                     ['MAINTENANCE EXPENSES'] + \
+                                     list(temp[temp["Group"] == "Maintenance Expenses"]["Sub_Group"].unique()) + \
+                                     ['DEPRECIATION'] + \
+                                     list(temp[temp["Group"] == "Depreciation"]["Sub_Group"].unique()) + \
+                                     ['G&A OVERHEAD'] + \
+                                     list(temp[temp["Group"] == "General & Administrative Overhead"]["Sub_Group"].unique()) + \
+                                     ['Excess Revenue', 'Loss After Depreciation']
+                        
+                            revs=[round(abs(temp[(temp["Sub_Group"]==i)&(temp["Group"]=="Revenues")]["Net"].sum()),1) for i in labels[:labels.index("TOTAL REVENUE")]]
+                            ops=[round(abs(temp[(temp["Sub_Group"]==i)&(temp["Group"]=="Operating Expenses")]["Net"].sum()),1) for i in labels[labels.index("OPERATING EXPENSES")+1:labels.index("MAINTENANCE EXPENSES")]]
+                            maint=[round(abs(temp[(temp["Sub_Group"]==i)&(temp["Group"]=="Maintenance Expenses")]["Net"].sum()),1) for i in labels[labels.index("MAINTENANCE EXPENSES")+1:labels.index("DEPRECIATION")]]
+                            dep=[round(abs(temp[temp["Sub_Group"]==i]["Net"].sum()),1) for i in labels[labels.index("DEPRECIATION")+1:labels.index("G&A OVERHEAD")]]
+                            overhead=[round(abs(temp[temp["Sub_Group"]==i]["Net"].sum()),1) for i in labels[labels.index("G&A OVERHEAD")+1:labels.index("Excess Revenue")]]
+                            overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
+                            valerians = revs + [sum(revs), sum(ops)] + ops + [sum(maint)] + maint + [sum(dep)] + dep + [sum(overhead)] + overhead + [overall, overall]
+                            valerians_fmt = ['<b>${:,.1f}</b>'.format(round(i, 1)) for i in valerians]
+                            flabels = [f'<b>{i}</b>' for i in raw_labels]
+                        
+                            source, target, values, link_colors = build_sankey_links(revs, ops, maint, dep, overhead, overall, raw_labels)
+                        
+                            fig = go.Figure(data=[go.Sankey(
+                                node=dict(
+                                    thickness=10,
+                                    label=[f'{flabels[i]} - {valerians_fmt[i]}' for i in range(len(flabels))],
+                                    color="#F5F5F5"
+                                ),
+                                link=dict(
+                                    source=source,
+                                    target=target,
+                                    value=values,
+                                    color=link_colors
+                                )
+                            )])
+                        
+                            title_ = f'{year}-YTD' if year == "2023" else year
+                            fig.update_layout(
+                                width=1200,
+                                height=800,
+                                title=title_,
+                                hovermode='x',
+                                font=dict(size=12, color='black'),
+                                paper_bgcolor='#FCE6C9',
+                                margin=dict(l=50, r=350, t=50, b=50)
                             )
-                        )])
-                        # fig.add_annotation(
-                        #                                         x=0.5,
-                        #                                         y=-0.05,
-                        #                                         text="From Budgeted Monthly",
-                        #                                         showarrow=False,
-                        #                                         font=dict(
-                        #                                             size=16,
-                        #                                             color="darkblue",
-                        #                                             family="Arial"
-                        #                                         )
-                        #                                     )
-                        fig.update_layout(width=1200, height=800,
-                            title=title_,hovermode = 'x',
-                                          
-                            font=dict(size = 12, color = 'black'),paper_bgcolor='#FCE6C9',margin=dict(
-                                l=50,  # Set the left margin to 50 pixels
-                                r=350,  # Set the right margin to 150 pixels
-                                t=50,  # Set the top margin to 50 pixels
-                                b=50,  # Set the bottom margin to 50 pixels
-                            ),
-                                          
-                
-                
-                        )
+                            return fig
+                        fig = build_sankey_chart(temp, year)
                         st.plotly_chart(fig)
                     #fig.write_html(fr'c:\Users\{loc}\Desktop\OldBudget.html')
                     #fig.show()

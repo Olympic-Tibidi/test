@@ -1874,6 +1874,8 @@ if authentication_status:
                                 else:
                                     keys[k]=v
                             return keys
+
+                        temp=ledger_b.copy()
                         vlabels=list(temp[temp["Group"]=="Revenues"]["Sub_Group"].unique())+['TOTAL REVENUE','OPERATING EXPENSES']+\
                                list(temp[temp["Group"]=="Operating Expenses"]["Sub_Group"].unique())+\
                                 ["MAINTENANCE EXPENSES"]+\

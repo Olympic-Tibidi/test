@@ -1737,7 +1737,7 @@ if authentication_status:
                         ledgers["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d") for i in ledgers["Date"]]
                         ledgers["Period_Date"]=[datetime.datetime.strptime(i,"%Y-%m") for i in ledgers["Period_Date"]]
                         ledger_b=ledgers.copy()
-                        ledger_b=ledger_b[ledger_b["Period_Date"]<pd.Timestamp(datetime.date(int(year),int(month),1))]
+                        ledger_b=ledger_b[ledger_b["Period_Date"]<=pd.Timestamp(datetime.date(int(year),int(month),1))]
                         
                         ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
                         

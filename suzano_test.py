@@ -1602,7 +1602,7 @@ if authentication_status:
                             col1, col2,col3= st.columns([4,2,4])
                             
                             with col1:
-                                st.write(monthly_)
+                                st.table(monthly_)
                             with col2:
                                 text='${:,.1f}'.format(total)
                                 st.markdown('**Average Monthly    :      ${:,.1f}**'.format(avg))

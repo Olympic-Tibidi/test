@@ -1641,7 +1641,7 @@ if authentication_status:
                                             'steps': [
                                                 {'range': [0, abs(budgeted)], 'color': 'cyan'},
                                                 {'range': [abs(budgeted),
-                                                          abs(1.5*budgeted)], 'color': 'royalblue'}],
+                                                          abs(2*budgeted)], 'color': 'royalblue'}],
                                             'threshold': {
                                                 'line': {'color': "red", 'width': 4},
                                                 'thickness': 0.75,
@@ -1705,19 +1705,23 @@ if authentication_status:
                                 st.plotly_chart(fig1)
                             with col6:
                                 st.subheader(f"{monthly_label} Across Years")
-                                yillar=["2023","2022","2021","2020","2019","2018", "2017","2016"]
+                                yillar=["2024","2023","2022","2021","2020","2019","2018", "2017","2016"]
                                 results=[]
                                 for k in yillar:
-                                    temp=gcp_download_x(target_bucket,rf"FIN/main{k}.ftr")
-                                    temp=pd.read_feather(io.BytesIO(temp))
+                                    if k!="2024":
+                                        
+                                        temp=gcp_download_x(target_bucket,rf"FIN/main{k}.ftr")
+                                        temp=pd.read_feather(io.BytesIO(temp))
+                                        
                                     
-                                
-                                    temp.set_index("index",drop=True,inplace=True)
-                
-                                    ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
-                                    temp1=temp.copy()
-                                    temp1.Account=[str(i)+"-"+str(j) for i,j in zip(temp1.Account,temp1.Sub_Cat)]
-                                    result=temp1[temp1["Account"].isin(accounts)]["Net"].sum()
+                                        temp.set_index("index",drop=True,inplace=True)
+                    
+                                        ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
+                                        temp1=temp.copy()
+                                        temp1.Account=[str(i)+"-"+str(j) for i,j in zip(temp1.Account,temp1.Sub_Cat)]
+                                        result=temp1[temp1["Account"].isin(accounts)]["Net"].sum()
+                                    else:
+                                        result=ledgers_b[ledgers_b["Acc"].isin(accounts)]["Net"].sum()
                                     results.append(result)
                                 fig2 = go.Figure(data=[go.Bar(x=yillar, y=results)])
                                 st.plotly_chart(fig2)

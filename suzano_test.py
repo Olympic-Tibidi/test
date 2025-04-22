@@ -2080,15 +2080,19 @@ if authentication_status:
         #             #             #print(overall)
         #             #             revs
                     with fintab4:
-                        ear=st.selectbox("Select Year",["2024","2023","2022","2021"],key="yeartab2")
+                        ear=st.selectbox("Select Year",["2025","2024","2023","2022","2021"],key="yeartab2")
+
+                        main_json = gcp_download(target_bucket, "main.json")
                 
-                        try:
-                            ledgers=gcp_download_x(target_bucket,rf"FIN/NEW/ledger-{ear}.ftr")
-                        except:
-                            ledgers=gcp_download_x(target_bucket,rf"FIN/main-{ear}.ftr")
-                        ledgers=pd.read_feather(io.BytesIO(ledgers))
+                        main = pd.DataFrame.from_dict(main_json, orient="index").T
+                        ledgers=main[main["Period_Year"]==int(year[-2:])]
                         ledgers["Account"]=ledgers["Account"].astype("str")
-                        ledgers.set_index("index",drop=True,inplace=True)
+                        ledgers["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d") for i in ledgers["Date"]]
+                        ledgers["Period_Date"]=[datetime.datetime.strptime(i,"%Y-%m") for i in ledgers["Period_Date"]]
+
+                        ledgers["Credit"]=ledgers["Credit"].astype(float)
+                        ledgers["Debit"]=ledgers["Debit"].astype(float)
+                        ledgers["Net"]=ledgers["Net"].astype(float)
                         #st.write(ledgers)
         
                         for_search_ledger=ledgers.fillna("")

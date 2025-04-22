@@ -1748,7 +1748,7 @@ if authentication_status:
                         maintenance_codes=structure[structure["Group"]=="Maintenance Expenses"]["Account"].unique()
                         depreciation_codes=structure[structure["Group"]=="Depreciation"]["Account"].unique()
                         overhead_codes=structure[structure["Group"]=="General & Administrative Overhead"]["Account"].unique()
-                        st.write(revenue_codes)
+                        st.write(revenues_codes)
                         expenses=operations_codes+maintenance_codes
                         expenses_dep=expenses+depreciation_codes
                     

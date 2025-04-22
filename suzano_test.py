@@ -1758,7 +1758,7 @@ if authentication_status:
                         outs_dep=ledger_b[ledger_b["Acc"].isin(expenses_dep)].Net.sum()
                         dep=ledger_b[ledger_b["Acc"].isin(depreciation_codes)].Net.sum()
                         
-                        a1, a2,= st.columns([2,5])
+                        a1, a2,= st.columns([2,7])
                         with a1:
                             
                             st.write(f"**REVENUES     :  {'${:,.1f}**'.format(ins)}")

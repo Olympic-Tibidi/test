@@ -1744,11 +1744,11 @@ if authentication_status:
                         ledger_b.Account=[str(i)+"-"+str(j) for i,j in zip(ledger_b.Account,ledger_b.Sub_Cat)]
 
                         revenues_codes=list(structure[structure["Group"]=="Revenues"]["Account"].unique())
-                        operations_codes=structure[structure["Group"]=="Operating Expenses"]["Account"].unique()
-                        maintenance_codes=structure[structure["Group"]=="Maintenance Expenses"]["Account"].unique()
-                        depreciation_codes=structure[structure["Group"]=="Depreciation"]["Account"].unique()
-                        overhead_codes=structure[structure["Group"]=="General & Administrative Overhead"]["Account"].unique()
-                        st.write(revenues_codes)
+                        operations_codes=list(structure[structure["Group"]=="Operating Expenses"]["Account"].unique())
+                        maintenance_codes=list(structure[structure["Group"]=="Maintenance Expenses"]["Account"].unique())
+                        depreciation_codes=list(structure[structure["Group"]=="Depreciation"]["Account"].unique())
+                        overhead_codes=list(structure[structure["Group"]=="General & Administrative Overhead"]["Account"].unique())
+                        # st.write(revenues_codes)
                         expenses=operations_codes+maintenance_codes
                         expenses_dep=expenses+depreciation_codes
                     

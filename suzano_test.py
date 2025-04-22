@@ -1633,7 +1633,7 @@ if authentication_status:
                                         title = {'text': gauge_text, 'font': {'size': 24}},
                                         delta = {'position':'bottom','reference': abs(round(budgeted,1)), 'increasing': {'color': "RebeccaPurple"}},
                                         gauge = {
-                                            'axis': {'range': [None, 1.5*abs(budgeted)], 'tickwidth': 1, 'tickcolor': "darkblue"},
+                                            'axis': {'range': [None, 2*abs(budgeted)], 'tickwidth': 1, 'tickcolor': "darkblue"},
                                             'bar': {'color': "darkblue"},
                                             'bgcolor': "white",
                                             'borderwidth': 2,

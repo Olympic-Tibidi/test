@@ -1979,9 +1979,9 @@ if authentication_status:
                             overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
                             valerians = revs + [sum(revs), sum(ops)] + ops + [sum(maint)] + maint + [sum(dep)] + dep + [sum(overhead)] + overhead + [overall, overall]
                             valerians_fmt = ['<b>${:,.1f}</b>'.format(round(i, 1)) for i in valerians]
-                            flabels = [f'<b>{i}</b>' for i in raw_labels]
+                            flabels = [f'<b>{i}</b>' for i in labels]
                         
-                            source, target, values, link_colors = build_sankey_links(revs, ops, maint, dep, overhead, overall, raw_labels)
+                            source, target, values, link_colors = build_sankey_links(revs, ops, maint, dep, overhead, overall, labels)
                         
                             fig = go.Figure(data=[go.Sankey(
                                 node=dict(

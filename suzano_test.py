@@ -1960,7 +1960,7 @@ if authentication_status:
                         
                         
                         def build_sankey_chart(temp, year):
-                            raw_labels = list(temp[temp["Group"] == "Revenues"]["Sub_Group"].unique()) + [
+                            labels = list(temp[temp["Group"] == "Revenues"]["Sub_Group"].unique()) + [
                                 'TOTAL REVENUE', 'OPERATING EXPENSES'] + \
                                      list(temp[temp["Group"] == "Operating Expenses"]["Sub_Group"].unique()) + \
                                      ['MAINTENANCE EXPENSES'] + \

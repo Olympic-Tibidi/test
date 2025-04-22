@@ -1366,23 +1366,7 @@ if authentication_status:
 
                     budget=json.loads(gcp_download(target_bucket,rf"main_budget.json"))
 
-                    # keys={}
-                    # revenues_codes=list(get_all_keys(budget["Revenues"],keys).keys())
-                    # keys={}
-                    # operations_codes=list(get_all_keys(budget["Operating Expenses"],keys).keys())
-                    # keys={}
-                    # maintenance_codes=list(get_all_keys(budget["Maintenance Expenses"],keys).keys())
-                    # keys={}
-                    # depreciation_codes=list(get_all_keys(budget["Depreciation"],keys).keys())
-                    # keys={}
-                    # overhead_codes=list(get_all_keys(budget["G & A Overhead"],keys).keys())
-                
-                    # expenses=operations_codes+maintenance_codes#+overhead_codes
-                    # expenses_dep=expenses+depreciation_codes
-                
-                    # accounts_classes=gcp_download_x(target_bucket,rf"FIN/accounts_classes.pkl")
-                    # accounts_classes = pickle.load(io.BytesIO(accounts_classes))
-                
+                                 
                      
                 
                     with fintab1: 
@@ -1753,18 +1737,26 @@ if authentication_status:
                         ledgers["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d") for i in ledgers["Date"]]
                         ledgers["Period_Date"]=[datetime.datetime.strptime(i,"%Y-%m") for i in ledgers["Period_Date"]]
                         ledger_b=ledgers.copy()
-                        ledger_b=ledger_b[ledger_b["Date"]<pd.Timestamp(datetime.date(int(year),int(month),1))]
+                        ledger_b=ledger_b[ledger_b["Period_Date"]<pd.Timestamp(datetime.date(int(year),int(month),1))]
                         
                         ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
                         
                         ledger_b.Account=[str(i)+"-"+str(j) for i,j in zip(ledger_b.Account,ledger_b.Sub_Cat)]
-                        
-                        
-                        ins=ledger_b[ledger_b["Account"].isin(revenues_codes)].Net.sum()
-                        outs=ledger_b[ledger_b["Account"].isin(expenses)].Net.sum()
-                        outs_overhead=ledger_b[ledger_b["Account"].isin(overhead_codes)].Net.sum()
-                        outs_dep=ledger_b[ledger_b["Account"].isin(expenses_dep)].Net.sum()
-                        dep=ledger_b[ledger_b["Account"].isin(depreciation_codes)].Net.sum()
+
+                        revenues_codes=structure[structure["Group"]=="Revenues"]["Account"].unique()
+                        operations_codes=structure[structure["Group"]=="Operating Expenses"]["Account"].unique()
+                        maintenance_codes=structure[structure["Group"]=="Maintenance Expenses"]["Account"].unique()
+                        depreciation_codes=structure[structure["Group"]=="Depreciation"]["Account"].unique()
+                        overhead_codes=structure[structure["Group"]=="General & Administrative Overhead"]["Account"].unique()
+                    
+                        expenses=operations_codes+maintenance_codes#+overhead_codes
+                        expenses_dep=expenses+depreciation_codes
+                    
+                        ins=ledger_b[ledger_b["Acc"].isin(revenues_codes)].Net.sum()
+                        outs=ledger_b[ledger_b["Acc"].isin(expenses)].Net.sum()
+                        outs_overhead=ledger_b[ledger_b["Acc"].isin(overhead_codes)].Net.sum()
+                        outs_dep=ledger_b[ledger_b["Acc"].isin(expenses_dep)].Net.sum()
+                        dep=ledger_b[ledger_b["Acc"].isin(depreciation_codes)].Net.sum()
                         
                         a1, a2,= st.columns([2,5])
                         with a1:

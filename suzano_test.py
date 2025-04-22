@@ -1599,7 +1599,7 @@ if authentication_status:
                             monthly_=monthly_.applymap(dollar_format)
                             #st.write(annual_budget)
                             #st.write(accounts)
-                            col1, col2,col3= st.columns([4,2,4])
+                            col1, col2,col3= st.columns([3,2,4])
                             
                             with col1:
                                 st.table(monthly_)

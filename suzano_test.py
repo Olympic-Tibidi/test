@@ -1743,13 +1743,13 @@ if authentication_status:
                         
                         ledger_b.Account=[str(i)+"-"+str(j) for i,j in zip(ledger_b.Account,ledger_b.Sub_Cat)]
 
-                        revenues_codes=structure[structure["Group"]=="Revenues"]["Account"].unique()
-                        operations_codes=structure[structure["Group"]=="Operating Expenses"]["Account"].unique()
-                        maintenance_codes=structure[structure["Group"]=="Maintenance Expenses"]["Account"].unique()
-                        depreciation_codes=structure[structure["Group"]=="Depreciation"]["Account"].unique()
-                        overhead_codes=structure[structure["Group"]=="General & Administrative Overhead"]["Account"].unique()
+                        revenues_codes=structure[structure["Group"]=="Revenues"]["Account"].unique().to_list()
+                        operations_codes=structure[structure["Group"]=="Operating Expenses"]["Account"].unique().to_list()
+                        maintenance_codes=structure[structure["Group"]=="Maintenance Expenses"]["Account"].unique().to_list()
+                        depreciation_codes=structure[structure["Group"]=="Depreciation"]["Account"].unique().to_list()
+                        overhead_codes=structure[structure["Group"]=="General & Administrative Overhead"]["Account"].unique().to_list()
                     
-                        expenses=operations_codes+maintenance_codes#+overhead_codes
+                        expenses=operations_codes+maintenance_codes
                         expenses_dep=expenses+depreciation_codes
                     
                         ins=ledger_b[ledger_b["Acc"].isin(revenues_codes)].Net.sum()

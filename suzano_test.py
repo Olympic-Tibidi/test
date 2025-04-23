@@ -2082,7 +2082,15 @@ if authentication_status:
                     with fintab4:
                         ear=st.selectbox("Select Year",["2025","2024","2023","2022","2021"],key="yeartab2")
 
-                        main_json = json.loads(gcp_download(target_bucket, "main.json"))
+                        main_json = gcp_download(target_bucket, "main.json")
+                        try:
+                            main_json = json.loads(main_json)
+                            # Check: was it a string again?
+                            if isinstance(main_json, str):
+                                main_json = json.loads(main_json)
+                        except Exception as e:
+                            st.error(f"Failed to load JSON: {e}")
+                            st.stop()
                 
                         main = pd.DataFrame.from_dict(main_json, orient="index").T
                         ledgers=main[main["Period_Year"]==int(year[-2:])]

@@ -2082,7 +2082,7 @@ if authentication_status:
                     with fintab4:
                         ear=st.selectbox("Select Year",["2025","2024","2023","2022","2021"],key="yeartab2")
 
-                        main_json = gcp_download(target_bucket, "main.json")
+                        main_json = json.loads(gcp_download(target_bucket, "main.json"))
                 
                         main = pd.DataFrame.from_dict(main_json, orient="index").T
                         ledgers=main[main["Period_Year"]==int(year[-2:])]

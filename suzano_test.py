@@ -2031,16 +2031,25 @@ if authentication_status:
                             df = df.drop(columns=[mode_col])
                             return df
 
-                        main_budget=json.loads(gcp_download(target_bucket,rf"main_budget.json"))
+                        
+                        
+                        if "budget_df" not in st.session_state:
+                            budget_df_json = json.loads(gcp_download(target_bucket,rf"main_budget.json"))
+                            st.session_state.budget_df=pd.DataFrame(main_budget).T
 
-                        df=pd.DataFrame(main_budget).T
-                        df_a = apply_grouping_mode(df, mode_col='original')
+                        
+                        
+                        df_a = apply_grouping_mode(budget_df, mode_col='original')
                         df_a.drop(columns=['afsin'], inplace=True)
                         df_a=df_a[['Account','Name','Group','Subgroup','ship','2024','2025']]
                         # Apply option "b"
-                        df_b = apply_grouping_mode(df, mode_col='afsin')
+                        df_b = apply_grouping_mode(budget_df, mode_col='afsin')
                         df_b.drop(columns=['original'], inplace=True)
                         df_b=df_b[['Account','Name','Group','Subgroup','ship','2024','2025']]
+
+                        st.title("📊 Editable Budget Table")
+                        st.caption("Edit 2025 and 2026 budget projections and save your changes.")
+
 
                         genre = st.radio(
                             "CHOOSE BUDGET STYLE",
@@ -2068,8 +2077,23 @@ if authentication_status:
                             },
                             disabled=["Account", "Name", "Group", "Subgroup", "ship", "2024", "2024 Results", "Variance"] # Disable others
                         )
+                        if st.button("💾 Save Changes"):
+                            st.session_state.budget_df = edited_df
+                            st.success("Changes saved to session!")
                         
-               
+                        # ---- SHOW UPDATED TABLE ----
+                        st.markdown("### 🔄 Current Saved Budget")
+                        st.dataframe(st.session_state.budget_df, use_container_width=True)
+                        
+                        # ---- DOWNLOAD BUTTON ----
+                        csv = st.session_state.budget_df.to_csv(index=False).encode('utf-8')
+                        st.download_button(
+                            label="📥 Download as CSV",
+                            data=csv,
+                            file_name='edited_budget.csv',
+                            mime='text/csv'
+                        )
+                   
                    
                     with fintab4:
                         ear=st.selectbox("Select Year",["2025","2024","2023","2022","2021"],key="yeartab2")

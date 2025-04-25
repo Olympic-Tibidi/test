@@ -2126,7 +2126,11 @@ if authentication_status:
                                 return obj
                             
                             updated_json = json.dumps(original_dict, default=convert_numpy)
-                            gcp_upload(target_bucket, "main_budget.json", updated_json)
+                            storage_client = get_storage_client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"main_budget.json")
+                            blob.upload_from_string(updated_json)
+                   
                         
                             st.success("✅ Budget successfully updated and uploaded to GCS!")
 

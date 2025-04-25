@@ -2042,7 +2042,7 @@ if authentication_status:
                         
                         st.write("Edited Budget")
                         st.dataframe(edited_df)
-                        st.write(temp)
+               
                         #temp2023["Account"]=temp2023["Account"].astype("str")
                         #temp2023.set_index("index",drop=True,inplace=True)
                         #temp2023.Account=[str(i)+"-"+str(j) for i,j in zip(temp2023.Account,temp2023.Sub_Cat)]

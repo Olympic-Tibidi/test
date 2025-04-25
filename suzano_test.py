@@ -2033,8 +2033,8 @@ if authentication_status:
                             captions=[
                                 "Original Terminal Budget Structure",
                                 "Re-Organized for Clearer View",
-                            horizontal=True  
                             ],
+                            horizontal=True
                         )
                         if genre==":rainbow[ORIGINAL]":
                             df=df_a.copy()

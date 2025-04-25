@@ -2014,71 +2014,83 @@ if authentication_status:
                     #fig.show()
                 
                 
-        #             with fintab3:
-        #                 resim=gcp_download_x(target_bucket,rf"FIN/2023Adopted.png")
-        #                 resim=Image.open(io.BytesIO(resim))
+                    with fintab3:
+
+                        main_budget=json.loads(gcp_download(target_bucket,rf"main_budget.json"))
+
+                        df=pd.DataFrame(main_budget).T
+                        df_a = apply_grouping_mode(df, mode_col='original')
+                        df_a.drop(columns=['afsin'], inplace=True)
+                        df_a=df_a[['Account','Name','Group','Subgroup','ship','2024','2025']]
+                        # Apply option "b"
+                        df_b = apply_grouping_mode(df, mode_col='afsin')
+                        df_b.drop(columns=['original'], inplace=True)
+                        df_b=df_b[['Account','Name','Group','Subgroup','ship','2024','2025']]
+                        if '2026' not in df.columns:
+                            df['2026'] = 0
                         
-        #                 agree = st.checkbox('CHECK BOX TO SEE 2023 BUDGET STRUCTURE')
-                
-        #                 if agree:
-        #                     st.image(resim)
+                        # Now select only 2025 and 2026 as editable
+                        edited_df = st.experimental_data_editor(
+                            df,
+                            num_rows="dynamic", # Allows adding rows if needed
+                            column_config={
+                                "2025": st.column_config.NumberColumn("2025 Budget"),
+                                "2026": st.column_config.NumberColumn("2026 Budget"),
+                            },
+                            disabled=["Account", "Name", "Group", "Subgroup", "ship", "2024", "2024 Results", "Variance"] # Disable others
+                        )
                         
-        #                 temp=gcp_download_x(target_bucket,rf"FIN/Budget_2025.ftr")
-        #                 temp=pd.read_feather(io.BytesIO(temp)) 
-        #                 #temp2023=gcp_download_x(target_bucket,rf"FIN/main2023.ftr")
-        #                 #temp2023=pd.read_feather(io.BytesIO(temp2023))
-        #                 # temp["Account"]=temp["Account"].astype("str")
-        #                 # temp.set_index("index",drop=True,inplace=True)
-        #                 # temp.Account=[str(i)+"-"+str(j) for i,j in zip(temp.Account,temp.Sub_Cat)]
-        #                 st.write(temp)
-        #                 #temp2023["Account"]=temp2023["Account"].astype("str")
-        #                 #temp2023.set_index("index",drop=True,inplace=True)
-        #                 #temp2023.Account=[str(i)+"-"+str(j) for i,j in zip(temp2023.Account,temp2023.Sub_Cat)]
+                        st.write("Edited Budget")
+                        st.dataframe(edited_df)
+                        st.write(temp)
+                        #temp2023["Account"]=temp2023["Account"].astype("str")
+                        #temp2023.set_index("index",drop=True,inplace=True)
+                        #temp2023.Account=[str(i)+"-"+str(j) for i,j in zip(temp2023.Account,temp2023.Sub_Cat)]
                         
-        #                 # temp1=budget_codes.copy()
-        #                 # temp1.drop(columns=["2021 Final"],inplace=True)
-        #                 # temp1.insert(5,"2022 Actual",[temp[temp["Account"]==i]["Net"].sum() for i in temp1.Account])
-        #                 # temp1.insert(6,"2022 Monthly",[round(temp[temp["Account"]==i]["Net"].sum()/12,1) for i in temp1.Account])
-        #                 # months=int(temp2023.Date.max().month)-1
-        #                 # st.write(months)
+                        # temp1=budget_codes.copy()
+                        # temp1.drop(columns=["2021 Final"],inplace=True)
+                        # temp1.insert(5,"2022 Actual",[temp[temp["Account"]==i]["Net"].sum() for i in temp1.Account])
+                        # temp1.insert(6,"2022 Monthly",[round(temp[temp["Account"]==i]["Net"].sum()/12,1) for i in temp1.Account])
+                        # months=int(temp2023.Date.max().month)-1
+                        # st.write(months)
                         
-        #                 #months=5
-        #                 # temp1["2023 Monthly Budgeted"]=[round(i/12,2) for i in temp1["2023 Adopted"]]
-        #                 # temp1["2023 Monthly"]=[round(temp2023[temp2023["Account"]==i]["Net"].sum()/months,1) for i in temp1.Account]
-        #                 # x=gcp_download_x(target_bucket,rf"FIN/2024annual-try.pkl")
-        #                 # x=io.BytesIO(x)
-        #                 # temp1["2024 PROPOSED"]= pd.read_pickle(x)["2024 PROPOSED"]
-        #                 # temp1["2024 Monthly"]=[round(i/12,1) for i in temp1["2024 PROPOSED"]]
-        #                 # temp1=st.experimental_data_editor(temp1)
-        #                 # if st.button("SAVE 2024 BUDGET EDITS"):
+                        #months=5
+                        # temp1["2023 Monthly Budgeted"]=[round(i/12,2) for i in temp1["2023 Adopted"]]
+                        # temp1["2023 Monthly"]=[round(temp2023[temp2023["Account"]==i]["Net"].sum()/months,1) for i in temp1.Account]
+                        # x=gcp_download_x(target_bucket,rf"FIN/2024annual-try.pkl")
+                        # x=io.BytesIO(x)
+                        # temp1["2024 PROPOSED"]= pd.read_pickle(x)["2024 PROPOSED"]
+                        # temp1["2024 Monthly"]=[round(i/12,1) for i in temp1["2024 PROPOSED"]]
+                        # temp1=st.experimental_data_editor(temp1)
+                        # if st.button("SAVE 2024 BUDGET EDITS"):
                             
-        #                 #     temp1["2024 PROPOSED"].to_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual.pkl')
-        #                 #     temp1.to_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')
-        #                 #     temp1.to_excel(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.xlsx')
-        #                 #     temp1 = pd.read_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')
-        #                 # b1,b2,b3,b4= st.columns([2,2,2,6])
+                        #     temp1["2024 PROPOSED"].to_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual.pkl')
+                        #     temp1.to_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')
+                        #     temp1.to_excel(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.xlsx')
+                        #     temp1 = pd.read_pickle(fr'c:\Users\afsiny\Desktop\Dashboard\2024annual-try.pkl')
+                        # b1,b2,b3,b4= st.columns([2,2,2,6])
                         
-        #                 # with b1:
-        #                 #     sankey=temp1.groupby(["Group"])[["2022 Adopted"]].sum()
+                        # with b1:
+                        #     sankey=temp1.groupby(["Group"])[["2022 Adopted"]].sum()
                             
-        #                 #     st.write(sankey)
-        #                 # with b2:
-        #                 #     sankey=temp1.groupby(["Group"])[["2022 Actual"]].sum()
+                        #     st.write(sankey)
+                        # with b2:
+                        #     sankey=temp1.groupby(["Group"])[["2022 Actual"]].sum()
                             
-        #                 #     st.write(sankey)
-        #                 # with b3:
-        #                 #     sankey=temp1.groupby(["Group"])[["2023 Adopted"]].sum()
+                        #     st.write(sankey)
+                        # with b3:
+                        #     sankey=temp1.groupby(["Group"])[["2023 Adopted"]].sum()
                             
-        #                 #     st.write(sankey)
-        #             #             revs=[temp.loc[("Revenue",i)].values[0] for i in labels[:5]]
-        #             # 
-        #             #             ops=[abs(temp.loc[("Operating Expenses",i)].values[0]) for i in labels[7:13]]
-        #             #             maint=[abs(temp.loc[("Maintenance Expenses",i)].values[0]) for i in labels[14:19]]
-        #             #             dep=[abs(temp.loc[("Depreciation",i)].values[0]) for i in labels[20:22]]
-        #             #             overhead=[abs(temp.loc[("Overhead",i)].values[0]) for i in labels[22:23]]
-        #             #             overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
-        #             #             #print(overall)
-        #             #             revs
+                        #     st.write(sankey)
+                    #             revs=[temp.loc[("Revenue",i)].values[0] for i in labels[:5]]
+                    # 
+                    #             ops=[abs(temp.loc[("Operating Expenses",i)].values[0]) for i in labels[7:13]]
+                    #             maint=[abs(temp.loc[("Maintenance Expenses",i)].values[0]) for i in labels[14:19]]
+                    #             dep=[abs(temp.loc[("Depreciation",i)].values[0]) for i in labels[20:22]]
+                    #             overhead=[abs(temp.loc[("Overhead",i)].values[0]) for i in labels[22:23]]
+                    #             overall=sum(revs)-sum(ops)-sum(maint)-sum(dep)-sum(overhead)
+                    #             #print(overall)
+                    #             revs
                     with fintab4:
                         ear=st.selectbox("Select Year",["2025","2024","2023","2022","2021"],key="yeartab2")
 

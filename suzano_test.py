@@ -2068,7 +2068,7 @@ if authentication_status:
                             df['2026'] = 0
                         
                         # Now select only 2025 and 2026 as editable
-                        edited_df = st.experimental_data_editor(
+                        edited_df = st.data_editor(
                             df,
                             num_rows="dynamic", # Allows adding rows if needed
                             column_config={
@@ -2117,7 +2117,15 @@ if authentication_status:
                             st.session_state.budget_df = pd.DataFrame(original_dict).T
                         
                             # Dump and upload
-                            updated_json = json.dumps(original_dict)
+                            # Convert all values to native Python types (like int, float, str)
+                            def convert_numpy(obj):
+                                if isinstance(obj, (np.int64, np.int32)):
+                                    return int(obj)
+                                elif isinstance(obj, (np.float64, np.float32)):
+                                    return float(obj)
+                                return obj
+                            
+                            updated_json = json.dumps(original_dict, default=convert_numpy)
                             gcp_upload(target_bucket, "main_budget.json", updated_json)
                         
                             st.success("✅ Budget successfully updated and uploaded to GCS!")

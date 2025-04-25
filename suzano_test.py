@@ -2026,6 +2026,20 @@ if authentication_status:
                         df_b = apply_grouping_mode(df, mode_col='afsin')
                         df_b.drop(columns=['original'], inplace=True)
                         df_b=df_b[['Account','Name','Group','Subgroup','ship','2024','2025']]
+
+                        genre = st.radio(
+                            "CHOOSE BUDGET STYLE",
+                            [":rainbow[ORIGINAL]", "***AFSIN***"],
+                            captions=[
+                                "Original Terminal Budget Structure",
+                                "Re-Organized for Clearer View",
+                            horizontal=True  
+                            ],
+                        )
+                        if genre==":rainbow[ORIGINAL]":
+                            df=df_a.copy()
+                        else:
+                            df=df_b.copy()
                         if '2026' not in df.columns:
                             df['2026'] = 0
                         
@@ -2040,8 +2054,6 @@ if authentication_status:
                             disabled=["Account", "Name", "Group", "Subgroup", "ship", "2024", "2024 Results", "Variance"] # Disable others
                         )
                         
-                        st.write("Edited Budget")
-                        st.dataframe(edited_df)
                
                         #temp2023["Account"]=temp2023["Account"].astype("str")
                         #temp2023.set_index("index",drop=True,inplace=True)

@@ -2039,11 +2039,11 @@ if authentication_status:
 
                         
                         
-                        df_a = apply_grouping_mode(budget_df, mode_col='original')
+                        df_a = apply_grouping_mode(st.session_state.budget_df, mode_col='original')
                         df_a.drop(columns=['afsin'], inplace=True)
                         df_a=df_a[['Account','Name','Group','Subgroup','ship','2024','2025']]
                         # Apply option "b"
-                        df_b = apply_grouping_mode(budget_df, mode_col='afsin')
+                        df_b = apply_grouping_mode(st.session_state.budget_df, mode_col='afsin')
                         df_b.drop(columns=['original'], inplace=True)
                         df_b=df_b[['Account','Name','Group','Subgroup','ship','2024','2025']]
 

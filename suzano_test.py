@@ -2014,7 +2014,22 @@ if authentication_status:
                     #fig.show()
                 
                 
-                    with fintab3:
+                    with fintab3:   ## BUDGET
+
+                        def apply_grouping_mode(df, mode_col='original'):
+                            """
+                            Flattens Group/Subgroup from the specified mode column and adds them to the DataFrame.
+                            Drops the original nested column after expansion.
+                            
+                            Parameters:
+                            - df: input DataFrame
+                            - mode_col: name of the column containing nested {'Group': ..., 'Subgroup': ...} dict
+                            """
+                            df = df.copy()
+                            df['Group'] = df[mode_col].apply(lambda x: x.get('Group') if isinstance(x, dict) else None)
+                            df['Subgroup'] = df[mode_col].apply(lambda x: x.get('Subgroup') if isinstance(x, dict) else None)
+                            df = df.drop(columns=[mode_col])
+                            return df
 
                         main_budget=json.loads(gcp_download(target_bucket,rf"main_budget.json"))
 

@@ -2093,6 +2093,35 @@ if authentication_status:
                             file_name='edited_budget.csv',
                             mime='text/csv'
                         )
+                        import json
+
+                        if st.button("📤 Upload to GCS"):
+                            edited = edited_df.set_index("Account")
+                        
+                            # Reload full original from session
+                            original_df = st.session_state.budget_df
+                            original_dict = original_df.T.to_dict()
+                        
+                            # Loop through edited rows
+                            for acct in edited.index:
+                                # Get new values
+                                new_2025 = edited.loc[acct, "2025"]
+                                new_2026 = edited.loc[acct, "2026"]
+                        
+                                # Update only 2025 and 2026 in original
+                                if acct in original_dict:
+                                    original_dict[acct]["2025"] = new_2025
+                                    original_dict[acct]["2026"] = new_2026
+                        
+                            # Optional: save to session state too
+                            st.session_state.budget_df = pd.DataFrame(original_dict).T
+                        
+                            # Dump and upload
+                            updated_json = json.dumps(original_dict)
+                            gcp_upload(target_bucket, "main_budget.json", updated_json)
+                        
+                            st.success("✅ Budget successfully updated and uploaded to GCS!")
+
                    
                    
                     with fintab4:

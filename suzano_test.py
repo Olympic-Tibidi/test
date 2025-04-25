@@ -2033,9 +2033,9 @@ if authentication_status:
 
                         
                         
-                        if "budget_df" not in st.session_state:
-                            budget_df_json = json.loads(gcp_download(target_bucket,rf"main_budget.json"))
-                            st.session_state.budget_df=pd.DataFrame(budget_df_json).T
+                        
+                        budget_df_json = json.loads(gcp_download(target_bucket,rf"main_budget.json"))
+                        st.session_state.budget_df=pd.DataFrame(budget_df_json).T
 
                         
                         

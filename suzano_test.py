@@ -2031,7 +2031,7 @@ if authentication_status:
                         
                         # Now select only 2025 and 2026 as editable
                         edited_df = st.experimental_data_editor(
-                            df,
+                            df_a,
                             num_rows="dynamic", # Allows adding rows if needed
                             column_config={
                                 "2025": st.column_config.NumberColumn("2025 Budget"),

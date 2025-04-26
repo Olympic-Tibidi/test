@@ -2083,9 +2083,9 @@ if authentication_status:
                         if selected_account:
                             
                            
-                            row = df[df["Account"] == selected].iloc[0]
+                            row = df[df["Account"] == selected_account].iloc[0]
                             with st.sidebar:
-                                st.header(f"📋 Account Info: {selected}")
+                                st.header(f"📋 Account Info: {selected_account}")
                                 st.write("**Name:**", row["Name"])
                                 st.write("**Group:**", row["Group"])
                                 st.write("**Subgroup:**", row["Subgroup"])

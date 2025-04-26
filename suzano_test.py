@@ -1392,7 +1392,7 @@ if authentication_status:
                             st.session_state.main_json = main_json
                         
                         # Now it's safely a dict of entries like {"0": {...}, "1": {...}}
-                        if main not in st.session_state:
+                        if "main" not in st.session_state:
                             st.session_state.main=pd.DataFrame.from_dict(st.session_state.main_json, orient="index").T
                      
                         ledgers=st.session_state.main[st.session_state.main["Period_Year"]==int(year[-2:])]

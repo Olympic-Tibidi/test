@@ -842,6 +842,7 @@ if authentication_status:
                 hadi=True
             if hadi:
                 ttab1,ttab2,ttab3=st.tabs(["MT LEDGERS","UPLOAD CSV LEDGER UPDATES","BUDGET PERFORMANCE"])
+                main_json = load_main_json(target_bucket)
 
                 with ttab3:
                     pass
@@ -1348,6 +1349,19 @@ if authentication_status:
                             return '${:,.1f}'.format(x)
                         else:
                             return x
+                    @st.cache_data(show_spinner="Loading Ledger Data...")
+                    def load_main_json(target_bucket, filename="main.json"):
+                        raw_json = gcp_download(target_bucket, filename)
+                    
+                        try:
+                            main_json = json.loads(raw_json)
+                            if isinstance(main_json, str):
+                                main_json = json.loads(main_json)
+                        except Exception as e:
+                            st.error(f"Failed to parse main.json: {e}")
+                            st.stop()
+                    
+                        return main_json
                     tt=f"MARINE TERMINAL FINANCIALS"
                     original_title = f'<p style="font-family:Arial;font-weight: bold; color:Black; font-size: 20px;">{tt}</p>'
                     st.markdown(original_title, unsafe_allow_html=True)
@@ -1377,23 +1391,26 @@ if authentication_status:
                         ### LETS PUT YEAR in st.session state to use later.
                         if year not in st.session_state:
                             st.session_state.year=year
-                        if "main_json" not in st.session_state:
-                            raw_main_json = gcp_download(target_bucket, "main.json")
+                        # if "main_json" not in st.session_state:
+                        #     raw_main_json = gcp_download(target_bucket, "main.json")
                             
-                            # Safe loading
-                            try:
-                                main_json = json.loads(raw_main_json)
-                                if isinstance(main_json, str):
-                                    main_json = json.loads(main_json)
-                            except Exception as e:
-                                st.error(f"Failed to load JSON: {e}")
-                                st.stop()
+                        #     # Safe loading
+                        #     try:
+                        #         main_json = json.loads(raw_main_json)
+                        #         if isinstance(main_json, str):
+                        #             main_json = json.loads(main_json)
+                        #     except Exception as e:
+                        #         st.error(f"Failed to load JSON: {e}")
+                        #         st.stop()
                         
-                            st.session_state.main_json = main_json
-                        
+                        #     st.session_state.main_json = main_json
                         # Now it's safely a dict of entries like {"0": {...}, "1": {...}}
+
+
+                        main_json = load_main_json(target_bucket)
+
                         if "main" not in st.session_state:
-                            st.session_state.main=pd.DataFrame.from_dict(st.session_state.main_json, orient="index").T
+                            st.session_state.main=pd.DataFrame.from_dict(main_json, orient="index").T
                      
                         ledgers=st.session_state.main[st.session_state.main["Period_Year"]==int(year[-2:])]
                         ledgers["Account"]=ledgers["Account"].astype("str")
@@ -1720,18 +1737,19 @@ if authentication_status:
                         
                             
                         ### LOAD LEDGERS by year
-                        main_json = gcp_download(target_bucket, "main.json")
+                        
 
                         # Try loading once
-                        try:
-                            main_json = json.loads(main_json)
-                            # Check: was it a string again?
-                            if isinstance(main_json, str):
-                                main_json = json.loads(main_json)
-                        except Exception as e:
-                            st.error(f"Failed to load JSON: {e}")
-                            st.stop()
-                        
+                        # try:
+                        #     main_json = json.loads(main_json)
+                        #     # Check: was it a string again?
+                        #     if isinstance(main_json, str):
+                        #         main_json = json.loads(main_json)
+                        # except Exception as e:
+                        #     st.error(f"Failed to load JSON: {e}")
+                        #     st.stop()
+                        main_json = load_main_json(target_bucket)
+
                         # Now it's safely a dict of entries like {"0": {...}, "1": {...}}
                         main = pd.DataFrame.from_dict(main_json, orient="index").T
                         ledgers=main[main["Period_Year"]==int(year[-2:])]
@@ -2170,22 +2188,24 @@ if authentication_status:
                         if show_ledger:
                             st.markdown("## 📘 Ledger Entries")
                            
-                            if "main_json" not in st.session_state:
-                                raw_main_json = gcp_download(target_bucket, "main.json")
+                            # if "main_json" not in st.session_state:
+                            #     raw_main_json = gcp_download(target_bucket, "main.json")
                                 
-                                # Safe loading
-                                try:
-                                    main_json = json.loads(raw_main_json)
-                                    if isinstance(main_json, str):
-                                        main_json = json.loads(main_json)
-                                except Exception as e:
-                                    st.error(f"Failed to load JSON: {e}")
-                                    st.stop()
+                            #     # Safe loading
+                            #     try:
+                            #         main_json = json.loads(raw_main_json)
+                            #         if isinstance(main_json, str):
+                            #             main_json = json.loads(main_json)
+                            #     except Exception as e:
+                            #         st.error(f"Failed to load JSON: {e}")
+                            #         st.stop()
                             
-                                st.session_state.main_json = main_json
+                            #     st.session_state.main_json = main_json
+                            
+
                         
                         # Now it's safely a dict of entries like {"0": {...}, "1": {...}}
-                            main = pd.DataFrame.from_dict(st.session_state.main_json, orient="index").T
+                            main = pd.DataFrame.from_dict(main_json, orient="index").T
                             ledgers = main[main["Period_Year"] == int(24)]
                             ledgers["Account"] = ledgers["Account"].astype("str")
                             ledgers["Date"] = [datetime.datetime.strptime(i, "%Y-%m-%d") for i in ledgers["Date"]]

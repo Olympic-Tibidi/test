@@ -42,6 +42,7 @@ from yaml.loader import SafeLoader
 import math
 import plotly.express as px               #to create interactive charts
 import plotly.graph_objects as go         #to create interactive charts
+from plotly.subplots import make_subplots
 import zipfile
 import requests
 from bs4 import BeautifulSoup

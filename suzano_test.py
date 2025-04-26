@@ -2080,9 +2080,17 @@ if authentication_status:
 
                         # Capture clicked account manually with selectbox
                         selected_account = st.selectbox("Pick an account to view details:", df['Account'])
-                        if selected_account:
-                            st.markdown(f"### Info for **{selected_account}**")
-                            st.info(f"This is where you would show more detailed information for account {selected_account}. 🚢")
+                       if selected:
+                            row = df[df["Account"] == selected].iloc[0]
+                            with st.sidebar:
+                                st.header(f"📋 Account Info: {selected}")
+                                st.write("**Name:**", row["Name"])
+                                st.write("**Group:**", row["Group"])
+                                st.write("**Subgroup:**", row["Subgroup"])
+                                st.write("**2024:**", f"${row['2024']:,.0f}")
+                                st.write("**2025:**", f"${row['2025']:,.0f}")
+                                st.write("**2026:**", f"${row['2026']:,.0f}")
+                                st.success("You can add charts, notes, or graphs here too!")
                         if st.button("💾 Save Changes"):
                             st.session_state.budget_df = edited_df
                             st.success("Changes saved to session!")

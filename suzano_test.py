@@ -2235,7 +2235,7 @@ if authentication_status:
                         
                                 # 🎯 Create scatter and histogram separately
                                 scatter = go.Scatter(
-                                    x=ledger_entries["Per_Period"],
+                                    x=ledger_entries["Per_Entry"],
                                     y=ledger_entries["Net"],
                                     mode='markers',
                                     marker=dict(
@@ -2272,8 +2272,8 @@ if authentication_status:
                                 # Threshold line
                                 fig.add_shape(
                                     type="line",
-                                    x0=min(ledger_entries["Per_Period"]),
-                                    x1=max(ledger_entries["Per_Period"]),
+                                    x0=min(ledger_entries["Per_Entry"]),
+                                    x1=max(ledger_entries["Per_Entry"]),
                                     y0=q90,
                                     y1=q90,
                                     line=dict(color="green", width=2, dash="dash"),

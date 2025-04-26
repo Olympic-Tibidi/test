@@ -1379,16 +1379,16 @@ if authentication_status:
                             st.session_state.year=year
                             
                         ### LOAD LEDGERS by year
-                        if main_json not in st.session_state:
-                            st.session_state.main_json=gcp_download(target_bucket, "main.json")
+                        if main_json_ not in st.session_state:
+                            st.session_state.main_json_=gcp_download(target_bucket, "main.json")
                        
 
                         # Try loading once
                         try:
-                            main_json = json.loads(st.session_state.main_json)
+                            main_json = json.loads(st.session_state.main_json_)
                             # Check: was it a string again?
                             if isinstance(main_json, str):
-                                main_json = json.loads(st.session_state.main_json)
+                                main_json = json.loads(st.session_state.main_json_)
                         except Exception as e:
                             st.error(f"Failed to load JSON: {e}")
                             st.stop()

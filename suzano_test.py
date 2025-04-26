@@ -2086,8 +2086,8 @@ if authentication_status:
                             st.success("Changes saved to session!")
                         
                         # ---- SHOW UPDATED TABLE ----
-                        st.markdown("### 🔄 Current Saved Budget")
-                        st.dataframe(st.session_state.budget_df, use_container_width=True)
+                        # st.markdown("### 🔄 Current Saved Budget")
+                        # st.dataframe(st.session_state.budget_df, use_container_width=True)
                         
                         # ---- DOWNLOAD BUTTON ----
                         csv = st.session_state.budget_df.to_csv(index=False).encode('utf-8')

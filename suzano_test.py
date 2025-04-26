@@ -2081,6 +2081,7 @@ if authentication_status:
                         # Capture clicked account manually with selectbox
                         selected_account = st.selectbox("Pick an account to view details:", df['Account'])
                         if selected_account:
+                            row = df[df["Account"] == selected_account].iloc[0]
                             with st.sidebar:
                                 st.markdown("---")
                                 st.markdown(

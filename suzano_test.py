@@ -2199,6 +2199,23 @@ if authentication_status:
                         
                             if not ledger_entries.empty:
                                 st.dataframe(ledger_entries, use_container_width=True)
+                                fig = px.scatter(
+                                    ledger_entries,
+                                    x="Date",
+                                    y="Amount",
+                                    color="Amount",
+                                    hover_data=["Description"],
+                                    title=f"💰 Payment Distribution for {selected_account}",
+                                    labels={"Amount": "Ledger Amount ($)", "Date": "Transaction Date"},
+                                    color_continuous_scale="bluered"
+                                )
+                                fig.update_traces(marker=dict(size=10, opacity=0.7), selector=dict(mode='markers'))
+                                fig.update_layout(
+                                    plot_bgcolor='white',
+                                    hovermode='closest',
+                                    height=500
+                                )
+                                st.plotly_chart(fig, use_container_width=True)
                             else:
                                 st.info("No ledger entries found for this account.")
 

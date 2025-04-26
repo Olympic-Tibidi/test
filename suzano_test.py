@@ -2201,8 +2201,8 @@ if authentication_status:
                                 st.dataframe(ledger_entries, use_container_width=True)
                                 fig = px.scatter(
                                     ledger_entries,
-                                    x="Date",
-                                    y="Amount",
+                                    x="Per_Entry",
+                                    y="Net",
                                     color="Amount",
                                     hover_data=["Description"],
                                     title=f"💰 Payment Distribution for {selected_account}",

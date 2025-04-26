@@ -2049,6 +2049,8 @@ if authentication_status:
 
                         st.title("📊 Editable Budget Table")
                         st.caption("Edit 2025 and 2026 budget projections and save your changes.")
+                        if "account_notes" not in st.session_state:
+                           st.session_state.account_notes = {}
 
 
                         genre = st.radio(

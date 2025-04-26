@@ -1377,10 +1377,13 @@ if authentication_status:
                         ### LETS PUT YEAR in st.session state to use later.
                         if year not in st.session_state:
                             st.session_state.year=year
+                        try:
+                            main_json = json.loads(st.session_state.main_json_)
+                        except:
                             
                         ### LOAD LEDGERS by year
-                        if main_json_ not in st.session_state:
-                            st.session_state.main_json_=gcp_download(target_bucket, "main.json")
+                            if main_json_ not in st.session_state:
+                                st.session_state.main_json_=gcp_download(target_bucket, "main.json")
                        
 
                         # Try loading once

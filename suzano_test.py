@@ -2080,7 +2080,7 @@ if authentication_status:
 
                         # Capture clicked account manually with selectbox
                         selected_account = st.selectbox("Pick an account to view details:", df['Account'])
-                        if selected:
+                        if selected_account:
                             
                            
                             row = df[df["Account"] == selected].iloc[0]

@@ -2066,7 +2066,7 @@ if authentication_status:
                             df=df_b.copy()
                         if '2026' not in df.columns:
                             df['2026'] = 0
-                        
+                        df['Account Link'] = df['Account'].apply(lambda x: f"[{x}](#account-{x})")
                         # Now select only 2025 and 2026 as editable
                         edited_df = st.data_editor(
                             df,
@@ -2077,6 +2077,12 @@ if authentication_status:
                             },
                             disabled=["Account", "Name", "Group", "Subgroup", "ship", "2024", "2024 Results", "Variance"] # Disable others
                         )
+
+                        # Capture clicked account manually with selectbox
+                        selected_account = st.selectbox("Pick an account to view details:", df['Account'])
+                        if selected_account:
+                            st.markdown(f"### Info for **{selected_account}**")
+                            st.info(f"This is where you would show more detailed information for account {selected_account}. 🚢")
                         if st.button("💾 Save Changes"):
                             st.session_state.budget_df = edited_df
                             st.success("Changes saved to session!")

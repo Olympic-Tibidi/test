@@ -2297,7 +2297,7 @@ if authentication_status:
                         
                                 # 🎯 Monthly Aggregation (Sum of Payments)
                                 ledger_entries["YearMonth"] = ledger_entries["Date"].dt.to_period('M').astype(str)
-                                monthly_sum = ledger_entries.groupby("YearMonth")["Amount"].sum().reset_index()
+                                monthly_sum = ledger_entries.groupby("YearMonth")["Net"].sum().reset_index()
                         
                                 bar_fig = px.bar(
                                     monthly_sum,

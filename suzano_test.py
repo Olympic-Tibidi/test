@@ -2254,7 +2254,7 @@ if authentication_status:
                             st.dataframe(ledger_entries, use_container_width=True)
                     
                             # 🎯 Calculate percentiles
-                            q25 = np.percentile(ledger_entries["Net], 25)
+                            q25 = np.percentile(ledger_entries["Net"], 25)
                             q50 = np.percentile(ledger_entries["Net"], 50)
                             q75 = np.percentile(ledger_entries["Net"], 75)
                     

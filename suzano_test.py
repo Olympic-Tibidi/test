@@ -2254,9 +2254,9 @@ if authentication_status:
                             st.dataframe(ledger_entries, use_container_width=True)
                     
                             # 🎯 Calculate percentiles
-                            q25 = np.percentile(ledger_entries["Amount"], 25)
-                            q50 = np.percentile(ledger_entries["Amount"], 50)
-                            q75 = np.percentile(ledger_entries["Amount"], 75)
+                            q25 = np.percentile(ledger_entries["Net], 25)
+                            q50 = np.percentile(ledger_entries["Net"], 50)
+                            q75 = np.percentile(ledger_entries["Net"], 75)
                     
                             def assign_color(amount):
                                 if amount <= q25:
@@ -2268,12 +2268,12 @@ if authentication_status:
                                 else:
                                     return "blue"
                     
-                            ledger_entries["Color"] = ledger_entries["Amount"].apply(assign_color)
+                            ledger_entries["Color"] = ledger_entries["Net"].apply(assign_color)
                     
                             # 🎯 Create scatter and histogram separately
                             scatter = go.Scatter(
-                                x=ledger_entries["Date"],
-                                y=ledger_entries["Amount"],
+                                x=ledger_entries["Per_Entry"],
+                                y=ledger_entries["Net"],
                                 mode='markers',
                                 marker=dict(
                                     color=ledger_entries["Color"],
@@ -2286,7 +2286,7 @@ if authentication_status:
                             )
                     
                             hist = go.Histogram(
-                                x=ledger_entries["Amount"],
+                                x=ledger_entries["Net"],
                                 nbinsx=30,
                                 marker_color='gray',
                                 opacity=0.6,

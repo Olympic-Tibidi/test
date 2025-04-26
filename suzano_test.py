@@ -2199,142 +2199,124 @@ if authentication_status:
                                 st.markdown("</div>", unsafe_allow_html=True)
                         if show_ledger:
                             st.markdown("## 📘 Ledger Entries")
-                           
-                            # if "main_json" not in st.session_state:
-                            #     raw_main_json = gcp_download(target_bucket, "main.json")
-                                
-                            #     # Safe loading
-                            #     try:
-                            #         main_json = json.loads(raw_main_json)
-                            #         if isinstance(main_json, str):
-                            #             main_json = json.loads(main_json)
-                            #     except Exception as e:
-                            #         st.error(f"Failed to load JSON: {e}")
-                            #         st.stop()
-                            
-                            #     st.session_state.main_json = main_json
-                            
-
                         
-                        # Now it's safely a dict of entries like {"0": {...}, "1": {...}}
                             main = pd.DataFrame.from_dict(main_json, orient="index").T
                             ledgers = main[main["Period_Year"] == int(24)]
                             ledgers["Account"] = ledgers["Account"].astype("str")
                             ledgers["Date"] = [datetime.datetime.strptime(i, "%Y-%m-%d") for i in ledgers["Date"]]
                             ledgers["Period_Date"] = [datetime.datetime.strptime(i, "%Y-%m") for i in ledgers["Period_Date"]]
                             ledger_df = ledgers.copy()
-                            ledger_df = ledger_df[ledger_df["Period_Date"] <= pd.Timestamp(datetime.date(2025, 1, 1))]
+                            ledger_df = ledger_df[ledger_df["Period_Date"] <= pd.Timestamp(datetime.date(int(year), int(month), 1))]
                         
-                            # Adjust the Account structure
                             ledger_df["Account"] = [str(i) + "-" + str(j) for i, j in zip(ledger_df["Account"], ledger_df["Sub_Cat"])]
                             ledger_entries = ledger_df[ledger_df["Account"] == selected_account]
                         
-                            # if not ledger_entries.empty:
-                            #     st.dataframe(ledger_entries, use_container_width=True)
-                            #     fig = px.scatter(
-                            #         ledger_entries,
-                            #         x="Per_Entry",
-                            #         y="Net",
-                            #         color="Net",
-                            #         hover_data=["Description"],
-                            #         title=f"💰 Payment Distribution for {selected_account}",
-                            #         labels={"Amount": "Ledger Amount ($)", "Date": "Transaction Date"},
-                            #         color_continuous_scale="bluered"
-                            #     )
-                            #     fig.update_traces(marker=dict(size=10, opacity=0.7), selector=dict(mode='markers'))
-                            #     fig.update_layout(
-                            #         plot_bgcolor='white',
-                            #         hovermode='closest',
-                            #         height=500
-                            #     )
-                            #     st.plotly_chart(fig, use_container_width=True)
-                            # else:
-                            #     st.info("No ledger entries found for this account.")
-                          
-                            st.dataframe(ledger_entries, use_container_width=True)
-                    
-                            # 🎯 Calculate percentiles
-                            q25 = np.percentile(ledger_entries["Net"], 25)
-                            q50 = np.percentile(ledger_entries["Net"], 50)
-                            q75 = np.percentile(ledger_entries["Net"], 75)
-                    
-                            def assign_color(amount):
-                                if amount <= q25:
-                                    return "red"
-                                elif amount <= q50:
-                                    return "orange"
-                                elif amount <= q75:
-                                    return "lightblue"
-                                else:
-                                    return "blue"
-                    
-                            ledger_entries["Color"] = ledger_entries["Net"].apply(assign_color)
-                    
-                            # 🎯 Create scatter and histogram separately
-                            scatter = go.Scatter(
-                                x=ledger_entries["Per_Entry"],
-                                y=ledger_entries["Net"],
-                                mode='markers',
-                                marker=dict(
-                                    color=ledger_entries["Color"],
-                                    size=10,
-                                    opacity=0.7
-                                ),
-                                text=ledger_entries["Description"],
-                                hovertemplate="Date: %{x}<br>Amount: %{y}<br>Description: %{text}<extra></extra>",
-                                name="Transactions"
-                            )
-                    
-                            hist = go.Histogram(
-                                x=ledger_entries["Net"],
-                                nbinsx=30,
-                                marker_color='gray',
-                                opacity=0.6,
-                                name="Amount Distribution"
-                            )
-                    
-                            # 🎯 Build figure with subplots
-                            from plotly.subplots import make_subplots
-                    
-                            fig = make_subplots(
-                                rows=2, cols=1,
-                                shared_xaxes=False,
-                                row_heights=[0.7, 0.3],
-                                vertical_spacing=0.1,
-                                subplot_titles=(f"💰 Payment Scatter for {selected_account}", "📊 Payment Amount Histogram")
-                            )
-                    
-                            fig.add_trace(scatter, row=1, col=1)
-                            fig.add_trace(hist, row=2, col=1)
-                    
-                            fig.update_layout(
-                                height=800,
-                                plot_bgcolor='white',
-                                showlegend=False,
-                                hovermode="closest",
-                            )
-                    
-                            fig.update_xaxes(title_text="Transaction Date", row=1, col=1)
-                            fig.update_yaxes(title_text="Amount ($)", row=1, col=1)
-                            fig.update_xaxes(title_text="Amount ($)", row=2, col=1)
-                            fig.update_yaxes(title_text="Number of Transactions", row=2, col=1)
-                    
-                            st.plotly_chart(fig, use_container_width=True)
-                    
-                        else:
-                            st.info("No ledger entries found for this account.")
-
-                           
-                            # row = df[df["Account"] == selected_account].iloc[0]
-                            # with st.sidebar:
-                            #     st.header(f"📋 Account Info: {selected_account}")
-                            #     st.write("**Name:**", row["Name"])
-                            #     st.write("**Group:**", row["Group"])
-                            #     st.write("**Subgroup:**", row["Subgroup"])
-                            #     st.write("**2024:**", f"${row['2024']:,.0f}")
-                            #     st.write("**2025:**", f"${row['2025']:,.0f}")
-                            #     st.write("**2026:**", f"${row['2026']:,.0f}")
-                            #     st.success("You can add charts, notes, or graphs here too!")
+                            if not ledger_entries.empty:
+                                st.dataframe(ledger_entries, use_container_width=True)
+                        
+                                # 🎯 Calculate percentiles
+                                q25 = np.percentile(ledger_entries["Net"], 25)
+                                q50 = np.percentile(ledger_entries["Net"], 50)
+                                q75 = np.percentile(ledger_entries["Net"], 75)
+                                q90 = np.percentile(ledger_entries["Net"], 90)  # Threshold
+                        
+                                def assign_color(amount):
+                                    if amount <= q25:
+                                        return "red"
+                                    elif amount <= q50:
+                                        return "orange"
+                                    elif amount <= q75:
+                                        return "lightblue"
+                                    else:
+                                        return "blue"
+                        
+                                ledger_entries["Color"] = ledger_entries["Net"].apply(assign_color)
+                                ledger_entries["Above Threshold"] = ledger_entries["Net"] > q90
+                        
+                                # 🎯 Create scatter and histogram separately
+                                scatter = go.Scatter(
+                                    x=ledger_entries["Per_Period"],
+                                    y=ledger_entries["Net"],
+                                    mode='markers',
+                                    marker=dict(
+                                        color=ledger_entries["Color"],
+                                        size=ledger_entries["Above Threshold"].apply(lambda x: 14 if x else 8),
+                                        opacity=0.8,
+                                        line=dict(width=1, color='DarkSlateGrey')
+                                    ),
+                                    text=ledger_entries["Description"],
+                                    hovertemplate="Date: %{x}<br>Amount: %{y}<br>Description: %{text}<extra></extra>",
+                                    name="Transactions"
+                                )
+                        
+                                hist = go.Histogram(
+                                    x=ledger_entries["Net"],
+                                    nbinsx=30,
+                                    marker_color='gray',
+                                    opacity=0.6,
+                                    name="Amount Distribution"
+                                )
+                        
+                                # 🎯 Build figure with subplots
+                                fig = make_subplots(
+                                    rows=2, cols=1,
+                                    shared_xaxes=False,
+                                    row_heights=[0.7, 0.3],
+                                    vertical_spacing=0.1,
+                                    subplot_titles=(f"💰 Payment Scatter for {selected_account}", "📊 Payment Amount Histogram")
+                                )
+                        
+                                fig.add_trace(scatter, row=1, col=1)
+                                fig.add_trace(hist, row=2, col=1)
+                        
+                                # Threshold line
+                                fig.add_shape(
+                                    type="line",
+                                    x0=min(ledger_entries["Per_Period"]),
+                                    x1=max(ledger_entries["Per_Period"]),
+                                    y0=q90,
+                                    y1=q90,
+                                    line=dict(color="green", width=2, dash="dash"),
+                                    row=1, col=1
+                                )
+                        
+                                fig.update_layout(
+                                    height=850,
+                                    plot_bgcolor='white',
+                                    showlegend=False,
+                                    hovermode="closest",
+                                )
+                        
+                                fig.update_xaxes(title_text="Transaction Date", row=1, col=1)
+                                fig.update_yaxes(title_text="Amount ($)", row=1, col=1)
+                                fig.update_xaxes(title_text="Amount ($)", row=2, col=1)
+                                fig.update_yaxes(title_text="Number of Transactions", row=2, col=1)
+                        
+                                st.plotly_chart(fig, use_container_width=True)
+                        
+                                # 🎯 Monthly Aggregation (Sum of Payments)
+                                ledger_entries["YearMonth"] = ledger_entries["Date"].dt.to_period('M').astype(str)
+                                monthly_sum = ledger_entries.groupby("YearMonth")["Amount"].sum().reset_index()
+                        
+                                bar_fig = px.bar(
+                                    monthly_sum,
+                                    x="YearMonth",
+                                    y="Net",
+                                    title=f"📅 Monthly Sum of Payments for {selected_account}",
+                                    labels={"YearMonth": "Month", "Amount": "Total Amount ($)"},
+                                    text_auto='.2s'
+                                )
+                        
+                                bar_fig.update_layout(
+                                    plot_bgcolor='white',
+                                    height=500,
+                                    xaxis_tickangle=-45
+                                )
+                        
+                                st.plotly_chart(bar_fig, use_container_width=True)
+                        
+                            else:
+                                st.info("No ledger entries found for this account.")
                         
 
                    

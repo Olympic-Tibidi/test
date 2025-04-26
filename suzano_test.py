@@ -2203,7 +2203,7 @@ if authentication_status:
                                     ledger_entries,
                                     x="Per_Entry",
                                     y="Net",
-                                    color="Amount",
+                                    color="Net",
                                     hover_data=["Description"],
                                     title=f"💰 Payment Distribution for {selected_account}",
                                     labels={"Amount": "Ledger Amount ($)", "Date": "Transaction Date"},

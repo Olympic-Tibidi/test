@@ -2112,6 +2112,31 @@ if authentication_status:
                                 st.markdown("</div>", unsafe_allow_html=True)
                         if show_ledger:
                             st.markdown("## 📘 Ledger Entries")
+
+                            main_json = gcp_download(target_bucket, "main.json")
+
+                        # Try loading once
+                        try:
+                            main_json = json.loads(main_json)
+                            # Check: was it a string again?
+                            if isinstance(main_json, str):
+                                main_json = json.loads(main_json)
+                        except Exception as e:
+                            st.error(f"Failed to load JSON: {e}")
+                            st.stop()
+                        
+                        # Now it's safely a dict of entries like {"0": {...}, "1": {...}}
+                            main = pd.DataFrame.from_dict(main_json, orient="index").T
+                            ledgers=main[main["Period_Year"]==int(24)]
+                            ledgers["Account"]=ledgers["Account"].astype("str")
+                            ledgers["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d") for i in ledgers["Date"]]
+                            ledgers["Period_Date"]=[datetime.datetime.strptime(i,"%Y-%m") for i in ledgers["Period_Date"]]
+                            ledger_df=ledgers.copy()
+                            ledger_df=ledger_df[ledger_df["Period_Date"]<=pd.Timestamp(datetime.date(int(year),int(month),1))]
+                            
+                            ### MAKE A COPY OF LEDGERS to change Account column to our structure : 6311000-32
+                            
+                            ledger_df.Account=[str(i)+"-"+str(j) for i,j in zip(ledger_df.Account,ledger_df.Sub_Cat)]
                             ledger_entries = ledger_df[ledger_df["Account"] == selected_account]
                             if not ledger_entries.empty:
                                 st.dataframe(ledger_entries, use_container_width=True)

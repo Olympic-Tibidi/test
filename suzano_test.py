@@ -2081,7 +2081,62 @@ if authentication_status:
                             },
                             disabled=["Account", "Name", "Group", "Subgroup", "ship", "2024", "2024 Results", "Variance"] # Disable others
                         )
+                        if st.button("💾 Save Changes"):
+                            st.session_state.budget_df = edited_df
+                            st.success("Changes saved to session!")
+                        
+                        # ---- SHOW UPDATED TABLE ----
+                        st.markdown("### 🔄 Current Saved Budget")
+                        st.dataframe(st.session_state.budget_df, use_container_width=True)
+                        
+                        # ---- DOWNLOAD BUTTON ----
+                        csv = st.session_state.budget_df.to_csv(index=False).encode('utf-8')
+                        st.download_button(
+                            label="📥 Download as CSV",
+                            data=csv,
+                            file_name='edited_budget.csv',
+                            mime='text/csv'
+                        )
+                        import json
 
+                        if st.button("📤 Upload to GCS"):
+                            edited = edited_df.set_index("Account")
+                        
+                            # Reload full original from session
+                            original_df = st.session_state.budget_df
+                            original_dict = original_df.T.to_dict()
+                        
+                            # Loop through edited rows
+                            for acct in edited.index:
+                                # Get new values
+                                new_2025 = edited.loc[acct, "2025"]
+                                new_2026 = edited.loc[acct, "2026"]
+                        
+                                # Update only 2025 and 2026 in original
+                                if acct in original_dict:
+                                    original_dict[acct]["2025"] = new_2025
+                                    original_dict[acct]["2026"] = new_2026
+                        
+                            # Optional: save to session state too
+                            st.session_state.budget_df = pd.DataFrame(original_dict).T
+                        
+                            # Dump and upload
+                            # Convert all values to native Python types (like int, float, str)
+                            def convert_numpy(obj):
+                                if isinstance(obj, (np.int64, np.int32)):
+                                    return int(obj)
+                                elif isinstance(obj, (np.float64, np.float32)):
+                                    return float(obj)
+                                return obj
+                            
+                            updated_json = json.dumps(original_dict, default=convert_numpy)
+                            storage_client = get_storage_client()
+                            bucket = storage_client.bucket(target_bucket)
+                            blob = bucket.blob(rf"main_budget.json")
+                            blob.upload_from_string(updated_json)
+                   
+                        
+                            st.success("✅ Budget successfully updated and uploaded to GCS!")
                         # Capture clicked account manually with selectbox
                         selected_account = st.selectbox("Pick an account to view details:", df['Account'])
                         if selected_account:
@@ -2158,62 +2213,7 @@ if authentication_status:
                             #     st.write("**2025:**", f"${row['2025']:,.0f}")
                             #     st.write("**2026:**", f"${row['2026']:,.0f}")
                             #     st.success("You can add charts, notes, or graphs here too!")
-                        if st.button("💾 Save Changes"):
-                            st.session_state.budget_df = edited_df
-                            st.success("Changes saved to session!")
                         
-                        # ---- SHOW UPDATED TABLE ----
-                        st.markdown("### 🔄 Current Saved Budget")
-                        st.dataframe(st.session_state.budget_df, use_container_width=True)
-                        
-                        # ---- DOWNLOAD BUTTON ----
-                        csv = st.session_state.budget_df.to_csv(index=False).encode('utf-8')
-                        st.download_button(
-                            label="📥 Download as CSV",
-                            data=csv,
-                            file_name='edited_budget.csv',
-                            mime='text/csv'
-                        )
-                        import json
-
-                        if st.button("📤 Upload to GCS"):
-                            edited = edited_df.set_index("Account")
-                        
-                            # Reload full original from session
-                            original_df = st.session_state.budget_df
-                            original_dict = original_df.T.to_dict()
-                        
-                            # Loop through edited rows
-                            for acct in edited.index:
-                                # Get new values
-                                new_2025 = edited.loc[acct, "2025"]
-                                new_2026 = edited.loc[acct, "2026"]
-                        
-                                # Update only 2025 and 2026 in original
-                                if acct in original_dict:
-                                    original_dict[acct]["2025"] = new_2025
-                                    original_dict[acct]["2026"] = new_2026
-                        
-                            # Optional: save to session state too
-                            st.session_state.budget_df = pd.DataFrame(original_dict).T
-                        
-                            # Dump and upload
-                            # Convert all values to native Python types (like int, float, str)
-                            def convert_numpy(obj):
-                                if isinstance(obj, (np.int64, np.int32)):
-                                    return int(obj)
-                                elif isinstance(obj, (np.float64, np.float32)):
-                                    return float(obj)
-                                return obj
-                            
-                            updated_json = json.dumps(original_dict, default=convert_numpy)
-                            storage_client = get_storage_client()
-                            bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"main_budget.json")
-                            blob.upload_from_string(updated_json)
-                   
-                        
-                            st.success("✅ Budget successfully updated and uploaded to GCS!")
 
                    
                    

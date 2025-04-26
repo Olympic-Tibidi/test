@@ -718,7 +718,19 @@ def apply_grouping_mode(df, mode_col='original'):
     df['Subgroup'] = df[mode_col].apply(lambda x: x.get('Subgroup') if isinstance(x, dict) else None)
     df = df.drop(columns=[mode_col])
     return df
+@st.cache_data(show_spinner="Loading Ledger Data...")
+def load_main_json(target_bucket, filename="main.json"):
+    raw_json = gcp_download(target_bucket, filename)
 
+    try:
+        main_json = json.loads(raw_json)
+        if isinstance(main_json, str):
+            main_json = json.loads(main_json)
+    except Exception as e:
+        st.error(f"Failed to parse main.json: {e}")
+        st.stop()
+
+    return main_json
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)

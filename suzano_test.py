@@ -2110,6 +2110,13 @@ if authentication_status:
                                 # Ledger modal button
                                 show_ledger = st.button("📖 View Ledger Entries")
                                 st.markdown("</div>", unsafe_allow_html=True)
+                        if show_ledger:
+                            st.markdown("## 📘 Ledger Entries")
+                            ledger_entries = ledger_df[ledger_df["Account"] == selected_account]
+                            if not ledger_entries.empty:
+                                st.dataframe(ledger_entries, use_container_width=True)
+                            else:
+                                st.info("No ledger entries found for this account.")
 
                            
                             # row = df[df["Account"] == selected_account].iloc[0]

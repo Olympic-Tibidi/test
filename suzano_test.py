@@ -2191,7 +2191,7 @@ if authentication_status:
                             ledgers["Date"] = [datetime.datetime.strptime(i, "%Y-%m-%d") for i in ledgers["Date"]]
                             ledgers["Period_Date"] = [datetime.datetime.strptime(i, "%Y-%m") for i in ledgers["Period_Date"]]
                             ledger_df = ledgers.copy()
-                            ledger_df = ledger_df[ledger_df["Period_Date"] <= pd.Timestamp(datetime.date(int(year), int(month), 1))]
+                            ledger_df = ledger_df[ledger_df["Period_Date"] <= pd.Timestamp(datetime.date(2025, 1, 1))]
                         
                             # Adjust the Account structure
                             ledger_df["Account"] = [str(i) + "-" + str(j) for i, j in zip(ledger_df["Account"], ledger_df["Sub_Cat"])]

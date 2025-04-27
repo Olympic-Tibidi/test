@@ -2202,7 +2202,7 @@ if authentication_status:
                                             <strong>Subgroup:</strong> {row['Subgroup']}<br>
                                             <strong>2024 Budget:</strong> ${row['2024']:,.0f}<br>
                                             <strong>2024 Total Net:</strong> ${ledger_entries.Net.sum():,.0f}<br>
-                                            <strong>2024 Monthly Net:</strong> ${round(ledger_entries.Net.sum(),2):,.0f}<br>
+                                            <strong>2024 Monthly Net:</strong> ${round(ledger_entries.Net.sum()/12,2):,.0f}<br>
                                             <strong>2025 Budget:</strong> ${row['2025']:,.0f}<br>
                                             <strong>2026 Budget:</strong> ${row['2026']:,.0f}</p>
                                         </div>

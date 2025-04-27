@@ -2172,8 +2172,7 @@ if authentication_status:
                         selected_account = st.selectbox("Pick an account to view details:", df['Account'])
                         if selected_account:
                             row = df[df["Account"] == selected_account].iloc[0]
-                            with st.sidebar:
-                                st.markdown("---")
+                            with st.expander(f"📋 Account Info: {selected_account}", expanded=True):
                                 st.markdown(
                                     f"""
                                     <div style="background-color:#f0f5ff; padding:15px; border-radius:10px;">
@@ -2188,7 +2187,6 @@ if authentication_status:
                                     unsafe_allow_html=True
                                 )
                         
-                                # Notes section
                                 note_key = f"note_{selected_account}"
                                 current_note = st.session_state.account_notes.get(selected_account, "")
                                 updated_note = st.text_area("📝 Notes for this Account", value=current_note, height=100)

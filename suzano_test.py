@@ -2112,7 +2112,7 @@ if authentication_status:
                             },
                             disabled=["Account", "Name", "Group", "Subgroup", "ship", "2024", "2024 Results", "Variance"] # Disable others
                         )
-                        save_changes, download, upload=st.columns(2,2,2)
+                        save_changes, download, upload=st.columns(3)
                         with save_changes:
                             
                             if st.button("💾 Save Changes"):

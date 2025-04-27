@@ -2112,66 +2112,73 @@ if authentication_status:
                             },
                             disabled=["Account", "Name", "Group", "Subgroup", "ship", "2024", "2024 Results", "Variance"] # Disable others
                         )
-                        if st.button("💾 Save Changes"):
-                            st.session_state.budget_df = edited_df
-                            st.success("Changes saved to session!")
+                        save_changes, download, upload=st.columns(2,2,2)
+                        with save_changes:
+                            
+                            if st.button("💾 Save Changes"):
+                                st.session_state.budget_df = edited_df
+                                st.success("Changes saved to session!")
                         
                         # ---- SHOW UPDATED TABLE ----
                         # st.markdown("### 🔄 Current Saved Budget")
                         # st.dataframe(st.session_state.budget_df, use_container_width=True)
-                        
-                        # ---- DOWNLOAD BUTTON ----
-                        csv = st.session_state.budget_df.to_csv(index=False).encode('utf-8')
-                        st.download_button(
-                            label="📥 Download as CSV",
-                            data=csv,
-                            file_name='edited_budget.csv',
-                            mime='text/csv'
-                        )
-                        import json
 
-                        if st.button("📤 Upload to GCS"):
-                            edited = edited_df.set_index("Account")
-                        
-                            # Reload full original from session
-                            original_df = st.session_state.budget_df
-                            original_dict = original_df.T.to_dict()
-                        
-                            # Loop through edited rows
-                            for acct in edited.index:
-                                # Get new values
-                                new_2025 = edited.loc[acct, "2025"]
-                                new_2026 = edited.loc[acct, "2026"]
-                        
-                                # Update only 2025 and 2026 in original
-                                if acct in original_dict:
-                                    original_dict[acct]["2025"] = new_2025
-                                    original_dict[acct]["2026"] = new_2026
-                        
-                            # Optional: save to session state too
-                            st.session_state.budget_df = pd.DataFrame(original_dict).T
-                        
-                            # Dump and upload
-                            # Convert all values to native Python types (like int, float, str)
-                            def convert_numpy(obj):
-                                if isinstance(obj, (np.int64, np.int32)):
-                                    return int(obj)
-                                elif isinstance(obj, (np.float64, np.float32)):
-                                    return float(obj)
-                                return obj
+                        with download:
+                            # ---- DOWNLOAD BUTTON ----
+                            csv = st.session_state.budget_df.to_csv(index=False).encode('utf-8')
+                            st.download_button(
+                                label="📥 Download as CSV",
+                                data=csv,
+                                file_name='edited_budget.csv',
+                                mime='text/csv'
+                            )
+
+                        with upload:
                             
-                            updated_json = json.dumps(original_dict, default=convert_numpy)
-                            storage_client = get_storage_client()
-                            bucket = storage_client.bucket(target_bucket)
-                            blob = bucket.blob(rf"main_budget.json")
-                            blob.upload_from_string(updated_json)
-                   
-                        
-                            st.success("✅ Budget successfully updated and uploaded to GCS!")
-                        # Capture clicked account manually with selectbox
+                            if st.button("📤 Upload to GCS"):
+                                edited = edited_df.set_index("Account")
+                            
+                                # Reload full original from session
+                                original_df = st.session_state.budget_df
+                                original_dict = original_df.T.to_dict()
+                            
+                                # Loop through edited rows
+                                for acct in edited.index:
+                                    # Get new values
+                                    new_2025 = edited.loc[acct, "2025"]
+                                    new_2026 = edited.loc[acct, "2026"]
+                            
+                                    # Update only 2025 and 2026 in original
+                                    if acct in original_dict:
+                                        original_dict[acct]["2025"] = new_2025
+                                        original_dict[acct]["2026"] = new_2026
+                            
+                                # Optional: save to session state too
+                                st.session_state.budget_df = pd.DataFrame(original_dict).T
+                            
+                                # Dump and upload
+                                # Convert all values to native Python types (like int, float, str)
+                                def convert_numpy(obj):
+                                    if isinstance(obj, (np.int64, np.int32)):
+                                        return int(obj)
+                                    elif isinstance(obj, (np.float64, np.float32)):
+                                        return float(obj)
+                                    return obj
+                                
+                                updated_json = json.dumps(original_dict, default=convert_numpy)
+                                storage_client = get_storage_client()
+                                bucket = storage_client.bucket(target_bucket)
+                                blob = bucket.blob(rf"main_budget.json")
+                                blob.upload_from_string(updated_json)
+                       
+                            
+                                st.success("✅ Budget successfully updated and uploaded to GCS!")
+                            # Capture clicked account manually with selectbox
                         selected_account = st.selectbox("Pick an account to view details:", df['Account'])
+
                         if selected_account:
                             row = df[df["Account"] == selected_account].iloc[0]
+                        
                             with st.expander(f"📋 Account Info: {selected_account}", expanded=True):
                                 st.markdown(
                                     f"""
@@ -2183,139 +2190,139 @@ if authentication_status:
                                         <strong>2024:</strong> ${row['2024']:,.0f}<br>
                                         <strong>2025:</strong> ${row['2025']:,.0f}<br>
                                         <strong>2026:</strong> ${row['2026']:,.0f}</p>
+                                    </div>
                                     """,
                                     unsafe_allow_html=True
                                 )
                         
                                 note_key = f"note_{selected_account}"
                                 current_note = st.session_state.account_notes.get(selected_account, "")
-                                updated_note = st.text_area("📝 Notes for this Account", value=current_note, height=100)
+                                updated_note = st.text_area("📝 Notes for this Account", value=current_note, height=120)
                                 if updated_note != current_note:
                                     st.session_state.account_notes[selected_account] = updated_note
                         
-                                # Ledger modal button
-                                show_ledger = st.button("📖 View Ledger Entries")
-                                st.markdown("</div>", unsafe_allow_html=True)
-                        if show_ledger:
-                            st.markdown("## 📘 Ledger Entries")
+                                # 📖 Ledger View inside the same expander
+                                if st.button("📖 View Ledger Entries") or st.session_state.get("show_ledger_entries", False):
+                                    st.session_state.show_ledger_entries = True  # Set the flag when button clicked
+                                    st.markdown("## 📘 Ledger Entries")
                         
-                            main = pd.DataFrame.from_dict(main_json, orient="index").T
-                            ledgers = main[main["Period_Year"] == int(24)]
-                            ledgers["Account"] = ledgers["Account"].astype("str")
-                            ledgers["Date"] = [datetime.datetime.strptime(i, "%Y-%m-%d") for i in ledgers["Date"]]
-                            ledgers["Period_Date"] = [datetime.datetime.strptime(i, "%Y-%m") for i in ledgers["Period_Date"]]
-                            ledger_df = ledgers.copy()
-                            ledger_df = ledger_df[ledger_df["Period_Date"] <= pd.Timestamp(datetime.date(int(year), int(month), 1))]
-                        
-                            ledger_df["Account"] = [str(i) + "-" + str(j) for i, j in zip(ledger_df["Account"], ledger_df["Sub_Cat"])]
-                            ledger_entries = ledger_df[ledger_df["Account"] == selected_account]
-                        
-                            if not ledger_entries.empty:
-                                st.dataframe(ledger_entries, use_container_width=True)
-                        
-                                # 🎯 Calculate percentiles
-                                q25 = np.percentile(ledger_entries["Net"], 25)
-                                q50 = np.percentile(ledger_entries["Net"], 50)
-                                q75 = np.percentile(ledger_entries["Net"], 75)
-                                q90 = np.percentile(ledger_entries["Net"], 90)  # Threshold
-                        
-                                def assign_color(amount):
-                                    if amount <= q25:
-                                        return "red"
-                                    elif amount <= q50:
-                                        return "orange"
-                                    elif amount <= q75:
-                                        return "lightblue"
+                                    main = pd.DataFrame.from_dict(main_json, orient="index").T
+                                    ledgers = main[main["Period_Year"] == int(24)]
+                                    ledgers["Account"] = ledgers["Account"].astype("str")
+                                    ledgers["Date"] = [datetime.datetime.strptime(i, "%Y-%m-%d") for i in ledgers["Date"]]
+                                    ledgers["Period_Date"] = [datetime.datetime.strptime(i, "%Y-%m") for i in ledgers["Period_Date"]]
+                                    ledger_df = ledgers.copy()
+                                    ledger_df = ledger_df[ledger_df["Period_Date"] <= pd.Timestamp(datetime.date(int(year), int(month), 1))]
+                                
+                                    ledger_df["Account"] = [str(i) + "-" + str(j) for i, j in zip(ledger_df["Account"], ledger_df["Sub_Cat"])]
+                                    ledger_entries = ledger_df[ledger_df["Account"] == selected_account]
+                                
+                                    if not ledger_entries.empty:
+                                        st.dataframe(ledger_entries, use_container_width=True)
+                                
+                                        # 🎯 Calculate percentiles
+                                        q25 = np.percentile(ledger_entries["Net"], 25)
+                                        q50 = np.percentile(ledger_entries["Net"], 50)
+                                        q75 = np.percentile(ledger_entries["Net"], 75)
+                                        q90 = np.percentile(ledger_entries["Net"], 90)  # Threshold
+                                
+                                        def assign_color(amount):
+                                            if amount <= q25:
+                                                return "red"
+                                            elif amount <= q50:
+                                                return "orange"
+                                            elif amount <= q75:
+                                                return "lightblue"
+                                            else:
+                                                return "blue"
+                                
+                                        ledger_entries["Color"] = ledger_entries["Net"].apply(assign_color)
+                                        ledger_entries["Above Threshold"] = ledger_entries["Net"] > q90
+                                
+                                        # 🎯 Create scatter and histogram separately
+                                        scatter = go.Scatter(
+                                            x=ledger_entries["Per_Entry"],
+                                            y=ledger_entries["Net"],
+                                            mode='markers',
+                                            marker=dict(
+                                                color=ledger_entries["Color"],
+                                                size=ledger_entries["Above Threshold"].apply(lambda x: 14 if x else 8),
+                                                opacity=0.8,
+                                                line=dict(width=1, color='DarkSlateGrey')
+                                            ),
+                                            text=ledger_entries["Description"],
+                                            hovertemplate="Date: %{x}<br>Amount: %{y}<br>Description: %{text}<extra></extra>",
+                                            name="Transactions"
+                                        )
+                                
+                                        hist = go.Histogram(
+                                            x=ledger_entries["Net"],
+                                            nbinsx=30,
+                                            marker_color='gray',
+                                            opacity=0.6,
+                                            name="Amount Distribution"
+                                        )
+                                
+                                        # 🎯 Build figure with subplots
+                                        fig = make_subplots(
+                                            rows=2, cols=1,
+                                            shared_xaxes=False,
+                                            row_heights=[0.7, 0.3],
+                                            vertical_spacing=0.1,
+                                            subplot_titles=(f"💰 Payment Scatter for {selected_account}", "📊 Payment Amount Histogram")
+                                        )
+                                
+                                        fig.add_trace(scatter, row=1, col=1)
+                                        fig.add_trace(hist, row=2, col=1)
+                                
+                                        # Threshold line
+                                        fig.add_shape(
+                                            type="line",
+                                            x0=min(ledger_entries["Per_Entry"]),
+                                            x1=max(ledger_entries["Per_Entry"]),
+                                            y0=q90,
+                                            y1=q90,
+                                            line=dict(color="green", width=2, dash="dash"),
+                                            row=1, col=1
+                                        )
+                                
+                                        fig.update_layout(
+                                            height=850,
+                                            plot_bgcolor='white',
+                                            showlegend=False,
+                                            hovermode="closest",
+                                        )
+                                
+                                        fig.update_xaxes(title_text="Transaction Date", row=1, col=1)
+                                        fig.update_yaxes(title_text="Amount ($)", row=1, col=1)
+                                        fig.update_xaxes(title_text="Amount ($)", row=2, col=1)
+                                        fig.update_yaxes(title_text="Number of Transactions", row=2, col=1)
+                                
+                                        st.plotly_chart(fig, use_container_width=True)
+                                
+                                        # 🎯 Monthly Aggregation (Sum of Payments)
+                                        ledger_entries["YearMonth"] = ledger_entries["Date"].dt.to_period('M').astype(str)
+                                        monthly_sum = ledger_entries.groupby("YearMonth")["Net"].sum().reset_index()
+                                
+                                        bar_fig = px.bar(
+                                            monthly_sum,
+                                            x="YearMonth",
+                                            y="Net",
+                                            title=f"📅 Monthly Sum of Payments for {selected_account}",
+                                            labels={"YearMonth": "Month", "Amount": "Total Amount ($)"},
+                                            text_auto='.2s'
+                                        )
+                                
+                                        bar_fig.update_layout(
+                                            plot_bgcolor='white',
+                                            height=500,
+                                            xaxis_tickangle=-45
+                                        )
+                                
+                                        st.plotly_chart(bar_fig, use_container_width=True)
+                                
                                     else:
-                                        return "blue"
-                        
-                                ledger_entries["Color"] = ledger_entries["Net"].apply(assign_color)
-                                ledger_entries["Above Threshold"] = ledger_entries["Net"] > q90
-                        
-                                # 🎯 Create scatter and histogram separately
-                                scatter = go.Scatter(
-                                    x=ledger_entries["Per_Entry"],
-                                    y=ledger_entries["Net"],
-                                    mode='markers',
-                                    marker=dict(
-                                        color=ledger_entries["Color"],
-                                        size=ledger_entries["Above Threshold"].apply(lambda x: 14 if x else 8),
-                                        opacity=0.8,
-                                        line=dict(width=1, color='DarkSlateGrey')
-                                    ),
-                                    text=ledger_entries["Description"],
-                                    hovertemplate="Date: %{x}<br>Amount: %{y}<br>Description: %{text}<extra></extra>",
-                                    name="Transactions"
-                                )
-                        
-                                hist = go.Histogram(
-                                    x=ledger_entries["Net"],
-                                    nbinsx=30,
-                                    marker_color='gray',
-                                    opacity=0.6,
-                                    name="Amount Distribution"
-                                )
-                        
-                                # 🎯 Build figure with subplots
-                                fig = make_subplots(
-                                    rows=2, cols=1,
-                                    shared_xaxes=False,
-                                    row_heights=[0.7, 0.3],
-                                    vertical_spacing=0.1,
-                                    subplot_titles=(f"💰 Payment Scatter for {selected_account}", "📊 Payment Amount Histogram")
-                                )
-                        
-                                fig.add_trace(scatter, row=1, col=1)
-                                fig.add_trace(hist, row=2, col=1)
-                        
-                                # Threshold line
-                                fig.add_shape(
-                                    type="line",
-                                    x0=min(ledger_entries["Per_Entry"]),
-                                    x1=max(ledger_entries["Per_Entry"]),
-                                    y0=q90,
-                                    y1=q90,
-                                    line=dict(color="green", width=2, dash="dash"),
-                                    row=1, col=1
-                                )
-                        
-                                fig.update_layout(
-                                    height=850,
-                                    plot_bgcolor='white',
-                                    showlegend=False,
-                                    hovermode="closest",
-                                )
-                        
-                                fig.update_xaxes(title_text="Transaction Date", row=1, col=1)
-                                fig.update_yaxes(title_text="Amount ($)", row=1, col=1)
-                                fig.update_xaxes(title_text="Amount ($)", row=2, col=1)
-                                fig.update_yaxes(title_text="Number of Transactions", row=2, col=1)
-                        
-                                st.plotly_chart(fig, use_container_width=True)
-                        
-                                # 🎯 Monthly Aggregation (Sum of Payments)
-                                ledger_entries["YearMonth"] = ledger_entries["Date"].dt.to_period('M').astype(str)
-                                monthly_sum = ledger_entries.groupby("YearMonth")["Net"].sum().reset_index()
-                        
-                                bar_fig = px.bar(
-                                    monthly_sum,
-                                    x="YearMonth",
-                                    y="Net",
-                                    title=f"📅 Monthly Sum of Payments for {selected_account}",
-                                    labels={"YearMonth": "Month", "Amount": "Total Amount ($)"},
-                                    text_auto='.2s'
-                                )
-                        
-                                bar_fig.update_layout(
-                                    plot_bgcolor='white',
-                                    height=500,
-                                    xaxis_tickangle=-45
-                                )
-                        
-                                st.plotly_chart(bar_fig, use_container_width=True)
-                        
-                            else:
-                                st.info("No ledger entries found for this account.")
+                                        st.info("No ledger entries found for this account.")
                         
 
                    

@@ -2189,9 +2189,11 @@ if authentication_status:
                                             <p><strong>Name:</strong> {row['Name']}<br>
                                             <strong>Group:</strong> {row['Group']}<br>
                                             <strong>Subgroup:</strong> {row['Subgroup']}<br>
-                                            <strong>2024:</strong> ${row['2024']:,.0f}<br>
-                                            <strong>2025:</strong> ${row['2025']:,.0f}<br>
-                                            <strong>2026:</strong> ${row['2026']:,.0f}</p>
+                                            <strong>2024 Budget:</strong> ${row['2024']:,.0f}<br>
+                                            <strong>2024 Total Net:</strong> ${row['2024 Results']:,.0f}<br>
+                                            <strong>2024 Monthly Net:</strong> ${round(row['2024 Results']/12,2):,.0f}<br>
+                                            <strong>2025 Budget:</strong> ${row['2025']:,.0f}<br>
+                                            <strong>2026 Budget:</strong> ${row['2026']:,.0f}</p>
                                         </div>
                                         """,
                                         unsafe_allow_html=True

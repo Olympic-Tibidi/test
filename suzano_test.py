@@ -2178,6 +2178,17 @@ if authentication_status:
 
                         if selected_account:
                             row = df[df["Account"] == selected_account].iloc[0]
+                            main = pd.DataFrame.from_dict(main_json, orient="index").T
+                            ledgers = main[main["Period_Year"] == int(24)]
+                            ledgers["Account"] = ledgers["Account"].astype("str")
+                            ledgers["Date"] = [datetime.datetime.strptime(i, "%Y-%m-%d") for i in ledgers["Date"]]
+                            ledgers["Period_Date"] = [datetime.datetime.strptime(i, "%Y-%m") for i in ledgers["Period_Date"]]
+                            ledger_df = ledgers.copy()
+                            ledger_df = ledger_df[ledger_df["Period_Date"] <= pd.Timestamp(datetime.date(int(year), int(month), 1))]
+                        
+                            ledger_df["Account"] = [str(i) + "-" + str(j) for i, j in zip(ledger_df["Account"], ledger_df["Sub_Cat"])]
+                            ledger_entries = ledger_df[ledger_df["Account"] == selected_account]
+                            
                         
                             with st.expander(f"📋 Account Info: {selected_account}", expanded=True):
                                 info, entries=st.columns([2,8])
@@ -2190,7 +2201,7 @@ if authentication_status:
                                             <strong>Group:</strong> {row['Group']}<br>
                                             <strong>Subgroup:</strong> {row['Subgroup']}<br>
                                             <strong>2024 Budget:</strong> ${row['2024']:,.0f}<br>
-                                            <strong>2024 Total Net:</strong> ${row['2024 Results']:,.0f}<br>
+                                            <strong>2024 Total Net:</strong> ${ledger_entries.Net.sum():,.0f}<br>
                                             <strong>2024 Monthly Net:</strong> ${round(row['2024 Results']/12,2):,.0f}<br>
                                             <strong>2025 Budget:</strong> ${row['2025']:,.0f}<br>
                                             <strong>2026 Budget:</strong> ${row['2026']:,.0f}</p>
@@ -2211,16 +2222,8 @@ if authentication_status:
                                         st.session_state.show_ledger_entries = True  # Set the flag when button clicked
                                         st.markdown("## 📘 Ledger Entries")
                             
-                                        main = pd.DataFrame.from_dict(main_json, orient="index").T
-                                        ledgers = main[main["Period_Year"] == int(24)]
-                                        ledgers["Account"] = ledgers["Account"].astype("str")
-                                        ledgers["Date"] = [datetime.datetime.strptime(i, "%Y-%m-%d") for i in ledgers["Date"]]
-                                        ledgers["Period_Date"] = [datetime.datetime.strptime(i, "%Y-%m") for i in ledgers["Period_Date"]]
-                                        ledger_df = ledgers.copy()
-                                        ledger_df = ledger_df[ledger_df["Period_Date"] <= pd.Timestamp(datetime.date(int(year), int(month), 1))]
-                                    
-                                        ledger_df["Account"] = [str(i) + "-" + str(j) for i, j in zip(ledger_df["Account"], ledger_df["Sub_Cat"])]
-                                        ledger_entries = ledger_df[ledger_df["Account"] == selected_account]
+                                        
+                                        
                                     
                                         if not ledger_entries.empty:
                                             st.dataframe(ledger_entries, use_container_width=True)

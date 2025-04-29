@@ -2348,7 +2348,7 @@ if authentication_status:
                             st.error(f"Failed to load JSON: {e}")
                             st.stop()
                 
-                        ledgers=st.session_state.main[st.session_state.main["Period_Year"]==int(year[-2:])]
+                        ledgers=st.session_state.main[st.session_state.main["Period_Year"]==int(ear[-2:])]
                         ledgers["Account"]=ledgers["Account"].astype("str")
                         ledgers["Date"]=[datetime.datetime.strptime(i,"%Y-%m-%d") for i in ledgers["Date"]]
                         ledgers["Period_Date"]=[datetime.datetime.strptime(i,"%Y-%m") for i in ledgers["Period_Date"]]

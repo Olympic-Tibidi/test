@@ -4840,6 +4840,8 @@ if authentication_status:
                                                 # --- capture old values BEFORE update ---
                                                 old_shipped = float(raw_ro[str(sel_ro)][str(sel_so)]["shipped"])
                                                 delta_shipped = new_shipped - old_shipped
+                                            except:
+                                                pass
                     
                                             # Update underlying JSON
                                             try:
@@ -8090,6 +8092,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

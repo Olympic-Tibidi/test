@@ -4905,6 +4905,7 @@ if authentication_status:
                                         # format & order
                                         log_df["date"] = pd.to_datetime(log_df["date"])
                                         log_df = log_df.sort_values("date", ascending=False)
+                                        st.write("so far")
                             
                                         # Pretty delta column
                                         def fmt_arrow(x):
@@ -8092,6 +8093,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

@@ -4835,6 +4835,11 @@ if authentication_status:
                                             # Soft validation
                                             if abs((new_shipped + new_remaining) - total_val) > 1e-6:
                                                 st.warning("Shipped + Remaining ≠ Total. Remaining will be set to (Total − Shipped) on save.")
+
+                                            try:
+                                                # --- capture old values BEFORE update ---
+                                                old_shipped = float(raw_ro[str(sel_ro)][str(sel_so)]["shipped"])
+                                                delta_shipped = new_shipped - old_shipped
                     
                                             # Update underlying JSON
                                             try:
@@ -4862,6 +4867,9 @@ if authentication_status:
                                                     "user": user_name.strip(),
                                                     "ro": str(sel_ro),
                                                     "sales_order": str(sel_so),
+                                                    "prev_shipped": old_shipped,
+                                                    "new_shipped": new_shipped,
+                                                    "delta_shipped": delta_shipped,
                                                     "reason": reason.strip()
                                                 }
                                                 ro_log.append(log_entry)
@@ -4870,11 +4878,16 @@ if authentication_status:
                                                 bucket = storage_client.bucket(target_bucket)
                                                 blob = bucket.blob(rf"release_orders/ro_log.json")
                                                 blob.upload_from_string(json.dumps(ro_log))
-                                                st.success(f"Saved: RO {sel_ro} / SO {sel_so} — Shipped={new_shipped:,.0f}, Remaining={fixed_remaining:,.0f}")
+                                                st.success(
+                                                    f"Saved: RO {sel_ro} / SO {sel_so} — "
+                                                    f"Shipped {old_shipped:,.0f} → {new_shipped:,.0f} (Δ {delta_shipped:+,.0f}). "
+                                                    f"Remaining={fixed_remaining:,.0f}. Log updated."
+                                                )
                                                 st.rerun()
                                             except Exception as e:
                                                 st.error(f"Failed to save changes: {e}")
                                     # --- LOG VIEWER ---
+                            # --- LOG VIEWER ---
                             st.markdown("---")
                             if st.checkbox("Show Edit Log"):
                                 try:
@@ -4882,10 +4895,25 @@ if authentication_status:
                                     ro_log = json.loads(ro_log_raw) if ro_log_raw else []
                                     if ro_log:
                                         log_df = pd.DataFrame(ro_log)
-                                        # Make date the index for cleaner view
+                                        # optional: filter to current selection
+                                        filter_current = st.checkbox("Filter to selected RO/SO", value=False)
+                                        if filter_current and 'sel_ro' in locals() and 'sel_so' in locals():
+                                            log_df = log_df[(log_df["ro"] == str(sel_ro)) & (log_df["sales_order"] == str(sel_so))]
+                            
+                                        # format & order
                                         log_df["date"] = pd.to_datetime(log_df["date"])
                                         log_df = log_df.sort_values("date", ascending=False)
-                                        st.dataframe(log_df, use_container_width=True, height=300)
+                            
+                                        # Pretty delta column
+                                        def fmt_arrow(x):
+                                            if x > 0:  return f"↑ {x:,.0f}"
+                                            if x < 0:  return f"↓ {abs(x):,.0f}"
+                                            return "—"
+                            
+                                        log_df["Δ shipped"] = log_df["delta_shipped"].apply(fmt_arrow)
+                            
+                                        display_cols = ["date","user","ro","sales_order","reason","prev_shipped","new_shipped","Δ shipped"]
+                                        st.dataframe(log_df[display_cols], use_container_width=True, height=320)
                                     else:
                                         st.info("No log entries found.")
                                 except Exception as e:
@@ -8062,6 +8090,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

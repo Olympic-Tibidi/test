@@ -4849,7 +4849,13 @@ if authentication_status:
                                                 blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
                                                 blob.upload_from_string(json.dumps(raw_ro))
                                                 
-                    
+                                                from datetime import datetime
+                                                try:
+                                                    from zoneinfo import ZoneInfo  # Py3.9+
+                                                    _tz = ZoneInfo("America/Los_Angeles")
+                                                except Exception:
+                                                    import pytz
+                                                    _tz = pytz.timezone("America/Los_Angeles")
                                                 
                                                 log_entry = {
                                                     "date": datetime.datetime.now(_tz).isoformat(timespec="seconds"),
@@ -8039,6 +8045,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

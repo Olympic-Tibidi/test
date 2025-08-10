@@ -4706,36 +4706,136 @@ if authentication_status:
                     active_frame=active_frame_.copy()
                     active_frame.loc["Total"]=active_frame[["Total","Shipped","Remaining"]].sum()
                     
-                    st.markdown(active_frame.to_html(render_links=True),unsafe_allow_html=True)
-    
-                    
-                    release_orders = status_frame.index[:-1]
-                    release_orders = pd.Categorical(release_orders)
-                    active_order_names = [f"{i} to {raw_ro[i]['destination']}" for i in active_frame_.index]
-                    destinations=[raw_ro[i]['destination'] for i in active_frame_.index]
-                    active_orders=[str(i) for i in active_frame.index]
-                   
-                    fig = go.Figure()
-                    fig.add_trace(go.Bar(x=active_orders, y=active_frame["Total"], name='Total', marker_color='lightgray'))
-                    fig.add_trace(go.Bar(x=active_orders, y=active_frame["Shipped"], name='Shipped', marker_color='blue', opacity=0.7))
-                    remaining_data = [remaining if remaining > 0 else None for remaining in active_frame_["Remaining"]]
-                    fig.add_trace(go.Scatter(x=active_orders, y=remaining_data, mode='markers', name='Remaining', marker=dict(color='red', size=10)))
-                    
-                    #annotations = [dict(x=release_order, y=total_quantity, text=destination, showarrow=True, arrowhead=4, ax=0, ay=-30) for release_order, total_quantity, destination in zip(active_orders, active_frame["Total"], destinations)]
-                    #fig.update_layout(annotations=annotations)
-    
-                    # fig.add_annotation(x="3172296", y=800, text="destination",
-                    #                        showarrow=True, arrowhead=4, ax=0, ay=-30)
-                    
-                    fig.update_layout(title='ACTIVE RELEASE ORDERS',
-                                      xaxis_title='Release Orders',
-                                      yaxis_title='Quantities',
-                                      barmode='overlay',
-                                      width=1300,
-                                      height=700,
-                                      xaxis=dict(tickangle=-90, type='category'))
-                    
-                    st.plotly_chart(fig)
+                    # --- layout: two columns (table left, editor right) ---
+    col_table, col_edit = st.columns([2, 1])
+
+    with col_table:
+        st.markdown("### RELEASE ORDER STATUS (Active)")
+        st.markdown(active_frame.to_html(render_links=True), unsafe_allow_html=True)
+
+    # Build fig as you already do (left column is fine)
+    with col_table:
+        release_orders = status_frame.index[:-1]
+        release_orders = pd.Categorical(release_orders)
+        active_order_names = [f"{i} to {raw_ro[i]['destination']}" for i in active_frame_.index]
+        destinations = [raw_ro[i]['destination'] for i in active_frame_.index]
+        active_orders = [str(i) for i in active_frame.index]
+
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=active_orders, y=active_frame["Total"], name='Total', marker_color='lightgray'))
+        fig.add_trace(go.Bar(x=active_orders, y=active_frame["Shipped"], name='Shipped', marker_color='blue', opacity=0.7))
+        remaining_data = [r if r > 0 else None for r in active_frame_["Remaining"]]
+        fig.add_trace(go.Scatter(x=active_orders, y=remaining_data, mode='markers', name='Remaining',
+                                 marker=dict(color='red', size=10)))
+        st.plotly_chart(fig, use_container_width=True)
+
+    # --- EDITOR (right column) ---
+    with col_edit:
+        st.markdown("### Edit Release Order Numbers")
+
+        # Only allow editing rows that are actually displayed (exclude the summary row)
+        # We need both RO and Sales Order to uniquely identify the line
+        if len(active_frame_) == 0:
+            st.info("No active release orders to edit.")
+        else:
+            # Rebuild a tidy table with RO + SO as distinct rows for selection
+            tidy = (
+                active_frame_
+                .reset_index()  # brings "Release Order #" back as a column
+                .rename(columns={"Release Order #": "RO"})
+            )
+
+            # NOTE: active_frame_ has duplicate index values (RO) for each Sales Order.
+            # We pull the Sales Order from the original dict using the combined keys.
+            # Let's reconstruct by walking status_dict and filtering those present in active_frame_
+            rows = []
+            for key, row in status_dict.items():
+                ro = row["Release Order #"]
+                if ro in active_frame_.index:
+                    rows.append({
+                        "key": key,  # e.g. "RO-SO"
+                        "RO": ro,
+                        "SO": row["Sales Order #"],
+                        "Dest": row["Destination"],
+                        "Total": row["Total"],
+                        "Shipped": row["Shipped"],
+                        "Remaining": row["Remaining"]
+                    })
+            edit_df = pd.DataFrame(rows)
+
+            # If somehow nothing matched (shouldn't happen), guard:
+            if edit_df.empty:
+                st.info("No editable rows found for the current view.")
+            else:
+                enable_edit = st.checkbox("EDIT RELEASE ORDER NUMBERS", value=False)
+
+                if enable_edit:
+                    # Build human-friendly labels but keep (RO, SO) as the actual value
+                    options = [
+                        (r["RO"], r["SO"]) for _, r in edit_df.iterrows()
+                    ]
+                    labels = [
+                        f"RO {r['RO']} | SO {r['SO']} → {r['Dest']}"
+                        for _, r in edit_df.iterrows()
+                    ]
+                    # Map index to label/value
+                    label_to_value = {labels[i]: options[i] for i in range(len(labels))}
+                    choice_label = st.selectbox("Select Release Order / Sales Order", labels, index=0)
+                    sel_ro, sel_so = label_to_value[choice_label]
+
+                    # Current values for the selection
+                    current = edit_df[(edit_df["RO"] == sel_ro) & (edit_df["SO"] == sel_so)].iloc[0]
+                    total_val = float(current["Total"])
+                    shipped_val = float(current["Shipped"])
+                    remaining_val = float(current["Remaining"])
+
+                    st.caption(f"Total (read-only): **{total_val:,.0f}**")
+
+                    new_shipped = st.number_input(
+                        "Shipped",
+                        min_value=0.0,
+                        max_value=float(total_val),
+                        value=float(shipped_val),
+                        step=1.0,
+                        help="Must be ≤ Total"
+                    )
+
+                    # User can edit Remaining, but we'll reconcile on save
+                    new_remaining = st.number_input(
+                        "Remaining",
+                        min_value=0.0,
+                        max_value=float(total_val),
+                        value=float(remaining_val),
+                        step=1.0,
+                        help="Should equal Total − Shipped; adjusted on save if not."
+                    )
+
+                    # Soft validation
+                    if abs((new_shipped + new_remaining) - total_val) > 1e-6:
+                        st.warning("Shipped + Remaining ≠ Total. Remaining will be set to (Total − Shipped) on save.")
+
+                    if st.button("Save Changes", type="primary", use_container_width=True):
+                        # Reconcile: enforce Remaining = Total − Shipped (and clamp at 0)
+                        new_shipped = float(new_shipped)
+                        fixed_remaining = max(0.0, float(total_val) - new_shipped)
+
+                        # Update underlying JSON
+                        try:
+                            # Update raw_ro structure
+                            raw_ro[str(sel_ro)][str(sel_so)]["shipped"] = new_shipped
+                            raw_ro[str(sel_ro)][str(sel_so)]["remaining"] = fixed_remaining
+
+                            # Upload back to GCS
+                            gcp_upload(
+                                target_bucket,
+                                rf"release_orders/RELEASE_ORDERS.json",
+                                json.dumps(raw_ro, indent=2)
+                            )
+
+                            st.success(f"Saved: RO {sel_ro} / SO {sel_so} — Shipped={new_shipped:,.0f}, Remaining={fixed_remaining:,.0f}")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Failed to save changes: {e}")
                     
                     
                     duration=st.toggle("Duration Report")
@@ -7907,3 +8007,4 @@ elif authentication_status == None:
     
         
      
+

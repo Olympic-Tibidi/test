@@ -6446,47 +6446,154 @@ if authentication_status:
                             st.dataframe(temp)
                             st.subheader("By Ocean BOL,TONS")
                             st.dataframe(tempo)        
+                        from datetime import datetime
+                        try:
+                            from zoneinfo import ZoneInfo
+                            _tz = ZoneInfo("America/Los_Angeles")
+                        except Exception:
+                            import pytz
+                            _tz = pytz.timezone("America/Los_Angeles")
+                        
+                        def safe_download_json(bucket, path, default):
+                            try:
+                                raw = gcp_download(bucket, path)
+                                if not raw:
+                                    return default
+                                obj = json.loads(raw)
+                                return obj if obj is not None else default
+                            except Exception:
+                                return default
+
                         with inv_col2:
-                            edit_inventory_checkbox=st.checkbox("CHECK TO EDIT INVENTORY")
+                            st.markdown("### Inventory Editor")
+                            edit_inventory_checkbox = st.checkbox("CHECK TO EDIT INVENTORY", value=False)
+                        
                             if edit_inventory_checkbox:
-                                
-                                bol_to_edit=st.selectbox("EDIT INVENTORY",[i for i in temp.index])
-                                dinv1,dinv2,_=st.columns([3,3,4])
-                                with dinv1:
-                                    st.write(f"DAMAGED")
-                                    st.write(f"TOTAL")
-                                with dinv2:
-                                    damaged_edit=st.number_input("lala",value=map['bol_mapping'][bol_to_edit]['damaged'],label_visibility='collapsed')
-                                    total_edit=st.number_input("tata",value=map['bol_mapping'][bol_to_edit]['total'],label_visibility='collapsed',key="dsd")
-                                if st.button("SUBMIT CHANGE",key="t2ds"):
-                                    map['bol_mapping'][bol_to_edit]['total']=total_edit
-                                    map['bol_mapping'][bol_to_edit]['damaged']=damaged_edit
-                                    #storage_client = storage.Client()
-                                    storage_client = get_storage_client()
-                                    bucket = storage_client.bucket(target_bucket)
-                                    blob = bucket.blob(rf"map.json")
-                                    blob.upload_from_string(json.dumps(map))
-                                    st.success(f"Updated Inventory Database",icon="✅")
-                                    
-                                    user="admin"
-                                    log_type="Warehouse Adjustment"
-                                    inventory_log=log_inventory_change(bol_to_edit, total_edit, damaged_edit, user, log_type)
-                                    #storage_client = storage.Client()
-                                    storage_client = get_storage_client()
-                                    bucket = storage_client.bucket(target_bucket)
-                                    blob = bucket.blob(rf"inventory_log.json")
-                                    blob.upload_from_string(json.dumps(inventory_log))
-                                    st.success(f"Logged Inventory Change",icon="✅")
-                                    
-                                see_inventory_change_checkbox=st.checkbox("SEE INVENTORY EDIT LOGS")
-                                if see_inventory_change_checkbox:
+                                bols = list(temp.index)
+                        
+                                with st.form("inv_edit_form", clear_on_submit=False):
+                                    bol_to_edit = st.selectbox("EDIT INVENTORY (Ocean BOL)", bols, index=0, key="inv_bol_sel")
+                        
+                                    # Current values
+                                    cur_total   = float(map['bol_mapping'][bol_to_edit].get('total', 0))
+                                    cur_damaged = float(map['bol_mapping'][bol_to_edit].get('damaged', 0))
+                        
+                                    c1, c2 = st.columns(2)
+                                    with c1:
+                                        st.caption("TOTAL")
+                                        total_edit = st.number_input(
+                                            "Total", value=cur_total, min_value=0.0, step=1.0, key=f"inv_total_{bol_to_edit}", label_visibility="collapsed"
+                                        )
+                                    with c2:
+                                        st.caption("DAMAGED")
+                                        damaged_edit = st.number_input(
+                                            "Damaged", value=cur_damaged, min_value=0.0, step=1.0, key=f"inv_damaged_{bol_to_edit}", label_visibility="collapsed"
+                                        )
+                        
+                                    user_name = st.text_input("Your name/initials (for log)", value="", key="inv_user")
+                                    reason    = st.text_area("Reason for change", value="", key="inv_reason")
+                        
+                                    submitted = st.form_submit_button("Save Inventory Changes", use_container_width=True)
+                        
+                                if submitted:
+                                    if not user_name.strip() or not reason.strip():
+                                        st.error("Please enter your name/initials and a reason before saving.")
+                                    else:
+                                        try:
+                                            # Old values (for delta)
+                                            old_total   = cur_total
+                                            old_damaged = cur_damaged
+                        
+                                            # Update map.json
+                                            map['bol_mapping'][bol_to_edit]['total']   = float(total_edit)
+                                            map['bol_mapping'][bol_to_edit]['damaged'] = float(damaged_edit)
+                        
+                                            storage_client = get_storage_client()
+                                            bucket = storage_client.bucket(target_bucket)
+                                            bucket.blob("map.json").upload_from_string(json.dumps(map))
+                        
+                                            # Append to inventory_log.json (as a list of entries)
+                                            inv_log = safe_download_json(target_bucket, "inventory_log.json", default=[])
+                                            if isinstance(inv_log, dict):  # normalize if older format
+                                                # convert dict-of-BOL->list to a flat list
+                                                flat = []
+                                                for k, v in inv_log.items():
+                                                    if isinstance(v, list):
+                                                        for entry in v:
+                                                            entry['bol'] = k
+                                                            flat.append(entry)
+                                                inv_log = flat
+                        
+                                            entry = {
+                                                "date": datetime.now(_tz).isoformat(timespec="seconds"),
+                                                "user": user_name.strip(),
+                                                "type": "Warehouse Adjustment",
+                                                "bol":  str(bol_to_edit),
+                                                "prev_total":   old_total,
+                                                "new_total":    float(total_edit),
+                                                "delta_total":  float(total_edit) - old_total,
+                                                "prev_damaged": old_damaged,
+                                                "new_damaged":  float(damaged_edit),
+                                                "delta_damaged": float(damaged_edit) - old_damaged,
+                                                "reason": reason.strip(),
+                                            }
+                                            inv_log.append(entry)
+                                            bucket.blob("inventory_log.json").upload_from_string(json.dumps(inv_log))
+                        
+                                            st.success(
+                                                f"Updated {bol_to_edit} — "
+                                                f"Total {old_total:,.0f} → {float(total_edit):,.0f} (Δ {float(total_edit)-old_total:+,.0f}), "
+                                                f"Damaged {old_damaged:,.0f} → {float(damaged_edit):,.0f} (Δ {float(damaged_edit)-old_damaged:+,.0f})."
+                                            )
+                                        except Exception as e:
+                                            st.error(f"Failed to save inventory change: {e}")
+                        
+                                # -------- Log viewer (outside the form so the checkbox can trigger a rerun) --------
+                                st.markdown("---")
+                                if st.checkbox("SEE INVENTORY EDIT LOGS"):
                                     try:
-                                        inventory_log=gcp_download(target_bucket,rf"inventory_log.json")
-                                        inventory_log=json.loads(inventory_log)
-                                    except :
-                                        inventory_log = []
-                                       
-                                    st.write(inventory_log[bol_to_edit])
+                                        inv_log = safe_download_json(target_bucket, "inventory_log.json", default=[])
+                                        if not inv_log:
+                                            st.info("No inventory log entries yet.")
+                                        else:
+                                            log_df = pd.DataFrame(inv_log)
+                        
+                                            # Optional filter to the selected BOL (if selection exists in session)
+                                            filter_current = st.checkbox("Filter to selected BOL", value=True)
+                                            if filter_current and "inv_bol_sel" in st.session_state:
+                                                log_df = log_df[log_df.get("bol", "").astype(str) == str(st.session_state["inv_bol_sel"])]
+                        
+                                            # Clean types
+                                            if "date" in log_df.columns:
+                                                log_df["date"] = pd.to_datetime(log_df["date"], errors="coerce")
+                                            for c in ["prev_total","new_total","delta_total","prev_damaged","new_damaged","delta_damaged"]:
+                                                if c in log_df.columns:
+                                                    log_df[c] = pd.to_numeric(log_df[c], errors="coerce")
+                        
+                                            # Pretty delta columns
+                                            def fmt_delta(x):
+                                                if pd.isna(x): return "—"
+                                                x = float(x)
+                                                if x > 0:  return f"↑ {x:,.0f}"
+                                                if x < 0:  return f"↓ {abs(x):,.0f}"
+                                                return "—"
+                        
+                                            if "delta_total" in log_df.columns:
+                                                log_df["Δ total"]   = log_df["delta_total"].apply(fmt_delta)
+                                            if "delta_damaged" in log_df.columns:
+                                                log_df["Δ damaged"] = log_df["delta_damaged"].apply(fmt_delta)
+                        
+                                            if "date" in log_df.columns:
+                                                log_df = log_df.sort_values("date", ascending=False)
+                        
+                                            display_cols = [c for c in ["date","user","type","bol","reason",
+                                                                        "prev_total","new_total","Δ total",
+                                                                        "prev_damaged","new_damaged","Δ damaged"]
+                                                            if c in log_df.columns]
+                                            st.dataframe(log_df[display_cols], use_container_width=True, height=320)
+                                    except Exception as e:
+                                        st.error(f"Could not load inventory logs: {e}")
+
 
 
                             
@@ -8122,6 +8229,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

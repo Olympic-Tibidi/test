@@ -4913,10 +4913,10 @@ if authentication_status:
                                             if x < 0:  return f"↓ {abs(x):,.0f}"
                                             return "—"
                             
-                                        log_df["Δ shipped"] = log_df["delta_shipped"].apply(fmt_arrow)
+                                        log_df["delta_shipped"] = log_df["delta_shipped"].apply(fmt_arrow)
                                         st.write("so far")
                             
-                                        display_cols = ["date","user","ro","sales_order","reason","prev_shipped","new_shipped","Δ shipped"]
+                                        display_cols = ["date","user","ro","sales_order","reason","prev_shipped","new_shipped","delta_shipped"]
                                         st.dataframe(log_df[display_cols], use_container_width=True, height=320)
                                     else:
                                         st.info("No log entries found.")
@@ -8094,6 +8094,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

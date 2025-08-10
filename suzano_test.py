@@ -4828,8 +4828,8 @@ if authentication_status:
                                         )
     
                                         # NEW: user + reason for logging
-                                        user_name = st.text_input("Your name/initials (for log)", value="", placeholder="e.g., AY")
-                                        reason = st.text_area("Reason for change", value="", placeholder="Explain why you're updating the numbers")
+                                        user_name = st.text_input("Your name/initials (for log)", value="", placeholder="e.g., AY",key="inp_user")
+                                        reason = st.text_area("Reason for change", value="", placeholder="Explain why you're updating the numbers",key="inp_reason")
 
                                         submitted = st.form_submit_button(
                                                 "Save Changes", use_container_width=True,
@@ -8123,6 +8123,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

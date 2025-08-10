@@ -4826,11 +4826,11 @@ if authentication_status:
                                             raw_ro[str(sel_ro)][str(sel_so)]["remaining"] = fixed_remaining
                 
                                             # Upload back to GCS
-                                            gcp_upload(
-                                                target_bucket,
-                                                rf"release_orders/RELEASE_ORDERS.json",
-                                                json.dumps(raw_ro, indent=2)
-                                            )
+                                            storage_client = get_storage_client()
+                                            bucket = storage_client.bucket(target_bucket)
+                                            blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
+                                            blob.upload_from_string(json.dumps(raw_ro))
+                                            
                 
                                             st.success(f"Saved: RO {sel_ro} / SO {sel_so} — Shipped={new_shipped:,.0f}, Remaining={fixed_remaining:,.0f}")
                                             st.rerun()
@@ -8007,5 +8007,6 @@ elif authentication_status == None:
     
         
      
+
 
 

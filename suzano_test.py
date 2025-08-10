@@ -4852,7 +4852,7 @@ if authentication_status:
                     
                                                 
                                                 log_entry = {
-                                                    "date": datetime.now(_tz).isoformat(timespec="seconds"),
+                                                    "date": .datetime.datetime.now(_tz).isoformat(timespec="seconds"),
                                                     "user": user_name.strip(),
                                                     "ro": str(sel_ro),
                                                     "sales_order": str(sel_so),
@@ -8039,6 +8039,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

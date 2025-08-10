@@ -4810,17 +4810,19 @@ if authentication_status:
                                         help="Should equal Total − Shipped; adjusted on save if not."
                                     )
                 
-                                    # Soft validation
-                                    if abs((new_shipped + new_remaining) - total_val) > 1e-6:
-                                        st.warning("Shipped + Remaining ≠ Total. Remaining will be set to (Total − Shipped) on save.")
+                                    
                 
                                     if st.button("Save Changes", type="primary", use_container_width=True):
                                         # Reconcile: enforce Remaining = Total − Shipped (and clamp at 0)
                                         new_shipped = float(new_shipped)
                                         fixed_remaining = max(0.0, float(total_val) - new_shipped)
+                                        # Soft validation
+                                        if abs((new_shipped + new_remaining) - total_val) > 1e-6:
+                                            st.warning("Shipped + Remaining ≠ Total. Remaining will be set to (Total − Shipped) on save.")
                 
                                         # Update underlying JSON
                                         try:
+                                            
                                             # Update raw_ro structure
                                             raw_ro[str(sel_ro)][str(sel_so)]["shipped"] = new_shipped
                                             raw_ro[str(sel_ro)][str(sel_so)]["remaining"] = fixed_remaining
@@ -8007,6 +8009,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

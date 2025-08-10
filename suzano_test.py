@@ -4905,7 +4905,7 @@ if authentication_status:
                                         # format & order
                                         log_df["date"] = pd.to_datetime(log_df["date"])
                                         log_df = log_df.sort_values("date", ascending=False)
-                                        st.write("so far")
+                                        
                             
                                         # Pretty delta column
                                         def fmt_arrow(x):
@@ -4914,6 +4914,7 @@ if authentication_status:
                                             return "—"
                             
                                         log_df["Δ shipped"] = log_df["delta_shipped"].apply(fmt_arrow)
+                                        st.write("so far")
                             
                                         display_cols = ["date","user","ro","sales_order","reason","prev_shipped","new_shipped","Δ shipped"]
                                         st.dataframe(log_df[display_cols], use_container_width=True, height=320)
@@ -8093,6 +8094,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

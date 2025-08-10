@@ -4731,6 +4731,15 @@ if authentication_status:
                 
                     # --- EDITOR (right column) ---
                     with col_edit:
+                        def safe_download_json(bucket, path, default):
+                            try:
+                                raw = gcp_download(bucket, path)
+                                if not raw:
+                                    return default
+                                return json.loads(raw)
+                            except Exception:
+                                # file missing or invalid JSON → start fresh
+                                return default
                         st.markdown("### Edit Release Order Numbers")
                 
                         # Only allow editing rows that are actually displayed (exclude the summary row)
@@ -4772,8 +4781,7 @@ if authentication_status:
                                 if enable_edit:
 
                                     try:
-                                        ro_log_raw = gcp_download(target_bucket, rf"release_orders/ro_log.json")
-                                        ro_log = json.loads(ro_log_raw) if ro_log_raw else []
+                                        ro_log = safe_download_json(target_bucket, r"release_orders/ro_log.json", default=[])
                                         if not isinstance(ro_log, list):
                                             ro_log = []
                                     except Exception:
@@ -4893,42 +4901,34 @@ if authentication_status:
                             st.markdown("---")
                             if st.checkbox("Show Edit Log"):
                                 try:
-                                    ro_log_raw = gcp_download(target_bucket, rf"release_orders/ro_log.json")
-                                    ro_log = json.loads(ro_log_raw) if ro_log_raw else []
-                            
-                                    # Normalize: ensure list
-                                    if isinstance(ro_log, dict):
-                                        ro_log = [ro_log]
-                            
-                                    if ro_log:
+                                    ro_log = safe_download_json(target_bucket, r"release_orders/ro_log.json", default=[])
+                                    if not ro_log:
+                                        st.info("No log entries found yet.")
+                                    else:
                                         log_df = pd.DataFrame(ro_log)
                             
-                                        # Optional: filter to current selection
+                                        # optional filter
                                         filter_current = st.checkbox("Filter to selected RO/SO", value=False)
                                         if filter_current and 'sel_ro' in locals() and 'sel_so' in locals():
                                             log_df = log_df[(log_df.get("ro","").astype(str) == str(sel_ro)) &
                                                             (log_df.get("sales_order","").astype(str) == str(sel_so))]
                             
-                                        # Parse/clean date
+                                        # clean types
                                         if "date" in log_df.columns:
                                             log_df["date"] = pd.to_datetime(log_df["date"], errors="coerce")
-                            
-                                        # Ensure numeric types
-                                        for c in ["prev_shipped", "new_shipped", "delta_shipped"]:
+                                        for c in ["prev_shipped","new_shipped","delta_shipped"]:
                                             if c in log_df.columns:
                                                 log_df[c] = pd.to_numeric(log_df[c], errors="coerce")
                             
-                                        # Backfill delta_shipped if missing
+                                        # backfill delta if missing
                                         if "delta_shipped" not in log_df.columns:
                                             log_df["delta_shipped"] = np.nan
                                         if "prev_shipped" in log_df.columns and "new_shipped" in log_df.columns:
-                                            # only fill where delta is NaN and both prev/new exist
                                             mask = log_df["delta_shipped"].isna()
                                             log_df.loc[mask, "delta_shipped"] = (
                                                 log_df.loc[mask, "new_shipped"] - log_df.loc[mask, "prev_shipped"]
                                             )
                             
-                                        # Pretty delta without destroying numeric column
                                         def fmt_arrow(x):
                                             if pd.isna(x): return "—"
                                             x = float(x)
@@ -4937,19 +4937,14 @@ if authentication_status:
                                             return "—"
                             
                                         log_df["Δ shipped"] = log_df["delta_shipped"].apply(fmt_arrow)
-                            
-                                        # Sort newest first if date exists
                                         if "date" in log_df.columns:
                                             log_df = log_df.sort_values("date", ascending=False)
                             
-                                        # Choose display columns that actually exist
                                         display_cols = [c for c in ["date","user","ro","sales_order","reason",
                                                                     "prev_shipped","new_shipped","Δ shipped"]
                                                         if c in log_df.columns]
-                            
                                         st.dataframe(log_df[display_cols], use_container_width=True, height=320)
-                                    else:
-                                        st.info("No log entries found.")
+                            
                                 except Exception as e:
                                     st.error(f"Could not load log: {e}")
                                     
@@ -8124,6 +8119,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

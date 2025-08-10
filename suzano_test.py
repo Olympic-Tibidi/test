@@ -4832,13 +4832,12 @@ if authentication_status:
                                         reason = st.text_area("Reason for change", value="", placeholder="Explain why you're updating the numbers",key="inp_reason")
 
                                         submitted = st.form_submit_button(
-                                                "Save Changes", use_container_width=True,
-                                                disabled=(not user_name.strip() or not reason.strip())
-                                            )
+                                                "Save Changes", use_container_width=True)
                     
                                         if submitted:
                                             if user_name.strip() == "" or reason.strip() == "":
-                                                st.info("Enter your name/initials and a reason before saving.")
+                                                st.error("Please enter your name/initials and a reason before saving.")
+                                                st.stop()
                                             else:
                                                 
                                                 # Reconcile: enforce Remaining = Total − Shipped (and clamp at 0)
@@ -8123,6 +8122,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

@@ -4874,6 +4874,23 @@ if authentication_status:
                                                 st.rerun()
                                             except Exception as e:
                                                 st.error(f"Failed to save changes: {e}")
+                                    # --- LOG VIEWER ---
+                            st.markdown("---")
+                            if st.checkbox("Show Edit Log"):
+                                try:
+                                    ro_log_raw = gcp_download(target_bucket, rf"release_orders/ro_log.json")
+                                    ro_log = json.loads(ro_log_raw) if ro_log_raw else []
+                                    if ro_log:
+                                        log_df = pd.DataFrame(ro_log)
+                                        # Make date the index for cleaner view
+                                        log_df["date"] = pd.to_datetime(log_df["date"])
+                                        log_df = log_df.sort_values("date", ascending=False)
+                                        st.dataframe(log_df, use_container_width=True, height=300)
+                                    else:
+                                        st.info("No log entries found.")
+                                except Exception as e:
+                                    st.error(f"Could not load log: {e}")
+                                    
                     
                     
                     duration=st.toggle("Duration Report")
@@ -8045,6 +8062,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

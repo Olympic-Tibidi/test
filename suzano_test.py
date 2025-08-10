@@ -4779,123 +4779,124 @@ if authentication_status:
                                 enable_edit = st.checkbox("EDIT RELEASE ORDER NUMBERS", value=False)
                 
                                 if enable_edit:
+                                    with st.form("ro_edit_form", clear_on_submit=False):
 
-                                    try:
-                                        ro_log = safe_download_json(target_bucket, r"release_orders/ro_log.json", default=[])
-                                        if not isinstance(ro_log, list):
+                                        try:
+                                            ro_log = safe_download_json(target_bucket, r"release_orders/ro_log.json", default=[])
+                                            if not isinstance(ro_log, list):
+                                                ro_log = []
+                                        except Exception:
                                             ro_log = []
-                                    except Exception:
-                                        ro_log = []
-                                    # Build human-friendly labels but keep (RO, SO) as the actual value
-                                    options = [
-                                        (r["RO"], r["SO"]) for _, r in edit_df.iterrows()
-                                    ]
-                                    labels = [
-                                        f"RO {r['RO']} | SO {r['SO']} → {r['Dest']}"
-                                        for _, r in edit_df.iterrows()
-                                    ]
-                                    # Map index to label/value
-                                    label_to_value = {labels[i]: options[i] for i in range(len(labels))}
-                                    choice_label = st.selectbox("Select Release Order / Sales Order", labels, index=0)
-                                    sel_ro, sel_so = label_to_value[choice_label]
-                
-                                    # Current values for the selection
-                                    current = edit_df[(edit_df["RO"] == sel_ro) & (edit_df["SO"] == sel_so)].iloc[0]
-                                    total_val = float(current["Total"])
-                                    shipped_val = float(current["Shipped"])
-                                    remaining_val = float(current["Remaining"])
-                
-                                    st.caption(f"Total (read-only): **{total_val:,.0f}**")
-                
-                                    new_shipped = st.number_input(
-                                        "Shipped",
-                                        min_value=0.0,
-                                        max_value=float(total_val),
-                                        value=float(shipped_val),
-                                        step=1.0,
-                                        help="Must be ≤ Total"
-                                    )
-                
-                                    # User can edit Remaining, but we'll reconcile on save
-                                    new_remaining = st.number_input(
-                                        "Remaining",
-                                        min_value=0.0,
-                                        max_value=float(total_val),
-                                        value=float(remaining_val),
-                                        step=1.0,
-                                        help="Should equal Total − Shipped; adjusted on save if not."
-                                    )
-
-                                    # NEW: user + reason for logging
-                                    user_name = st.text_input("Your name/initials (for log)", value="", placeholder="e.g., AY")
-                                    reason = st.text_area("Reason for change", value="", placeholder="Explain why you're updating the numbers")
-                
-                                    
-                
-                                    if st.button("Save Changes", type="primary", use_container_width=True):
-                                        if user_name.strip() == "" or reason.strip() == "":
-                                            st.info("Enter your name/initials and a reason before saving.")
-                                        else:
-                                            
-                                            # Reconcile: enforce Remaining = Total − Shipped (and clamp at 0)
-                                            new_shipped = float(new_shipped)
-                                            fixed_remaining = max(0.0, float(total_val) - new_shipped)
-                                            # Soft validation
-                                            if abs((new_shipped + new_remaining) - total_val) > 1e-6:
-                                                st.warning("Shipped + Remaining ≠ Total. Remaining will be set to (Total − Shipped) on save.")
-
-                                            try:
-                                                # --- capture old values BEFORE update ---
-                                                old_shipped = float(raw_ro[str(sel_ro)][str(sel_so)]["shipped"])
-                                                delta_shipped = new_shipped - old_shipped
-                                            except:
-                                                pass
+                                        # Build human-friendly labels but keep (RO, SO) as the actual value
+                                        options = [
+                                            (r["RO"], r["SO"]) for _, r in edit_df.iterrows()
+                                        ]
+                                        labels = [
+                                            f"RO {r['RO']} | SO {r['SO']} → {r['Dest']}"
+                                            for _, r in edit_df.iterrows()
+                                        ]
+                                        # Map index to label/value
+                                        label_to_value = {labels[i]: options[i] for i in range(len(labels))}
+                                        choice_label = st.selectbox("Select Release Order / Sales Order", labels, index=0)
+                                        sel_ro, sel_so = label_to_value[choice_label]
                     
-                                            # Update underlying JSON
-                                            try:
-                                                
-                                                # Update raw_ro structure
-                                                raw_ro[str(sel_ro)][str(sel_so)]["shipped"] = new_shipped
-                                                raw_ro[str(sel_ro)][str(sel_so)]["remaining"] = fixed_remaining
+                                        # Current values for the selection
+                                        current = edit_df[(edit_df["RO"] == sel_ro) & (edit_df["SO"] == sel_so)].iloc[0]
+                                        total_val = float(current["Total"])
+                                        shipped_val = float(current["Shipped"])
+                                        remaining_val = float(current["Remaining"])
                     
-                                                # Upload back to GCS
-                                                storage_client = get_storage_client()
-                                                bucket = storage_client.bucket(target_bucket)
-                                                blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
-                                                blob.upload_from_string(json.dumps(raw_ro))
+                                        st.caption(f"Total (read-only): **{total_val:,.0f}**")
+                    
+                                        new_shipped = st.number_input(
+                                            "Shipped",
+                                            min_value=0.0,
+                                            max_value=float(total_val),
+                                            value=float(shipped_val),
+                                            step=1.0,
+                                            help="Must be ≤ Total"
+                                        )
+                    
+                                        # User can edit Remaining, but we'll reconcile on save
+                                        new_remaining = st.number_input(
+                                            "Remaining",
+                                            min_value=0.0,
+                                            max_value=float(total_val),
+                                            value=float(remaining_val),
+                                            step=1.0,
+                                            help="Should equal Total − Shipped; adjusted on save if not."
+                                        )
+    
+                                        # NEW: user + reason for logging
+                                        user_name = st.text_input("Your name/initials (for log)", value="", placeholder="e.g., AY")
+                                        reason = st.text_area("Reason for change", value="", placeholder="Explain why you're updating the numbers")
+                    
+                                        
+                    
+                                        if st.button("Save Changes", type="primary", use_container_width=True):
+                                            if user_name.strip() == "" or reason.strip() == "":
+                                                st.info("Enter your name/initials and a reason before saving.")
+                                            else:
                                                 
-                                               
+                                                # Reconcile: enforce Remaining = Total − Shipped (and clamp at 0)
+                                                new_shipped = float(new_shipped)
+                                                fixed_remaining = max(0.0, float(total_val) - new_shipped)
+                                                # Soft validation
+                                                if abs((new_shipped + new_remaining) - total_val) > 1e-6:
+                                                    st.warning("Shipped + Remaining ≠ Total. Remaining will be set to (Total − Shipped) on save.")
+    
                                                 try:
-                                                    from zoneinfo import ZoneInfo  # Py3.9+
-                                                    _tz = ZoneInfo("America/Los_Angeles")
-                                                except Exception:
-                                                    import pytz
-                                                    _tz = pytz.timezone("America/Los_Angeles")
-                                                
-                                                log_entry = {
-                                                    "date": datetime.datetime.now(_tz).isoformat(timespec="seconds"),
-                                                    "user": user_name.strip(),
-                                                    "ro": str(sel_ro),
-                                                    "sales_order": str(sel_so),
-                                                    "prev_shipped": old_shipped,
-                                                    "new_shipped": new_shipped,
-                                                    "delta_shipped": delta_shipped,
-                                                    "reason": reason.strip()
-                                                }
-                                                ro_log.append(log_entry)
+                                                    # --- capture old values BEFORE update ---
+                                                    old_shipped = float(raw_ro[str(sel_ro)][str(sel_so)]["shipped"])
+                                                    delta_shipped = new_shipped - old_shipped
+                                                except:
+                                                    pass
                         
-                                                storage_client = get_storage_client()
-                                                bucket = storage_client.bucket(target_bucket)
-                                                blob = bucket.blob(rf"release_orders/ro_log.json")
-                                                blob.upload_from_string(json.dumps(ro_log))
-                                                st.success(
-                                                    f"Saved: RO {sel_ro} / SO {sel_so} — "
-                                                    f"Shipped {old_shipped:,.0f} → {new_shipped:,.0f} (Δ {delta_shipped:+,.0f}). "
-                                                    f"Remaining={fixed_remaining:,.0f}. Log updated."
-                                                )
-                                                st.rerun()
-                                            except Exception as e:
-                                                st.error(f"Failed to save changes: {e}")
+                                                # Update underlying JSON
+                                                try:
+                                                    
+                                                    # Update raw_ro structure
+                                                    raw_ro[str(sel_ro)][str(sel_so)]["shipped"] = new_shipped
+                                                    raw_ro[str(sel_ro)][str(sel_so)]["remaining"] = fixed_remaining
+                        
+                                                    # Upload back to GCS
+                                                    storage_client = get_storage_client()
+                                                    bucket = storage_client.bucket(target_bucket)
+                                                    blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
+                                                    blob.upload_from_string(json.dumps(raw_ro))
+                                                    
+                                                   
+                                                    try:
+                                                        from zoneinfo import ZoneInfo  # Py3.9+
+                                                        _tz = ZoneInfo("America/Los_Angeles")
+                                                    except Exception:
+                                                        import pytz
+                                                        _tz = pytz.timezone("America/Los_Angeles")
+                                                    
+                                                    log_entry = {
+                                                        "date": datetime.datetime.now(_tz).isoformat(timespec="seconds"),
+                                                        "user": user_name.strip(),
+                                                        "ro": str(sel_ro),
+                                                        "sales_order": str(sel_so),
+                                                        "prev_shipped": old_shipped,
+                                                        "new_shipped": new_shipped,
+                                                        "delta_shipped": delta_shipped,
+                                                        "reason": reason.strip()
+                                                    }
+                                                    ro_log.append(log_entry)
+                            
+                                                    storage_client = get_storage_client()
+                                                    bucket = storage_client.bucket(target_bucket)
+                                                    blob = bucket.blob(rf"release_orders/ro_log.json")
+                                                    blob.upload_from_string(json.dumps(ro_log))
+                                                    st.success(
+                                                        f"Saved: RO {sel_ro} / SO {sel_so} — "
+                                                        f"Shipped {old_shipped:,.0f} → {new_shipped:,.0f} (Δ {delta_shipped:+,.0f}). "
+                                                        f"Remaining={fixed_remaining:,.0f}. Log updated."
+                                                    )
+                                                    st.rerun()
+                                                except Exception as e:
+                                                    st.error(f"Failed to save changes: {e}")
                                     # --- LOG VIEWER ---
                             # --- LOG VIEWER ---
                             st.markdown("---")
@@ -8119,6 +8120,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

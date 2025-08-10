@@ -4895,28 +4895,58 @@ if authentication_status:
                                 try:
                                     ro_log_raw = gcp_download(target_bucket, rf"release_orders/ro_log.json")
                                     ro_log = json.loads(ro_log_raw) if ro_log_raw else []
+                            
+                                    # Normalize: ensure list
+                                    if isinstance(ro_log, dict):
+                                        ro_log = [ro_log]
+                            
                                     if ro_log:
                                         log_df = pd.DataFrame(ro_log)
-                                        # optional: filter to current selection
+                            
+                                        # Optional: filter to current selection
                                         filter_current = st.checkbox("Filter to selected RO/SO", value=False)
                                         if filter_current and 'sel_ro' in locals() and 'sel_so' in locals():
-                                            log_df = log_df[(log_df["ro"] == str(sel_ro)) & (log_df["sales_order"] == str(sel_so))]
+                                            log_df = log_df[(log_df.get("ro","").astype(str) == str(sel_ro)) &
+                                                            (log_df.get("sales_order","").astype(str) == str(sel_so))]
                             
-                                        # format & order
-                                        log_df["date"] = pd.to_datetime(log_df["date"])
-                                        log_df = log_df.sort_values("date", ascending=False)
-                                        
+                                        # Parse/clean date
+                                        if "date" in log_df.columns:
+                                            log_df["date"] = pd.to_datetime(log_df["date"], errors="coerce")
                             
-                                        # Pretty delta column
+                                        # Ensure numeric types
+                                        for c in ["prev_shipped", "new_shipped", "delta_shipped"]:
+                                            if c in log_df.columns:
+                                                log_df[c] = pd.to_numeric(log_df[c], errors="coerce")
+                            
+                                        # Backfill delta_shipped if missing
+                                        if "delta_shipped" not in log_df.columns:
+                                            log_df["delta_shipped"] = np.nan
+                                        if "prev_shipped" in log_df.columns and "new_shipped" in log_df.columns:
+                                            # only fill where delta is NaN and both prev/new exist
+                                            mask = log_df["delta_shipped"].isna()
+                                            log_df.loc[mask, "delta_shipped"] = (
+                                                log_df.loc[mask, "new_shipped"] - log_df.loc[mask, "prev_shipped"]
+                                            )
+                            
+                                        # Pretty delta without destroying numeric column
                                         def fmt_arrow(x):
+                                            if pd.isna(x): return "—"
+                                            x = float(x)
                                             if x > 0:  return f"↑ {x:,.0f}"
                                             if x < 0:  return f"↓ {abs(x):,.0f}"
                                             return "—"
                             
-                                        log_df["delta_shipped"] = log_df["delta_shipped"].apply(fmt_arrow)
-                                        st.write("so far")
+                                        log_df["Δ shipped"] = log_df["delta_shipped"].apply(fmt_arrow)
                             
-                                        display_cols = ["date","user","ro","sales_order","reason","prev_shipped","new_shipped","delta_shipped"]
+                                        # Sort newest first if date exists
+                                        if "date" in log_df.columns:
+                                            log_df = log_df.sort_values("date", ascending=False)
+                            
+                                        # Choose display columns that actually exist
+                                        display_cols = [c for c in ["date","user","ro","sales_order","reason",
+                                                                    "prev_shipped","new_shipped","Δ shipped"]
+                                                        if c in log_df.columns]
+                            
                                         st.dataframe(log_df[display_cols], use_container_width=True, height=320)
                                     else:
                                         st.info("No log entries found.")
@@ -8094,6 +8124,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 

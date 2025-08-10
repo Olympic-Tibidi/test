@@ -4770,6 +4770,14 @@ if authentication_status:
                                 enable_edit = st.checkbox("EDIT RELEASE ORDER NUMBERS", value=False)
                 
                                 if enable_edit:
+
+                                    try:
+                                        ro_log_raw = gcp_download(target_bucket, rf"release_orders/ro_log.json")
+                                        ro_log = json.loads(ro_log_raw) if ro_log_raw else []
+                                        if not isinstance(ro_log, list):
+                                            ro_log = []
+                                    except Exception:
+                                        ro_log = []
                                     # Build human-friendly labels but keep (RO, SO) as the actual value
                                     options = [
                                         (r["RO"], r["SO"]) for _, r in edit_df.iterrows()
@@ -4809,35 +4817,57 @@ if authentication_status:
                                         step=1.0,
                                         help="Should equal Total − Shipped; adjusted on save if not."
                                     )
+
+                                    # NEW: user + reason for logging
+                                    user_name = st.text_input("Your name/initials (for log)", value="", placeholder="e.g., AY")
+                                    reason = st.text_area("Reason for change", value="", placeholder="Explain why you're updating the numbers")
                 
                                     
                 
                                     if st.button("Save Changes", type="primary", use_container_width=True):
-                                        # Reconcile: enforce Remaining = Total − Shipped (and clamp at 0)
-                                        new_shipped = float(new_shipped)
-                                        fixed_remaining = max(0.0, float(total_val) - new_shipped)
-                                        # Soft validation
-                                        if abs((new_shipped + new_remaining) - total_val) > 1e-6:
-                                            st.warning("Shipped + Remaining ≠ Total. Remaining will be set to (Total − Shipped) on save.")
-                
-                                        # Update underlying JSON
-                                        try:
+                                        if user_name.strip() == "" or reason.strip() == "":
+                                            st.info("Enter your name/initials and a reason before saving.")
+                                        else:
                                             
-                                            # Update raw_ro structure
-                                            raw_ro[str(sel_ro)][str(sel_so)]["shipped"] = new_shipped
-                                            raw_ro[str(sel_ro)][str(sel_so)]["remaining"] = fixed_remaining
-                
-                                            # Upload back to GCS
-                                            storage_client = get_storage_client()
-                                            bucket = storage_client.bucket(target_bucket)
-                                            blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
-                                            blob.upload_from_string(json.dumps(raw_ro))
-                                            
-                
-                                            st.success(f"Saved: RO {sel_ro} / SO {sel_so} — Shipped={new_shipped:,.0f}, Remaining={fixed_remaining:,.0f}")
-                                            st.rerun()
-                                        except Exception as e:
-                                            st.error(f"Failed to save changes: {e}")
+                                            # Reconcile: enforce Remaining = Total − Shipped (and clamp at 0)
+                                            new_shipped = float(new_shipped)
+                                            fixed_remaining = max(0.0, float(total_val) - new_shipped)
+                                            # Soft validation
+                                            if abs((new_shipped + new_remaining) - total_val) > 1e-6:
+                                                st.warning("Shipped + Remaining ≠ Total. Remaining will be set to (Total − Shipped) on save.")
+                    
+                                            # Update underlying JSON
+                                            try:
+                                                
+                                                # Update raw_ro structure
+                                                raw_ro[str(sel_ro)][str(sel_so)]["shipped"] = new_shipped
+                                                raw_ro[str(sel_ro)][str(sel_so)]["remaining"] = fixed_remaining
+                    
+                                                # Upload back to GCS
+                                                storage_client = get_storage_client()
+                                                bucket = storage_client.bucket(target_bucket)
+                                                blob = bucket.blob(rf"release_orders/RELEASE_ORDERS.json")
+                                                blob.upload_from_string(json.dumps(raw_ro))
+                                                
+                    
+                                                
+                                                log_entry = {
+                                                    "date": datetime.now(_tz).isoformat(timespec="seconds"),
+                                                    "user": user_name.strip(),
+                                                    "ro": str(sel_ro),
+                                                    "sales_order": str(sel_so),
+                                                    "reason": reason.strip()
+                                                }
+                                                ro_log.append(log_entry)
+                        
+                                                storage_client = get_storage_client()
+                                                bucket = storage_client.bucket(target_bucket)
+                                                blob = bucket.blob(rf"release_orders/ro_log.json")
+                                                blob.upload_from_string(json.dumps(ro_log))
+                                                st.success(f"Saved: RO {sel_ro} / SO {sel_so} — Shipped={new_shipped:,.0f}, Remaining={fixed_remaining:,.0f}")
+                                                st.rerun()
+                                            except Exception as e:
+                                                st.error(f"Failed to save changes: {e}")
                     
                     
                     duration=st.toggle("Duration Report")
@@ -8009,6 +8039,7 @@ elif authentication_status == None:
     
         
      
+
 
 
 
